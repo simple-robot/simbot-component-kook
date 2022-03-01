@@ -62,13 +62,12 @@ public sealed class KaiheilaApiResult<T> {
          * 列表返回数据。其中，[Data.items] 代表真正的列表元素。
          */
         override val data: Data<T>
-    ) : KaiheilaApiResult<List.Data<T>>() {
+    ) : KaiheilaApiResult<Data<T>>() {
 
         /**
          * 作为列表返回数据类型时候的 [KaiheilaApiResult.data] 数据格式。
          *
          * @param IT 数据元素的类型。
-         * @param S sort信息类型。如果不存在sort，可以考虑使用一些object代替，例如 [Unit].
          */
         @Serializable
         public data class Data<IT>(
