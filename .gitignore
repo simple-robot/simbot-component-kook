@@ -10,7 +10,8 @@
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
-
+dokka
+dokka/**
 # Package Files #
 *.jar
 *.war
