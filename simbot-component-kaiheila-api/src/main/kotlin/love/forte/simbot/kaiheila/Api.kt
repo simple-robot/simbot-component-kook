@@ -1,6 +1,7 @@
 package love.forte.simbot.kaiheila
 
 import io.ktor.http.*
+import love.forte.simbot.kaiheila.util.*
 
 /**
  * 部分当前开黑啦api的信息常量，例如api版本信息。
@@ -25,39 +26,36 @@ public object KaiheilaApi {
     public const val HOST: String = "www.kaiheila.cn"
 
     /**
-     * 得到一个开黑啦API下的BaseUrl, 也就相当于 `https://HOST/api`.
-     *
-     *
+     * 得到一个开黑啦API下的BaseUrl, 相当于 `"https://$HOST/api/v$VERSION"`.
      */
-    public val baseUrl: Url = buildUrl {
-        protocol = URLProtocol.HTTPS
-        host = HOST
-        port = DEFAULT_PORT
-        path("api")
-    }
+    public val baseUrl: Url = buildApiUrl()
+
+    /**
+     * 得到一个开黑啦API下的BaseUrl, 但是不携带版本信息。 相当于 `"https://$HOST/api"`.
+     */
+    public val baseUrlWithoutVersion: Url = buildApiUrl(withVersion = false)
 
     /**
      * 通过参数构建器 [parameterBuilder] 和 [paths] 构建一个开黑啦api的标准 [Url] 实例。
+     * @param paths api路径的 `/api/vn` 后的真正api路径。
+     * @param withVersion 是否携带 `/api/` 后面的版本信息。
+     * @param parameterBuilder 可以构建参数。
      */
     public inline fun buildApiUrl(
         vararg paths: String,
+        withVersion: Boolean = true,
         parameterBuilder: ParametersBuilder.() -> Unit = {},
     ): Url {
+        val pathPrefix = if(withVersion) "/api/v$VERSION/" else "/api/"
         return buildUrl {
             protocol = URLProtocol.HTTPS
             host = HOST
             port = DEFAULT_PORT
             parameters.parameterBuilder()
-            encodedPath = paths.joinToString("/", prefix = "/api/") { it.encodeURLPath() }
+            encodedPath = paths.joinToString("/", prefix = pathPrefix) { it.encodeURLPath() }
         }
     }
 
 }
 
-/**
- * 通过 [URLBuilder] lambda 构建 [Url] 实例。
- */
-public inline fun buildUrl(builder: URLBuilder.() -> Unit): Url {
-    return URLBuilder().apply(builder).build()
-}
 

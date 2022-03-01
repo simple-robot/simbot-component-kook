@@ -12,7 +12,7 @@ class KaiheilaApiTest {
      * @see KaiheilaApi.buildApiUrl
      */
     @Test
-    fun urlTest() {
+    fun urlBuildTest() {
         val name = "forte"
         val age = 24
         val url = KaiheilaApi.buildApiUrl("user", "foo") {
@@ -20,9 +20,14 @@ class KaiheilaApiTest {
             append("age", age.toString())
         }
 
-        assert(url.encodedPath == "/api/user/foo")
-        assert(url.fullPath == "/api/user/foo?name=$name&age=$age")
-        assert(url.toString() == "https://${KaiheilaApi.HOST}/api/user/foo?name=$name&age=$age")
+        val version = "v${KaiheilaApi.VERSION}"
+
+        assert(url.encodedPath == "/api/$version/user/foo")
+        assert(url.fullPath == "/api/$version/user/foo?name=$name&age=$age")
+        assert(url.toString() == "https://${KaiheilaApi.HOST}/api/$version/user/foo?name=$name&age=$age")
+
+        println(KaiheilaApi.baseUrl)
+        println(KaiheilaApi.baseUrlWithoutVersion)
     }
 
 }
