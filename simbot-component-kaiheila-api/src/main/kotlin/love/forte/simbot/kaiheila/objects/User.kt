@@ -16,7 +16,9 @@ package love.forte.simbot.kaiheila.objects
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
+import love.forte.simbot.LoggerFactory
 import love.forte.simbot.definition.*
+import org.slf4j.*
 
 
 /**
@@ -143,10 +145,13 @@ public data class UserImpl(
 ) : User {
     init {
         if (!(status == 0 || status == 10)) {
-            // TODO
-            //  logger.warn("Parameter status must be 0(normal) or 10(banned), but {}", status)
+            logger.warn("Parameter 'status' must be 0(normal) or 10(banned), but {}", status)
+            // check(status == 0 || status == 10) { "Parameter status must be 0(normal) or 10(banned), but $status" }
         }
-        // check(status == 0 || status == 10) { "Parameter status must be 0(normal) or 10(banned), but $status" }
+    }
+
+    public companion object {
+        private val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.objects.User")
     }
 }
 

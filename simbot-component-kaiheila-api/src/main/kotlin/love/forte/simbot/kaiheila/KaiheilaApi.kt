@@ -36,6 +36,12 @@ public object KaiheilaApi {
     public val baseUrlWithoutVersion: Url = buildApiUrl(withVersion = false)
 
     /**
+     * 得到一个完整的路径前置。
+     */
+    public fun pathPrefix(withVersion: Boolean): String = if(withVersion) "/api/v$VERSION/" else "/api/"
+
+
+    /**
      * 通过参数构建器 [parameterBuilder] 和 [paths] 构建一个开黑啦api的标准 [Url] 实例。
      * @param paths api路径的 `/api/vn` 后的真正api路径。
      * @param withVersion 是否携带 `/api/` 后面的版本信息。
@@ -46,13 +52,32 @@ public object KaiheilaApi {
         withVersion: Boolean = true,
         parameterBuilder: ParametersBuilder.() -> Unit = {},
     ): Url {
-        val pathPrefix = if(withVersion) "/api/v$VERSION/" else "/api/"
         return buildUrl {
             protocol = URLProtocol.HTTPS
             host = HOST
             port = DEFAULT_PORT
             parameters.parameterBuilder()
-            encodedPath = paths.joinToString("/", prefix = pathPrefix) { it.encodeURLPath() }
+            encodedPath = paths.joinToString("/", prefix = pathPrefix(withVersion)) { it.encodeURLPath() }
+        }
+    }
+
+    /**
+     * 通过参数构建器 [parameterBuilder] 和 [paths] 构建一个开黑啦api的标准 [Url] 实例。
+     * @param paths api路径的 `/api/vn` 后的真正api路径。
+     * @param withVersion 是否携带 `/api/` 后面的版本信息。
+     * @param parameterBuilder 可以构建参数。
+     */
+    public inline fun buildApiUrl(
+        paths: List<String>,
+        withVersion: Boolean = true,
+        parameterBuilder: ParametersBuilder.() -> Unit = {},
+    ): Url {
+        return buildUrl {
+            protocol = URLProtocol.HTTPS
+            host = HOST
+            port = DEFAULT_PORT
+            parameters.parameterBuilder()
+            encodedPath = paths.joinToString("/", prefix = pathPrefix(withVersion)) { it.encodeURLPath() }
         }
     }
 

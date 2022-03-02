@@ -1,7 +1,7 @@
 package love.forte.simbot.kaiheila.api
 
 import kotlinx.serialization.*
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult.List.Data
+import kotlinx.serialization.json.*
 
 
 /**
@@ -10,100 +10,148 @@ import love.forte.simbot.kaiheila.api.KaiheilaApiResult.List.Data
  *
  * 参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
  *
- * 响应值类型无外乎三种形式：[列表][KaiheilaApiResult.List]、[对象][KaiheilaApiResult.Obj]、[空][KaiheilaApiResult.Empty]。
+ * 响应值类型无外乎三种形式：列表、对象、空。
+ *
+ * ```json
+ *{
+ *    "code" : 0, // integer, 错误码，0代表成功，非0代表失败，具体的错误码参见错误码一览
+ *    "message" : "error info", // string, 错误消息，具体的返回消息会根据Accept-Language来返回。
+ *    "data" : [], // mixed, 具体的数据。
+ *}
+ * ```
+ *
+ *
+ * 当返回数据为对象时，使用 [KaiheilaApiRequest] 的预期结果即为目标结果。
+ *
+ * 当返回数据为空时，使用 [KaiheilaApiRequest] 的预期结果考虑使用不变常量，例如 [Unit].
+ *
+ * 当返回数据为列表时，使用 [KaiheilaApiRequest] 的预期结果考虑使用 [KaiheilaApiResult.ListData].
  *
  * @author ForteScarlet
  */
-@SerialName("khl.result")
-@Serializable
-public sealed class KaiheilaApiResult<T> {
-    public companion object {
-        /**
-         * 代表成功的错误码。
-         */
-        public const val SUCCESS_CODE: Int = 0
-    }
-
+public object KaiheilaApiResult {
     /**
-     * 错误码，0代表成功，非0代表失败。
+     * 代表成功的 '错误码'。
      */
-    public abstract val code: Int
+    public const val SUCCESS_CODE: Int = 0
 
     /**
+     * 响应体中作为 `code` 的属性名, Int类型。
+     *
+     * 错误码，0代表成功，非0代表失败。
+     *
+     * @see SUCCESS_CODE
+     */
+    public const val CODE_PROPERTY_NAME: String = "code"
+
+    /**
+     * 响应体中作为 `message` 的属性名。
+     *
      * 错误消息，具体的返回消息会根据Accept-Language来返回。
      */
-    public abstract val message: String
+    public const val MESSAGE_PROPERTY_NAME: String = "message"
+
 
     /**
-     * 具体的数据。
+     * 响应体中作为 `data` 的属性名。
      */
-    public abstract val data: T
+    public const val DATA_PROPERTY_NAME: String = "data"
+
 
     /**
-     * [data] 为对象格式的响应值。
+     * 当响应体中的 `data` 为列表类型时，其有特殊的数据格式:
+     * ```json
+     * {
+     *      "items": [...],
+     *      "meta": {
+     *          "page": 1,
+     *          "page_total": 10,
+     *          "page_size": 50,
+     *          "total": 480
+     *      },
+     *      "sort": { "id": 2 }
+     * }
+     * ```
+     *@param T 数据元素的类型。
      */
-    @SerialName("khl.result.obj")
     @Serializable
-    public data class Obj<T>(
-        override val code: Int,
-        override val message: String,
-        override val data: T
-    ) : KaiheilaApiResult<T>()
+    public data class ListData<T>(
+        public val items: List<T> = emptyList(),
+        public val meta: ListMeta,
+        public val sort: Map<String, Int> = emptyMap()
+    ) : Iterable<T> by items
 
     /**
-     * [data] 为列表格式的响应值。
+     * 当返回值为列表时的分页响应元数据。
      */
-    @SerialName("khl.result.list")
     @Serializable
-    public data class List<T>(
-        override val code: Int,
-        override val message: String,
-        /**
-         * 列表返回数据。其中，[Data.items] 代表真正的列表元素。
-         */
-        override val data: Data<T>
-    ) : KaiheilaApiResult<Data<T>>() {
+    public data class ListMeta(
+        val page: Int,
+        @SerialName("page_total")
+        val pageTotal: Int,
+        @SerialName("page_size")
+        val pageSize: Int,
+        val total: Int,
+    )
 
-        /**
-         * 作为列表返回数据类型时候的 [KaiheilaApiResult.data] 数据格式。
-         *
-         * @param IT 数据元素的类型。
-         */
-        @Serializable
-        public data class Data<IT>(
-            public val items: kotlin.collections.List<IT> = emptyList(),
-            public val meta: Meta,
-            public val sort: Map<String, Int> = emptyMap()
-        ) : Iterable<IT> by items
+}
 
-        /**
-         * 当返回值为列表时的分页响应元数据。
-         */
-        @Serializable
-        public data class Meta(
-            val page: Int,
-            @SerialName("page_total")
-            val pageTotal: Int,
-            @SerialName("page_size")
-            val pageSize: Int,
-            val total: Int,
-        )
+/**
+ * 对开黑啦Api标准响应数据的封装。
+ */
+@Suppress("MemberVisibilityCanBePrivate")
+@Serializable
+public class ApiResult(
+    public val code: Int,
+    public val message: String,
+    public val data: JsonElement
+) {
+
+    /**
+     * 提供解析参数来使用当前result中的data内容解析为目标结果。
+     * 不会有任何判断，
+     *
+     * @throws SerializationException see [Json.decodeFromJsonElement].
+     */
+    public fun <T> parseData(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
+        return json.decodeFromJsonElement(deserializationStrategy, data)
     }
 
     /**
-     * 结果为空的响应值。
+     * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KaiheilaApiResult.SUCCESS_CODE]), 则抛出 [KaiheilaApiException] 异常。
+     *
+     * @throws KaiheilaApiException 如果 [code] 不为成功
+     * @throws SerializationException see [Json.decodeFromJsonElement].
      */
-    @SerialName("khl.result.empty")
-    @Serializable
-    public data class Empty(override val code: Int, override val message: String) : KaiheilaApiResult<Unit>() {
-        override val data: Unit get() = Unit
+    public fun <T> parseDataOrThrow(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
+        if (code != KaiheilaApiResult.SUCCESS_CODE) {
+            throw KaiheilaApiException(code, message)
+        }
+        return parseData(json, deserializationStrategy)
+    }
+
+
+    override fun toString(): String = "ApiResult(code=$code, message=$message, data=$data)"
+
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ApiResult) return false
+
+        if (code != other.code) return false
+        if (message != other.message) return false
+        if (data != other.data) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = code
+        result = 31 * result + message.hashCode()
+        result = 31 * result + data.hashCode()
+        return result
     }
 
 
 }
 
-
-/**
- * 判断 [KaiheilaApiResult] 的错误码是否代表成功。
- */
-public inline val KaiheilaApiResult<*>.isSuccess: Boolean get() = code == KaiheilaApiResult.SUCCESS_CODE
