@@ -31,11 +31,12 @@ class ApiRequestTest {
             }}
         """.trimIndent()
 
-        val listData = json.decodeFromString(KaiheilaApiResult.List.serializer(User.serializer()), jsonStr)
-        assert(listData.data.items.size == 2)
-        assert(listData.isSuccess)
-        assert(listData.data.meta == KaiheilaApiResult.List.Meta(1, 1, 10, 2))
-        assert(listData.data.sort["name"] == 1)
+        val listDataResult = json.decodeFromString(ApiResult.serializer(), jsonStr)
+        val listData = listDataResult.parseDataOrThrow(json, KaiheilaApiResult.ListData.serializer(User.serializer()))
+        assert(listData.items.size == 2)
+        assert(listDataResult.isSuccess)
+        assert(listData.meta == KaiheilaApiResult.ListMeta(1, 1, 10, 2))
+        assert(listData.sort["name"] == 1)
     }
 
 }

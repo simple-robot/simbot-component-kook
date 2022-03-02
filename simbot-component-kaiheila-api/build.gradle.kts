@@ -1,5 +1,3 @@
-import util.*
-
 /*
  *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *

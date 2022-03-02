@@ -18,7 +18,6 @@ package love.forte.simbot.kaiheila.objects
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.kaiheila.objects.impl.*
 
 
@@ -74,8 +73,6 @@ public interface Role : KhlObjects, Comparable<Role> {
 
     public companion object {
         public val serializer: KSerializer<out Role> = RoleImpl.serializer()
-        public val objectSerializer: KSerializer<out KaiheilaApiResult.Obj<out Role>> = KaiheilaApiResult.Obj.serializer(RoleImpl.serializer())
-        public val emptySortSerializer: KSerializer<out KaiheilaApiResult.List<out Role>> = KaiheilaApiResult.List.serializer(RoleImpl.serializer())
     }
 
 }

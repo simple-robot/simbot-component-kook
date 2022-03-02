@@ -107,6 +107,8 @@ public class ApiResult(
     public val data: JsonElement
 ) {
 
+    public val isSuccess: Boolean get() = code == KaiheilaApiResult.SUCCESS_CODE
+
     /**
      * 提供解析参数来使用当前result中的data内容解析为目标结果。
      * 不会有任何判断，
@@ -124,7 +126,7 @@ public class ApiResult(
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
     public fun <T> parseDataOrThrow(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
-        if (code != KaiheilaApiResult.SUCCESS_CODE) {
+        if (!isSuccess) {
             throw KaiheilaApiException(code, message)
         }
         return parseData(json, deserializationStrategy)
