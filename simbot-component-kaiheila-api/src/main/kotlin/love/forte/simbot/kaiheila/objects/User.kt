@@ -21,6 +21,7 @@ import kotlinx.serialization.*
 import love.forte.simbot.*
 import love.forte.simbot.LoggerFactory
 import love.forte.simbot.definition.*
+import love.forte.simbot.kaiheila.api.*
 import org.slf4j.*
 
 
@@ -166,7 +167,7 @@ internal data class UserImpl(
  */
 @Suppress("MemberVisibilityCanBePrivate")
 @Serializable
-public data class MentionPart(
+public data class MentionPart @ApiResultType constructor(
     val id: CharSequenceID,
     val username: String,
     @SerialName("full_name")

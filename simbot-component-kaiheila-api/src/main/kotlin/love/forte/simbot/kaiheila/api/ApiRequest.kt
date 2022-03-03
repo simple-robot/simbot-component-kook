@@ -252,14 +252,52 @@ public abstract class KaiheilaGetRequest<T> : BaseKaiheilaApiRequest<T>() {
 /**
  * 使用 Get 请求的 [KaiheilaApiRequest] 基础实现。
  */
-public abstract class KaiheilaPostRequest<T> : BaseKaiheilaApiRequest<T>() {
+public abstract class KaiheilaPostRequest<T>(
+    /**
+     * 是否缓存Body实例。如果开启缓存，且没有重写 [body] 或者 [createBody], 则会通过 [createBody] 懒初始化 [body] 实例。
+     * 如果不缓存body, 且没有重写 [body] 或者 [createBody], 则 [body] 每次都会通过 [createBody] 构建新的实例。
+     *
+     * 默认开启。
+     */
+    private val cacheBody: Boolean = true,
+) : BaseKaiheilaApiRequest<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
+
+    private lateinit var _body: Any
+
 
     /**
      * 可以提供一个body实例。
      */
-    public open val body: Any? get() = null
+    public open val body: Any?
+        get() {
+            return if (cacheBody) {
+                if (::_body.isInitialized) {
+                    // initialized.
+                    val b = _body
+                    if (b is NULL) null else b
+                } else {
+                    synchronized(this) {
+                        if (::_body.isInitialized) {
+                            // initialized.
+                            val b = _body
+                            if (b is NULL) null else b
+                        } else {
+                            createBody().also {
+                                _body = it ?: NULL
+                            }
+                        }
+                    }
+                }
+
+            } else createBody()
+        }
+
+    /**
+     * 构建一个新的 [body] 所使用的函数。用于简化懒加载逻辑。
+     */
+    protected open fun createBody(): Any? = null
 
     /**
      * 通过 [body] 构建提供 body 属性。
@@ -269,5 +307,16 @@ public abstract class KaiheilaPostRequest<T> : BaseKaiheilaApiRequest<T>() {
     }
 
 
+    private object NULL
 }
 
+
+public inline fun <reified T> ParametersBuilder.appendIfNotnull(
+    name: String,
+    value: T?,
+    toStringBlock: (T) -> String = { it.toString() },
+) {
+    value?.let { v ->
+        append(name, toStringBlock(v))
+    }
+}

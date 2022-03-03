@@ -10,12 +10,12 @@ import love.forte.simbot.kaiheila.api.*
  *
  * @author ForteScarlet
  */
-public class UserChatCreateRequest(targetId: ID) : KaiheilaPostRequest<UserChatView>() {
+public class UserChatCreateRequest(private val targetId: ID) : KaiheilaPostRequest<UserChatView>() {
     public companion object : BaseApiRequestKey("user-chat", "create")
 
     override val resultDeserializer: DeserializationStrategy<out UserChatView> get() = UserChatView.serializer()
     override val apiPaths: List<String> get() = apiPathList
-    override val body: Any = Body(targetId)
+    override fun createBody(): Any = Body(targetId)
 
     @Serializable
     private data class Body(@SerialName("target_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val targetId: ID)

@@ -41,7 +41,7 @@ public class AssertCreateRequest(
     private val resource: Resource,
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
-) : KaiheilaPostRequest<AssetCreated>() {
+) : KaiheilaPostRequest<AssetCreated>(false) {
     public companion object : BaseApiRequestKey("assert", "create")
 
     private val contentType: ContentType
@@ -78,8 +78,8 @@ public class AssertCreateRequest(
         }
     }
 
-    override val body: Any
-        get() = MultiPartFormDataContent(
+    override fun createBody(): Any {
+        return MultiPartFormDataContent(
             formData {
 
                 val headers = if (name != null) {
@@ -97,6 +97,7 @@ public class AssertCreateRequest(
                 )
             }
         )
+    }
 
 
 }
