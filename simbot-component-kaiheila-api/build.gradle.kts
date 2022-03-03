@@ -39,6 +39,7 @@ dependencies {
     api(V.Ktor.Client.Serialization.NOTATION)
 
     api(V.Kotlinx.Serialization.Json.NOTATION)
+    compileOnly(V.Jetbrains.Annotations.NOTATION)
 
     testImplementation(kotlin("test-junit5"))
 }

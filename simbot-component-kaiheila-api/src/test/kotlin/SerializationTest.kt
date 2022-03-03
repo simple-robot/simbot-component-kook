@@ -22,6 +22,13 @@ class SerializationTest {
         return json.encodeToString(serializer, any)
     }
 
+    @Test
+    fun serializerEqualsTest() {
+        assert(User.serializer() == User.serializer())
+        assert(User.serializer() === User.serializer())
+    }
+
+
     @Serializable
     data class User(val name: String)
 }

@@ -164,7 +164,7 @@ public abstract class BaseKaiheilaApiRequest<T> : KaiheilaApiRequest<T>() {
     /**
      * 参数构建器。
      */
-    protected abstract fun ParametersBuilder.buildParameters()
+    protected open fun ParametersBuilder.buildParameters() {}
 
     private lateinit var _url: Url
 
@@ -205,7 +205,7 @@ public abstract class KaiheilaPostRequest<T> : BaseKaiheilaApiRequest<T>() {
     /**
      * 可以提供一个body实例。
      */
-    public abstract val body: Any?
+    public open val body: Any? get() = null
 
     /**
      * 通过 [body] 构建提供 body 属性。
