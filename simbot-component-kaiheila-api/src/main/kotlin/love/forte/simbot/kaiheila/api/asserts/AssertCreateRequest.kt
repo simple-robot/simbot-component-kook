@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -32,15 +32,15 @@ import love.forte.simbot.resources.*
  *
  *
  * @param resource 资源对象。
- * @param name 需要能够体现出文件的扩展名（以文件扩展名结尾），否则尽可能提供 [resourceContentType] 参数。
+ * @param name 需要能够体现出文件的扩展名（以文件扩展名结尾），否则尽可能提供 `resourceContentType` 参数。
  * @param resourceContentType 资源的content类型。
  * @author ForteScarlet
  */
-public class AssertCreate(
+public class AssertCreateRequest(
     private val resource: Resource,
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
-) : KaiheilaPostRequest<AssetCreateResp>() {
+) : KaiheilaPostRequest<AssetCreated>() {
     public companion object : BaseApiRequestKey("assert", "create")
 
     private val contentType: ContentType
@@ -66,8 +66,8 @@ public class AssertCreate(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<out AssetCreateResp>
-        get() = AssetCreateResp.serializer()
+    override val resultDeserializer: DeserializationStrategy<out AssetCreated>
+        get() = AssetCreated.serializer()
 
     override val apiPaths: List<String> get() = apiPathList
 
@@ -100,6 +100,8 @@ public class AssertCreate(
 
 }
 
-
+/**
+ * api [AssertCreateRequest] 的响应体，得到上传后的资源路径。
+ */
 @Serializable
-public data class AssetCreateResp(val url: String)
+public data class AssetCreated(val url: String)
