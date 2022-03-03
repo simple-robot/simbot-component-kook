@@ -40,7 +40,7 @@ public object MeRequest : KaiheilaGetRequest<Me>() {
  * api [MeRequest] 的响应体。
  */
 @Serializable
-public data class Me(
+public data class Me @ApiResultType constructor(
     override val id: CharSequenceID,
     override val username: String,
     @SerialName("identify_num")

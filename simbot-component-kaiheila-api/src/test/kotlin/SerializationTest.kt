@@ -30,5 +30,5 @@ class SerializationTest {
 
 
     @Serializable
-    data class User(val name: String)
+    private data class User(val name: String)
 }

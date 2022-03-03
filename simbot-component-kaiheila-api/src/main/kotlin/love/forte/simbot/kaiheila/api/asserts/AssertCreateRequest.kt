@@ -24,6 +24,7 @@ import io.ktor.utils.io.streams.*
 import kotlinx.serialization.*
 import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.resources.*
+import java.net.*
 
 
 /**
@@ -104,4 +105,10 @@ public class AssertCreateRequest(
  * api [AssertCreateRequest] 的响应体，得到上传后的资源路径。
  */
 @Serializable
-public data class AssetCreated(val url: String)
+public data class AssetCreated @ApiResultType constructor(val url: String) {
+
+    /**
+     * 通过 [url] 构建一个 [URLResource].
+     */
+    public fun toResource(): URLResource = URLResource(URL(url))
+}
