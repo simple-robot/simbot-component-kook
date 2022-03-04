@@ -19,6 +19,7 @@ package love.forte.simbot.kaiheila.objects
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
+import love.forte.simbot.kaiheila.objects.impl.*
 
 
 /**
@@ -58,14 +59,3 @@ public interface Quote {
         internal val serializer: KSerializer<out Quote> = QuoteImpl.serializer()
     }
 }
-
-
-@Serializable
-internal data class QuoteImpl(
-    override val id: CharSequenceID,
-    override val type: Int,
-    override val content: String,
-    @SerialName("create_at")
-    override val createAt: Timestamp,
-    override val author: UserImpl
-) : Quote

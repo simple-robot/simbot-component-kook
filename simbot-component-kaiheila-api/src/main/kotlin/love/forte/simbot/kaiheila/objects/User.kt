@@ -58,7 +58,7 @@ import org.slf4j.*
 public interface User : KhlObjects, UserInfo {
 
     /** 用户的id */
-    override val id: CharSequenceID
+    override val id: ID
 
     /** 用户名称 */
     override val username: String
@@ -110,7 +110,7 @@ public interface User : KhlObjects, UserInfo {
     /**
      * 用户在当前服务器中的角色 id 组成的列表。
      */
-    public val roles: List<Int>
+    public val roles: List<ID>
 
 
 }
@@ -145,7 +145,7 @@ internal data class UserImpl(
     override val vipAvatar: String? = null,
     override val nickname: String = "",
     override val mobileVerified: Boolean = false,
-    override val roles: List<Int> = emptyList(),
+    override val roles: List<IntID> = emptyList(),
 ) : User {
     init {
         if (!(status == 0 || status == 10)) {
@@ -206,7 +206,7 @@ internal data class MentionPartUser(
         get() = null
     override val mobileVerified: Boolean
         get() = false
-    override val roles: List<Int>
+    override val roles: List<IntID>
         get() = emptyList()
 }
 
