@@ -1,6 +1,24 @@
+/*
+ *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
+ *
+ */
+
 package love.forte.simbot.kaiheila.api.message
 
 import kotlinx.serialization.*
+import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.*
 
 
@@ -20,12 +38,12 @@ public class DirectMessageCreateRequest internal constructor(
     /**
      * 目标用户 id，后端会自动创建会话。有此参数之后可不传 chat_code参数
      */
-    private val targetId: String?,
+    private val targetId: ID?,
 
     /**
-     * 目标会话 Code，chat_code 与 target_id 必须传一个
+     * 目标会话 Code。chat_code 与 target_id 必须传一个
      */
-    private val chatCode: String?,
+    private val chatCode: ID?,
 
     /**
      * 	消息内容
@@ -35,28 +53,101 @@ public class DirectMessageCreateRequest internal constructor(
     /**
      * 回复某条消息的 msgId
      */
-    private val quote: String? = null,
+    private val quote: ID? = null,
 
     /**
      * nonce, 服务端不做处理, 原样返回
      */
     private val nonce: String? = null,
 ) : KaiheilaPostRequest<MessageCreated>() {
-    public companion object : BaseApiRequestKey("direct-message", "create")
+    init {
+        Simbot.require(targetId != null || chatCode != null) {
+            "At least one of target Id, chat Code, and quote must exist"
+        }
+    }
+
+    public companion object : BaseApiRequestKey("direct-message", "create") {
+
+        /**
+         * 通过 [chatCode] 构建一个 [DirectMessageCreateRequest] api实例。
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun byChatCode(
+            chatCode: ID,
+            content: String,
+            type: MessageType = MessageType.TEXT,
+            quote: ID? = null,
+            nonce: String? = null,
+        ): DirectMessageCreateRequest = DirectMessageCreateRequest(
+            type = type.type, chatCode = chatCode, targetId = null, content = content, quote = quote, nonce = nonce
+        )
+
+        /**
+         * 通过 [targetId] 构建一个 [DirectMessageCreateRequest] api实例。
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun byTargetId(
+            targetId: ID,
+            content: String,
+            type: MessageType = MessageType.TEXT,
+            quote: ID? = null,
+            nonce: String? = null,
+        ): DirectMessageCreateRequest = DirectMessageCreateRequest(
+            type = type.type, chatCode = null, targetId = targetId, content = content, quote = quote, nonce = nonce
+        )
+    }
 
     override val resultDeserializer: DeserializationStrategy<out MessageCreated> get() = MessageCreated.serializer()
     override val apiPaths: List<String> get() = apiPathList
-    override fun createBody(): Any = Body(type, targetId, chatCode, content, quote, nonce)
+    override fun createBody(): Any =
+        Body(type, targetId, chatCode, content, quote, nonce)
 
     @Serializable
     private data class Body(
         private val type: Int,
         @SerialName("target_id")
-        private val targetId: String?,
+        @Serializable(ID.AsCharSequenceIDSerializer::class)
+        private val targetId: ID?,
         @SerialName("chat_code")
-        private val chatCode: String?,
+        @Serializable(ID.AsCharSequenceIDSerializer::class)
+        private val chatCode: ID?,
         private val content: String,
-        private val quote: String?,
+        @Serializable(ID.AsCharSequenceIDSerializer::class)
+        private val quote: ID?,
         private val nonce: String?,
     )
 }
+
+/**
+ * 通过 [targetId] 构建一个 [DirectMessageCreateRequest] api实例。
+ *
+ * @see DirectMessageCreateRequest.byTargetId
+ */
+public fun directMessageCreateRequestByTargetId(
+    targetId: ID,
+    content: String,
+    type: MessageType = MessageType.TEXT,
+    quote: ID? = null,
+    nonce: String? = null,
+): DirectMessageCreateRequest = DirectMessageCreateRequest.byTargetId(
+    targetId = targetId, content = content, type = type, quote = quote, nonce = nonce
+)
+
+/**
+ * 通过 [chatCode] 构建一个 [DirectMessageCreateRequest] api实例。
+ *
+ * @see DirectMessageCreateRequest.byChatCode
+ */
+public fun directMessageCreateRequestByChatCode(
+    chatCode: ID,
+    content: String,
+    type: MessageType = MessageType.TEXT,
+    quote: ID? = null,
+    nonce: String? = null,
+): DirectMessageCreateRequest = DirectMessageCreateRequest.byChatCode(
+    chatCode = chatCode, content = content, type = type, quote = quote, nonce = nonce
+)
