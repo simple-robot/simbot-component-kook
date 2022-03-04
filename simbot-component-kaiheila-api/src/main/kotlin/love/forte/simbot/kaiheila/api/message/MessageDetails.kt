@@ -77,7 +77,7 @@ public interface MessageDetails {
  * 频道的[消息详情](https://developer.kaiheila.cn/doc/http/message#%E6%B6%88%E6%81%AF%E8%AF%A6%E6%83%85%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E)
  *
  */
-internal interface ChannelMessageDetails : MessageDetails {
+public interface ChannelMessageDetails : MessageDetails {
     /**
      * 	消息 id
      */
@@ -92,7 +92,7 @@ internal interface ChannelMessageDetails : MessageDetails {
     /**
      * 	作者的用户信息
      */
-    val author: AuthorImpl
+    public val author: Author
 
     /**
      * 消息内容
@@ -102,22 +102,22 @@ internal interface ChannelMessageDetails : MessageDetails {
     /**
      * at特定用户 的用户ID数组，与 mention_info 中的数据对应
      */
-    val mention: List<ID>
+    public val mention: List<ID>
 
     /**
      * 是否含有 @全体人员
      */
-    val isMentionAll: Boolean
+    public val isMentionAll: Boolean
 
     /**
      * at特定角色 的角色ID数组，与 mention_info 中的数据对应
      */
-    val mentionRoles: List<ID>
+    public val mentionRoles: List<ID>
 
     /**
      * 是否含有 @在线人员
      */
-    val isMentionHere: Boolean
+    public val isMentionHere: Boolean
 
     /**
      * 超链接解析数据
@@ -144,10 +144,8 @@ internal interface ChannelMessageDetails : MessageDetails {
     /**
      * 通知信息
      */
-    val mentionInfo: MentionInfo
+    public val mentionInfo: MentionInfo
 
-    override val authorId: CharSequenceID
-        get() = author.id
 }
 
 
@@ -187,7 +185,6 @@ public interface DirectMessageDetails : MessageDetails {
         public val serializer: KSerializer<out DirectMessageDetails> = DirectMessageDetailsImpl.serializer()
     }
 }
-
 
 
 /**

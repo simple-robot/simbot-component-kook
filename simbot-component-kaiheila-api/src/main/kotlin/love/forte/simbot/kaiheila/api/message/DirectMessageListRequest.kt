@@ -48,7 +48,7 @@ public class DirectMessageListRequest private constructor(
     /**
      * 查询模式，有三种模式可以选择。不传则默认查询最新的消息
      */
-    private val flag: String? = null,
+    private val flag: MessageListFlag? = null,
 ) : KaiheilaGetRequest<KaiheilaApiResult.ListData<DirectMessageDetails>>() {
     public companion object : BaseApiRequestKey("direct-message", "list") {
         @JvmStatic
@@ -60,7 +60,7 @@ public class DirectMessageListRequest private constructor(
             flag: MessageListFlag? = null,
         ): DirectMessageListRequest {
             return DirectMessageListRequest(
-                chatCode = chatCode, targetId = null, msgId = msgId, flag = flag?.flag
+                chatCode = chatCode, targetId = null, msgId = msgId, flag = flag
             )
         }
 
@@ -73,7 +73,7 @@ public class DirectMessageListRequest private constructor(
             flag: MessageListFlag? = null,
         ): DirectMessageListRequest {
             return DirectMessageListRequest(
-                chatCode = null, targetId = targetId, msgId = msgId, flag = flag?.flag
+                chatCode = null, targetId = targetId, msgId = msgId, flag = flag
             )
         }
     }
@@ -87,31 +87,6 @@ public class DirectMessageListRequest private constructor(
         appendIfNotnull("chat_code", chatCode)
         appendIfNotnull("target_id", targetId)
         appendIfNotnull("msg_id", msgId)
-        appendIfNotnull("flag", flag)
+        appendIfNotnull("flag", flag) { it.name.lowercase() }
     }
-}
-
-
-/**
- *
- * 对消息进行查询时的 `flag` 参数范围。
- *
- * @author ForteScarlet
- */
-public enum class MessageListFlag(public val flag: String) {
-
-    /**
-     * 查询参考消息之前的消息，不包括参考消息。
-     */
-    BEFORE("before"),
-
-    /**
-     * 查询以参考消息为中心，前后一定数量的消息。
-     */
-    AROUND("around"),
-
-    /**
-     * 查询参考消息之后的消息，不包括参考消息。
-     */
-    AFTER("after"),
 }
