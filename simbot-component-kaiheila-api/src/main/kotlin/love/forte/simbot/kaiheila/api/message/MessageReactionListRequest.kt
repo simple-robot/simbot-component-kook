@@ -55,12 +55,12 @@ public class MessageReactionListRequest(
  * api [MessageReactionListRequest] 的响应列表元素。
  */
 @Serializable
-public class MessageReactor(
+public class MessageReactor @ApiResultType constructor(
 
     /**
      * 用户的id
      */
-    public val id: ID,
+    public val id: CharSequenceID,
 
     /**
      * 用户的名称
@@ -100,11 +100,11 @@ public class MessageReactor(
      * 用户点击reaction的毫秒时间戳
      */
     @SerialName("reaction_time")
-    public val reactionTime: Long,
+    public val reactionTime: Timestamp,
 ) {
     public companion object {
-        public const val STATUS_NORMAL = 0
-        public const val STATUS_BAN = 10
+        public const val STATUS_NORMAL: Int = 0
+        public const val STATUS_BAN: Int = 10
     }
 
 }

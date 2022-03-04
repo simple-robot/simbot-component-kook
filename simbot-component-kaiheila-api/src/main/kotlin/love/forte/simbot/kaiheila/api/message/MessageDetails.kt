@@ -182,6 +182,10 @@ public interface DirectMessageDetails : MessageDetails {
     override val reactions: List<Reaction>
     override val quote: Quote?
     public val readStatus: Boolean
+
+    public companion object {
+        public val serializer: KSerializer<out DirectMessageDetails> = DirectMessageDetailsImpl.serializer()
+    }
 }
 
 
