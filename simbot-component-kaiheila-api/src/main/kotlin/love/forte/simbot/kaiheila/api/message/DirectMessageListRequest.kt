@@ -21,8 +21,8 @@ import com.sun.xml.internal.bind.v2.model.core.*
 import io.ktor.http.*
 import kotlinx.serialization.*
 import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Companion.byChatCode
-import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Companion.byTargetId
+import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Key.byChatCode
+import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Key.byTargetId
 
 /**
  * [获取私信聊天消息列表](https://developer.kaiheila.cn/doc/http/direct-message#%E8%8E%B7%E5%8F%96%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF%E5%88%97%E8%A1%A8)
@@ -50,7 +50,7 @@ public class DirectMessageListRequest private constructor(
      */
     private val flag: MessageListFlag? = null,
 ) : KaiheilaGetRequest<KaiheilaApiResult.ListData<DirectMessageDetails>>() {
-    public companion object : BaseApiRequestKey("direct-message", "list") {
+    public companion object Key : BaseApiRequestKey("direct-message", "list") {
         @JvmStatic
         @JvmOverloads
         @JvmName("getInstanceByChatCode")

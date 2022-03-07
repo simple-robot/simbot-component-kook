@@ -27,7 +27,7 @@ import love.forte.simbot.kaiheila.api.*
  * @param msgId 消息 id
  */
 public class MessageDeleteRequest(private val msgId: ID) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("message", "delete")
+    public companion object Key : BaseApiRequestKey("message", "delete")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
 

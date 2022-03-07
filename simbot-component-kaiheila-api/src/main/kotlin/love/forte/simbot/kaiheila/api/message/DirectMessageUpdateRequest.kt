@@ -44,7 +44,7 @@ public class DirectMessageUpdateRequest(
      */
     private val quote: ID?,
 ) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("direct-message", "update")
+    public companion object Key : BaseApiRequestKey("direct-message", "update")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

@@ -33,7 +33,7 @@ import love.forte.simbot.kaiheila.objects.*
  *
  */
 public class GuildViewRequest(private val guildId: ID) : KaiheilaGetRequest<Guild>() {
-    public companion object : BaseApiRequestKey("guild", "view")
+    public companion object Key : BaseApiRequestKey("guild", "view")
 
     override val apiPaths: List<String>
         get() = apiPathList

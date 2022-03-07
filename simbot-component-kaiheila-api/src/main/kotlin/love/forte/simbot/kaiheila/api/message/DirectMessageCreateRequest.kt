@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -66,7 +66,7 @@ public class DirectMessageCreateRequest internal constructor(
         }
     }
 
-    public companion object : BaseApiRequestKey("direct-message", "create") {
+    public companion object Key : BaseApiRequestKey("direct-message", "create") {
 
         /**
          * 通过 [chatCode] 构建一个 [DirectMessageCreateRequest] api实例。

@@ -42,7 +42,7 @@ public class AssertCreateRequest(
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
 ) : KaiheilaPostRequest<AssetCreated>(false) {
-    public companion object : BaseApiRequestKey("assert", "create")
+    public companion object Key : BaseApiRequestKey("assert", "create")
 
     private val contentType: ContentType
 

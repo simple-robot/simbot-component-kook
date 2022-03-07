@@ -36,7 +36,7 @@ public class MessageReactionListRequest(
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
 
-    public companion object : BaseApiRequestKey("message", "reaction-list") {
+    public companion object Key : BaseApiRequestKey("message", "reaction-list") {
         private val serializer = ListSerializer(MessageReactor.serializer())
     }
 

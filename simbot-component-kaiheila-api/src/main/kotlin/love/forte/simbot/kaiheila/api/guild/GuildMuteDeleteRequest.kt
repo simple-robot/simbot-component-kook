@@ -38,7 +38,7 @@ public class GuildMuteDeleteRequest(
     /** 1代表麦克风闭麦，2代表耳机静音 */
     type: Int
 ) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("guild-mute", "delete")
+    public companion object Key : BaseApiRequestKey("guild-mute", "delete")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

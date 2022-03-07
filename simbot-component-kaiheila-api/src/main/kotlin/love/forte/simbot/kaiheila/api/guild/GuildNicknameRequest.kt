@@ -36,7 +36,7 @@ public class GuildNicknameRequest(
     nickname: String? = null,
     userId: ID? = null,
 ) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("guild", "nickname")
+    public companion object Key : BaseApiRequestKey("guild", "nickname")
 
     init {
         if (nickname != null) {

@@ -33,7 +33,7 @@ import love.forte.simbot.kaiheila.api.*
  * @author ForteScarlet
  */
 public class ChannelDeleteRequest(private val channelId: ID) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("channel", "delete")
+    public companion object Key : BaseApiRequestKey("channel", "delete")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

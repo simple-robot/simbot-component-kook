@@ -34,7 +34,7 @@ import love.forte.simbot.kaiheila.objects.*
  */
 public class ChannelViewRequest(private val targetId: ID) : KaiheilaGetRequest<ChannelView>() {
 
-    public companion object : BaseApiRequestKey("channel", "view")
+    public companion object Key : BaseApiRequestKey("channel", "view")
 
     override val resultDeserializer: DeserializationStrategy<out ChannelView>
         get() = ChannelView.serializer()

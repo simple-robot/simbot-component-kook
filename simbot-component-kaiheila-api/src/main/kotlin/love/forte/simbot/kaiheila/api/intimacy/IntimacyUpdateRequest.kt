@@ -46,7 +46,7 @@ public class IntimacyUpdateRequest @JvmOverloads constructor(
      */
     private val imgId: ID? = null
 ) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("intimacy", "update")
+    public companion object Key : BaseApiRequestKey("intimacy", "update")
 
     init {
         Simbot.require(score == null || score in 0..2200) { "Score must in 0 .. 2200" }

@@ -1,14 +1,17 @@
 /*
+ *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
  *
- *  * Copyright (c) 2021. ForteScarlet All rights reserved.
- *  * Project  simple-robot
- *  * File     MiraiAvatar.kt
- *  *
- *  * You can contact the author through the following channels:
- *  * github https://github.com/ForteScarlet
- *  * gitee  https://gitee.com/ForteScarlet
- *  * email  ForteScarlet@163.com
- *  * QQ     1149159218
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
  *
  */
 
@@ -239,6 +242,11 @@ public enum class PermissionType(public val bitValue: UInt) {
      */
     public val value: UInt get() = 1u shl bitValue.toInt()
 
+    /**
+     * 权限的实际值，[Int] 类型。
+     */
+    public val permValue: Int get() = value.toInt()
+
     public companion object {
         @Suppress("FunctionName")
         @JvmStatic
@@ -249,7 +257,9 @@ public enum class PermissionType(public val bitValue: UInt) {
         @Suppress("FunctionName")
         @JvmStatic
         @JvmName("combine")
-        public fun _combine(vararg perm: PermissionType): Int = combine(*perm).toInt()
+        public fun _combine(vararg perm: PermissionType): Int = perm.combine().toInt()
+
+
     }
 }
 
@@ -262,9 +272,9 @@ public operator fun PermissionType.plus(other: PermissionType): UInt = value or 
 /**
  * 合并多个权限值
  */
-public fun combine(vararg perm: PermissionType): UInt {
+public fun Array<out PermissionType>.combine(): UInt {
     var combine = 0u
-    for (p in perm) {
+    for (p in this) {
         combine = combine or p.value
     }
     return combine

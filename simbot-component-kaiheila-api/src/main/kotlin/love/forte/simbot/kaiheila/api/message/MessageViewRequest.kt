@@ -27,7 +27,7 @@ import love.forte.simbot.kaiheila.api.*
  * @author ForteScarlet
  */
 public class MessageViewRequest(private val msgId: ID) : KaiheilaGetRequest<ChannelMessageDetails>() {
-    public companion object : BaseApiRequestKey("message", "view")
+    public companion object Key : BaseApiRequestKey("message", "view")
 
     override val resultDeserializer: DeserializationStrategy<out ChannelMessageDetails>
         get() = ChannelMessageDetailsImpl.serializer()

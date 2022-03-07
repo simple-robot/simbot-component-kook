@@ -55,7 +55,7 @@ public class MessageListRequest(
      */
     private val pageSize: Int = -1
 ) : KaiheilaGetRequest<KaiheilaApiResult.ListData<ChannelMessageDetails>>() {
-    public companion object : BaseApiRequestKey("message", "list") {
+    public companion object Key : BaseApiRequestKey("message", "list") {
         private val serializer = KaiheilaApiResult.ListData.serializer(ChannelMessageDetailsImpl.serializer())
     }
 

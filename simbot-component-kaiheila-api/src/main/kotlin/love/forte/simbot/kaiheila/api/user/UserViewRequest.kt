@@ -30,7 +30,7 @@ public class UserViewRequest(
     private val userId: String,
     private val guildId: String,
 ) : KaiheilaGetRequest<User>() {
-    public companion object : BaseApiRequestKey("user", "view")
+    public companion object Key : BaseApiRequestKey("user", "view")
 
     override val resultDeserializer: DeserializationStrategy<out User>
         get() = UserImpl.serializer()

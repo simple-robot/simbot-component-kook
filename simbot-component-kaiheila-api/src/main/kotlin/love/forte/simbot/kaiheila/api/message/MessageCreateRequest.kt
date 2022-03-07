@@ -58,7 +58,7 @@ public class MessageCreateRequest(
      */
     private val tempTargetId: ID? = null,
 ) : KaiheilaPostRequest<MessageCreated>() {
-    public companion object : BaseApiRequestKey("message", "create")
+    public companion object Key : BaseApiRequestKey("message", "create")
 
     override val resultDeserializer: DeserializationStrategy<out MessageCreated> get() = MessageCreated.serializer()
 

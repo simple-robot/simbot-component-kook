@@ -36,7 +36,7 @@ public class IntimacyIndexRequest(
      */
     private val userId: ID,
 ) : KaiheilaGetRequest<IntimacyIndex>() {
-    public companion object : BaseApiRequestKey("intimacy", "index")
+    public companion object Key : BaseApiRequestKey("intimacy", "index")
 
     override val resultDeserializer: DeserializationStrategy<out IntimacyIndex>
         get() = IntimacyIndex.serializer()

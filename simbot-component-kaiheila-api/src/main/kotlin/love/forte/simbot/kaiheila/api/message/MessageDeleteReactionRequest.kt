@@ -33,7 +33,7 @@ public class MessageDeleteReactionRequest(
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji, userId: ID) : this(msgId, emoji.id, userId)
     public constructor(msgId: ID, emoji: Emoji, userId: ID) : this(msgId, emoji.id, userId)
 
-    public companion object : BaseApiRequestKey("message", "delete-reaction")
+    public companion object Key : BaseApiRequestKey("message", "delete-reaction")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

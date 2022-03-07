@@ -64,7 +64,7 @@ public class GuildUserListRequest(
         pageSize = pageSize
     )
 
-    public companion object : BaseApiRequestKey("guild", "user-list")
+    public companion object Key : BaseApiRequestKey("guild", "user-list")
 
     override val resultDeserializer: DeserializationStrategy<out GuildUserList>
         get() = GuildUserList.serializer()

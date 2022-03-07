@@ -49,7 +49,7 @@ public class MessageUpdateRequest(
      */
     private val tempTargetId: ID? = null,
 ) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("message", "update")
+    public companion object Key : BaseApiRequestKey("message", "update")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

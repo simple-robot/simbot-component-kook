@@ -33,7 +33,7 @@ public class GuildKickoutRequest(
     guildId: ID,
     targetId: ID,
 ) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("guild", "kickout")
+    public companion object Key : BaseApiRequestKey("guild", "kickout")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

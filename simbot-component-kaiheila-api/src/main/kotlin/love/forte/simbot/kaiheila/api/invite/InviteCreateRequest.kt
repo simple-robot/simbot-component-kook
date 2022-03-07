@@ -19,28 +19,28 @@ package love.forte.simbot.kaiheila.api.invite
 import kotlinx.serialization.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_HALF_DAY
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_HALF_HOUR
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_NEVER
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_ONE_DAY
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_ONE_HOUR
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_ONE_WEEK
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_SEVEN_DAYS
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_SIX_HOURS
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.DURATION_TWELVE_HOURS
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_1
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_10
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_100
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_25
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_5
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_50
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_FIFTY
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_FIVE
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_ONE
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_ONE_HUNDRED
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_TEN
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_TWENTY_FIVE
-import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Companion.SETTING_TIMES_UNLIMITED
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_HALF_DAY
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_HALF_HOUR
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_NEVER
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_ONE_DAY
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_ONE_HOUR
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_ONE_WEEK
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_SEVEN_DAYS
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_SIX_HOURS
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_TWELVE_HOURS
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_1
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_10
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_100
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_25
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_5
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_50
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_FIFTY
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_FIVE
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_ONE
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_ONE_HUNDRED
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_TEN
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_TWENTY_FIVE
+import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.SETTING_TIMES_UNLIMITED
 
 /**
  *
@@ -117,7 +117,7 @@ public class InviteCreateRequest @JvmOverloads constructor(
 
 
     @Suppress("MemberVisibilityCanBePrivate")
-    public companion object : BaseApiRequestKey("invite", "create") {
+    public companion object Key : BaseApiRequestKey("invite", "create") {
 
         //region duration常量
         /** 0 => 永不 */

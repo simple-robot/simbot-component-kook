@@ -49,7 +49,7 @@ public class GuildListRequest @JvmOverloads constructor(
     private val sort: String? = null
 ) :
     KaiheilaGetRequest<KaiheilaApiResult.ListData<Guild>>() {
-    public companion object : BaseApiRequestKey("guild", "list") {
+    public companion object Key : BaseApiRequestKey("guild", "list") {
         private val serializer = KaiheilaApiResult.ListData.serializer(GuildListElement.serializer())
     }
 

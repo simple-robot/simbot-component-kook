@@ -34,7 +34,7 @@ import love.forte.simbot.kaiheila.objects.*
  */
 public class ChannelListRequest(private val guildId: ID) :
     KaiheilaGetRequest<KaiheilaApiResult.ListData<ChannelInfo>>() {
-    public companion object : BaseApiRequestKey("channel", "list") {
+    public companion object Key : BaseApiRequestKey("channel", "list") {
         private val serializer = KaiheilaApiResult.ListData.serializer(ChannelInfo.serializer())
     }
 

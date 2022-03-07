@@ -30,7 +30,7 @@ import love.forte.simbot.kaiheila.api.*
  *
  */
 public class GuildLeaveRequest(private val guildId: ID) : KaiheilaPostRequest<Unit>() {
-    public companion object : BaseApiRequestKey("guild", "leave")
+    public companion object Key : BaseApiRequestKey("guild", "leave")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

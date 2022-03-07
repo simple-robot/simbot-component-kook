@@ -40,7 +40,7 @@ public class InviteListRequest(
     private val page: Int = -1,
     private val pageSize: Int = -1,
 ) : KaiheilaGetRequest<KaiheilaApiResult.ListData<InviteInfo>>() {
-    public companion object : BaseApiRequestKey("invite", "list") {
+    public companion object Key : BaseApiRequestKey("invite", "list") {
         private val serializer = KaiheilaApiResult.ListData.serializer(InviteInfoImpl.serializer())
     }
 

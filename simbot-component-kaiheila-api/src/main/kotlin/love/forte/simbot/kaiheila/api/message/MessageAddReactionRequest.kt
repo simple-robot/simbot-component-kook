@@ -39,7 +39,7 @@ public class MessageAddReactionRequest(
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
 
-    public companion object : BaseApiRequestKey("message", "add-reaction")
+    public companion object Key : BaseApiRequestKey("message", "add-reaction")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

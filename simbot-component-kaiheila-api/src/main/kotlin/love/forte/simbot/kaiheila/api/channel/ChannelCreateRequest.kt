@@ -45,7 +45,7 @@ public class ChannelCreateRequest @JvmOverloads constructor(
     /** 否 语音音质，默认为2。1流畅，2正常，3高质量 */
     private val voiceQuality: Int = 2,
 ) : KaiheilaPostRequest<Channel>() {
-    public companion object : BaseApiRequestKey("channel", "create")
+    public companion object Key : BaseApiRequestKey("channel", "create")
 
     init {
         require(type in 1..2) { "The 'type' must be 1(Text) or 2(Voice), but $type" }
