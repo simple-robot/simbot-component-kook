@@ -89,14 +89,16 @@ public object KaiheilaApiResult {
      *      "sort": { "id": 2 }
      * }
      * ```
-     *@param T 数据元素的类型。
+     *
+     * @see ListData
+     *
      */
-    @Serializable
-    public data class ListData<out T>(
-        public val items: List<T> = emptyList(),
-        public val meta: ListMeta,
-        public val sort: Map<String, Int> = emptyMap()
-    ) : Iterable<T> by items
+    public abstract class ListDataResponse<out T, SORT> {
+        public abstract val items: List<T>
+        public abstract val meta: ListMeta
+        public abstract val sort: SORT
+    }
+
 
     /**
      * 当返回值为列表时的分页响应元数据。
@@ -110,6 +112,20 @@ public object KaiheilaApiResult {
         val pageSize: Int,
         val total: Int,
     )
+
+    /**
+     *
+     * [ListData] 将 sort 类型直接视为 Map 进行解析。
+     *
+     * @param T 数据元素的类型。
+     */
+    @Serializable
+    public class ListData<out T>(
+        override val items: List<T> = emptyList(),
+        override val meta: ListMeta,
+        override val sort: Map<String, Int> = emptyMap()
+    ) : ListDataResponse<T, Map<String, Int>>(), Iterable<T> by items
+
 
 }
 

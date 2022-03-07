@@ -1,14 +1,17 @@
 /*
+ *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
  *
- *  * Copyright (c) 2021. ForteScarlet All rights reserved.
- *  * Project  simple-robot
- *  * File     MiraiAvatar.kt
- *  *
- *  * You can contact the author through the following channels:
- *  * github https://github.com/ForteScarlet
- *  * gitee  https://gitee.com/ForteScarlet
- *  * email  ForteScarlet@163.com
- *  * QQ     1149159218
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
  *
  */
 
@@ -70,7 +73,7 @@ import love.forte.simbot.kaiheila.objects.impl.*
 public interface Guild : KhlObjects, GuildInfo {
 
     /** 服务器id */
-    override val id: CharSequenceID
+    override val id: ID
 
     /** 服务器名称 */
     override val name: String
@@ -82,7 +85,7 @@ public interface Guild : KhlObjects, GuildInfo {
     public val topic: String
 
     /** 服务器主的id */
-    public val masterId: CharSequenceID
+    public val masterId: ID
 
 
     /** 通知类型, 0代表默认使用服务器通知设置，1代表接收所有通知, 2代表仅@被提及，3代表不接收通知 */
@@ -95,13 +98,13 @@ public interface Guild : KhlObjects, GuildInfo {
     public val enableOpen: Boolean
 
     /** 公开服务器id */
-    public val openId: CharSequenceID
+    public val openId: ID
 
     /** 默认频道id */
-    public val defaultChannelId: CharSequenceID
+    public val defaultChannelId: ID
 
     /** 欢迎频道id */
-    public val welcomeChannelId: CharSequenceID
+    public val welcomeChannelId: ID
 
     /** 角色列表 */
     public val roles: List<Role>
@@ -110,7 +113,7 @@ public interface Guild : KhlObjects, GuildInfo {
     public val channels: List<Channel>
 
     //// impls
-    override val ownerId: CharSequenceID get() = masterId
+    override val ownerId: ID get() = masterId
     override val description: String get() = topic
     override val currentChannel: Int get() = channels.size
 
