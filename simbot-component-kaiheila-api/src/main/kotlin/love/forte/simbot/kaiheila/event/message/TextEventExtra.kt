@@ -71,6 +71,12 @@ internal data class TextEventExtraImpl(
 ) : TextEventExtra
 
 
+// public object TextEventProcessor : EventProcessor<> {
+//
+// }
+
+
+
 //
 // /**
 //  * 文本事件。

@@ -37,7 +37,7 @@ import java.util.*
  *
  * @author ForteScarlet
  */
-public interface Event<Extra : Event.Extra> {
+public interface Event<out Extra : Event.Extra> {
 
     /**
      * 消息频道类型.

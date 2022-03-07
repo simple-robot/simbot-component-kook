@@ -44,7 +44,7 @@ public interface AttachmentsMessageEventExtra<A : Attachments> : MessageEventExt
  * 消息相关事件接口。
  *
  */
-public interface MessageEvent<E : MessageEventExtra> : Event<E> {
+public interface MessageEvent<out E : MessageEventExtra> : Event<E> {
     override val channelType: Channel.Type
     override val type: Event.Type
     override val targetId: ID
