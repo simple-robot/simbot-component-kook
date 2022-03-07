@@ -51,7 +51,7 @@ public abstract class EventProcessor<EX : Event.Extra, E : Event<EX>> {
  */
 public class MessageEventProcessor<EX : MessageEventExtra>(
     private val type: Event.Type,
-    extraSerializer: KSerializer<EX>
+    extraSerializer: KSerializer<out EX>
 ) : EventProcessor<EX, MessageEvent<EX>>() {
     private val eventSerializer: KSerializer<out MessageEvent<EX>> = MessageEventImpl.serializer(extraSerializer)
     override fun check(eventType: JsonPrimitive, subType: JsonPrimitive): Boolean {
@@ -64,14 +64,24 @@ public class MessageEventProcessor<EX : MessageEventExtra>(
 }
 
 
+
+
 /**
  * 所有事件以及其对应的定位器。
  *
  */
 public object EventSignals {
     // TODO
-    private val eventProcessors = EnumMap<Event.Type, String>(Event.Type::class.java).also {
-
+    private val eventProcessors = EnumMap<Event.Type, Map<Any, EventProcessor<*, *>>>(Event.Type::class.java).also { eMap ->
+        eMap[Event.Type.TEXT] = mapOf(Event.Type.TEXT.type to TextEventProcessor)
+        eMap[Event.Type.IMAGE] = mapOf(Event.Type.IMAGE.type to ImageEventProcessor)
+        eMap[Event.Type.VIDEO] = mapOf(Event.Type.VIDEO.type to VideoEventProcessor)
+        eMap[Event.Type.FILE] = mapOf(Event.Type.FILE.type to FileEventProcessor)
+        eMap[Event.Type.KMD] = mapOf(Event.Type.KMD.type to KMarkdownEventProcessor)
+        eMap[Event.Type.CARD] = mapOf(Event.Type.CARD.type to CardEventProcessor)
+        eMap[Event.Type.SYS] = buildMap {
+            // TODO other sys events
+        }
     }
 
 }
