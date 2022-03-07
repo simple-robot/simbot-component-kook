@@ -142,7 +142,7 @@ internal data class AuthorImpl @ApiResultType constructor(
     @SerialName("mobile_verified")
     override val mobileVerified: Boolean = false,
     override val nickname: String = "",
-    override val roles: List<IntID> = emptyList(),
+    override val roles: List<LongID> = emptyList(),
 ) : Author
 
 

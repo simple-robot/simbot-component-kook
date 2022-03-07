@@ -145,7 +145,7 @@ internal data class UserImpl(
     override val vipAvatar: String? = null,
     override val nickname: String = "",
     override val mobileVerified: Boolean = false,
-    override val roles: List<IntID> = emptyList(),
+    override val roles: List<LongID> = emptyList(),
 ) : User {
     init {
         if (!(status == 0 || status == 10)) {
@@ -206,7 +206,7 @@ internal data class MentionPartUser(
         get() = null
     override val mobileVerified: Boolean
         get() = false
-    override val roles: List<IntID>
+    override val roles: List<LongID>
         get() = emptyList()
 }
 

@@ -55,5 +55,5 @@ public data class Me @ApiResultType constructor(
     @SerialName("mobile_verified")
     override val mobileVerified: Boolean,
     override val nickname: String = username,
-    override val roles: List<IntID> = emptyList(),
+    override val roles: List<LongID> = emptyList(),
 ) : User

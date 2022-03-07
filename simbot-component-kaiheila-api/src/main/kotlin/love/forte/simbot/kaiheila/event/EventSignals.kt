@@ -15,24 +15,34 @@
  *
  */
 
-package love.forte.simbot.kaiheila.api.guild.role
+package love.forte.simbot.kaiheila.event
 
 import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.json.*
 
 /**
- *
- * 对用户角色的操作结果响应体。
- *
- * @see GuildRoleGrantRequest
- * @see GuildRoleRevokeRequest
- *
+ * 事件的反序列化器，提供一个从事件得到的原始 [JsonElement]，将其反序列化为一个 [Event] 实例。
+ */
+public interface EventDeserializer<EX : Event.Extra, E : Event<EX>> {
+
+    /**
+     * 提供原始数据，并将其转化为对应的具体事件类型。
+     *
+     * @throws SerializationException 序列化过程中可能会遇到任何序列化相关异常
+     */
+    public fun deserialize(rawData: JsonElement): E
+}
+
+
+
+
+
+
+
+
+/**
+ * 所有事件所对应的定位器。
  *
  */
-@Serializable
-public data class UserRoleOperated @ApiResultType constructor(
-    @SerialName("user_id") val userId: CharSequenceID,
-    @SerialName("guild_id") val guildId: CharSequenceID,
-    val roles: List<LongID>,
-)
+public object EventSignals {
+}

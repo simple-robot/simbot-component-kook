@@ -65,7 +65,7 @@ public data class GuildRoleCreated @ApiResultType constructor(
      * 角色的id
      */
     @SerialName("role_id")
-    override val id: IntID,
+    override val id: LongID,
     /**
      * 角色的名称
      */

@@ -1,0 +1,335 @@
+/*
+ *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ *
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
+ *
+ */
+
+@file:JvmName("Events")
+@file:Suppress("unused")
+
+package love.forte.simbot.kaiheila.event
+
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
+import love.forte.simbot.*
+import love.forte.simbot.kaiheila.objects.*
+import java.util.*
+
+
+/**
+ *
+ * 开黑啦Event - [事件Event](https://developer.kaiheila.cn/doc/event)
+ *
+ *
+ * 当 websocket 或 webhook 收到 s=0 的消息时，代表当前收到的消息是事件(包含用户的聊天消息及系统的通知消息等)。
+ *
+ * @author ForteScarlet
+ */
+public interface Event<Extra : Event.Extra> {
+
+    /**
+     * 消息频道类型.
+     */
+    public val channelType: Channel.Type
+
+    /**
+     * 事件的类型。
+     *
+     * - 1:文字消息
+     * - 2:图片消息
+     * - 3:视频消息
+     * - 4:文件消息
+     * - 8:音频消息
+     * - 9:KMarkdown
+     * - 10:card消息
+     * - 255:系统消息
+     *
+     * 其它的暂未开放
+     * @see Type
+     */
+    public val type: Type
+
+
+    /**
+     * 事件基本类型。详见 [事件 - 事件主要格式](https://developer.kaiheila.cn/doc/event)
+     *
+     * - 1:文字消息,
+     * - 2:图片消息，
+     * - 3:视频消息，
+     * - 4:文件消息，
+     * - 8:音频消息，
+     * - 9:KMarkdown，
+     * - 10:card消息，
+     * - 255:系统消息,
+     * - 其它的暂未开放
+     *
+     */
+    @Serializable(with = EventTypeSerializer::class)
+    @Suppress("unused")
+    public enum class Type(public val type: Int) {
+        UNKNOWN(-999999),
+
+        TEXT(EventTypeConstant.T_TEXT),
+        IMAGE(EventTypeConstant.T_IMAGE),
+        VIDEO(EventTypeConstant.T_VIDEO),
+        FILE(EventTypeConstant.T_FILE),
+        VOICE(EventTypeConstant.T_VOICE),
+        KMD(EventTypeConstant.T_KMD),
+        CARD(EventTypeConstant.T_CARD),
+        SYS(EventTypeConstant.T_SYS),
+        ;
+
+        public companion object {
+            @JvmStatic
+            public fun byType(type: Int): Type {
+                if (type == UNKNOWN.type) {
+                    return UNKNOWN
+                }
+                if (type !in EventTypeConstant) {
+                    throw IndexOutOfBoundsException("Type $type")
+                }
+
+                val values = values()
+                for (i in 1..values.size) {
+                    val v = values[i]
+                    if (v.type == type) {
+                        return v
+                    }
+                }
+
+                throw NoSuchElementException("Type $type")
+            }
+
+            /**
+             * Get instance of [Event.Type] by [type], or default value (like null).
+             */
+            @JvmStatic
+            @JvmOverloads
+            public fun byTypeOr(type: Int, default: Type? = null): Type? {
+                if (type == UNKNOWN.type) {
+                    return UNKNOWN
+                }
+                if (type !in EventTypeConstant) {
+                    return default
+                }
+
+                val values = values()
+                for (i in 1..values.size) {
+                    val v = values[i]
+                    if (v.type == type) {
+                        return v
+                    }
+                }
+
+                return default
+            }
+        }
+
+    }
+
+
+    /**
+     * 发送目的 id，如果为是 GROUP 消息，则 target_id 代表频道 id
+     */
+    public val targetId: ID
+
+    /**
+     * 发送者 id, `1` 代表系统
+     */
+    public val authorId: ID
+
+    /**
+     * 消息内容, 文件，图片，视频时，content 为 url
+     */
+    public val content: String
+
+    /**
+     * msgId
+     */
+    public val msgId: ID
+
+
+    /**
+     * 消息发送时间的**毫秒**时间戳.
+     */
+    public val msgTimestamp: Timestamp
+
+    /**
+     * 随机串，与用户消息发送 api 中传的 nonce 保持一致
+     */
+    public val nonce: String
+
+    /**
+     * 不同的消息类型，结构不一致。
+     */
+    public val extra: Extra
+
+
+    /**
+     * 事件中的额外消息结构。
+     *
+     * 分为两种情况：[Event.type] == `255` 的时候与相反的时候。
+     *
+     *
+     * 等于 `255` 的时候即代表为 *系统事件消息*，否则是 *文字频道消息*
+     *
+     * @see Event.extra
+     */
+    public sealed interface Extra {
+        //
+        // /**
+        //  * Type.
+        //  */
+        // public val type: T
+
+
+        /**
+         * 当 [Event.type] == `255` 时的 [结构](https://developer.kaiheila.cn/doc/event/event-introduction#).
+         *
+         *
+         *
+         */
+        public interface Sys<B> : Extra {
+            /**
+             * 标识该事件的类型
+             */
+            public val type: String
+
+            /**
+             * 该事件关联的具体数据, 详见各系统消息事件示例.
+             */
+            public val body: B
+        }
+
+        /**
+         * 当 [Event.type] != `255` 时的 [结构](https://developer.kaiheila.cn/doc/event/event-introduction#)
+         */
+        public interface Text : Extra {
+            /**
+             * 同上面的type（[Event.type]）
+             */
+            public val type: Type
+
+            /**
+             * 服务器 id
+             */
+            public val guildId: ID
+
+            /**
+             * 频道名
+             */
+            public val channelName: String
+
+            /**
+             * 提及到的用户 id 的列表
+             */
+            public val mention: List<ID>
+
+            /**
+             * 是否 mention 所有用户
+             */
+            public val mentionAll: Boolean
+
+            /**
+             * mention 用户角色的数组
+             */
+            public val mentionRoles: List<ID>
+
+            /**
+             * 是否 mention 在线用户
+             */
+            public val mentionHere: Boolean
+
+            /**
+             * 用户信息, 见 [对象-用户User](https://developer.kaiheila.cn/doc/objects#%E7%94%A8%E6%88%B7User) ([User])
+             */
+            public val author: User
+        }
+
+    }
+
+}
+
+
+/**
+ * 基础的事件接收实体。
+ */
+@Serializable
+internal data class SimpleEvent<E : Event.Extra>(
+    @SerialName("channel_type")
+    override val channelType: Channel.Type,
+    override val type: Event.Type,
+    @SerialName("target_id")
+    override val targetId: CharSequenceID,
+    @SerialName("author_id")
+    override val authorId: CharSequenceID,
+    override val content: String,
+    @SerialName("msg_id")
+    override val msgId: CharSequenceID,
+    @SerialName("msg_timestamp")
+    override val msgTimestamp: Timestamp,
+    override val nonce: String,
+    override val extra: E,
+) : Event<E>
+
+
+
+/**
+ * 类型枚举 [Event.Type] 的类型常量类。
+ */
+public object EventTypeConstant {
+    public const val T_TEXT: Int = 1
+    public const val T_IMAGE: Int = 2
+    public const val T_VIDEO: Int = 3
+    public const val T_FILE: Int = 4
+    public const val T_VOICE: Int = 8
+    public const val T_KMD: Int = 9
+    public const val T_CARD: Int = 10
+
+    /** sys目前与上述几种类型的关联性/连续性差距较大，暂时用于单独判断。 */
+    public const val T_SYS: Int = 255
+
+    /** all types */
+    private val types = BitSet(16).apply {
+        set(T_TEXT)
+        set(T_IMAGE)
+        set(T_VIDEO)
+        set(T_FILE)
+        set(T_VOICE)
+        set(T_KMD)
+        set(T_CARD)
+    }
+
+    /** 判断是否存在某个类型。 */
+    public operator fun contains(type: Int): Boolean = types[type] || type == T_SYS
+}
+
+
+/**
+ * [Event.Type] 序列化器。
+ */
+public object EventTypeSerializer : KSerializer<Event.Type> {
+    /** descriptor for Int */
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("EventType", PrimitiveKind.INT)
+
+    override fun deserialize(decoder: Decoder): Event.Type {
+        val value = decoder.decodeInt()
+        return Event.Type.byType(value)
+    }
+
+    override fun serialize(encoder: Encoder, value: Event.Type) {
+        encoder.encodeInt(value.type)
+    }
+}

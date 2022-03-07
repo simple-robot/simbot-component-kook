@@ -15,24 +15,33 @@
  *
  */
 
-package love.forte.simbot.kaiheila.api.guild.role
+package love.forte.simbot.kaiheila.event.message
 
-import kotlinx.serialization.*
 import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import love.forte.simbot.kaiheila.event.*
+import love.forte.simbot.kaiheila.objects.*
 
 /**
+ * [Event.Extra] 中当 [Event.type] != [Event.Type.SYS] 的时候的Extra数据格式。
  *
- * 对用户角色的操作结果响应体。
- *
- * @see GuildRoleGrantRequest
- * @see GuildRoleRevokeRequest
- *
- *
+ * @author ForteScarlet
  */
-@Serializable
-public data class UserRoleOperated @ApiResultType constructor(
-    @SerialName("user_id") val userId: CharSequenceID,
-    @SerialName("guild_id") val guildId: CharSequenceID,
-    val roles: List<LongID>,
-)
+@kotlinx.serialization.Serializable
+public abstract class NoSysEvent : Event<Event.Extra.Text> {
+    abstract override val type: Event.Type
+    abstract override val channelType: Channel.Type
+    abstract override val targetId: ID
+    abstract override val authorId: ID
+    abstract override val content: String
+    abstract override val msgId: ID
+    abstract override val msgTimestamp: Timestamp
+    abstract override val nonce: String
+    abstract override val extra: Event.Extra.Text
+}
+
+
+
+
+
+
+

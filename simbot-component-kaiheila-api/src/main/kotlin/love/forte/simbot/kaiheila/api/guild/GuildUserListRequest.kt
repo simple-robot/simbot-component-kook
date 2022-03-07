@@ -163,5 +163,5 @@ public data class GuildUser @ApiResultType constructor(
     override val mobileVerified: Boolean = false,
     @SerialName("identify_num")
     override val identifyNum: String = username.split("#", limit = 2).let { if (it.size < 2) it[1] else "" },
-    override val roles: List<IntID> = emptyList(),
+    override val roles: List<LongID> = emptyList(),
 ) : User

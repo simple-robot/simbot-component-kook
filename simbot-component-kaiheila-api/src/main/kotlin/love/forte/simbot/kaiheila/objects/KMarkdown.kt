@@ -1,14 +1,17 @@
 /*
+ *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
  *
- *  * Copyright (c) 2021. ForteScarlet All rights reserved.
- *  * Project  simple-robot
- *  * File     MiraiAvatar.kt
- *  *
- *  * You can contact the author through the following channels:
- *  * github https://github.com/ForteScarlet
- *  * gitee  https://gitee.com/ForteScarlet
- *  * email  ForteScarlet@163.com
- *  * QQ     1149159218
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
  *
  */
 
@@ -20,6 +23,7 @@ package love.forte.simbot.kaiheila.objects
 import kotlinx.serialization.*
 import love.forte.simbot.kaiheila.objects.AtTarget.*
 import love.forte.simbot.kaiheila.objects.AtTarget.User
+import love.forte.simbot.kaiheila.objects.impl.*
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 @DslMarker
@@ -43,29 +47,18 @@ public interface KMarkdown {
     /**
      * 此 markdown 的最终字符串。
      */
-    @SerialName("raw_content")
     public val rawContent: String
 
     /**
      * 提及部分，参考自 [KMarkdown消息](https://developer.kaiheila.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF) 字段
      */
-    @SerialName("mention_part")
     public val mentionPart: List<MentionPart>
 
     /**
-     *
+     * \@特定角色 的角色ID信息，与mention_roles中数据对应 -&gt; [ 角色id ]
      */
-    @SerialName("mention_role_part")
     public val mentionRolePart: List<Role>
 
-    // companion object : SerializerModuleRegistrar {
-    //     override public fun SerializersModuleBuilder.serializerModule() {
-    //         polymorphic(KMarkdown::class) {
-    //             subclass(RawValueKMarkdown::class)
-    //             default { RawValueKMarkdown.serializer() }
-    //         }
-    //     }
-    // }
 }
 
 /**
@@ -73,13 +66,13 @@ public interface KMarkdown {
  */
 @Serializable
 @SerialName(RawValueKMarkdown.SERIAL_NAME)
-public data class RawValueKMarkdown(
+internal data class RawValueKMarkdown(
     @SerialName("raw_content")
     override val rawContent: String,
     @SerialName("mention_part")
     override val mentionPart: List<MentionPart> = emptyList(),
     @SerialName("mention_role_part")
-    override val mentionRolePart: List<Role> = emptyList(),
+    override val mentionRolePart: List<RoleImpl> = emptyList(),
 ) : KMarkdown {
     internal companion object {
         const val SERIAL_NAME = "RAW_V_K_MD"
@@ -122,7 +115,8 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
      * 拼接一个倾斜文本
      */
     @KhlMarkdownBuilderDsl
-    public fun italic(value: CharSequence): KMarkdownBuilder = also { KhlMarkdownGrammar.Italic.appendTo(value, appender) }
+    public fun italic(value: CharSequence): KMarkdownBuilder =
+        also { KhlMarkdownGrammar.Italic.appendTo(value, appender) }
 
     /**
      * 拼接一个加粗倾斜文本
@@ -164,7 +158,8 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
      * 引用。如果想要结束引用内容，需要连续换行两次。
      */
     @KhlMarkdownBuilderDsl
-    public fun quote(value: CharSequence): KMarkdownBuilder = also { KhlMarkdownGrammar.Quote.appendTo(value, appender) }
+    public fun quote(value: CharSequence): KMarkdownBuilder =
+        also { KhlMarkdownGrammar.Quote.appendTo(value, appender) }
 
     /**
      * 引用，并在结束后自动换行2次。
@@ -228,7 +223,8 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
      * role
      */
     @KhlMarkdownBuilderDsl
-    public fun role(roleId: CharSequence): KMarkdownBuilder = also { KhlMarkdownGrammar.Role.appendTo(roleId, appender) }
+    public fun role(roleId: CharSequence): KMarkdownBuilder =
+        also { KhlMarkdownGrammar.Role.appendTo(roleId, appender) }
 
     /**
      * 行内代码

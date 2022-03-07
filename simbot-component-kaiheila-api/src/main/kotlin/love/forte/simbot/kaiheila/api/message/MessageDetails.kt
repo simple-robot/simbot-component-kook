@@ -163,7 +163,7 @@ public interface Author : User {
     override val isBot: Boolean
     override val mobileVerified: Boolean
     override val nickname: String
-    override val roles: List<IntID>
+    override val roles: List<LongID>
 }
 
 
