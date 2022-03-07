@@ -310,7 +310,23 @@ public abstract class KaiheilaPostRequest<T>(
     private object NULL
 }
 
+/**
+ * 当目标值 [value] 不为null并且通过 [check] 检测的时候。
+ */
+public inline fun <reified T : Any?> ParametersBuilder.appendIfNotnullAnd(
+    name: String,
+    value: T?,
+    check: (T) -> Boolean,
+    toStringBlock: (T) -> String = { it.toString() },
+) {
+    value?.takeIf(check)?.let { v ->
+        append(name, toStringBlock(v))
+    }
+}
 
+/**
+ * 当目标值 [value] 不为null时拼接。
+ */
 public inline fun <reified T> ParametersBuilder.appendIfNotnull(
     name: String,
     value: T?,
