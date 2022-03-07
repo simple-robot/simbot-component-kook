@@ -81,14 +81,14 @@ public interface Event<out Extra : Event.Extra> {
     public enum class Type(public val type: Int) {
         UNKNOWN(-999999),
 
-        TEXT(EventTypeConstant.T_TEXT),
-        IMAGE(EventTypeConstant.T_IMAGE),
-        VIDEO(EventTypeConstant.T_VIDEO),
-        FILE(EventTypeConstant.T_FILE),
-        VOICE(EventTypeConstant.T_VOICE),
-        KMD(EventTypeConstant.T_KMD),
-        CARD(EventTypeConstant.T_CARD),
-        SYS(EventTypeConstant.T_SYS),
+        TEXT(EventTypeConstant.TEXT),
+        IMAGE(EventTypeConstant.IMAGE),
+        VIDEO(EventTypeConstant.VIDEO),
+        FILE(EventTypeConstant.FILE),
+        VOICE(EventTypeConstant.VOICE),
+        KMD(EventTypeConstant.KMD),
+        CARD(EventTypeConstant.CARD),
+        SYS(EventTypeConstant.SYS),
         ;
 
         public companion object {
@@ -263,57 +263,35 @@ public interface Event<out Extra : Event.Extra> {
 }
 
 
-/**
- * 基础的事件接收实体。
- */
-@Serializable
-internal data class SimpleEvent<E : Event.Extra>(
-    @SerialName("channel_type")
-    override val channelType: Channel.Type,
-    override val type: Event.Type,
-    @SerialName("target_id")
-    override val targetId: CharSequenceID,
-    @SerialName("author_id")
-    override val authorId: CharSequenceID,
-    override val content: String,
-    @SerialName("msg_id")
-    override val msgId: CharSequenceID,
-    @SerialName("msg_timestamp")
-    override val msgTimestamp: Timestamp,
-    override val nonce: String,
-    override val extra: E,
-) : Event<E>
-
-
 
 /**
  * 类型枚举 [Event.Type] 的类型常量类。
  */
 public object EventTypeConstant {
-    public const val T_TEXT: Int = 1
-    public const val T_IMAGE: Int = 2
-    public const val T_VIDEO: Int = 3
-    public const val T_FILE: Int = 4
-    public const val T_VOICE: Int = 8
-    public const val T_KMD: Int = 9
-    public const val T_CARD: Int = 10
+    public const val TEXT: Int = 1
+    public const val IMAGE: Int = 2
+    public const val VIDEO: Int = 3
+    public const val FILE: Int = 4
+    public const val VOICE: Int = 8
+    public const val KMD: Int = 9
+    public const val CARD: Int = 10
 
     /** sys目前与上述几种类型的关联性/连续性差距较大，暂时用于单独判断。 */
-    public const val T_SYS: Int = 255
+    public const val SYS: Int = 255
 
     /** all types */
     private val types = BitSet(16).apply {
-        set(T_TEXT)
-        set(T_IMAGE)
-        set(T_VIDEO)
-        set(T_FILE)
-        set(T_VOICE)
-        set(T_KMD)
-        set(T_CARD)
+        set(TEXT)
+        set(IMAGE)
+        set(VIDEO)
+        set(FILE)
+        set(VOICE)
+        set(KMD)
+        set(CARD)
     }
 
     /** 判断是否存在某个类型。 */
-    public operator fun contains(type: Int): Boolean = types[type] || type == T_SYS
+    public operator fun contains(type: Int): Boolean = types[type] || type == SYS
 }
 
 

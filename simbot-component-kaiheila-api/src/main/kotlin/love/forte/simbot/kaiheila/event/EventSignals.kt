@@ -20,6 +20,7 @@ package love.forte.simbot.kaiheila.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
+import love.forte.simbot.kaiheila.event.user.*
 import java.util.*
 
 /**
@@ -67,18 +68,18 @@ public class MessageEventParser<EX : MessageEventExtra>(
  * 使用 [SimpleSysEventExtra] 作为 extra 的类型的事件解析器。
  */
 public class SysEventParser<B>(
-    private val type: Event.Type,
+    private val type: Event.Type = Event.Type.SYS,
     private val subType: String,
-    extraBodySerializer: KSerializer<B>
-) : EventParser<SimpleSysEventExtra<B>, SysEvent<B, SimpleSysEventExtra<B>>>() {
-    private val eventSerializer: KSerializer<out SysEvent<B, SimpleSysEventExtra<B>>> =
-        SysEventImpl.serializer(extraBodySerializer)
+    extraBodySerializer: KSerializer<out B>
+) : EventParser<SimpleSysEventExtra<B>, SystemEvent<B, SimpleSysEventExtra<B>>>() {
+    private val eventSerializer: KSerializer<out SystemEvent<B, SimpleSysEventExtra<B>>> =
+        SystemEventImpl.serializer(extraBodySerializer)
 
     override fun check(eventType: Event.Type, subType: JsonPrimitive): Boolean {
         return eventType == type && subType.isString && this.subType == subType.contentOrNull
     }
 
-    override fun deserialize(decoder: Json, rawData: JsonElement): SysEvent<B, SimpleSysEventExtra<B>> {
+    override fun deserialize(decoder: Json, rawData: JsonElement): SystemEvent<B, SimpleSysEventExtra<B>> {
         return decoder.decodeFromJsonElement(eventSerializer, rawData)
     }
 
@@ -98,7 +99,10 @@ public object EventSignals {
         eMap[Event.Type.FILE] = mapOf(Event.Type.FILE.type to FileEventParser)
         eMap[Event.Type.KMD] = mapOf(Event.Type.KMD.type to KMarkdownEventParser)
         eMap[Event.Type.CARD] = mapOf(Event.Type.CARD.type to CardEventParser)
+
         eMap[Event.Type.SYS] = buildMap {
+            userEventParsers()
+
             // TODO other sys events
         }
     }
