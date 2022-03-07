@@ -201,7 +201,7 @@ public interface Event<out Extra : Event.Extra> {
          *
          *
          */
-        public interface Sys<B> : Extra {
+        public interface Sys<out B> : Extra {
             /**
              * 标识该事件的类型
              */

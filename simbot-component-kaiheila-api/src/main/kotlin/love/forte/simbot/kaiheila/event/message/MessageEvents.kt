@@ -17,6 +17,7 @@
 
 package love.forte.simbot.kaiheila.event.message
 
+import kotlinx.serialization.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.event.*
 import love.forte.simbot.kaiheila.objects.*
@@ -60,14 +61,19 @@ public interface MessageEvent<out E : MessageEventExtra> : Event<E> {
 /**
  * [MessageEvent] 的基础实现。
  */
-@kotlinx.serialization.Serializable
+@Serializable
 internal data class MessageEventImpl<E : MessageEventExtra>(
+    @SerialName("channel_type")
     override val channelType: Channel.Type,
     override val type: Event.Type,
+    @SerialName("target_id")
     override val targetId: CharSequenceID,
+    @SerialName("author_id")
     override val authorId: CharSequenceID,
     override val content: String,
+    @SerialName("msg_id")
     override val msgId: CharSequenceID,
+    @SerialName("msg_timestamp")
     override val msgTimestamp: Timestamp,
     override val nonce: String,
     override val extra: E
@@ -75,97 +81,105 @@ internal data class MessageEventImpl<E : MessageEventExtra>(
 
 
 /**
- * 与消息事件相关的抽象类定义。
+ * 系统相关事件接口。
  */
-public abstract class AbstractMessageEvent<E : MessageEventExtra> : MessageEvent<E>
+public interface SysEvent<out B, out EX : Event.Extra.Sys<B>> : Event<EX> {
+    override val channelType: Channel.Type
+    override val type: Event.Type
+    override val targetId: ID
+    override val authorId: ID
+    override val content: String
+    override val msgId: ID
+    override val msgTimestamp: Timestamp
+    override val nonce: String
+    override val extra: EX
+}
+
+/**
+ * 针对 [Event.Extra.Sys] 的简单实现。
+ */
+@Serializable
+public data class SimpleSysEventExtra<B>(override val type: String, override val body: B) : Event.Extra.Sys<B>
 
 
-// public fun EventLocator.registerMessageEventCoordinates() {
-//     TextEventImpl.run {
-//         registerCoordinates()
-//     }
-//
-//     ImageEventImpl.run {
-//         registerCoordinates()
-//     }
-//
-//     VideoEventImpl.run {
-//         registerCoordinates()
-//     }
-//
-//     FileEventImpl.run {
-//         registerCoordinates()
-//     }
-//
-//     CardEventImpl.run {
-//         registerCoordinates()
-//     }
-//
-//     KMarkdownEventImpl.run {
-//         registerCoordinates()
-//     }
-// }
+@Serializable
+internal data class SysEventImpl<B>(
+    @SerialName("channel_type")
+    override val channelType: Channel.Type,
+    override val type: Event.Type,
+    @SerialName("target_id")
+    override val targetId: CharSequenceID,
+    @SerialName("author_id")
+    override val authorId: CharSequenceID,
+    override val content: String,
+    @SerialName("msg_id")
+    override val msgId: CharSequenceID,
+    @SerialName("msg_timestamp")
+    override val msgTimestamp: Timestamp,
+    override val nonce: String,
+    override val extra: SimpleSysEventExtra<B>
+) : SysEvent<B, SimpleSysEventExtra<B>>
 
 
 //region External interface
 //
-
-/**
- * 所有的消息事件
- */
-public interface MessageEventExternal {
-    public interface Group : MessageEventExternal
-    public interface Person : MessageEventExternal
-}
-
-/**sea 纯文本消息事件。
- */
-public sealed interface TextEvent : MessageEvent<TextEventExtra>, MessageEventExternal {
-    public interface Group : TextEvent, MessageEventExternal.Group
-    public interface Person : TextEvent, MessageEventExternal.Person
-}
-
-/**
- * 图片消息事件。
- */
-public sealed interface ImageEvent : MessageEvent<ImageEventExtra>, MessageEventExternal {
-    public interface Group : ImageEvent, MessageEventExternal.Group
-    public interface Person : ImageEvent, MessageEventExternal.Person
-}
-
-/**
- * 文件消息事件。
- */
-public sealed interface FileEvent : MessageEvent<FileEventExtra>, MessageEventExternal {
-    public interface Group : FileEvent, MessageEventExternal.Group
-    public interface Person : FileEvent, MessageEventExternal.Person
-}
-
-/**
- * 视频消息事件。
- */
-public sealed interface VideoEvent : MessageEvent<VideoEventExtra>, MessageEventExternal {
-    public interface Group : VideoEvent, MessageEventExternal.Group
-    public interface Person : VideoEvent, MessageEventExternal.Person
-}
-
-/**
- * 卡片消息事件。
- */
-public sealed interface CardEvent : MessageEvent<CardEventExtra>, MessageEventExternal {
-    public interface Group : CardEvent, MessageEventExternal.Group
-    public interface Person : CardEvent, MessageEventExternal.Person
-}
-
-/**
- * `KMarkdown` 消息事件。
- */
-public sealed interface KMarkdownEvent : MessageEvent<KMarkdownEventExtra>, MessageEventExternal {
-    public interface Group : KMarkdownEvent, MessageEventExternal.Group
-    public interface Person : KMarkdownEvent, MessageEventExternal.Person
-}
-
-//endregion
+//
+// /**
+//  * 所有的消息事件
+//  */
+// public interface MessageEventExternal {
+//     public interface Group : MessageEventExternal
+//     public interface Person : MessageEventExternal
+// }
+//
+// /**sea 纯文本消息事件。
+//  */
+// public sealed interface TextEvent : MessageEvent<TextEventExtra>, MessageEventExternal {
+//     public interface Group : TextEvent, MessageEventExternal.Group
+//     public interface Person : TextEvent, MessageEventExternal.Person
+// }
+//
+// /**
+//  * 图片消息事件。
+//  */
+// public sealed interface ImageEvent : MessageEvent<ImageEventExtra>, MessageEventExternal {
+//     public interface Group : ImageEvent, MessageEventExternal.Group
+//     public interface Person : ImageEvent, MessageEventExternal.Person
+// }
+//
+// /**
+//  * 文件消息事件。
+//  */
+// public sealed interface FileEvent : MessageEvent<FileEventExtra>, MessageEventExternal {
+//     public interface Group : FileEvent, MessageEventExternal.Group
+//     public interface Person : FileEvent, MessageEventExternal.Person
+// }
+//
+// /**
+//  * 视频消息事件。
+//  */
+// public sealed interface VideoEvent : MessageEvent<VideoEventExtra>, MessageEventExternal {
+//     public interface Group : VideoEvent, MessageEventExternal.Group
+//     public interface Person : VideoEvent, MessageEventExternal.Person
+// }
+//
+// /**
+//  * 卡片消息事件。
+//  */
+// public sealed interface CardEvent : MessageEvent<CardEventExtra>, MessageEventExternal {
+//     public interface Group : CardEvent, MessageEventExternal.Group
+//     public interface Person : CardEvent, MessageEventExternal.Person
+// }
+//
+// /**
+//  * `KMarkdown` 消息事件。
+//  */
+// public sealed interface KMarkdownEvent : MessageEvent<KMarkdownEventExtra>, MessageEventExternal {
+//     public interface Group : KMarkdownEvent, MessageEventExternal.Group
+//     public interface Person : KMarkdownEvent, MessageEventExternal.Person
+// }
+//
+// //endregion
 
 
 
