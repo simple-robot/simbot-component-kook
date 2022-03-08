@@ -21,7 +21,7 @@ import kotlinx.serialization.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.kaiheila.objects.*
-import java.util.*
+import love.forte.simbot.kaiheila.util.*
 
 /**
  * [获取当前用户信息](https://developer.kaiheila.cn/doc/http/user#%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
@@ -29,7 +29,7 @@ import java.util.*
  * @author ForteScarlet
  */
 public object MeRequest : KaiheilaGetRequest<Me>() {
-    override val apiPaths: List<String> = Collections.unmodifiableList(listOf("user", "me"))
+    override val apiPaths: List<String> = unmodifiableListOf("user", "me")
 
     override val resultDeserializer: DeserializationStrategy<out Me>
         get() = Me.serializer()

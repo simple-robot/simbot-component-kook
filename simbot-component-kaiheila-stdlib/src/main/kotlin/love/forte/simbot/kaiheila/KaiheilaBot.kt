@@ -23,6 +23,7 @@ import kotlinx.serialization.json.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.event.*
+import org.slf4j.*
 import kotlin.coroutines.*
 
 /**
@@ -32,8 +33,9 @@ import kotlin.coroutines.*
  *
  * @author ForteScarlet
  */
-public interface KaiheilaBot : CoroutineScope {
+public interface KaiheilaBot : CoroutineScope, LoggerContainer {
     override val coroutineContext: CoroutineContext
+    override val logger: Logger
 
     /**
      * 当前bot所使用的配置类。
@@ -167,11 +169,6 @@ public interface KaiheilaBot : CoroutineScope {
          * 当前 client 是否处于运行状态。
          */
         public val isActive: Boolean
-
-        /**
-         * 是否正处于重新连接状态.
-         */
-        public val isResuming: Boolean
 
 
     }

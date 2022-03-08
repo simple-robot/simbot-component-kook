@@ -17,8 +17,7 @@
 
 package love.forte.simbot.kaiheila.api
 
-import org.jetbrains.annotations.*
-import java.util.*
+import love.forte.simbot.kaiheila.util.*
 
 /**
  *
@@ -32,7 +31,7 @@ public abstract class BaseApiRequestKey(vararg paths: String) {
      * 路径列表。
      * [apiPathList] 为不可变列表。
      */
-    public val apiPathList: List<String> = Collections.unmodifiableList(paths.asList())
+    public val apiPathList: List<String> = paths.asList().unmodifiable()
 
 
 }

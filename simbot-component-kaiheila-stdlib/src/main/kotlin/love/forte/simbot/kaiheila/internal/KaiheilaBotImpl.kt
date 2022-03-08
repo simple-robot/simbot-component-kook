@@ -28,12 +28,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.*
-import love.forte.simbot.LoggerFactory
 import love.forte.simbot.kaiheila.*
 import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.event.*
-import org.slf4j.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.*
 import java.util.zip.*
@@ -50,7 +48,7 @@ internal class KaiheilaBotImpl(
     override val ticket: KaiheilaBot.Ticket,
     override val configuration: KaiheilaBotConfiguration
 ) : KaiheilaBot {
-    private val logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.${ticket.clientId}")
+    override val logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.client.${ticket.clientId}")
     private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Any) -> Unit> =
         ConcurrentLinkedQueue()
@@ -82,6 +80,7 @@ internal class KaiheilaBotImpl(
             // install ws
             install(WebSockets)
 
+
             // config it.
             configuration.httpClientConfig(this)
         }
@@ -112,17 +111,28 @@ internal class KaiheilaBotImpl(
     @Volatile
     private var client: ClientImpl? = null
 
-    override suspend fun start(): Boolean = lifeLock.withLock {
+    override suspend fun start(): Boolean = start { null }
+
+
+    private suspend inline fun start(reason: () -> Throwable? = { null }): Boolean = lifeLock.withLock {
         if (job.isCancelled) {
-            throw kotlinx.coroutines.CancellationException("Job has been cancelled")
+            throw kotlinx.coroutines.CancellationException("Bot has been cancelled.")
         }
 
+        val c = client
+        if (c != null) {
+            clientLogger.debug("Closing the current client: {}", c)
+            c.cancel(reason())
+            clientLogger.debug("Current client closed.")
+            client = null
+        }
 
+        clientLogger.debug("Requesting for gateway info...")
         val gateway = gatewayRequest.requestDataBy(this)
 
-        val clientJob = SupervisorJob(job)
-
-        client = createClient(clientJob, gateway)
+        clientLogger.debug("Creating client by gateway {}", gateway)
+        client = createClient(gateway, DEFAULT_CONNECT_TIMEOUT)
+        clientLogger.debug("Client created. client: {}", client)
 
         true
     }
@@ -131,76 +141,81 @@ internal class KaiheilaBotImpl(
     /**
      * 创建并启动一个连接。
      */
-    private suspend fun createClient(clientJob: Job, gateway: Gateway): ClientImpl {
-        val sessionInfo = createSession(clientJob, gateway)
-        val (session, sn, heartbeatJob, sessionData) = sessionInfo
+    private suspend fun createClient(gateway: Gateway, connectTimeout: Long): ClientImpl {
+        clientLogger.debug("Creating session...")
+        val sessionInfo: SessionInfo = createSession(gateway, connectTimeout)
+        clientLogger.debug("Session created: {}", sessionInfo)
+        val (session, sn, _, sessionData) = sessionInfo
 
-        val processingJob = processEvent(clientJob, sessionInfo)
+        processEvent(sessionInfo)
 
-        return ClientImpl(clientJob, gateway.url, sessionData, heartbeatJob, processingJob, sn, session)
+        return ClientImpl(gateway.url, sessionData, sn, session)
     }
 
 
     /**
      * 创建一个连接。
      */
-    private suspend fun createSession(clientJob: Job, gateway: Gateway): SessionInfo {
+    private suspend fun createSession(gateway: Gateway, connectTimeout: Long): SessionInfo {
         val sn = AtomicLong(0)
 
         val session = httpClient.ws(gateway)
 
-        return withContext(clientJob) {
-            kotlin.runCatching {
-                val hello: Signal.Hello = session.waitHello().check()
-
-                clientLogger.debug("Received Hello: {}", hello)
-                // receive events
-
-                val heartbeatJob = session.heartbeatJob(sn)
-
-
-                return@withContext SessionInfo(session, sn, heartbeatJob, hello)
-
-            }.getOrElse {
-                session.closeReason.await().err(it)
+        kotlin.runCatching {
+            val timeoutJob = launch {
+                delay(connectTimeout)
+                val message = "Hello receive timeout: $connectTimeout ms"
+                session.cancel(message, TimeoutException(message))
             }
+
+            val hello: Signal.Hello = session.waitHello().check()
+            timeoutJob.cancel()
+
+            clientLogger.debug("Received Hello: {}", hello)
+            // receive events
+
+            val heartbeatJob = session.heartbeatJob(sn)
+
+
+            return SessionInfo(session, sn, heartbeatJob, hello)
+        }.getOrElse {
+            session.closeReason.await().err(it)
         }
 
     }
 
 
-    private suspend fun resumeSession(
-        gateway: Gateway,
-        sessionData: Signal.HelloPack,
-        seq: AtomicLong,
-    ): SessionInfo {
-        val requestToken = ticket.botToken
+    // private suspend fun resumeSession(
+    //     gateway: Gateway,
+    //     sessionData: Signal.HelloPack,
+    //     seq: AtomicLong,
+    // ): SessionInfo {
+    //
+    //     val resume = Signal.Resume(
+    //         Signal.Resume.Data(
+    //             token = requestToken,
+    //             sessionId = sessionData.sessionId,
+    //             seq = seq.get()
+    //         )
+    //     )
+    //
+    //     val session = httpClient.ws(gateway)
+    //
+    //     val hello = session.waitHello()
+    //
+    //     clientLogger.debug("Received Hello: {}", hello)
+    //
+    //     // 重连
+    //     // see https://bot.q.qq.com/wiki/develop/api/gateway/reference.html#%E9%89%B4%E6%9D%83ß
+    //     session.send(decoder.encodeToString(Signal.Resume.serializer(), resume))
+    //
+    //     val heartbeatJob = session.heartbeatJob(seq)
+    //
+    //     return SessionInfo(session, seq, heartbeatJob, logger, sessionData)
+    // }
 
-        val resume = Signal.Resume(
-            Signal.Resume.Data(
-                token = requestToken,
-                sessionId = sessionData.sessionId,
-                seq = seq.get()
-            )
-        )
 
-        val session = httpClient.ws(gateway)
-
-        val hello = session.waitHello()
-
-        clientLogger.debug("Received Hello: {}", hello)
-
-        // 重连
-        // see https://bot.q.qq.com/wiki/develop/api/gateway/reference.html#%E9%89%B4%E6%9D%83ß
-        session.send(decoder.encodeToString(Signal.Resume.serializer(), resume))
-
-        val heartbeatJob = session.heartbeatJob(seq)
-
-        return SessionInfo(session, seq, heartbeatJob, logger, sessionData)
-    }
-
-
-    private suspend fun processEvent(clientJob: Job, sessionInfo: SessionInfo): Job {
+    private suspend fun processEvent(sessionInfo: SessionInfo): Job {
         val eventSerializer = Signal.Event.serializer()
         val sn = sessionInfo.sn
 
@@ -217,9 +232,12 @@ internal class KaiheilaBotImpl(
                     null
                 }
                 Signal.Reconnect.S_CODE -> {
-                    // TODO reconnect
-                    this.clientLogger.error("Reconnect signal received.")
-
+                    this.clientLogger.debug("Reconnect signal received: {}", eventString)
+                    val reconnect = decoder.decodeFromJsonElement(Signal.Reconnect.serializer(), jsonElement)
+                    val reconnectData = reconnect.data
+                    this.launch {
+                        start { ReconnectException(reconnectData.code, reconnectData.err.toString()) }
+                    }
                     null
                 }
                 // Event
@@ -230,6 +248,8 @@ internal class KaiheilaBotImpl(
                 else -> null
             }
         }
+
+        val processJob = SupervisorJob(sessionInfo.session.coroutineContext[Job])
 
         return sessionInfo.session.incoming.receiveAsFlow().mapNotNull {
             when (it) {
@@ -281,7 +301,6 @@ internal class KaiheilaBotImpl(
             // 留下最大的值。
             sn.updateAndGet { prev -> max(prev, nowSn) }
         }
-            .flowOn(clientJob) // on client job
             .onCompletion { cause ->
                 clientLogger.debug(
                     "Session flow completion. cause: ${cause?.localizedMessage}",
@@ -293,7 +312,7 @@ internal class KaiheilaBotImpl(
                     cause
                 )
             }
-            .launchIn(this)
+            .launchIn(this + processJob)
     }
 
 
@@ -303,9 +322,6 @@ internal class KaiheilaBotImpl(
     private suspend fun HttpClient.ws(gateway: Gateway): DefaultClientWebSocketSession {
         return webSocketSession {
             url(gateway.url)
-            // headers {
-            //     this[HttpHeaders.Authorization] = ticket.authorization
-            // }
         }
     }
 
@@ -362,19 +378,16 @@ internal class KaiheilaBotImpl(
     }
 
     private inner class ClientImpl(
-        private val job: Job,
+        //private val job: Job,
         override val url: String,
         private val sessionData: Signal.Hello,
-        private var heartbeatJob: Job,
-        private var processingJob: Job,
         private val _sn: AtomicLong,
         private var session: DefaultClientWebSocketSession,
     ) : KaiheilaBot.Client {
         override val sn: Long get() = _sn.get()
-        private val _resuming = AtomicBoolean(false)
 
         override val isActive: Boolean get() = session.isActive
-        override val isResuming: Boolean get() = _resuming.get()
+        // override val isResuming: Boolean get() = _resuming.get()
 
         override val bot: KaiheilaBot
             get() = this@KaiheilaBotImpl
@@ -382,85 +395,18 @@ internal class KaiheilaBotImpl(
         override val isCompress: Boolean
             get() = this@KaiheilaBotImpl.isCompress
 
-        private var resumeJob: Job = launch {
-            val closed = session.closeReason.await()
-            resume(closed)
-        }
 
-        suspend fun cancel(reason: Throwable? = null) {
+        suspend fun cancel(reason: Throwable? = null) = lifeLock.withLock {
             val cancel = reason?.let { CancellationException(it.localizedMessage, it) }
 
-            job.cancel(cancel)
-            val sessionJob = session.coroutineContext[Job]
-            sessionJob?.cancel(cancel)
-            resumeJob.cancel(cancel)
-            heartbeatJob.cancel(cancel)
-
-            sessionJob?.join()
-            heartbeatJob.join()
-            processingJob.join()
+            val sessionJob = session.coroutineContext[Job]!!
+            sessionJob.cancel(cancel)
+            sessionJob.join()
         }
 
-
-        /**
-         * 重新连接。
-         * // TODO 增加日志
-         */
-        private suspend fun resume(closeReason: CloseReason?) {
-            if (closeReason == null) {
-                clientLogger.warn(
-                    "Client {} was closed, but no reason. stop this client without any action, including resuming.",
-                    this
-                )
-                return
-            }
-
-            // val code = closeReason.code
-            // TODO reason check
-            // if (!checkResumeCode(code)) {
-            //     logger.debug("Not resume code: {}, close and restart.", code)
-            //     launch { start() }
-            //     return
-            // }
-
-            while (!_resuming.compareAndSet(false, true)) {
-                logger.info("In resuming now, delay 100ms")
-                delay(100)
-            }
-
-            logger.info("Resume. reason: $closeReason")
-
-            try {
-                heartbeatJob.cancel()
-                processingJob.cancel()
-                heartbeatJob.join()
-                processingJob.join()
-
-                val gatewayInfo = gatewayRequest.resume(sn, sessionData.d.sessionId).requestDataBy(this@KaiheilaBotImpl)
-
-                // val gatewayInfo = GatewayApis.Normal.request(
-                //     this@KaiheilaBotImpl.httpClient,
-                //     server = this@KaiheilaBotImpl.url,
-                //     token = this@KaiheilaBotImpl.ticket.botToken,
-                //     decoder = this@KaiheilaBotImpl.decoder,
-                // )
-
-                val resumeSession = resumeSession(gatewayInfo, sessionData, _sn)
-                val (session, _, heartbeatJob, _, _) = resumeSession
-                this.session = session
-                this.heartbeatJob = heartbeatJob
-                val processingJob = processEvent(resumeSession)
-                this.processingJob = processingJob
-                this.resumeJob = launch {
-                    val closed = session.closeReason.await()
-                    resume(closed)
-                }
-            } finally {
-                _resuming.compareAndSet(true, false)
-            }
-
+        override fun toString(): String {
+            return "Client(url=$url, sn=$sn, sessionId=${sessionData.d.sessionId})"
         }
-
 
     }
 
@@ -468,6 +414,12 @@ internal class KaiheilaBotImpl(
     override suspend fun me(): Me {
         return MeRequest.requestDataBy(this)
     }
+
+
+    companion object {
+        private val DEFAULT_CONNECT_TIMEOUT: Long = 6000L
+    }
+
 }
 
 
@@ -527,3 +479,7 @@ private fun Signal.Hello.check(): Signal.Hello {
 
     return this
 }
+
+
+internal class ReconnectException(code: Int, message: String, cause: Throwable? = null) :
+    KaiheilaApiException(code, message, cause)

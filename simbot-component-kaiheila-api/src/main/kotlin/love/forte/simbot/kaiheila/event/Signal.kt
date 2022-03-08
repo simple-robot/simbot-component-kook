@@ -354,6 +354,9 @@ public sealed class Signal<T> {
 
 }
 
+public inline val <T> Signal<T>.data: T get() = d
+
+
 
 /**
  * 尝试获取一个事件的外层 type 属性字段，并转化为 type。

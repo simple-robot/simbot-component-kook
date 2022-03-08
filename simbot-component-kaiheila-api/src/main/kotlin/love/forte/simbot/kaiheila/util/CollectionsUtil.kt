@@ -6,7 +6,11 @@ import java.util.*
 /**
  * 将目标转化为不可变列表。
  */
-public inline fun <reified T> List<T>.unmodifiable(): List<T> = Collections.unmodifiableList(this.toTypedArray().asList())
+public inline fun <reified T> List<T>.unmodifiable(): List<T> = when {
+    isEmpty() -> emptyList()
+    size == 1 -> listOf(first())
+    else -> Collections.unmodifiableList(toTypedArray().asList())
+}
 
 /**
  * 构建不可变列表。
