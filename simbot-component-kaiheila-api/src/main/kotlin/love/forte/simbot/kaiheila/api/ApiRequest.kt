@@ -30,6 +30,7 @@ import kotlinx.serialization.json.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.*
 import love.forte.simbot.utils.*
+import java.util.function.*
 
 
 /**
@@ -86,16 +87,22 @@ public abstract class KaiheilaApiRequest<T> {
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
+     * @param postchecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
+     *
+     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postchecker] 进行实现支持。
+     *
      */
     @JvmSynthetic
     public open suspend fun request(
         client: HttpClient,
         authorization: String,
-        decoder: Json = DEFAULT_JSON
+        decoder: Json = DEFAULT_JSON,
+        postchecker: suspend (HttpResponse) -> Unit = {}
     ): ApiResult {
         val response = requestForResponse(client, authorization) {
             requestFinishingAction()
-        }
+        }.also { resp -> postchecker(resp) }
+
 
         return response.receive()
     }
@@ -116,6 +123,10 @@ public abstract class KaiheilaApiRequest<T> {
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
+     * @param postchecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
+     *
+     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postchecker] 进行实现支持。
+     *
      * @see request
      */
     @Api4J
@@ -123,8 +134,13 @@ public abstract class KaiheilaApiRequest<T> {
     public open fun requestBlocking(
         client: HttpClient,
         authorization: String,
-        decoder: Json = DEFAULT_JSON
-    ): ApiResult = runInBlocking { request(client, authorization, decoder) }
+        decoder: Json = DEFAULT_JSON,
+        postchecker: Consumer<HttpResponse> = defaultRequestPostChecker
+    ): ApiResult = runInBlocking {
+        request(client, authorization, decoder) { resp ->
+            runWithInterruptible { postchecker.accept(resp) }
+        }
+    }
 
 
     /**
@@ -143,9 +159,7 @@ public abstract class KaiheilaApiRequest<T> {
      */
     @JvmSynthetic
     public open suspend fun requestData(
-        client: HttpClient,
-        authorization: String,
-        decoder: Json = DEFAULT_JSON
+        client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
     ): T {
         val result = request(client, authorization, decoder)
         return result.parseDataOrThrow(decoder, resultDeserializer)
@@ -169,9 +183,7 @@ public abstract class KaiheilaApiRequest<T> {
     @Api4J
     @JvmOverloads
     public open fun requestDataBlocking(
-        client: HttpClient,
-        authorization: String,
-        decoder: Json = DEFAULT_JSON
+        client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
     ): T = runInBlocking { requestData(client, authorization, decoder) }
 
 
@@ -180,6 +192,8 @@ public abstract class KaiheilaApiRequest<T> {
             isLenient = true
             ignoreUnknownKeys = true
         }
+
+        internal val defaultRequestPostChecker: Consumer<HttpResponse> = Consumer {}
     }
 
 }

@@ -41,16 +41,6 @@ public open class KhlRuntimeException : SimbotRuntimeException {
 }
 
 
-// TODO
-/**
- * 开黑啦 [超速限制](https://developer.kaiheila.cn/doc/rate-limit) 异常。
- */
-public open class KhlRateLimitException : KhlRuntimeException {
-    public constructor() : super()
-    public constructor(message: String?) : super(message)
-    public constructor(message: String?, cause: Throwable?) : super(message, cause)
-    public constructor(cause: Throwable?) : super(cause)
-}
 
 
 
