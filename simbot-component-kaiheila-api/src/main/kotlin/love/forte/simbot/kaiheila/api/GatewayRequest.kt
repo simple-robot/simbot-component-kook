@@ -65,7 +65,7 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KaiheilaGe
     /**
      * 重连获取路由时使用的api。
      */
-    public class Resume(isCompress: Boolean, private val sn: Long, private val sessionId: String) :
+    public class Resume(internal val isCompress: Boolean, private val sn: Long, private val sessionId: String) :
         GatewayRequest(isCompress) {
         override fun ParametersBuilder.buildParameters0() {
             append("resume", "1")
@@ -77,10 +77,13 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KaiheilaGe
 
 
 @Suppress("unused")
-public fun Compress.resume(sn: Long, sessionId: String): Resume = Resume(true, sn, sessionId)
-
-@Suppress("unused")
-public fun NotCompress.resume(sn: Long, sessionId: String): Resume = Resume(false, sn, sessionId)
+public fun GatewayRequest.resume(sn: Long, sessionId: String): Resume {
+    return when (this) {
+        is Compress -> Resume(true, sn, sessionId)
+        is NotCompress -> Resume(true, sn, sessionId)
+        is Resume -> Resume(isCompress, sn, sessionId)
+    }
+}
 
 
 /**

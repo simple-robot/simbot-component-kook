@@ -119,8 +119,21 @@ public interface KaiheilaBot : CoroutineScope {
     }
 
 
+    /**
+     * 启动此bot的连接。
+     *
+     * @throws kotlinx.coroutines.CancellationException 如果已经被关闭。
+     * @return 如果正常运行中，则尝试重新启动；如果尚未开始，则启动。如果已经被关闭，抛出 [kotlinx.coroutines.CancellationException].
+     */
     @JvmSynthetic
     public suspend fun start(): Boolean
+
+
+    /**
+     * 终止此bot并关闭所有连接。
+     */
+    @JvmSynthetic
+    public suspend fun cancel(reason: Throwable? = null)
 
 
     /**

@@ -113,7 +113,7 @@ public object EventSignals {
             guildRoleEventParsers()
             guildMemberEventParsers()
 
-            // TODO other sys events
+            // other sys events..?
         }
     }
 
@@ -121,12 +121,12 @@ public object EventSignals {
     /**
      * 根据 [type] 和 [subType] 尝试定位一个事件解析器。
      */
-    public fun get(type: Event.Type, subType: Any): EventParser<*, *>? = eventParsers[type.ordinal][subType]
+    public operator fun get(type: Event.Type, subType: Any): EventParser<*, *>? = eventParsers[type.ordinal][subType]
 
     /**
      * 获取消息事件解析器。如果使用了 [Event.Type.SYS] 或者 [Event.Type.VIDEO], 则得到null。
      */
-    public fun get(type: Event.Type): MessageEventParser<*>? {
+    public operator fun get(type: Event.Type): MessageEventParser<*>? {
         val subMap = eventParsers[type.ordinal].takeIf { it.size == 1 } ?: return null
         val (key, value) = subMap.entries.first()
         if (key != type) return null

@@ -83,10 +83,14 @@ public sealed class Signal<T> {
      */
     @Serializable
     public data class Event(
-        override val s: Int,
+        override val s: Int = S_CODE,
         override val d: JsonElement,
-        public val sn: Int,
-    ) : Signal<JsonElement>()
+        public val sn: Long,
+    ) : Signal<JsonElement>() {
+        public companion object {
+            public const val S_CODE: Int = 0
+        }
+    }
     //endregion
 
 
@@ -131,11 +135,27 @@ public sealed class Signal<T> {
      */
     @Serializable
     public data class Hello(override val d: HelloPack) : Signal<HelloPack>() {
-        override val s: Int get() = 1
+        override val s: Int get() = S_CODE
+
+        public companion object {
+            public const val S_CODE: Int = 1
+            public const val SUCCESS_CODE: Long = 0
+
+            private val errorCodes: Map<Long, String> = mapOf(
+                40100L to "缺少参数",
+                40101L to "无效的 token",
+                40102L to "token 验证失败",
+                40103L to "token 过期",
+            )
+
+            public fun getErrorInfo(code: Long): String? = errorCodes[code]
+
+
+        }
     }
 
     @Serializable
-    public data class HelloPack(val code: Int, @SerialName("session_id") val sessionId: String?)
+    public data class HelloPack(val code: Long, @SerialName("session_id") val sessionId: String)
     //endregion
 
 
@@ -155,13 +175,14 @@ public sealed class Signal<T> {
      *
      */
     @Serializable
-    public data class Ping(public val sn: Int) : Signal<Unit>() {
-        override val s: Int get() = 2
+    public data class Ping(public val sn: Long) : Signal<Unit>() {
+        override val s: Int get() = S_CODE
         override val d: Unit get() = Unit
 
         public companion object : JsonValueFactory<Ping> {
+            public const val S_CODE: Int = 2
             @JvmStatic
-            override fun jsonValue(value: Ping): String = """{"s":2,"sn":${value.sn}}"""
+            override fun jsonValue(value: Ping): String = """{"s":$S_CODE,"sn":${value.sn}}"""
 
         }
     }
@@ -184,8 +205,9 @@ public sealed class Signal<T> {
      */
     @Serializable
     public object Pong : Signal<Unit>() {
-        override val s: Int get() = 3
+        override val s: Int get() = S_CODE
         override val d: Unit get() = Unit
+        public const val S_CODE : Int = 3
     }
     //endregion
 
@@ -206,12 +228,14 @@ public sealed class Signal<T> {
      */
     @Serializable
     public data class Resume(public val sn: Int) : Signal<Unit>() {
-        override val s: Int get() = 4
+        override val s: Int get() = S_CODE
         override val d: Unit get() = Unit
 
         public companion object : JsonValueFactory<Resume> {
+            public const val S_CODE: Int = 4
+
             @JvmStatic
-            override fun jsonValue(value: Resume): String = """{"s":4,"sn":${value.sn}}"""
+            override fun jsonValue(value: Resume): String = """{"s":$S_CODE,"sn":${value.sn}}"""
 
         }
     }
@@ -252,7 +276,11 @@ public sealed class Signal<T> {
      */
     @Serializable
     public data class Reconnect(override val d: ReconnectPack) : Signal<ReconnectPack>() {
-        override val s: Int get() = 5
+        override val s: Int get() = S_CODE
+
+        public companion object {
+            public const val S_CODE: Int = 5
+        }
     }
 
 
@@ -308,7 +336,11 @@ public sealed class Signal<T> {
      *
      */
     @Serializable
-    public data class ResumeAck(override val s: Int, override val d: ResumeAckPack) : Signal<ResumeAckPack>()
+    public data class ResumeAck(override val s: Int = S_CODE, override val d: ResumeAckPack) : Signal<ResumeAckPack>() {
+        public companion object {
+            public const val S_CODE: Int = 6
+        }
+    }
 
     /**
      * [ResumeAck.d] 的数据体.
