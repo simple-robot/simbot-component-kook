@@ -20,8 +20,7 @@ package love.forte.simbot.kaiheila.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
-import love.forte.simbot.kaiheila.event.user.*
-import java.util.*
+import love.forte.simbot.kaiheila.event.system.user.*
 
 /**
  * 事件原始数据处理器，提供一个从事件得到的原始 [JsonElement]，将其反序列化为一个 [Event] 实例。
@@ -91,32 +90,33 @@ public class SysEventParser<B>(
  *
  */
 public object EventSignals {
-    // TODO
-    private val eventParsers = EnumMap<Event.Type, Map<Any, EventParser<*, *>>>(Event.Type::class.java).also { eMap ->
-        eMap[Event.Type.TEXT] = mapOf(Event.Type.TEXT.type to TextEventParser)
-        eMap[Event.Type.IMAGE] = mapOf(Event.Type.IMAGE.type to ImageEventParser)
-        eMap[Event.Type.VIDEO] = mapOf(Event.Type.VIDEO.type to VideoEventParser)
-        eMap[Event.Type.FILE] = mapOf(Event.Type.FILE.type to FileEventParser)
-        eMap[Event.Type.KMD] = mapOf(Event.Type.KMD.type to KMarkdownEventParser)
-        eMap[Event.Type.CARD] = mapOf(Event.Type.CARD.type to CardEventParser)
+    private val eventParsers: Array<Map<Any, EventParser<*, *>>> = Array(Event.Type.values().size) { emptyMap() }
 
-        eMap[Event.Type.SYS] = buildMap {
+    init {
+        eventParsers[Event.Type.TEXT.ordinal] = mapOf(Event.Type.TEXT.type to TextEventParser)
+        eventParsers[Event.Type.IMAGE.ordinal] = mapOf(Event.Type.IMAGE.type to ImageEventParser)
+        eventParsers[Event.Type.VIDEO.ordinal] = mapOf(Event.Type.VIDEO.type to VideoEventParser)
+        eventParsers[Event.Type.FILE.ordinal] = mapOf(Event.Type.FILE.type to FileEventParser)
+        eventParsers[Event.Type.KMD.ordinal] = mapOf(Event.Type.KMD.type to KMarkdownEventParser)
+        eventParsers[Event.Type.CARD.ordinal] = mapOf(Event.Type.CARD.type to CardEventParser)
+        eventParsers[Event.Type.SYS.ordinal] = buildMap {
             userEventParsers()
 
             // TODO other sys events
         }
     }
 
+
     /**
      * 根据 [type] 和 [subType] 尝试定位一个事件解析器。
      */
-    public fun get(type: Event.Type, subType: Any): EventParser<*, *>? = eventParsers[type]?.get(subType)
+    public fun get(type: Event.Type, subType: Any): EventParser<*, *>? = eventParsers[type.ordinal][subType]
 
     /**
      * 获取消息事件解析器。如果使用了 [Event.Type.SYS] 或者 [Event.Type.VIDEO], 则得到null。
      */
     public fun get(type: Event.Type): MessageEventParser<*>? {
-        val subMap = eventParsers[type]?.takeIf { it.size == 1 } ?: return null
+        val subMap = eventParsers[type.ordinal].takeIf { it.size == 1 } ?: return null
         val (key, value) = subMap.entries.first()
         if (key != type) return null
 
