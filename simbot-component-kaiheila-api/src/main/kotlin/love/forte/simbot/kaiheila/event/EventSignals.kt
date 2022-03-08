@@ -21,6 +21,9 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
 import love.forte.simbot.kaiheila.event.system.channel.*
+import love.forte.simbot.kaiheila.event.system.guild.*
+import love.forte.simbot.kaiheila.event.system.guild.member.*
+import love.forte.simbot.kaiheila.event.system.guild.role.*
 import love.forte.simbot.kaiheila.event.system.message.*
 import love.forte.simbot.kaiheila.event.system.user.*
 
@@ -105,6 +108,9 @@ public object EventSignals {
             userEventParsers()
             messageEventParsers()
             channelEventParsers()
+            guildEventParsers()
+            guildRoleEventParsers()
+            guildMemberEventParsers()
 
             // TODO other sys events
         }
