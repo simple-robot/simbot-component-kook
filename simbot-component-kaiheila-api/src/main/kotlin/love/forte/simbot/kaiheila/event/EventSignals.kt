@@ -20,12 +20,13 @@ package love.forte.simbot.kaiheila.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
+import love.forte.simbot.kaiheila.event.system.message.*
 import love.forte.simbot.kaiheila.event.system.user.*
 
 /**
  * 事件原始数据处理器，提供一个从事件得到的原始 [JsonElement]，将其反序列化为一个 [Event] 实例。
  */
-public abstract class EventParser<EX : Event.Extra, E : Event<EX>> {
+public abstract class EventParser<out EX : Event.Extra, out E : Event<EX>> {
 
     /**
      * 通过 [eventType] 和 [subType] 来判断此事件是否可以由自身处理。
@@ -49,7 +50,7 @@ public abstract class EventParser<EX : Event.Extra, E : Event<EX>> {
 /**
  * 针对于消息事件的事件处理器。
  */
-public class MessageEventParser<EX : MessageEventExtra>(
+public class MessageEventParser<out EX : MessageEventExtra>(
     private val type: Event.Type,
     extraSerializer: KSerializer<out EX>
 ) : EventParser<EX, MessageEvent<EX>>() {
@@ -64,21 +65,21 @@ public class MessageEventParser<EX : MessageEventExtra>(
 }
 
 /**
- * 使用 [SimpleSysEventExtra] 作为 extra 的类型的事件解析器。
+ * 使用 [SimpleSystemEventExtra] 作为 extra 的类型的事件解析器。
  */
-public class SysEventParser<B>(
+public class SysEventParser<out B>(
     private val type: Event.Type = Event.Type.SYS,
     private val subType: String,
     extraBodySerializer: KSerializer<out B>
-) : EventParser<SimpleSysEventExtra<B>, SystemEvent<B, SimpleSysEventExtra<B>>>() {
-    private val eventSerializer: KSerializer<out SystemEvent<B, SimpleSysEventExtra<B>>> =
+) : EventParser<SimpleSystemEventExtra<B>, SystemEvent<B, SimpleSystemEventExtra<B>>>() {
+    private val eventSerializer: KSerializer<out SystemEvent<B, SimpleSystemEventExtra<B>>> =
         SystemEventImpl.serializer(extraBodySerializer)
 
     override fun check(eventType: Event.Type, subType: JsonPrimitive): Boolean {
         return eventType == type && subType.isString && this.subType == subType.contentOrNull
     }
 
-    override fun deserialize(decoder: Json, rawData: JsonElement): SystemEvent<B, SimpleSysEventExtra<B>> {
+    override fun deserialize(decoder: Json, rawData: JsonElement): SystemEvent<B, SimpleSystemEventExtra<B>> {
         return decoder.decodeFromJsonElement(eventSerializer, rawData)
     }
 
@@ -101,6 +102,9 @@ public object EventSignals {
         eventParsers[Event.Type.CARD.ordinal] = mapOf(Event.Type.CARD.type to CardEventParser)
         eventParsers[Event.Type.SYS.ordinal] = buildMap {
             userEventParsers()
+
+            messageEventParsers()
+
 
             // TODO other sys events
         }
@@ -125,5 +129,15 @@ public object EventSignals {
 
 }
 
+/**
+ * 描述一个事件的解析定义, 使用对象或伴生对象实现此接口，提供于用户做事件监听的目标参数。
+ */
+public interface KaiheilaEventParserDefinition<out EX : Event.Extra, out E : Event<EX>> {
+
+    /**
+     * 此事件的解析器。
+     */
+    public val parser: EventParser<EX, E>
+}
 
 

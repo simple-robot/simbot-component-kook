@@ -99,7 +99,7 @@ public interface SystemEvent<out B, out EX : Event.Extra.Sys<B>> : Event<EX> {
  * 针对 [Event.Extra.Sys] 的简单实现。
  */
 @Serializable
-public data class SimpleSysEventExtra<out B>(override val type: String, override val body: B) : Event.Extra.Sys<B>
+public data class SimpleSystemEventExtra<out B>(override val type: String, override val body: B) : Event.Extra.Sys<B>
 
 
 @Serializable
@@ -117,6 +117,6 @@ internal data class SystemEventImpl<B>(
     @SerialName("msg_timestamp")
     override val msgTimestamp: Timestamp,
     override val nonce: String,
-    override val extra: SimpleSysEventExtra<B>
-) : SystemEvent<B, SimpleSysEventExtra<B>>
+    override val extra: SimpleSystemEventExtra<B>
+) : SystemEvent<B, SimpleSystemEventExtra<B>>
 

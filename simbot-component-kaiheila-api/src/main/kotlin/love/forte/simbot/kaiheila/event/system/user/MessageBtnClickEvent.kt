@@ -27,7 +27,7 @@ import love.forte.simbot.kaiheila.objects.*
  * [Card消息中的Button点击事件](https://developer.kaiheila.cn/doc/event/user#Card%E6%B6%88%E6%81%AF%E4%B8%AD%E7%9A%84Button%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6)
  *
  *
- * type: [UserEventSubTypeConstants.MESSAGE_BTN_CLICK]
+ * type: [UserEvents.MESSAGE_BTN_CLICK]
  *
  */
 public interface MessageBtnClickEventBody {

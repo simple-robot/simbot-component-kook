@@ -26,7 +26,7 @@ import love.forte.simbot.*
  *
  * 当自己被踢出服务器或被拉黑或主动退出服务器时, 产生该事件（对于机器人来说，就是机器人被踢出/拉黑/主动退出新服务器）
  *
- * type: [UserEventSubTypeConstants.SELF_EXITED_GUILD]
+ * type: [UserEvents.SELF_EXITED_GUILD]
  *
  */
 public interface SelfExitedGuildEventBody {

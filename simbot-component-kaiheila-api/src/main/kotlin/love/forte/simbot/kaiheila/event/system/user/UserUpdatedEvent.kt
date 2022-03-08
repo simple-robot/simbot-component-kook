@@ -29,7 +29,7 @@ import love.forte.simbot.*
  *   1. 仅当用户的 用户名 或 头像 变更时;
  *   2. 仅通知与该用户存在关联的用户或Bot: a. 存在聊天会话 b. 双方好友关系
  *
- * type: [UserEventSubTypeConstants.USER_UPDATED]
+ * type: [UserEvents.USER_UPDATED]
  *
  */
 public interface UserUpdatedEventBody {

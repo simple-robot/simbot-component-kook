@@ -19,18 +19,25 @@
 
 package love.forte.simbot.kaiheila.event.system.user
 
-import kotlinx.serialization.*
 import love.forte.simbot.kaiheila.event.*
+import love.forte.simbot.kaiheila.event.system.*
 
 
 /**
  * [用户相关事件](https://developer.kaiheila.cn/doc/event/user) 的子事件type常量类。
  */
-public object UserEventSubTypeConstants {
+public object UserEvents {
     /**
      * @see SelfExitedGuildEventBody
      */
     public const val SELF_EXITED_GUILD: String = "self_exited_guild"
+
+
+    /**
+     * @see SelfExitedGuildEventBody
+     */
+    public val selfExitedGuildEventParser: SysEventParser<SelfExitedGuildEventBody> =
+        sysParser(SELF_EXITED_GUILD, SelfExitedGuildEventBodyImpl.serializer())
 
     /**
      * @see SelfJoinedGuildEventBody
@@ -38,9 +45,22 @@ public object UserEventSubTypeConstants {
     public const val SELF_JOINED_GUILD: String = "self_joined_guild"
 
     /**
+     * @see SelfJoinedGuildEventBody
+     */
+    public val selfJoinedGuildEventParser: SysEventParser<SelfJoinedGuildEventBody> =
+        sysParser(SELF_JOINED_GUILD, SelfJoinedGuildEventBodyImpl.serializer())
+
+
+    /**
      * @see UserExitedChannelEventBody
      */
     public const val EXITED_CHANNEL: String = "exited_channel"
+
+    /**
+     * @see UserExitedChannelEventBody
+     */
+    public val userExitedChannelEventParser: SysEventParser<UserExitedChannelEventBody> =
+        sysParser(EXITED_CHANNEL, UserExitedChannelEventBodyImpl.serializer())
 
     /**
      * @see UserJoinedChannelEventBody
@@ -48,61 +68,123 @@ public object UserEventSubTypeConstants {
     public const val JOINED_CHANNEL: String = "joined_channel"
 
     /**
+     * @see SelfJoinedGuildEventBody
+     */
+    public val userJoinedChannelEventParser: SysEventParser<UserJoinedChannelEventBody> =
+        sysParser(JOINED_CHANNEL, UserJoinedChannelEventBodyImpl.serializer())
+
+    /**
      * @see UserUpdatedEventBody
      */
     public const val USER_UPDATED: String = "user_updated"
+
+    /**
+     * @see UserUpdatedEventBody
+     */
+    public val userUpdatedEventParser: SysEventParser<UserUpdatedEventBody> =
+        sysParser(USER_UPDATED, UserUpdatedEventBodyImpl.serializer())
 
     /**
      * @see MessageBtnClickEventBody
      */
     public const val MESSAGE_BTN_CLICK: String = "message_btn_click"
 
+
+    /**
+     * @see MessageBtnClickEventBody
+     */
+    public val messageBtnClickEventParser: SysEventParser<MessageBtnClickEventBody> =
+        sysParser(SELF_JOINED_GUILD, MessageBtnClickEventBodyImpl.serializer())
+
 }
 
 
 internal fun MutableMap<Any, EventParser<*, *>>.userEventParsers() {
-    registerParsers<SelfExitedGuildEventBody>(
-        UserEventSubTypeConstants.SELF_EXITED_GUILD,
-        SelfExitedGuildEventBodyImpl.serializer()
+    registerParsers(
+        UserEvents.SELF_EXITED_GUILD,
+        UserEvents.selfExitedGuildEventParser
     )
 
-    registerParsers<SelfJoinedGuildEventBody>(
-        UserEventSubTypeConstants.SELF_JOINED_GUILD,
-        SelfJoinedGuildEventBodyImpl.serializer()
-    )
-
-
-    registerParsers<UserExitedChannelEventBody>(
-        UserEventSubTypeConstants.EXITED_CHANNEL,
-        UserExitedChannelEventBodyImpl.serializer()
-    )
-
-    registerParsers<UserJoinedChannelEventBody>(
-        UserEventSubTypeConstants.JOINED_CHANNEL,
-        UserJoinedChannelEventBodyImpl.serializer()
+    registerParsers(
+        UserEvents.SELF_JOINED_GUILD,
+        UserEvents.selfJoinedGuildEventParser
     )
 
 
-    registerParsers<UserUpdatedEventBody>(
-        UserEventSubTypeConstants.USER_UPDATED,
-        UserUpdatedEventBodyImpl.serializer()
+    registerParsers(
+        UserEvents.EXITED_CHANNEL,
+        UserEvents.userExitedChannelEventParser
     )
 
-    registerParsers<MessageBtnClickEventBody>(
-        UserEventSubTypeConstants.MESSAGE_BTN_CLICK,
-        MessageBtnClickEventBodyImpl.serializer()
+    registerParsers(
+        UserEvents.JOINED_CHANNEL,
+        UserEvents.userJoinedChannelEventParser
+    )
+
+
+    registerParsers(
+        UserEvents.USER_UPDATED,
+        UserEvents.userUpdatedEventParser
+    )
+
+    registerParsers(
+        UserEvents.MESSAGE_BTN_CLICK,
+        UserEvents.messageBtnClickEventParser
     )
 }
 
 
-private inline fun <reified B> MutableMap<Any, EventParser<*, *>>.registerParsers(
-    subType: String,
-    serializer: KSerializer<out B>
-) {
-    @Suppress("RemoveExplicitTypeArguments")
-    this[subType] = SysEventParser<B>(
-        Event.Type.SYS,
-        subType,
-        serializer
-    )
+/**
+ * 事件定义。
+ * @see SelfExitedGuildEventBody
+ */
+public object SelfExitedGuildEvent : SystemEventParserDefinition<SelfExitedGuildEventBody>() {
+    override val parser: SysEventParser<SelfExitedGuildEventBody>
+        get() = UserEvents.selfExitedGuildEventParser
+}
+
+
+/**
+ * 事件定义。
+ * @see SelfJoinedGuildEventBody
+ */
+public object SelfJoinedGuildEvent : SystemEventParserDefinition<SelfJoinedGuildEventBody>() {
+    override val parser: SysEventParser<SelfJoinedGuildEventBody>
+        get() = UserEvents.selfJoinedGuildEventParser
+}
+
+/**
+ * 事件定义。
+ * @see UserExitedChannelEventBody
+ */
+public object UserExitedChannelEvent : SystemEventParserDefinition<UserExitedChannelEventBody>() {
+    override val parser: SysEventParser<UserExitedChannelEventBody>
+        get() = UserEvents.userExitedChannelEventParser
+}
+
+/**
+ * 事件定义。
+ * @see UserJoinedChannelEventBody
+ */
+public object UserJoinedChannelEvent : SystemEventParserDefinition<UserJoinedChannelEventBody>() {
+    override val parser: SysEventParser<UserJoinedChannelEventBody>
+        get() = UserEvents.userJoinedChannelEventParser
+}
+
+/**
+ * 事件定义。
+ * @see UserUpdatedEventBody
+ */
+public object UserUpdatedEvent : SystemEventParserDefinition<UserUpdatedEventBody>() {
+    override val parser: SysEventParser<UserUpdatedEventBody>
+        get() = UserEvents.userUpdatedEventParser
+}
+
+/**
+ * 事件定义。
+ * @see MessageBtnClickEventBody
+ */
+public object MessageBtnClickEvent : SystemEventParserDefinition<MessageBtnClickEventBody>() {
+    override val parser: SysEventParser<MessageBtnClickEventBody>
+        get() = UserEvents.messageBtnClickEventParser
 }

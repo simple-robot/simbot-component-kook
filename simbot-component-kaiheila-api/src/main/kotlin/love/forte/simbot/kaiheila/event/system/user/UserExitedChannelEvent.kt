@@ -24,7 +24,7 @@ import love.forte.simbot.*
 /**
  * [用户退出语音频道](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E9%80%80%E5%87%BA%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
  *
- * type: [UserEventSubTypeConstants.EXITED_CHANNEL]
+ * type: [UserEvents.EXITED_CHANNEL]
  *
  */
 public interface UserExitedChannelEventBody {

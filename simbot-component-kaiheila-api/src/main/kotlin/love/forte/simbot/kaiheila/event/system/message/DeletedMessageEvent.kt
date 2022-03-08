@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -15,32 +15,49 @@
  *
  */
 
-package love.forte.simbot.kaiheila.event.system.user
+package love.forte.simbot.kaiheila.event.system.message
 
 import kotlinx.serialization.*
-import love.forte.simbot.*
+
 
 /**
- * [自己新加入服务器](https://developer.kaiheila.cn/doc/event/user#%E8%87%AA%E5%B7%B1%E6%96%B0%E5%8A%A0%E5%85%A5%E6%9C%8D%E5%8A%A1%E5%99%A8)
+ * 频道消息被删除
  *
- *
- * 当自己被邀请或主动加入新的服务器时, 产生该事件（对于机器人来说，就是机器人被邀请进入新服务器）
- *
- *
- * type: [UserEvents.SELF_JOINED_GUILD]
- *
+ * type: [MessageEvents.DELETED_MESSAGE]
  */
-public interface SelfJoinedGuildEventBody {
+public interface DeletedMessageEventBody : MessageEventExtraBody {
     /**
-     * 频道ID
+     * 被删除的消息id
      */
-    public val guildId: ID
+    @SerialName("msg_id")
+    public val msgId: String
+
+    /**
+     * 消息所在频道id
+     */
+    @SerialName("channel_id")
+    public val channelId: String
 }
 
 
-
+/**
+ * 频道消息被删除
+ *
+ * type: [MessageEvents.DELETED_MESSAGE]
+ */
 @Serializable
-internal data class SelfJoinedGuildEventBodyImpl(@SerialName("guild_id") override val guildId: CharSequenceID):
-    SelfJoinedGuildEventBody
+internal data class DeletedMessageEventBodyImpl(
+    /**
+     * 被删除的消息id
+     */
+    @SerialName("msg_id")
+    override val msgId: String,
+
+    /**
+     * 消息所在频道id
+     */
+    @SerialName("channel_id")
+    override val channelId: String,
+) : DeletedMessageEventBody
 
 

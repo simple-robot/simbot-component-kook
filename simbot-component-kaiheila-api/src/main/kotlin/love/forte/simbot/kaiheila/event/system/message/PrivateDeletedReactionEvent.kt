@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -15,52 +15,48 @@
  *
  */
 
-package love.forte.simbot.kaiheila.event.system.user
+package love.forte.simbot.kaiheila.event.system.message
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
-
+import love.forte.simbot.kaiheila.objects.*
 
 /**
  *
- * [用户加入语音频道](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
+ * 私聊内用户删除reaction
  *
- * type: [UserEvents.JOINED_CHANNEL]
- *
+ * `private_deleted_reaction`
  * @author ForteScarlet
+ *
  */
-public interface UserJoinedChannelEventBody {
-    /**
-     * 用户ID
-     */
-    public val userId: ID
-
-    /**
-     * 频道ID
-     */
+public interface PrivateDeletedReactionEventBody : PrivateMessageEventExtraBody {
+    public val msgId: ID
+    public val chatCode: String
     public val channelId: ID
-
-    /**
-     * 加入时间
-     */
-    public val joinedAt: Timestamp
+    public val emoji: ReactionEmoji
+    public val userId: ID
 }
 
 /**
  *
- * [用户加入语音频道](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
+ * 私聊内用户删除reaction
  *
- * type: `joined_channel`
- *
+ * `private_deleted_reaction`
  * @author ForteScarlet
+ *
  */
 @Serializable
-public data class UserJoinedChannelEventBodyImpl(
-    @SerialName("user_id")
-    override val userId: CharSequenceID,
+internal data class PrivateDeletedReactionEventBodyImpl(
+    @SerialName("msg_id")
+    override val msgId: CharSequenceID,
+    @SerialName("chat_code")
+    override val chatCode: String,
     @SerialName("channel_id")
     override val channelId: CharSequenceID,
-    @SerialName("joined_at")
-    override val joinedAt: Timestamp,
-) : UserJoinedChannelEventBody
+    override val emoji: ReactionEmoji,
+    @SerialName("user_id")
+    override val userId: CharSequenceID,
+) : PrivateDeletedReactionEventBody
+
+
 
