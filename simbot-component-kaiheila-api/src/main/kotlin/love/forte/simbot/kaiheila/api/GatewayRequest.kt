@@ -19,16 +19,18 @@ package love.forte.simbot.kaiheila.api
 
 import io.ktor.http.*
 import kotlinx.serialization.*
-import love.forte.simbot.kaiheila.api.GatewayRequest.Compress
-import love.forte.simbot.kaiheila.api.GatewayRequest.NotCompress
+import love.forte.simbot.kaiheila.api.GatewayRequest.*
 
 
 /**
  *
  * 开黑啦 v3-api的 [gateway](https://developer.kaiheila.cn/doc/http/gateway) 获取接口的请求参数。
  *
+ * 如果是重连请求，使用 [Resume].
+ *
  * @see Compress
  * @see NotCompress
+ * @see Resume
  *
  * @author ForteScarlet
  */
@@ -38,7 +40,10 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KaiheilaGe
 
     override fun ParametersBuilder.buildParameters() {
         append("compress", if (isCompress) "1" else "0")
+        buildParameters0()
     }
+
+    protected open fun ParametersBuilder.buildParameters0() {}
 
     override val resultDeserializer: DeserializationStrategy<out Gateway>
         get() = Gateway.serializer()
@@ -56,7 +61,26 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KaiheilaGe
      */
     public object NotCompress : GatewayRequest(false)
 
+
+    /**
+     * 重连获取路由时使用的api。
+     */
+    public class Resume(isCompress: Boolean, private val sn: Long, private val sessionId: String) :
+        GatewayRequest(isCompress) {
+        override fun ParametersBuilder.buildParameters0() {
+            append("resume", "1")
+            append("sn", sn.toString())
+            append("session_id", sessionId)
+        }
+    }
 }
+
+
+@Suppress("unused")
+public fun Compress.resume(sn: Long, sessionId: String): Resume = Resume(true, sn, sessionId)
+
+@Suppress("unused")
+public fun NotCompress.resume(sn: Long, sessionId: String): Resume = Resume(false, sn, sessionId)
 
 
 /**

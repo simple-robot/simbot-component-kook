@@ -41,6 +41,13 @@ public interface KaiheilaBot : CoroutineScope {
      */
     public val configuration: KaiheilaBotConfiguration
 
+
+    /**
+     * 当前bot的[票据][Ticket]信息。
+     */
+    public val ticket: Ticket
+
+
     /**
      * 当前bot所使用的 [HttpClient] 实例。
      *
@@ -77,6 +84,88 @@ public interface KaiheilaBot : CoroutineScope {
             }
         }
     }
+
+
+    /**
+     * 当前bot所使用的部分权限"票据"。根据
+     */
+    public interface Ticket {
+
+        /**
+         * 得到当前bot的ID.（Client ID）
+         *
+         * [clientId] 作为bot在程序中的ID使用，例如在 simbot 整合中，会作为bot注册的唯一键。
+         *
+         */
+        public val clientId: ID
+
+
+        /**
+         * 当前bot所使用的 `Token`. 从 [Bot](https://developer.kaiheila.cn/bot/) 中 websocket链接模式中得到。
+         *
+         * 鉴于此token可以重新生成，当前ticket中的token也可以随时修改，并且立即生效。
+         *
+         * 如果需要进行API请求，请直接使用 [authorization].
+         *
+         */
+        public var token: String
+
+
+        /**
+         * 当前bot使用的 [token] 拼接了 `Bot ` 前缀的结果，用于通过API进行请求，会随着 [token] 的变化儿变化。
+         */
+        public val authorization: String
+
+    }
+
+
+    @JvmSynthetic
+    public suspend fun start(): Boolean
+
+
+    /**
+     * Bot内部持有的连接信息。
+     */
+    public interface Client {
+        /**
+         * 此连接是否为压缩连接。
+         */
+        public val isCompress: Boolean
+
+        /**
+         * 此连接所属Bot。
+         */
+        public val bot: KaiheilaBot
+
+
+        /**
+         * 此连接的目标url。
+         */
+        public val url: String
+
+
+        /**
+         * 此连接内部所持有的 `sn` 。
+         */
+        public val sn: Long
+
+
+        /**
+         * 当前 client 是否处于运行状态。
+         */
+        public val isActive: Boolean
+
+        /**
+         * 是否正处于重新连接状态.
+         */
+        public val isResuming: Boolean
+
+
+    }
+
+
+    //// some self func
+
 
     /**
      * 查询bot当前信息。

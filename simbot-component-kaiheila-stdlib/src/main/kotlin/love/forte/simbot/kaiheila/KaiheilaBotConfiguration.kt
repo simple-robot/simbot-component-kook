@@ -17,6 +17,15 @@
 
 package love.forte.simbot.kaiheila
 
+import kotlinx.serialization.json.*
+import kotlin.coroutines.*
+
+
+@Retention(AnnotationRetention.BINARY)
+@DslMarker
+public annotation class KaiheilaBotConfigurationDSL
+
+
 /**
  * [KaiheilaBot] 需要使用的配置类。
  *
@@ -26,5 +35,29 @@ package love.forte.simbot.kaiheila
  */
 public class KaiheilaBotConfiguration {
 
+    /**
+     * Bot用于解析api请求或其他用途的解析器。
+     */
+    @KaiheilaBotConfigurationDSL
+    public var decoder: Json = defaultDecoder
 
+    /**
+     * 为bot提供一个 [CoroutineContext]. 如果其中存在 [kotlinx.coroutines.Job], 则会作为parent job。
+     */
+    @KaiheilaBotConfigurationDSL
+    public var coroutineContext: CoroutineContext = EmptyCoroutineContext
+
+
+
+
+
+    public companion object {
+        /**
+         * [KaiheilaBotConfiguration] 默认使用的解析器。
+         */
+        public val defaultDecoder: Json = Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
+    }
 }
