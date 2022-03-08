@@ -20,6 +20,7 @@ package love.forte.simbot.kaiheila.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
+import love.forte.simbot.kaiheila.event.system.*
 import love.forte.simbot.kaiheila.event.system.channel.*
 import love.forte.simbot.kaiheila.event.system.guild.*
 import love.forte.simbot.kaiheila.event.system.guild.member.*
@@ -98,12 +99,12 @@ public object EventSignals {
     private val eventParsers: Array<Map<Any, EventParser<*, *>>> = Array(Event.Type.values().size) { emptyMap() }
 
     init {
-        eventParsers[Event.Type.TEXT.ordinal] = mapOf(Event.Type.TEXT.type to TextEventParser)
-        eventParsers[Event.Type.IMAGE.ordinal] = mapOf(Event.Type.IMAGE.type to ImageEventParser)
-        eventParsers[Event.Type.VIDEO.ordinal] = mapOf(Event.Type.VIDEO.type to VideoEventParser)
-        eventParsers[Event.Type.FILE.ordinal] = mapOf(Event.Type.FILE.type to FileEventParser)
-        eventParsers[Event.Type.KMD.ordinal] = mapOf(Event.Type.KMD.type to KMarkdownEventParser)
-        eventParsers[Event.Type.CARD.ordinal] = mapOf(Event.Type.CARD.type to CardEventParser)
+        eventParsers[Event.Type.TEXT.ordinal] = mapOf(Event.Type.TEXT to TextEventParser)
+        eventParsers[Event.Type.IMAGE.ordinal] = mapOf(Event.Type.IMAGE to ImageEventParser)
+        eventParsers[Event.Type.VIDEO.ordinal] = mapOf(Event.Type.VIDEO to VideoEventParser)
+        eventParsers[Event.Type.FILE.ordinal] = mapOf(Event.Type.FILE to FileEventParser)
+        eventParsers[Event.Type.KMD.ordinal] = mapOf(Event.Type.KMD to KMarkdownEventParser)
+        eventParsers[Event.Type.CARD.ordinal] = mapOf(Event.Type.CARD to CardEventParser)
         eventParsers[Event.Type.SYS.ordinal] = buildMap {
             userEventParsers()
             messageEventParsers()

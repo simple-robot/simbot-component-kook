@@ -14,17 +14,17 @@
  *
  *
  */
+package love.forte.simbot.kaiheila.event
 
-package love.forte.simbot.kaiheila
+import love.forte.simbot.kaiheila.api.*
 
 /**
- * [KaiheilaBot] 需要使用的配置类。
- *
- * 配置类不应在bot构建完成之后再做修改。
- *
+ * khl事件解析相关错误。
  * @author ForteScarlet
  */
-public class KaiheilaBotConfiguration {
-
-
+public class EventParserException : KhlRuntimeException {
+    public constructor() : super()
+    public constructor(message: String?) : super(message)
+    public constructor(message: String?, cause: Throwable?) : super(message, cause)
+    public constructor(cause: Throwable?) : super(cause)
 }

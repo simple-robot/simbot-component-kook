@@ -19,7 +19,10 @@ package love.forte.simbot.kaiheila
 
 import io.ktor.client.*
 import kotlinx.coroutines.*
+import kotlinx.serialization.json.*
+import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.user.*
+import love.forte.simbot.kaiheila.event.*
 import kotlin.coroutines.*
 
 /**
@@ -47,8 +50,48 @@ public interface KaiheilaBot : CoroutineScope {
 
 
     /**
+     * 添加一个事件处理器。
+     */
+    @JvmSynthetic
+    public fun processor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Any) -> Unit)
+
+    /**
+     * process for java
+     */
+    @Api4J
+    public fun process(processor: (rawEvent: Signal.Event, decoder: Json, decoded: () -> Any) -> Unit) {
+        processor { decoder, decoded -> processor(this, decoder, decoded) }
+    }
+
+    /**
+     * process for java
+     */
+    @Api4J
+    public fun <EX : Event.Extra, E : Event<EX>> process(eventParser: EventParser<EX, E>, processor: (E) -> Unit) {
+        processor { _, decoded ->
+
+            if (eventParser.check(type, extraTypePrimitive)) {
+                // val eventData: R = decoder.decodeFromJsonElement(eventType.decoder, data)
+                @Suppress("UNCHECKED_CAST")
+                processor(decoded() as E)
+            }
+        }
+    }
+
+    /**
      * 查询bot当前信息。
      */
     public suspend fun me(): Me
+
+}
+
+
+@Api4J
+public fun interface EventProcessor4J<out EX : Event.Extra, E : Event<EX>> {
+    /**
+     * 事件处理器。
+     */
+    @Api4J
+    public fun process(event: E)
 
 }

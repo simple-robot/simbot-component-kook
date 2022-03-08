@@ -324,6 +324,65 @@ public sealed class Signal<T> {
 
 
 /**
+ * 尝试获取一个事件的外层 type 属性字段，并转化为 type。
+ *
+ * @throws KhlSignalException 当出现预料之外的格式时。
+ */
+public inline val Signal_0.type: Event.Type
+    get() {
+        if (d !is JsonObject) throw KhlSignalException("Event json property 'd' is not a object type: $d")
+
+        val type = d["type"]
+
+        if (type !is JsonPrimitive) throw KhlSignalException("Event json property 'type' is not a primitive type: $type")
+
+        return type.intOrNull?.let { Event.Type.byTypeOr(it, Event.Type.UNKNOWN) }
+            ?: throw KhlSignalException("Unknown event type property: $type")
+    }
+
+/**
+ * 尝试获取一个事件的内部 `extra` 的 `type` 属性字段(的 [JsonPrimitive] 类型 )。
+ *
+ * @throws KhlSignalException 当出现预料之外的格式时。
+ *
+ */
+public inline val Signal_0.extraTypePrimitive: JsonPrimitive
+    get() {
+        if (d !is JsonObject) throw KhlSignalException("Event json property 'd' is not a object type: $d")
+
+        val extra = d["extra"]
+
+        if (extra !is JsonObject) throw KhlSignalException("Event json property 'extra' is not a object type: $extra")
+
+        val type = extra["type"]
+
+        if (type !is JsonPrimitive) throw KhlSignalException("Event json property 'type' in property 'extra' is not a primitive type.")
+
+        return type
+
+    }
+
+/**
+ * 尝试获取一个事件的内部 `extra` 的 `type` 属性字段。
+ *
+ * @throws KhlSignalException 当出现预料之外的格式时。
+ *
+ * @return 只可能是 [Event.Type] 或 [String] 类型。
+ */
+public inline val Signal_0.extraType: Any
+    get() {
+        val type = extraTypePrimitive
+        val intValue = type.intOrNull
+        if (intValue != null) {
+            return Event.Type.byTypeOr(intValue) ?: Event.Type.UNKNOWN
+        }
+
+        return type.contentOrNull
+            ?: throw KhlSignalException("Unknown type of event json property 'type' in property 'extra': $type")
+    }
+
+
+/**
  * 开黑啦信令异常。
  */
 public open class KhlSignalException : KhlRuntimeException {
