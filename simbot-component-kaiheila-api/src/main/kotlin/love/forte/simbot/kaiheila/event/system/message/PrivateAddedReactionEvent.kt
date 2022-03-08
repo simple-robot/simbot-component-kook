@@ -29,7 +29,7 @@ import love.forte.simbot.kaiheila.objects.*
  */
 public interface PrivateAddedReactionEventBody : PrivateMessageEventExtraBody {
     public val msgId: ID
-    public val chatCode: String
+    public val chatCode: ID
     public val channelId: ID
     public val emoji: ReactionEmoji
     public val userId: ID
@@ -47,7 +47,7 @@ internal data class PrivateAddedReactionEventBodyImpl(
     @SerialName("msg_id")
     override val msgId: CharSequenceID,
     @SerialName("chat_code")
-    override val chatCode: String,
+    override val chatCode: CharSequenceID,
     @SerialName("channel_id")
     override val channelId: CharSequenceID,
     override val emoji: ReactionEmoji,

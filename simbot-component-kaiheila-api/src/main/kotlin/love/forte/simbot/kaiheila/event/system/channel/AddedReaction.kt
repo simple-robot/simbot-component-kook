@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -15,48 +15,67 @@
  *
  */
 
-package love.forte.simbot.kaiheila.event.system.message
+package love.forte.simbot.kaiheila.event.system.channel
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.objects.*
 
+
 /**
- *
- * 私聊内用户删除reaction
- *
- * `private_deleted_reaction`
+ * [频道内用户添加 reaction](https://developer.kaiheila.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction)
  * @author ForteScarlet
- *
  */
-public interface PrivateDeletedReactionEventBody : PrivateMessageEventExtraBody {
+public interface AddedReactionExtraBody : ChannelEventExtraBody {
+
+    /**
+     * 用户点击的消息id
+     */
     public val msgId: ID
-    public val chatCode: ID
-    public val channelId: ID
-    public val emoji: ReactionEmoji
+
+    /**
+     * 点击的用户
+     */
     public val userId: ID
+
+    /**
+     * 频道id
+     */
+    public val channelId: ID
+
+    /**
+     * emoji	Map	消息对象, 包含 id 表情id, name 表情名称
+     */
+    public val emoji: ReactionEmoji
+
 }
 
 /**
- *
- * 私聊内用户删除reaction
- *
- * `private_deleted_reaction`
+ * [频道内用户添加 reaction](https://developer.kaiheila.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction)
  * @author ForteScarlet
- *
  */
 @Serializable
-internal data class PrivateDeletedReactionEventBodyImpl(
+internal data class AddedReactionExtraBodyImpl(
+    /**
+     * 用户点击的消息id
+     */
     @SerialName("msg_id")
     override val msgId: CharSequenceID,
-    @SerialName("chat_code")
-    override val chatCode: CharSequenceID,
-    @SerialName("channel_id")
-    override val channelId: CharSequenceID,
-    override val emoji: ReactionEmoji,
+
+    /**
+     * 点击的用户
+     */
     @SerialName("user_id")
     override val userId: CharSequenceID,
-) : PrivateDeletedReactionEventBody
 
+    /**
+     * 频道id
+     */
+    @SerialName("channel_id")
+    override val channelId: CharSequenceID,
 
-
+    /**
+     * emoji	Map	消息对象, 包含 id 表情id, name 表情名称
+     */
+    override val emoji: ReactionEmoji,
+) : AddedReactionExtraBody

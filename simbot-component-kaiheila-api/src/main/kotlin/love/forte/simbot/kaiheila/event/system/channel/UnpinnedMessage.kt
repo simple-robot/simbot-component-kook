@@ -15,48 +15,39 @@
  *
  */
 
-package love.forte.simbot.kaiheila.event.system.message
+package love.forte.simbot.kaiheila.event.system.channel
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
 
 /**
  *
- * 私聊内用户删除reaction
+ * 取消频道置顶消息
  *
- * `private_deleted_reaction`
+ * `unpinned_message`
+ *
  * @author ForteScarlet
- *
  */
-public interface PrivateDeletedReactionEventBody : PrivateMessageEventExtraBody {
-    public val msgId: ID
-    public val chatCode: ID
+public interface UnpinnedMessageExtraBody : ChannelEventExtraBody {
     public val channelId: ID
-    public val emoji: ReactionEmoji
-    public val userId: ID
+    public val operatorId: ID
+    public val msgId : ID
 }
 
 /**
  *
- * 私聊内用户删除reaction
+ * 取消频道置顶消息
  *
- * `private_deleted_reaction`
+ * `unpinned_message`
+ *
  * @author ForteScarlet
- *
  */
 @Serializable
-internal data class PrivateDeletedReactionEventBodyImpl(
-    @SerialName("msg_id")
-    override val msgId: CharSequenceID,
-    @SerialName("chat_code")
-    override val chatCode: CharSequenceID,
+public data class UnpinnedMessageExtraBodyImpl(
     @SerialName("channel_id")
     override val channelId: CharSequenceID,
-    override val emoji: ReactionEmoji,
-    @SerialName("user_id")
-    override val userId: CharSequenceID,
-) : PrivateDeletedReactionEventBody
-
-
-
+    @SerialName("operator_id")
+    override val operatorId: CharSequenceID,
+    @SerialName("msg_id")
+    override val msgId : CharSequenceID,
+) : UnpinnedMessageExtraBody

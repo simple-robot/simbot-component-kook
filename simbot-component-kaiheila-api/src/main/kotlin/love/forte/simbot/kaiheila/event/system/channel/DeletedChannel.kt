@@ -15,48 +15,49 @@
  *
  */
 
-package love.forte.simbot.kaiheila.event.system.message
+package love.forte.simbot.kaiheila.event.system.channel
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+
 
 /**
+ * 删除频道
  *
- * 私聊内用户删除reaction
+ * `deleted_channel`
  *
- * `private_deleted_reaction`
  * @author ForteScarlet
- *
  */
-public interface PrivateDeletedReactionEventBody : PrivateMessageEventExtraBody {
-    public val msgId: ID
-    public val chatCode: ID
-    public val channelId: ID
-    public val emoji: ReactionEmoji
-    public val userId: ID
+public interface DeletedChannelExtraBody : ChannelEventExtraBody {
+    /**
+     * 被删除的频道id
+     */
+    public val id: ID
+
+    /**
+     * 删除操作的时间戳(毫秒)
+     */
+    @SerialName("deleted_at")
+    public val deletedAt: Timestamp
 }
 
+
 /**
+ * 删除频道
  *
- * 私聊内用户删除reaction
+ * `deleted_channel`
  *
- * `private_deleted_reaction`
  * @author ForteScarlet
- *
  */
 @Serializable
-internal data class PrivateDeletedReactionEventBodyImpl(
-    @SerialName("msg_id")
-    override val msgId: CharSequenceID,
-    @SerialName("chat_code")
-    override val chatCode: CharSequenceID,
-    @SerialName("channel_id")
-    override val channelId: CharSequenceID,
-    override val emoji: ReactionEmoji,
-    @SerialName("user_id")
-    override val userId: CharSequenceID,
-) : PrivateDeletedReactionEventBody
-
-
-
+internal data class DeletedChannelExtraBodyImpl(
+    /**
+     * 被删除的频道id
+     */
+    override val id: CharSequenceID,
+    /**
+     * 删除操作的时间戳(毫秒)
+     */
+    @SerialName("deleted_at")
+    override val deletedAt: Timestamp
+) : DeletedChannelExtraBody

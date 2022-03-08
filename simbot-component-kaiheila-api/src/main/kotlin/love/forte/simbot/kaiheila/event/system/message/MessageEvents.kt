@@ -48,19 +48,24 @@ public object MessageEvents {
     public const val DELETED_MESSAGE: String = "deleted_message"
 
     /**
+     * @see UpdatedMessageEventBody
+     */
+    public const val UPDATED_MESSAGE: String = "updated_message"
+
+    /**
      * @see DeletedMessageEventBody
      */
-    public val deletedMessageEventParser: SysEventParser<DeletedMessageEventBody> = sysParser(DELETED_MESSAGE, DeletedMessageEventBodyImpl.serializer())
+    public val deletedMessageEventParser: SysEventParser<DeletedMessageEventBody> =
+        sysParser(DELETED_MESSAGE, DeletedMessageEventBodyImpl.serializer())
 
     /**
      * @see UpdatedMessageEventBody
      */
-    public const val UPDATED_MESSAGE: String = "updated_message"
-    /**
-     * @see UpdatedMessageEventBody
-     */
-    public val updatedMessageEventParser: SysEventParser<UpdatedMessageEventBody> = sysParser(UPDATED_MESSAGE, UpdatedMessageEventBodyImpl.serializer())
+    public val updatedMessageEventParser: SysEventParser<UpdatedMessageEventBody> =
+        sysParser(UPDATED_MESSAGE, UpdatedMessageEventBodyImpl.serializer())
+
     //endregion
+
 
     //region private message events
     /**
@@ -69,33 +74,35 @@ public object MessageEvents {
     public const val PRIVATE_ADDED_REACTION: String = "private_added_reaction"
 
     /**
-     * @see PrivateAddedReactionEventBody
-     */
-    public val privateAddedReactionEventParser: SysEventParser<PrivateAddedReactionEventBody> = sysParser(PRIVATE_ADDED_REACTION, PrivateAddedReactionEventBodyImpl.serializer())
-    /**
      * @see PrivateDeletedReactionEventBody
      */
     public const val PRIVATE_DELETED_REACTION: String = "private_deleted_reaction"
-
-    /**
-     * @see PrivateDeletedReactionEventBody
-     */
-    public val privateDeletedReactionEventParser: SysEventParser<PrivateDeletedReactionEventBody> = sysParser(PRIVATE_DELETED_REACTION, PrivateDeletedReactionEventBodyImpl.serializer())
-
 
     /**
      * @see PrivateUpdatedMessageEventBody
      */
     public const val UPDATED_PRIVATE_MESSAGE: String = "updated_private_message"
 
+
+    /**
+     * @see PrivateAddedReactionEventBody
+     */
+    public val privateAddedReactionEventParser: SysEventParser<PrivateAddedReactionEventBody> =
+        sysParser(PRIVATE_ADDED_REACTION, PrivateAddedReactionEventBodyImpl.serializer())
+
+
+    /**
+     * @see PrivateDeletedReactionEventBody
+     */
+    public val privateDeletedReactionEventParser: SysEventParser<PrivateDeletedReactionEventBody> =
+        sysParser(PRIVATE_DELETED_REACTION, PrivateDeletedReactionEventBodyImpl.serializer())
+
+
     /**
      * @see PrivateUpdatedMessageEventBody
      */
-    public val privateUpdatedMessageEventParser: SysEventParser<PrivateUpdatedMessageEventBody> = sysParser(UPDATED_PRIVATE_MESSAGE, PrivateUpdatedMessageEventBodyImpl.serializer())
-
-
-
-
+    public val privateUpdatedMessageEventParser: SysEventParser<PrivateUpdatedMessageEventBody> =
+        sysParser(UPDATED_PRIVATE_MESSAGE, PrivateUpdatedMessageEventBodyImpl.serializer())
 
 
     //endregion
@@ -129,7 +136,6 @@ internal fun MutableMap<Any, EventParser<*, *>>.messageEventParsers() {
         MessageEvents.UPDATED_PRIVATE_MESSAGE,
         MessageEvents.privateUpdatedMessageEventParser
     )
-
 
 
 }

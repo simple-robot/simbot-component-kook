@@ -20,6 +20,7 @@ package love.forte.simbot.kaiheila.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
+import love.forte.simbot.kaiheila.event.system.channel.*
 import love.forte.simbot.kaiheila.event.system.message.*
 import love.forte.simbot.kaiheila.event.system.user.*
 
@@ -102,9 +103,8 @@ public object EventSignals {
         eventParsers[Event.Type.CARD.ordinal] = mapOf(Event.Type.CARD.type to CardEventParser)
         eventParsers[Event.Type.SYS.ordinal] = buildMap {
             userEventParsers()
-
             messageEventParsers()
-
+            channelEventParsers()
 
             // TODO other sys events
         }

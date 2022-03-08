@@ -15,7 +15,7 @@
  *
  */
 
-package love.forte.simbot.kaiheila.event.system.message
+package love.forte.simbot.kaiheila.event.system.channel
 
 import kotlinx.serialization.*
 import love.forte.simbot.*
@@ -23,40 +23,28 @@ import love.forte.simbot.kaiheila.objects.*
 
 /**
  *
- * 私聊内用户删除reaction
+ * 频道内用户取消reaction
  *
- * `private_deleted_reaction`
+ * `deleted_reaction`
+ *
  * @author ForteScarlet
- *
  */
-public interface PrivateDeletedReactionEventBody : PrivateMessageEventExtraBody {
-    public val msgId: ID
-    public val chatCode: ID
+public interface DeletedReactionExtraBody : ChannelEventExtraBody {
     public val channelId: ID
     public val emoji: ReactionEmoji
-    public val userId: ID
 }
 
 /**
  *
- * 私聊内用户删除reaction
+ * 频道内用户取消reaction
  *
- * `private_deleted_reaction`
+ * `deleted_reaction`
+ *
  * @author ForteScarlet
- *
  */
 @Serializable
-internal data class PrivateDeletedReactionEventBodyImpl(
-    @SerialName("msg_id")
-    override val msgId: CharSequenceID,
-    @SerialName("chat_code")
-    override val chatCode: CharSequenceID,
+internal class DeletedReactionExtraBodyImpl(
     @SerialName("channel_id")
     override val channelId: CharSequenceID,
     override val emoji: ReactionEmoji,
-    @SerialName("user_id")
-    override val userId: CharSequenceID,
-) : PrivateDeletedReactionEventBody
-
-
-
+) : DeletedReactionExtraBody
