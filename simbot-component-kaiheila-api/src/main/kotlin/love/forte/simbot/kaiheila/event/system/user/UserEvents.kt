@@ -25,6 +25,14 @@ import love.forte.simbot.kaiheila.event.system.*
 
 /**
  * [用户相关事件](https://developer.kaiheila.cn/doc/event/user) 的子事件type常量类。
+ *
+ * @see SelfExitedGuildEvent
+ * @see SelfJoinedGuildEvent
+ * @see UserExitedChannelEvent
+ * @see UserJoinedChannelEvent
+ * @see UserUpdatedEvent
+ * @see MessageBtnClickEvent
+ *
  */
 public object UserEvents {
     /**

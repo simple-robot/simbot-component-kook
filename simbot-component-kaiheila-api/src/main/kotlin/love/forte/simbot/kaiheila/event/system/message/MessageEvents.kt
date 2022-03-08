@@ -38,6 +38,13 @@ public interface PrivateMessageEventExtraBody : MessageEventExtraBody
 
 /**
  * 与消息事件相关的 sub type 常量。
+ *
+ * @see DeletedMessageEvent
+ * @see UpdatedMessageEvent
+ * @see PrivateAddedReactionEvent
+ * @see PrivateDeletedReactionEvent
+ * @see PrivateUpdatedMessageEvent
+ *
  */
 public object MessageEvents {
 
@@ -140,3 +147,50 @@ internal fun MutableMap<Any, EventParser<*, *>>.messageEventParsers() {
 
 }
 
+
+/**
+ * 事件定义。
+ * @see DeletedMessageEventBody
+ */
+public object DeletedMessageEvent : SystemEventParserDefinition<DeletedMessageEventBody>() {
+    override val parser: SysEventParser<DeletedMessageEventBody>
+        get() = MessageEvents.deletedMessageEventParser
+}
+
+
+
+/**
+ * 事件定义。
+ * @see UpdatedMessageEventBody
+ */
+public object UpdatedMessageEvent : SystemEventParserDefinition<UpdatedMessageEventBody>() {
+    override val parser: SysEventParser<UpdatedMessageEventBody>
+        get() = MessageEvents.updatedMessageEventParser
+}
+
+/**
+ * 事件定义。
+ * @see PrivateAddedReactionEventBody
+ */
+public object PrivateAddedReactionEvent : SystemEventParserDefinition<PrivateAddedReactionEventBody>() {
+    override val parser: SysEventParser<PrivateAddedReactionEventBody>
+        get() = MessageEvents.privateAddedReactionEventParser
+}
+
+/**
+ * 事件定义。
+ * @see PrivateDeletedReactionEventBody
+ */
+public object PrivateDeletedReactionEvent : SystemEventParserDefinition<PrivateDeletedReactionEventBody>() {
+    override val parser: SysEventParser<PrivateDeletedReactionEventBody>
+        get() = MessageEvents.privateDeletedReactionEventParser
+}
+
+/**
+ * 事件定义。
+ * @see PrivateUpdatedMessageEventBody
+ */
+public object PrivateUpdatedMessageEvent : SystemEventParserDefinition<PrivateUpdatedMessageEventBody>() {
+    override val parser: SysEventParser<PrivateUpdatedMessageEventBody>
+        get() = MessageEvents.privateUpdatedMessageEventParser
+}

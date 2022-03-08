@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -33,6 +33,10 @@ public interface GuildRoleEventExtraBody : GuildEventExtraBody
 
 /**
  * 频道服务器角色相关定义。
+ *
+ * @see AddedRoleEvent
+ * @see DeletedRoleEvent
+ * @see UpdatedRoleEvent
  */
 public object GuildRoleEvents {
 

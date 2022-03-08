@@ -41,6 +41,12 @@ public interface GuildEventExtraBody
 
 /**
  * 频道服务器相关定义。
+ *
+ * @see AddedBlockListEvent
+ * @see DeletedBlockListEvent
+ * @see DeletedGuildEvent
+ * @see UpdatedGuildEvent
+ *
  */
 public object GuildEvents {
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -33,6 +33,12 @@ public interface GuildMemberEventExtraBody : GuildEventExtraBody
 
 /**
  * 服务器成员相关定义。
+ *
+ * @see JoinedGuildEvent
+ * @see ExitedGuildEvent
+ * @see UpdatedGuildMemberEvent
+ * @see GuildMemberOnlineEvent
+ * @see GuildMemberOfflineEvent
  */
 public object GuildMemberEvents {
 
