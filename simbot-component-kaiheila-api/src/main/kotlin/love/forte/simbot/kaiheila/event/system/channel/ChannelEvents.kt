@@ -34,6 +34,16 @@ public interface ChannelEventExtraBody
 
 /**
  * 频道相关事件的部分信息。
+ *
+ *
+ * @see AddedReactionEvent
+ * @see DeletedReactionEvent
+ * @see AddedChannelEvent
+ * @see UpdatedChannelEvent
+ * @see DeletedChannelEvent
+ * @see PinnedMessageEvent
+ * @see UnpinnedMessageEvent
+ *
  */
 public object ChannelEvents {
 
@@ -117,8 +127,77 @@ internal fun MutableMap<Any, EventParser<*, *>>.channelEventParsers() {
         ChannelEvents.pinnedMessageParser
     )
     registerParsers(
-       ChannelEvents.UNPINNED_MESSAGE,
-       ChannelEvents.unpinnedMessageParser
+        ChannelEvents.UNPINNED_MESSAGE,
+        ChannelEvents.unpinnedMessageParser
     )
 }
 
+
+/**
+ * 事件定义。
+ * @see AddedReactionExtraBody
+ */
+public object AddedReactionEvent : SystemEventParserDefinition<AddedReactionExtraBody>() {
+    override val parser: SysEventParser<AddedReactionExtraBody>
+        get() = ChannelEvents.addedReactionParser
+}
+
+
+/**
+ * 事件定义。
+ * @see DeletedReactionExtraBody
+ */
+public object DeletedReactionEvent : SystemEventParserDefinition<DeletedReactionExtraBody>() {
+    override val parser: SysEventParser<DeletedReactionExtraBody>
+        get() = ChannelEvents.deletedReactionParser
+}
+
+
+/**
+ * 事件定义。
+ * @see AddedChannelExtraBody
+ */
+public object AddedChannelEvent : SystemEventParserDefinition<AddedChannelExtraBody>() {
+    override val parser: SysEventParser<AddedChannelExtraBody>
+        get() = ChannelEvents.addedChannelParser
+}
+
+
+/**
+ * 事件定义。
+ * @see UpdatedChannelExtraBody
+ */
+public object UpdatedChannelEvent : SystemEventParserDefinition<UpdatedChannelExtraBody>() {
+    override val parser: SysEventParser<UpdatedChannelExtraBody>
+        get() = ChannelEvents.updatedChannelParser
+}
+
+
+/**
+ * 事件定义。
+ * @see DeletedChannelExtraBody
+ */
+public object DeletedChannelEvent : SystemEventParserDefinition<DeletedChannelExtraBody>() {
+    override val parser: SysEventParser<DeletedChannelExtraBody>
+        get() = ChannelEvents.deletedChannelParser
+}
+
+
+/**
+ * 事件定义。
+ * @see PinnedMessageExtraBody
+ */
+public object PinnedMessageEvent : SystemEventParserDefinition<PinnedMessageExtraBody>() {
+    override val parser: SysEventParser<PinnedMessageExtraBody>
+        get() = ChannelEvents.pinnedMessageParser
+}
+
+
+/**
+ * 事件定义。
+ * @see UnpinnedMessageExtraBody
+ */
+public object UnpinnedMessageEvent : SystemEventParserDefinition<UnpinnedMessageExtraBody>() {
+    override val parser: SysEventParser<UnpinnedMessageExtraBody>
+        get() = ChannelEvents.unpinnedMessageParser
+}
