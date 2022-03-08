@@ -15,8 +15,6 @@
  *
  */
 
-@file:JvmName("UserEvents")
-
 package love.forte.simbot.kaiheila.event.system.user
 
 import love.forte.simbot.kaiheila.event.*

@@ -132,7 +132,8 @@ internal data class UserImpl(
     override val isOnline: Boolean,
     /**
      * 用户的状态, 0代表正常，10代表被封禁
-     * Allowed: 0┃10
+     *
+     * Allowed: 0|1|10
      */
     override val status: Int,
     @SerialName("bot")
@@ -148,8 +149,8 @@ internal data class UserImpl(
     override val roles: List<LongID> = emptyList(),
 ) : User {
     init {
-        if (!(status == 0 || status == 10)) {
-            logger.warn("Parameter 'status' must be 0(normal) or 10(banned), but {}", status)
+        if (!(status == 0 || status == 1 || status == 10)) {
+            logger.warn("Parameter 'status' must be 0、1(normal) or 10(banned), but {}", status)
             // check(status == 0 || status == 10) { "Parameter status must be 0(normal) or 10(banned), but $status" }
         }
     }

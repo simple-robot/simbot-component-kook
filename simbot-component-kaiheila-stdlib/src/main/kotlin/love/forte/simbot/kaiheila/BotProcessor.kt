@@ -112,4 +112,52 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
     processor(eventDefinition.parser, block)
 }
 
+/**
+ * 提供一个 [EventParser] 进行事件验证并在验证通过时进行事件处理。
+ *
+ * 由于开黑啦事件可能会触发bot自身发的消息，通过 [processorExcludeSelf]
+ *
+ * @see love.forte.simbot.kaiheila.event.message.MessageEventDefinition
+ * @see love.forte.simbot.kaiheila.event.system.user.UserEvents
+ * @see love.forte.simbot.kaiheila.event.system.message.MessageEvents
+ * @see love.forte.simbot.kaiheila.event.system.guild.GuildEvents
+ * @see love.forte.simbot.kaiheila.event.system.guild.role.GuildRoleEvents
+ * @see love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberEvents
+ * @see love.forte.simbot.kaiheila.event.system.channel.ChannelEvents
+ *
+ */
+public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processorExcludeSelf(
+    eventParser: EventParser<EX, E>,
+    crossinline block: suspend (E) -> Unit
+) {
+    processor { _, decoded ->
+        if (eventParser.check(type, extraTypePrimitive)) {
+            val decodedEvent = decoded()
+            block(
+                decoded() as? E
+                    ?: throw EventParserException("Event decoded as ${E::class} failed. decoded: $decodedEvent, target event parser: $eventParser")
+            )
+        }
+    }
+}
+
+/**
+ * 提供一个 [KaiheilaEventParserDefinition] 进行事件验证并在验证通过时进行事件处理。
+ *
+ * @see love.forte.simbot.kaiheila.event.message.MessageEventDefinition
+ * @see love.forte.simbot.kaiheila.event.system.user.UserEvents
+ * @see love.forte.simbot.kaiheila.event.system.message.MessageEvents
+ * @see love.forte.simbot.kaiheila.event.system.guild.GuildEvents
+ * @see love.forte.simbot.kaiheila.event.system.guild.role.GuildRoleEvents
+ * @see love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberEvents
+ * @see love.forte.simbot.kaiheila.event.system.channel.ChannelEvents
+ *
+ */
+public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processorExcludeSelf(
+    eventDefinition: KaiheilaEventParserDefinition<EX, E>,
+    crossinline block: suspend (E) -> Unit
+) {
+    processor(eventDefinition.parser, block)
+}
+
 

@@ -25,6 +25,7 @@ import love.forte.simbot.kaiheila.api.message.MessageType.Companion.IMAGE
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.KMARKDOWN
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.TEXT
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.VIDEO
+import love.forte.simbot.kaiheila.event.*
 
 
 /**
@@ -106,6 +107,24 @@ public sealed class MessageType {
             TEXT, IMAGE, VIDEO, FILE, KMARKDOWN, CARD, SYSTEM
         )
 
+        /**
+         * 通过 [Event.Type] 解析得到 [MessageType].
+         */
+        public fun byEventType(eventType: Event.Type): MessageType? {
+            return when(eventType) {
+                Event.Type.TEXT -> TEXT
+                Event.Type.IMAGE -> IMAGE
+                Event.Type.VIDEO -> VIDEO
+                Event.Type.FILE -> FILE
+                // Event.Type.VOICE -> VOICE
+                Event.Type.KMD -> KMARKDOWN
+                Event.Type.CARD -> CARD
+                Event.Type.SYS -> SYSTEM // 不能用于发送
+                else -> null
+            }
+
+
+        }
 
     }
 

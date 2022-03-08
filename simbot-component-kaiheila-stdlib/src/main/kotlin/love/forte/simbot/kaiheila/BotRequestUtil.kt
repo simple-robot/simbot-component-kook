@@ -19,13 +19,21 @@
 
 package love.forte.simbot.kaiheila
 
+import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.*
+import love.forte.simbot.utils.*
 
 
 /**
  * 通过指定Bot，利用其token和client发起请求并得到对应的[ApiResult]。
+ *
+ * 如果你希望自动检测 [ApiResult] 响应类型并直接得到 [ApiResult.data] 的反序列化结果，参考 [requestData]、[requestDataBy].
+ *
+ * @see requestData
+ * @see requestDataBy
  */
-public suspend fun KaiheilaApiRequest<*>.requestBy(bot: KaiheilaBot): ApiResult {
+@JvmSynthetic
+public suspend inline fun KaiheilaApiRequest<*>.requestBy(bot: KaiheilaBot): ApiResult {
     return request(
         bot.httpClient,
         bot.ticket.authorization,
@@ -36,7 +44,8 @@ public suspend fun KaiheilaApiRequest<*>.requestBy(bot: KaiheilaBot): ApiResult 
 /**
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
-public suspend fun <T> KaiheilaApiRequest<T>.requestDataBy(bot: KaiheilaBot): T {
+@JvmSynthetic
+public suspend inline fun <T> KaiheilaApiRequest<T>.requestDataBy(bot: KaiheilaBot): T {
     return requestData(
         bot.httpClient,
         bot.ticket.authorization,
@@ -46,16 +55,47 @@ public suspend fun <T> KaiheilaApiRequest<T>.requestDataBy(bot: KaiheilaBot): T 
 
 /**
  * 通过指定Bot，利用其token和client发起请求并得到对应的[ApiResult]。
+ *
+ * 如果你希望自动检测 [ApiResult] 响应类型并直接得到 [ApiResult.data] 的反序列化结果，参考 [requestData]、[requestDataBy].
+ *
+ * @see requestData
+ * @see requestDataBy
+ *
  */
-public suspend fun KaiheilaBot.request(api: KaiheilaApiRequest<*>): ApiResult {
+@JvmSynthetic
+public suspend inline fun KaiheilaBot.request(api: KaiheilaApiRequest<*>): ApiResult {
     return api.requestBy(this)
 }
 
 /**
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
-public suspend fun <T> KaiheilaBot.requestData(api: KaiheilaApiRequest<T>): T {
+@JvmSynthetic
+public suspend inline fun <T> KaiheilaBot.requestData(api: KaiheilaApiRequest<T>): T {
     return api.requestDataBy(this)
+}
+
+
+
+/**
+ * 通过指定Bot，利用其token和client发起请求并得到对应的[ApiResult]。
+ *
+ * 如果你希望自动检测 [ApiResult] 响应类型并直接得到 [ApiResult.data] 的反序列化结果，参考 [requestDataBlocking]
+ *
+ * @see requestDataBlocking
+ *
+ */
+@Api4J
+public fun KaiheilaBot.requestBlocking(api: KaiheilaApiRequest<*>): ApiResult {
+    return runInBlocking { api.requestBy(this@requestBlocking) }
+}
+
+/**
+ * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
+ */
+@Api4J
+public fun <T> KaiheilaBot.requestDataBlocking(api: KaiheilaApiRequest<T>): T {
+    return runInBlocking { api.requestDataBy(this@requestDataBlocking) }
 }
 
 

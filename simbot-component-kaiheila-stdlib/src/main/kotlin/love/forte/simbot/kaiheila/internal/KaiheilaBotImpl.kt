@@ -363,6 +363,9 @@ internal class KaiheilaBotImpl(
         return heartbeatJob
     }
 
+    override suspend fun join() {
+        job.join()
+    }
 
     override suspend fun cancel(reason: Throwable?) = lifeLock.withLock {
         if (job.isCancelled) {
@@ -415,9 +418,13 @@ internal class KaiheilaBotImpl(
         return MeRequest.requestDataBy(this)
     }
 
+    override suspend fun offline() {
+        return OfflineRequest.requestDataBy(this)
+    }
+
 
     companion object {
-        private val DEFAULT_CONNECT_TIMEOUT: Long = 6000L
+        private const val DEFAULT_CONNECT_TIMEOUT: Long = 6000L
     }
 
 }

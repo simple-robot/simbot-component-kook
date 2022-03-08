@@ -15,8 +15,6 @@
  *
  */
 
-@file:JvmName("GuildEvents")
-
 package love.forte.simbot.kaiheila.event.system.guild
 
 import love.forte.simbot.kaiheila.event.*

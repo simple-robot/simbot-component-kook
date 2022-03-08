@@ -89,7 +89,9 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
 
 
     /**
-     * 当前bot所使用的部分权限"票据"。根据
+     * 当前bot所使用的部分权限"票据"。
+     *
+     * [Ticket.equals] 默认情况下将会只基于 [clientId] 进行匹配。如果你想同时比较 [token], 使用 [exactlyEquals].
      */
     public interface Ticket {
 
@@ -118,6 +120,11 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
          */
         public val authorization: String
 
+        /**
+         * 同时使用 [clientId] 和 [token] 进行比较。
+         */
+        public fun exactlyEquals(other: Any?): Boolean
+
     }
 
 
@@ -129,6 +136,12 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      */
     @JvmSynthetic
     public suspend fun start(): Boolean
+
+
+    /**
+     * 等待直到当前bot被取消。
+     */
+    public suspend fun join()
 
 
     /**
@@ -179,12 +192,23 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
 
     /**
      * 查询bot当前信息。
+     *
+     * @see MeRequest
      */
     public suspend fun me(): Me
 
+    /**
+     * 让 bot 下线。
+     *
+     * @see OfflineRequest
+     */
+    public suspend fun offline()
+
 }
 
-
+/**
+ * 用于Java的事件处理函数接口。
+ */
 @Api4J
 public fun interface EventProcessor4J<out EX : Event.Extra, E : Event<EX>> {
     /**
@@ -194,3 +218,52 @@ public fun interface EventProcessor4J<out EX : Event.Extra, E : Event<EX>> {
     public fun process(event: E)
 
 }
+
+
+/**
+ * [KaiheilaBot.Ticket] 的基础实现。
+ *
+ */
+public class SimpleTicket(
+    override val clientId: ID,
+    token: String,
+) : KaiheilaBot.Ticket {
+    // Bot xxx
+    private var _authToken = "Bot $token"
+
+    override var token: String
+        get() = _authToken.substring(4)
+        set(value) {
+            _authToken = "Bot $value"
+        }
+
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is SimpleTicket) return false
+
+        return clientId == other.clientId
+    }
+
+    override fun exactlyEquals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is SimpleTicket) return false
+
+        return clientId == other.clientId && _authToken == other._authToken
+    }
+
+    override fun hashCode(): Int {
+        return clientId.hashCode()
+    }
+
+    override val authorization: String
+        get() = _authToken
+
+    override fun toString(): String {
+        return "SimpleTicket(clientId=$clientId, token=${_authToken.substring(4, _authToken.length - 4 / 2)}******)"
+    }
+
+}
+
+
+
+
