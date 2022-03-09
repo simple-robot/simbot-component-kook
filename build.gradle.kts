@@ -1,7 +1,7 @@
 plugins {
-    `java-library`
-    kotlin("jvm") // version "1.6.0" // apply false
-    kotlin("plugin.serialization") // version "1.6.0" // apply false
+    // `java-library`
+    kotlin("jvm") apply false
+    kotlin("plugin.serialization") apply false
     id("org.jetbrains.dokka")
 }
 

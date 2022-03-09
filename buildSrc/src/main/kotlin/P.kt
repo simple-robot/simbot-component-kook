@@ -18,7 +18,7 @@
 
 object P {
     object Simbot {
-        val isSnapshot: Boolean = System.getProperty("isSnapshot")?.equals("true", true) ?: false // TODO
+        val isSnapshot: Boolean = System.getProperty("isSnapshot")?.equals("true", true) ?: false
         const val GROUP = "love.forte.simbot"
         const val REAL_VERSION = "3.0.0.preview.5.0"
         val VERSION = if (isSnapshot) "$REAL_VERSION-SNAPSHOT" else REAL_VERSION

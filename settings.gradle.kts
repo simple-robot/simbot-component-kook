@@ -13,5 +13,5 @@ pluginManagement {
 
 include("simbot-component-kaiheila-api")
 include("simbot-component-kaiheila-stdlib")
-// include("simbot-component-kaiheila-component")
+include("simbot-component-kaiheila-core")
 // include("simbot-component-kaiheila-component-boot")
