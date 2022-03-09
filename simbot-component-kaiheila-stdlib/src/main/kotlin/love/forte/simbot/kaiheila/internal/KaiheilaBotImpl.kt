@@ -32,6 +32,8 @@ import love.forte.simbot.kaiheila.*
 import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.event.*
+import org.slf4j.*
+import org.slf4j.LoggerFactory
 import java.util.concurrent.*
 import java.util.concurrent.atomic.*
 import java.util.zip.*
@@ -48,7 +50,7 @@ internal class KaiheilaBotImpl(
     override val ticket: KaiheilaBot.Ticket,
     override val configuration: KaiheilaBotConfiguration
 ) : KaiheilaBot {
-    override val logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.${ticket.clientId}")
+    override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.client.${ticket.clientId}")
     private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Any) -> Unit> =
         ConcurrentLinkedQueue()
