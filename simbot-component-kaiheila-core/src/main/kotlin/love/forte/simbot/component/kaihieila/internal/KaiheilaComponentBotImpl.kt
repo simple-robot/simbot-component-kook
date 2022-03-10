@@ -102,10 +102,11 @@ internal class KaiheilaComponentBotImpl(
 
         val guildsMap = ConcurrentHashMap<String, KaiheilaGuildImpl>()
         flow {
-            var page = 0
+            var page = 1
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
-                val guildsResult = GuildListRequest(page = page++).requestDataBy(this@KaiheilaComponentBotImpl)
+                val guildsResult = GuildListRequest(page = page).requestDataBy(this@KaiheilaComponentBotImpl)
+                page = guildsResult.meta.page + 1
                 val guilds = guildsResult.items
                 bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page - 1)
                 guilds.forEach {

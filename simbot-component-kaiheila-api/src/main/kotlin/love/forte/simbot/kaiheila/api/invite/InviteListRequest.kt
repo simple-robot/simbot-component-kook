@@ -59,10 +59,10 @@ public class InviteListRequest(
     override fun ParametersBuilder.buildParameters() {
         appendIfNotnull("guild_id", guildId) { it.literal }
         appendIfNotnull("channel_id", channelId) { it.literal }
-        if (page >= 0) {
+        if (page > 0) {
             append("page", page.toString())
         }
-        if (pageSize >= 0) {
+        if (pageSize > 0) {
             append("page_size", pageSize.toString())
         }
     }

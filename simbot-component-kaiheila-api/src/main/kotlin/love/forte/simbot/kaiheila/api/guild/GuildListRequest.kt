@@ -60,10 +60,10 @@ public class GuildListRequest @JvmOverloads constructor(
         get() = serializer
 
     override fun ParametersBuilder.buildParameters() {
-        if (page >= 0) {
+        if (page > 0) {
             append("page", page.toString())
         }
-        if (pageSize >= 0) {
+        if (pageSize > 0) {
             append("page_size", pageSize.toString())
         }
         appendIfNotnull("sort", sort)

@@ -80,10 +80,10 @@ public class GuildUserListRequest(
         appendIfNotnull("mobileVerified", mobileVerified) { if (it) "1" else "0" }
         appendIfNotnull("activeTime", activeTimeSort)
         appendIfNotnull("joinedAt", joinedAtSort)
-        if (page >= 0) {
+        if (page > 0) {
             append("page", page.toString())
         }
-        if (pageSize >= 0) {
+        if (pageSize > 0) {
             append("page_size", pageSize.toString())
         }
     }

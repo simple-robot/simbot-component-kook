@@ -82,7 +82,8 @@ internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
             var page = 0
             do {
                 bot.logger.debug("Sync member data ... page {}", page)
-                val usersResult = GuildUserListRequest(guildId = source.id, page = page++).requestDataBy(bot)
+                val usersResult = GuildUserListRequest(guildId = source.id, page = page).requestDataBy(bot)
+                page = usersResult.meta.page + 1
                 val users = usersResult.items
                 bot.logger.debug("{} member data synchronized in page {}", users.size, page - 1)
                 users.forEach {
