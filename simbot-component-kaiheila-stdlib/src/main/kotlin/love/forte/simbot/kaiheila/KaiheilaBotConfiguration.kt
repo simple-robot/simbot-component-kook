@@ -90,6 +90,20 @@ public class KaiheilaBotConfiguration {
         this.httpClientConfig = block
     }
 
+    /**
+     * 在执行 [KaiheilaBot.start] 建立连接成功后、进行事件处理之前执行此函数。
+     */
+    public var preEventProcessor: suspend (bot: KaiheilaBot, sessionId: String) -> Unit = { _, _ -> }
+
+
+    /**
+     * 在执行 [KaiheilaBot.start] 建立连接成功后、进行事件处理之前执行此函数。
+     */
+    @KaiheilaBotConfigurationDSL
+    public fun preEventProcessor(block: suspend (bot: KaiheilaBot, sessionId: String) -> Unit) {
+        this.preEventProcessor = block
+    }
+
 
     public companion object {
         /**

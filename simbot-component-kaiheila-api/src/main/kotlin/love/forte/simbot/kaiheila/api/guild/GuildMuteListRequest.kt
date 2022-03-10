@@ -58,22 +58,35 @@ public sealed class GuildMuteListRequest(
  */
 @Serializable
 public data class GuildMuteList @ApiResultType constructor(
+    /**
+     * 麦克风静音信息。
+     */
     val mic: Mic,
+
+    /**
+     * 耳机静音信息。
+     */
     val headset: Headset,
 ) {
 
+    /**
+     * 麦克风静音信息。
+     */
     @Serializable
     public data class Mic @ApiResultType constructor(
         override val type: Int = 1,
         @SerialName("user_ids")
-        override val userIds: List<CharSequenceID> = emptyList(),
+        override val userIds: Set<CharSequenceID> = emptySet(),
     ) : GuildMuteResult
 
+    /**
+     * 耳机静音信息。
+     */
     @Serializable
     public data class Headset @ApiResultType constructor(
         override val type: Int = 2,
         @SerialName("user_ids")
-        override val userIds: List<CharSequenceID> = emptyList(),
+        override val userIds: Set<CharSequenceID> = emptySet(),
     ) : GuildMuteResult
 
 }
@@ -89,8 +102,8 @@ public interface GuildMuteResult {
     public val type: Int
 
     /**
-     * 对应用户列表
+     * 对应用户列表. 用户列表没必要出现重复。
      */
-    public val userIds: List<ID>
+    public val userIds: Set<ID>
 }
 

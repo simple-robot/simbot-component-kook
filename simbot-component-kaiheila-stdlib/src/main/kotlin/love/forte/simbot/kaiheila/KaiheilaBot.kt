@@ -62,13 +62,13 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      * 添加一个事件处理器。
      */
     @JvmSynthetic
-    public fun processor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Any) -> Unit)
+    public fun processor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit)
 
     /**
      * process for java
      */
     @Api4J
-    public fun process(processor: (rawEvent: Signal.Event, decoder: Json, decoded: () -> Any) -> Unit) {
+    public fun process(processor: (rawEvent: Signal.Event, decoder: Json, decoded: () -> Event<*>) -> Unit) {
         processor { decoder, decoded -> processor(this, decoder, decoded) }
     }
 
@@ -149,6 +149,13 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      */
     @JvmSynthetic
     public suspend fun cancel(reason: Throwable? = null)
+
+
+    /**
+     * 此bot是否启动过了。
+     */
+    public val isStarted: Boolean
+
 
 
     /**

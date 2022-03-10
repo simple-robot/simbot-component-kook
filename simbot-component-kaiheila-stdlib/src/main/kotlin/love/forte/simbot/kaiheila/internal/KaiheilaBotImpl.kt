@@ -52,7 +52,7 @@ internal class KaiheilaBotImpl(
 ) : KaiheilaBot {
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.client.${ticket.clientId}")
-    private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Any) -> Unit> =
+    private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
 
 
@@ -104,7 +104,7 @@ internal class KaiheilaBotImpl(
 
     }
 
-    override fun processor(processor: suspend Signal_0.(decoder: Json, decoded: () -> Any) -> Unit) {
+    override fun processor(processor: suspend Signal_0.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
         processorQueue.add(processor)
     }
 
@@ -112,6 +112,11 @@ internal class KaiheilaBotImpl(
 
     @Volatile
     private var client: ClientImpl? = null
+
+    private val _isStarted: AtomicBoolean = AtomicBoolean(false)
+
+    override val isStarted: Boolean
+        get() = _isStarted.get()
 
     override suspend fun start(): Boolean = start { null }
 
@@ -136,6 +141,8 @@ internal class KaiheilaBotImpl(
         client = createClient(gateway, DEFAULT_CONNECT_TIMEOUT)
         clientLogger.debug("Client created. client: {}", client)
 
+        _isStarted.compareAndSet(false, true)
+
         true
     }
 
@@ -148,6 +155,10 @@ internal class KaiheilaBotImpl(
         val sessionInfo: SessionInfo = createSession(gateway, connectTimeout)
         clientLogger.debug("Session created: {}", sessionInfo)
         val (session, sn, _, sessionData) = sessionInfo
+
+        // pre process
+        val preProcessor = configuration.preEventProcessor
+        preProcessor(this, sessionData.data.sessionId)
 
         processEvent(sessionInfo)
 
@@ -187,36 +198,6 @@ internal class KaiheilaBotImpl(
     }
 
 
-    // private suspend fun resumeSession(
-    //     gateway: Gateway,
-    //     sessionData: Signal.HelloPack,
-    //     seq: AtomicLong,
-    // ): SessionInfo {
-    //
-    //     val resume = Signal.Resume(
-    //         Signal.Resume.Data(
-    //             token = requestToken,
-    //             sessionId = sessionData.sessionId,
-    //             seq = seq.get()
-    //         )
-    //     )
-    //
-    //     val session = httpClient.ws(gateway)
-    //
-    //     val hello = session.waitHello()
-    //
-    //     clientLogger.debug("Received Hello: {}", hello)
-    //
-    //     // 重连
-    //     // see https://bot.q.qq.com/wiki/develop/api/gateway/reference.html#%E9%89%B4%E6%9D%83ß
-    //     session.send(decoder.encodeToString(Signal.Resume.serializer(), resume))
-    //
-    //     val heartbeatJob = session.heartbeatJob(seq)
-    //
-    //     return SessionInfo(session, seq, heartbeatJob, logger, sessionData)
-    // }
-
-
     private suspend fun processEvent(sessionInfo: SessionInfo): Job {
         val eventSerializer = Signal.Event.serializer()
         val sn = sessionInfo.sn
@@ -228,7 +209,7 @@ internal class KaiheilaBotImpl(
             return when (s) {
                 // Pong.
                 Signal.Pong.S_CODE -> {
-                    // TODO 6s timeout
+                    // TODO 6s timeout?
                     this.clientLogger.debug("Pong signal received.")
 
                     null

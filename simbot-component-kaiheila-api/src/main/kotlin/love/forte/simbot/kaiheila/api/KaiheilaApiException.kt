@@ -30,7 +30,12 @@ public open class KaiheilaApiException(
     public val code: Int,
     public val msg: String?,
     cause: Throwable? = null
-) : SimbotIllegalStateException("code: $code, message: $msg", cause)
+) : SimbotIllegalStateException("code: $code, message: $msg", cause) {
+    public companion object {
+        public const val NOT_FOUNT: Int = 404
+    }
+
+}
 
 
 @Suppress("NOTHING_TO_INLINE")

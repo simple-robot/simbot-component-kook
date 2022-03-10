@@ -35,7 +35,12 @@ public class GuildMuteDeleteRequest(
     guildId: ID,
     /** 用户id */
     userId: ID,
-    /** 1代表麦克风闭麦，2代表耳机静音 */
+    /**
+     * 1代表麦克风闭麦，2代表耳机静音
+     *
+     * @see GuildMuteType.TYPE_MICROPHONE
+     * @see GuildMuteType.TYPE_EARPHONE
+     */
     type: Int
 ) : KaiheilaPostRequest<Unit>() {
     public companion object Key : BaseApiRequestKey("guild-mute", "delete")

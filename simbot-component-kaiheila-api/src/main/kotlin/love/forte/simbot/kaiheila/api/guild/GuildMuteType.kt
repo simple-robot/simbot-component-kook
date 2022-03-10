@@ -15,32 +15,21 @@
  *
  */
 
-package love.forte.simbot.kaiheila.api.user
-
-import io.ktor.http.*
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
+package love.forte.simbot.kaiheila.api.guild
 
 /**
- * 查询用户信息
- * @author ForteScarlet
+ * 对服务器静音相关api中的 `类型(type)` 常量定义。
  */
-public class UserViewRequest(
-    private val userId: ID,
-    private val guildId: ID,
-) : KaiheilaGetRequest<User>() {
-    public companion object Key : BaseApiRequestKey("user", "view")
+public object GuildMuteType {
 
-    override val resultDeserializer: DeserializationStrategy<out User>
-        get() = UserImpl.serializer()
+    /**
+     * 静音类型：麦克风静音。
+     */
+    public const val TYPE_MICROPHONE : Int = 1
 
-    override val apiPaths: List<String>
-        get() = apiPathList
+    /**
+     * 静音类型：耳机静音。
+     */
+    public const val TYPE_EARPHONE: Int = 2
 
-    override fun ParametersBuilder.buildParameters() {
-        append("user_id", userId.literal)
-        append("guild_id", guildId.literal)
-    }
 }
