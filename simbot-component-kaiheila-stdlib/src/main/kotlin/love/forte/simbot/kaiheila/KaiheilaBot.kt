@@ -259,11 +259,15 @@ public class SimpleTicket(
         get() = _authToken
 
     override fun toString(): String {
-        return "SimpleTicket(clientId=$clientId, token=${_authToken.substring(4, _authToken.length - 4 / 2)}******)"
+        return "SimpleTicket(clientId=$clientId, token=${token.hide()})"
     }
 
 }
 
+private fun String.hide(size: Int = 3, hide: String = "********"): String {
+    return if (length <= size) hide
+    else "${substring(0, 3)}$hide${substring(lastIndex - 2, length)}"
 
+}
 
 
