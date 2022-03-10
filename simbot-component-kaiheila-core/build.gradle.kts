@@ -34,6 +34,7 @@ dependencies {
     compileOnly(V.Jetbrains.Annotations.NOTATION)
 
     testImplementation(kotlin("test-junit5"))
+    testImplementation(V.Simbot.Core.NOTATION)
 }
 repositories {
     maven {

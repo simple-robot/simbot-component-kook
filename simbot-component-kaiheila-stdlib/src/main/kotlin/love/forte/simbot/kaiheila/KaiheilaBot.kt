@@ -58,8 +58,19 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
     public val httpClient: HttpClient
 
 
+
     /**
-     * 添加一个事件处理器。
+     * 添加一个事件的前置处理器。
+     *
+     * 与 [processor] 不同的是，前置处理器会在每次事件被触发时，优先于 [processor] 中的事件并**顺序**执行。
+     *
+     */
+    @JvmSynthetic
+    public fun preProcessor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit)
+
+
+    /**
+     * 添加一个事件处理器。所有事件处理器会在每次触发的时候异步的按照添加顺序依次进行处理。
      */
     @JvmSynthetic
     public fun processor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit)

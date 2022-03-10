@@ -124,7 +124,11 @@ public object KaiheilaApiResult {
         override val items: List<T> = emptyList(),
         override val meta: ListMeta,
         override val sort: Map<String, Int> = emptyMap()
-    ) : ListDataResponse<T, Map<String, Int>>(), Iterable<T> by items
+    ) : ListDataResponse<T, Map<String, Int>>(), Iterable<T> by items {
+        override fun toString(): String {
+            return "ListData(items=$items, meta=$meta, sort=$sort)"
+        }
+    }
 
 
 }

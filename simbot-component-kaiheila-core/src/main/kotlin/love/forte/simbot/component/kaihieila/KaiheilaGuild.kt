@@ -31,12 +31,12 @@ import love.forte.simbot.kaiheila.objects.Guild as KhlGuild
  *
  * @author ForteScarlet
  */
-public interface KaiheilaGuild : Guild {
+public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
 
     /**
      * 得到当前频道服务器所对应的api模块下的服务器对象。
      */
-    public val sourceGuild: KhlGuild
+    override val source: KhlGuild
 
     override val bot: KaiheilaComponentBot
 
@@ -54,7 +54,7 @@ public interface KaiheilaGuild : Guild {
     //region owner api
     override val ownerId: ID
 
-    @Api4J
+    @OptIn(Api4J::class)
     override val owner: KaiheilaGuildMember
 
     override suspend fun owner(): KaiheilaGuildMember
@@ -81,46 +81,43 @@ public interface KaiheilaGuild : Guild {
     /**
      * 查询用户列表。
      */
-    @Api4J
+    @OptIn(Api4J::class)
     override fun getMembers(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaGuildMember>
 
     /**
      * 查询用户列表。
      */
-    @Api4J
+    @OptIn(Api4J::class)
     override fun getMembers(): Stream<out KaiheilaGuildMember> = getMembers(null, Limiter)
 
     /**
      * 查询用户列表。
      */
-    @Api4J
+    @OptIn(Api4J::class)
     override fun getMembers(groupingId: ID?): Stream<out KaiheilaGuildMember> = getMembers(groupingId, Limiter)
 
     /**
      * 查询用户列表。
      */
-    @Api4J
+    @OptIn(Api4J::class)
     override fun getMembers(limiter: Limiter): Stream<out KaiheilaGuildMember> = getMembers(null, limiter)
     //endregion
 
 
     //region children api
-    // TODO
-    override suspend fun children(groupingId: ID?): Flow<Channel>
-    override suspend fun children(groupingId: ID?, limiter: Limiter): Flow<Channel>
 
-    @Api4J
-    override fun getChildren(groupingId: ID?, limiter: Limiter): Stream<out Channel>
+    override suspend fun children(groupingId: ID?, limiter: Limiter): Flow<KaiheilaChannel>
+    @OptIn(Api4J::class)
+    override fun getChildren(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaChannel>
 
-    @Api4J
-    override fun getChildren(): Stream<out Channel> {
-        return super.getChildren()
-    }
 
-    @Api4J
-    override fun getChildren(groupingId: ID?): Stream<out Channel> {
-        return super.getChildren(groupingId)
-    }
+    override suspend fun children(groupingId: ID?): Flow<KaiheilaChannel> = children(groupingId, Limiter)
+    @OptIn(Api4J::class)
+    override fun getChildren(): Stream<out KaiheilaChannel> = getChildren(null, Limiter)
+
+    @OptIn(Api4J::class)
+    override fun getChildren(groupingId: ID?): Stream<out KaiheilaChannel> = getChildren(groupingId, Limiter)
+
     //endregion
 
     //region role api

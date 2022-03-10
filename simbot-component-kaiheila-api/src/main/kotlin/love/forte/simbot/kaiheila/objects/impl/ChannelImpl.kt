@@ -39,9 +39,9 @@ internal data class ChannelImpl(
     override val slowMode: Int,
     override val type: Int,
     @SerialName("permission_overwrites")
-    override val permissionOverwrites: List<ChannelPermissionOverwritesImpl>,
+    override val permissionOverwrites: List<ChannelPermissionOverwritesImpl> = emptyList(),
     @SerialName("permission_users")
-    override val permissionUsers: List<String>,
+    override val permissionUsers: List<CharSequenceID> = emptyList(),
     @SerialName("permission_sync")
     override val permissionSync: Int,
 

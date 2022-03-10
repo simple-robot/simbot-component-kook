@@ -55,6 +55,9 @@ internal class KaiheilaBotImpl(
     private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
 
+    private val preProcessorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
+        ConcurrentLinkedQueue()
+
 
     private val decoder = configuration.decoder
 
@@ -102,6 +105,10 @@ internal class KaiheilaBotImpl(
         httpClient = client
 
 
+    }
+
+    override fun preProcessor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
+        preProcessorQueue.add(processor)
     }
 
     override fun processor(processor: suspend Signal_0.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
@@ -252,15 +259,15 @@ internal class KaiheilaBotImpl(
             }
         }.onEach { event ->
             val nowSn = event.sn
-            if (processorQueue.isNotEmpty()) {
+            if (preProcessorQueue.isNotEmpty() && processorQueue.isNotEmpty()) {
                 clientLogger.debug("On event: $event")
                 val eventType = event.type
-                val eventextraType = event.extraType
+                val eventExtraType = event.extraType
 
-                val parser = EventSignals[eventType, eventextraType] ?: run {
+                val parser = EventSignals[eventType, eventExtraType] ?: run {
                     val e = SimbotIllegalStateException("Unknown event type: $eventType. data: $event")
                     this.clientLogger.error(e.localizedMessage, e)
-                    // e.process(logger) { "Event receiving" } // TODO process exception
+                    // e.process(logger) { "Event receiving" } // TODO process exception?
                     return@onEach
                 }
 
@@ -270,6 +277,16 @@ internal class KaiheilaBotImpl(
 
 
                 val lazyDecoded = lazy::value
+
+                // pre process
+                preProcessorQueue.forEach { pre ->
+                    try {
+                        pre(event, decoder, lazyDecoded)
+                    } catch (e: Throwable) {
+                        clientLogger.error("Event pre precess failed.", e)
+                    }
+                }
+
                 launch {
                     processorQueue.forEach { p ->
                         try {

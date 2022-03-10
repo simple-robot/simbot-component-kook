@@ -21,8 +21,11 @@ import kotlinx.coroutines.flow.*
 import love.forte.simbot.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.kaiheila.api.guild.*
+import love.forte.simbot.utils.*
+import java.util.concurrent.*
 import java.util.stream.*
 import kotlin.time.*
+import kotlin.time.Duration.Companion.milliseconds
 import love.forte.simbot.kaiheila.objects.User as KhlUser
 
 /**
@@ -31,15 +34,16 @@ import love.forte.simbot.kaiheila.objects.User as KhlUser
  *
  * @author ForteScarlet
  */
-public interface KaiheilaGuildMember : GuildMember {
+public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<KhlUser> {
     override val bot: KaiheilaComponentBot
     override val id: ID
 
     /**
      * 此成员对应的源用户实例。
      */
-    public val sourceUser: KhlUser
+    override val source: KhlUser
 
+    //region mute api
     /**
      * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
      *
@@ -71,11 +75,55 @@ public interface KaiheilaGuildMember : GuildMember {
     public suspend fun mute(duration: Duration, type: Int): Boolean
 
 
-    override suspend fun guild(): KaiheilaGuild
+    /**
+     * 对此用户进行静音操作。
+     * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
+     *
+     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    override fun muteBlocking(time: Long, unit: TimeUnit): Boolean = runInBlocking { mute(unit.toMillis(time).milliseconds) }
+
+    /**
+     * 对此用户进行静音操作。
+     *
+     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    public fun muteBlocking(time: Long, unit: TimeUnit, type: Int): Boolean = runInBlocking { mute(unit.toMillis(time).milliseconds, type) }
+
+    /**
+     * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
+     *
+     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    override fun unmuteBlocking(): Boolean = runInBlocking { unmute() }
+
+
+    /**
+     * 取消禁言。[type] 代表 [love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
+     *
+     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    public fun unmuteBlocking(type: Int): Boolean = runInBlocking { unmute(type) }
+
+    //endregion
+
+
+    @OptIn(Api4J::class)
+    override val guild: KaiheilaGuild
+
+    @OptIn(Api4J::class)
+    override val organization: KaiheilaGuild
+        get() = guild
+
+    override suspend fun organization(): KaiheilaGuild = guild
+    override suspend fun guild(): KaiheilaGuild = guild
 
     @Api4J
     override val roles: Stream<out Role>
-
     override suspend fun roles(): Flow<Role>
 
     override val joinTime: Timestamp get() = Timestamp.notSupport()

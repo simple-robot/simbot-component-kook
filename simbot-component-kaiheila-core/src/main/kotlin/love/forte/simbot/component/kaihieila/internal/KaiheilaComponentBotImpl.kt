@@ -22,16 +22,17 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.*
+import love.forte.simbot.component.kaihieila.util.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.event.*
 import love.forte.simbot.kaiheila.*
+import love.forte.simbot.kaiheila.api.guild.*
 import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
 import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.message.*
 import love.forte.simbot.resources.*
-import love.forte.simbot.utils.*
 import org.slf4j.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.*
@@ -49,15 +50,22 @@ internal class KaiheilaComponentBotImpl(
     override val eventProcessor: EventProcessor,
     override val component: KaiheilaComponent,
 ) : KaiheilaComponentBot() {
-    private val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
+    internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
 
+    private lateinit var _guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
+    internal var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
+        get() = _guilds
+        set(value) {
+            _guilds = value
+        }
+
 
     init {
         // register some event processors
-        sourceBot.processor { _, decoded ->
+        sourceBot.preProcessor { _, decoded ->
             decoded().internalProcessor()
         }
 
@@ -88,6 +96,33 @@ internal class KaiheilaComponentBotImpl(
         }
     }
     //endregion
+
+    private suspend fun init() {
+        updateMe(sourceBot.me())
+
+        val guildsMap = ConcurrentHashMap<String, KaiheilaGuildImpl>()
+        flow {
+            var page = 0
+            do {
+                bot.logger.debug("Sync guild data ... page {}", page)
+                val guildsResult = GuildListRequest(page = page++).requestDataBy(this@KaiheilaComponentBotImpl)
+                val guilds = guildsResult.items
+                bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page - 1)
+                guilds.forEach {
+                    emit(it)
+                }
+            } while (guilds.isNotEmpty() && guildsResult.meta.page < guildsResult.meta.pageTotal)
+        }.buffer(100)
+            .map { guild ->
+                KaiheilaGuildImpl(this, guild)
+            }.collect {
+                guildsMap[it.id.literal] = it.also { it.init() }
+            }
+
+        bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
+
+        this.guilds = guildsMap
+    }
 
 
     override val isActive: Boolean
@@ -135,36 +170,31 @@ internal class KaiheilaComponentBotImpl(
     override val username: String
         get() = me.username
 
+    private val initLock = Mutex()
 
     /**
      * 启动bot。
      */
     override suspend fun start(): Boolean = sourceBot.start().also {
-        updateMe(sourceBot.me())
         if (!it) {
             return@also
+        }
+        initLock.withLock {
+            init()
         }
     }
 
 
     //region guild api
-    override suspend fun guild(id: ID): KaiheilaGuild? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun guild(id: ID): KaiheilaGuild? = guilds[id.literal]
 
-    override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuild> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuild> =
+        guilds.values.asFlow().withLimiter(limiter)
 
-    @Api4J
-    override fun getGuild(id: ID): KaiheilaGuild? {
-        TODO("Not yet implemented")
-    }
+    override fun getGuild(id: ID): KaiheilaGuild? = guilds[id.literal]
 
-    @Api4J
-    override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuild> {
-        TODO("Not yet implemented")
-    }
+    override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuild> =
+        guilds.values.stream().withLimiter(limiter)
     //endregion
 
 
@@ -195,29 +225,9 @@ internal class KaiheilaComponentBotImpl(
     //endregion
 
 
-    /**
-     * 禁言延时任务
-     */
-    internal val muteJobs = ConcurrentHashMap<String, Job>()
-
-
     companion object {
         val botStatus = UserStatus.builder().bot().fakeUser().build()
     }
-}
-
-internal fun love.forte.simbot.kaiheila.objects.User.asMember(
-    bot: KaiheilaComponentBotImpl,
-    guild: LazyValue<KaiheilaGuildImpl>
-): KaiheilaGuildMemberImpl {
-    return KaiheilaGuildMemberImpl(bot, guild, this)
-}
-
-internal fun love.forte.simbot.kaiheila.objects.User.asMember(
-    bot: KaiheilaComponentBotImpl,
-    guild: KaiheilaGuildImpl
-): KaiheilaGuildMemberImpl {
-    return KaiheilaGuildMemberImpl(bot, completedLazyValue(guild), this)
 }
 
 

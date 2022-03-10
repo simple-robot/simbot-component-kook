@@ -142,6 +142,7 @@ public data class GuildUserList @ApiResultType constructor(
  */
 @Serializable
 public data class GuildUser @ApiResultType constructor(
+    @Serializable(ID.AsCharSequenceIDSerializer::class)
     override val id: ID,
     override val username: String,
     override val nickname: String,

@@ -88,7 +88,7 @@ public data class ChannelView @ApiResultType constructor(
     @SerialName("permission_overwrites")
     override val permissionOverwrites: List<ChannelPermissionOverwrites> = emptyList(),
     @SerialName("permission_users")
-    override val permissionUsers: List<String> = emptyList(),
+    override val permissionUsers: List<CharSequenceID> = emptyList(),
     @SerialName("permission_sync")
     override val permissionSync: Int = 0,
 ) : Channel {

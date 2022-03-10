@@ -19,7 +19,9 @@ package love.forte.simbot.component.kaihieila
 
 import kotlinx.serialization.json.*
 import love.forte.simbot.*
+import love.forte.simbot.component.kaihieila.internal.*
 import love.forte.simbot.event.*
+import love.forte.simbot.kaiheila.*
 import kotlin.coroutines.*
 
 /**
@@ -30,9 +32,41 @@ import kotlin.coroutines.*
  */
 public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     abstract override val component: KaiheilaComponent
+    public abstract val configuration: KaiheilaBotManagerConfiguration
 
     override fun register(verifyInfo: BotVerifyInfo): Bot {
         TODO("Not yet implemented")
+    }
+
+    /**
+     * 通过 [ticket] 和 [configuration] 注册bot。
+     */
+    public abstract fun register(
+        ticket: KaiheilaBot.Ticket,
+        configuration: KaiheilaBotConfiguration
+    ): KaiheilaComponentBot
+
+
+    /**
+     * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
+     */
+    public fun register(clientId: ID, token: String, configuration: KaiheilaBotConfiguration): KaiheilaComponentBot {
+        return register(SimpleTicket(clientId, token), configuration)
+    }
+
+    /**
+     * 通过 [ticket] 和 [block] 注册bot。
+     */
+    public fun register(ticket: KaiheilaBot.Ticket, block: KaiheilaBotConfiguration.() -> Unit = {}): KaiheilaComponentBot {
+        return register(ticket, KaiheilaBotConfiguration().also(block))
+    }
+
+
+    /**
+     * 通过 [clientId]、 [token] 和 [block] 注册bot。
+     */
+    public fun register(clientId: ID, token: String, block: KaiheilaBotConfiguration.() -> Unit = {}): KaiheilaComponentBot {
+        return register(clientId, token, KaiheilaBotConfiguration().also(block))
     }
 
 
@@ -44,17 +78,26 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
 
 
         @JvmStatic
-        public fun newInstance(): KaiheilaBotManager {
+        public fun newInstance(eventProcessor: EventProcessor): KaiheilaBotManager {
+            return KaiheilaBotManagerImpl(KaiheilaBotManagerConfiguration(eventProcessor))
+        }
 
-
-
-            TODO()
+        @JvmStatic
+        public fun newInstance(configuration: KaiheilaBotManagerConfiguration): KaiheilaBotManager {
+            return KaiheilaBotManagerImpl(configuration)
         }
 
 
     }
 
 
+}
+
+public fun kaiheilaBotManager(
+    eventProcessor: EventProcessor,
+    block: KaiheilaBotManagerConfiguration.() -> Unit = {}
+): KaiheilaBotManager {
+    return KaiheilaBotManager.newInstance(KaiheilaBotManagerConfiguration(eventProcessor).also(block))
 }
 
 

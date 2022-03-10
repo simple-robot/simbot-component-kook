@@ -91,7 +91,7 @@ public interface Channel : KhlObjects, ChannelInfo {
     public val permissionOverwrites: List<ChannelPermissionOverwrites>
 
     /** 针对用户在该频道的权限覆写规则组成的列表 */
-    public val permissionUsers: List<String>
+    public val permissionUsers: List<ID>
 
     /** 权限设置是否与分组同步, 1 or 0 */
     public val permissionSync: Int
@@ -145,20 +145,8 @@ public inline val Channel.Type.isGroup: Boolean get() = this == Channel.Type.GRO
  *
  */
 public interface ChannelPermissionOverwrites {
-
     public val roleId: Int
-
     public val allow: Int
-
     public val deny: Int
-
-    // companion object : SerializerModuleRegistrar {
-    //     override fun SerializersModuleBuilder.serializerModule() {
-    //         polymorphic(ChannelPermissionOverwrites::class) {
-    //             subclass(ChannelPermissionOverwritesImpl::class)
-    //             default { ChannelPermissionOverwritesImpl.serializer() }
-    //         }
-    //     }
-    // }
 }
 

@@ -76,16 +76,16 @@ public abstract class KaiheilaComponentBot : Bot {
 
     abstract override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuild>
 
-    @Api4J
+    @OptIn(Api4J::class)
     abstract override fun getGuild(id: ID): KaiheilaGuild?
 
-    @Api4J
+    @OptIn(Api4J::class)
     abstract override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuild>
 
-    @Api4J
+    @OptIn(Api4J::class)
     override fun getGuilds(limiter: Limiter): Stream<out KaiheilaGuild> = getGuilds(Grouping.EMPTY, limiter)
 
-    @Api4J
+    @OptIn(Api4J::class)
     override fun getGuilds(): Stream<out KaiheilaGuild> = getGuilds(Grouping.EMPTY, Limiter)
     //endregion
 
@@ -125,26 +125,26 @@ public abstract class KaiheilaComponentBot : Bot {
     override val bot: KaiheilaComponentBot get() = this
 
     //region group apis
-    @Deprecated("不支持'群'概念", ReplaceWith("null"))
+    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override suspend fun group(id: ID): Group? = null
 
-    @Deprecated("不支持'群'概念", ReplaceWith("null"))
+    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override suspend fun groups(grouping: Grouping, limiter: Limiter): Flow<Group> = emptyFlow()
 
     @OptIn(Api4J::class)
-    @Deprecated("不支持'群'概念", ReplaceWith("null"))
+    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override fun getGroups(grouping: Grouping, limiter: Limiter): Stream<out Group> = Stream.empty()
 
     @OptIn(Api4J::class)
-    @Deprecated("不支持'群'概念", ReplaceWith("null"))
+    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override fun getGroup(id: ID): Group? = null
 
     @OptIn(Api4J::class)
-    @Deprecated("不支持'群'概念", ReplaceWith("null"))
+    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override fun getGroups(): Stream<out Group> = Stream.empty()
 
     @OptIn(Api4J::class)
-    @Deprecated("不支持'群'概念", ReplaceWith("null"))
+    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override fun getGroups(limiter: Limiter): Stream<out Group> = Stream.empty()
     //endregion
 // todo ..
