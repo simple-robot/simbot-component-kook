@@ -46,12 +46,28 @@ internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
     override val createTime: Timestamp get() = Timestamp.notSupport()
 
     override val maximumMember: Int get() = source.maximumMember
-    override val description: String get() = source.description
-    override val icon: String get() = source.icon
     override val id: ID get() = source.id
-    override val name: String get() = source.name
+    override val description: String get() = source.description
     override val maximumChannel: Int get() = source.maximumChannel
-    override val ownerId: ID get() = source.ownerId
+
+    override var ownerId: ID = source.ownerId
+        internal set(value) {
+            if (field != value) {
+                field = value
+                _owner = members[value.literal] ?: runBlocking {
+                    KaiheilaMemberImpl(
+                        bot,
+                        this@KaiheilaGuildImpl,
+                        UserViewRequest(ownerId, source.id).requestDataBy(bot)
+                    )
+                }
+            }
+        }
+
+    override var name: String = source.name
+        internal set
+    override var icon: String = source.icon
+        internal set
 
     internal lateinit var channels: ConcurrentHashMap<String, KaiheilaChannelImpl>
     internal lateinit var members: ConcurrentHashMap<String, KaiheilaMemberImpl>

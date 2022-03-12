@@ -42,9 +42,6 @@ internal class KaiheilaMemberImpl(
     internal val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
 
-    // private lateinit var userView: User
-    private val userView: User get() = source
-
     // @Suppress("RedundantSuspendModifier")
     // internal suspend fun init() {
     // userView = source // 暂时观望
@@ -52,16 +49,11 @@ internal class KaiheilaMemberImpl(
     // }
 
 
-    override val nickname: String
-        get() = userView.nickname ?: ""
-
-    override val username: String
-        get() = userView.username
-
-    override val avatar: String
-        get() = userView.avatar
-
-    override val status: UserStatus get() = if (userView.isBot) botUserStatus else normalUserStatus
+    override var nickname: String = source.nickname ?: ""
+        internal set
+    override val username: String = source.username
+    override val avatar: String = source.avatar
+    override val status: UserStatus = if (source.isBot) botUserStatus else normalUserStatus
 
     override val id: ID
         get() = source.id
@@ -81,59 +73,6 @@ internal class KaiheilaMemberImpl(
     override suspend fun roles(): Flow<Role> {
         TODO("Not yet implemented")
     }
-
-
-    // override val nickname: String
-    //     get() = sourceUser.nickname ?: ""
-    //
-    // override suspend fun unmute(type: Int): Boolean {
-    //     val guildId = lazyGuild().id
-    //     val userId = sourceUser.id
-    //     GuildMuteCreateRequest(guildId, userId, type).requestDataBy(bot)
-    //     bot.muteJobs.remove("$guildId-$userId")?.cancel()
-    //     return true
-    // }
-    //
-    // override suspend fun mute(duration: Duration, type: Int): Boolean {
-    //     val mill = duration.inWholeMilliseconds
-    //     return if (mill == 0L) {
-    //         unmute(type)
-    //     } else {
-    //         val guildId = lazyGuild().id
-    //         val userId = sourceUser.id
-    //         GuildMuteCreateRequest(guildId, userId, type).requestDataBy(bot)
-    //         if (mill > 0L) {
-    //             val id = "$guildId-$userId"
-    //             val job = bot.launch(start = CoroutineStart.LAZY) {
-    //                 delay(mill)
-    //                 unmute(type)
-    //             }
-    //             bot.muteJobs.merge(id, job) { old, now ->
-    //                 old.cancel()
-    //                 now
-    //             }
-    //             job.start()
-    //         }
-    //         true
-    //     }
-    // }
-    //
-    // override suspend fun guild(): KaiheilaGuild = lazyGuild()
-    //
-    // @Api4J
-    // override val roles: Stream<out Role> // TODO
-    //     get() = Stream.empty()
-    //
-    // override suspend fun roles(): Flow<Role> { // TODO
-    //     return emptyFlow()
-    // }
-    //
-    // override val status: UserStatus = if (sourceUser.isBot) botUserStatus else normalUserStatus
-    //
-    //
-    // override fun toString(): String {
-    //     return "KaiheilaGuildMember(sourceUser=$sourceUser)"
-    // }
 
 
     override fun toString(): String {

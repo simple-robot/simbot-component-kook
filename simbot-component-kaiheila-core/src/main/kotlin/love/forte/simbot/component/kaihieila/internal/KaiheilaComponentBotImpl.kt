@@ -30,6 +30,8 @@ import love.forte.simbot.kaiheila.api.guild.*
 import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
+import love.forte.simbot.kaiheila.event.system.guild.*
+import love.forte.simbot.kaiheila.event.system.guild.member.*
 import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.message.*
 import love.forte.simbot.resources.*
@@ -56,7 +58,7 @@ internal class KaiheilaComponentBotImpl(
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
 
     private lateinit var _guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
-    internal var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
+    private var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
         get() = _guilds
         set(value) {
             _guilds = value
@@ -74,28 +76,6 @@ internal class KaiheilaComponentBotImpl(
     }
 
 
-    //region internal event process
-    private suspend fun KhlEvent<*>.internalProcessor() {
-        when (val ex = extra) {
-            // 系统事件
-            is Sys<*> -> {
-                when (val body = ex.body) {
-                    is UserUpdatedEventBody -> {
-                        // 用户信息更新
-                        if (body.userId == me.id) {
-                            updateMe(me.copy(username = body.username, avatar = body.avatar))
-                        }
-
-                    }
-                }
-            }
-
-            // Text.
-            is Text -> {
-            }
-        }
-    }
-    //endregion
 
     private suspend fun init() {
         updateMe(sourceBot.me())
@@ -223,8 +203,96 @@ internal class KaiheilaComponentBotImpl(
     override suspend fun uploadImage(resource: Resource): Image<*> {
         TODO("Not yet implemented")
     }
+
+    @Api4J
+    override fun uploadImageBlocking(resource: Resource): Image<*> {
+        TODO("Not yet implemented")
+    }
+
+    @Api4J
+    override fun resolveImageBlocking(id: ID): Image<*> {
+        TODO("Not yet implemented")
+    }
+
     //endregion
 
+
+    //region internal event process
+    private suspend fun KhlEvent<*>.internalProcessor() {
+        when (val ex = extra) {
+            // 系统事件
+            is Sys<*> -> {
+                when (val body = ex.body) {
+
+                    //region guild members
+                    // 退出频道服务器
+                    is ExitedGuildEventBody -> {
+                        val guild = guilds[this.targetId.literal] ?: return
+                        guild.members.remove(body.userId.literal)?.also { it.cancel() }
+                    }
+                    // 加入频道服务器
+                    is JoinedGuildEventBody -> {
+                        // query user info.
+                        val guild = guilds[this.targetId.literal] ?: return
+                        val userInfo = UserViewRequest(guild.id, body.userId).requestDataBy(this@KaiheilaComponentBotImpl)
+                        val member = KaiheilaMemberImpl(this@KaiheilaComponentBotImpl, guild, userInfo)
+                        guild.members.merge(body.userId.literal, member) { old, now ->
+                            old.cancel()
+                            now
+                        }
+                    }
+                    // 信息变更 （昵称变更）
+                    is UpdatedGuildMemberEventBody -> {
+                        val guild = guilds[this.targetId.literal] ?: return
+                        val member = guild.members[body.userId.literal] ?: return
+                        member.nickname = body.nickname
+                    }
+                    //endregion
+                    //region guilds
+                    // 服务器被删除
+                    is DeletedGuildExtraBody -> {
+                        guilds.remove(body.id.literal)?.also { it.cancel() }
+                    }
+                    // 服务器更新
+                    is UpdatedGuildExtraBody -> {
+                        val guild = guilds[body.id.literal] ?: return
+                        guild.name = body.name
+                        guild.icon = body.icon
+                        guild.ownerId = body.openId
+                    }
+                    //endregion
+                    //region bot self
+                    // 用户信息更新
+                    is UserUpdatedEventBody -> {
+                        if (body.userId == me.id) {
+                            updateMe(me.copy(username = body.username, avatar = body.avatar))
+                        }
+                    }
+                    // bot退出了某个服务器
+                    is SelfExitedGuildEventBody -> {
+                        guilds.remove(body.guildId.literal)?.also { it.cancel() }
+                    }
+                    // bot加入了某服务器
+                    is SelfJoinedGuildEventBody -> {
+                        val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KaiheilaComponentBotImpl)
+                        val guild =  KaiheilaGuildImpl(this@KaiheilaComponentBotImpl, guildInfo)
+                        guilds.merge(guildInfo.id.literal, guild) { old, now ->
+                            old.cancel()
+                            now
+                        }
+                        guild.init()
+                    }
+                    //endregion
+
+                }
+            }
+
+            // Text.
+            is Text -> {
+            }
+        }
+    }
+    //endregion
 
     companion object {
         val botStatus = UserStatus.builder().bot().fakeUser().build()

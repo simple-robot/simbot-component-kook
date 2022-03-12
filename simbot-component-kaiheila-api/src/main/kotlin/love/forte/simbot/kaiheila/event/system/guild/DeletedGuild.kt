@@ -23,7 +23,7 @@ import love.forte.simbot.*
 
 /**
  *
- * 服务器删除
+ * [服务器删除](https://developer.kaiheila.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%88%A0%E9%99%A4)
  *
  * `deleted_guild`
  *
