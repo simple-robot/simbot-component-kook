@@ -22,18 +22,23 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.*
+import love.forte.simbot.component.kaihieila.message.*
+import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asImage
+import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asMessage
 import love.forte.simbot.component.kaihieila.util.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.event.*
 import love.forte.simbot.kaiheila.*
+import love.forte.simbot.kaiheila.api.*
+import love.forte.simbot.kaiheila.api.asset.*
 import love.forte.simbot.kaiheila.api.guild.*
+import love.forte.simbot.kaiheila.api.message.*
 import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
 import love.forte.simbot.kaiheila.event.system.guild.*
 import love.forte.simbot.kaiheila.event.system.guild.member.*
 import love.forte.simbot.kaiheila.event.system.user.*
-import love.forte.simbot.message.*
 import love.forte.simbot.resources.*
 import org.slf4j.*
 import org.slf4j.LoggerFactory
@@ -74,7 +79,6 @@ internal class KaiheilaComponentBotImpl(
         // register standard event processors
 
     }
-
 
 
     private suspend fun init() {
@@ -195,23 +199,37 @@ internal class KaiheilaComponentBotImpl(
     //endregion
 
 
-    //region image api
-    override suspend fun resolveImage(id: ID): Image<*> {
-        TODO("Not yet implemented")
+    //region image api / assert api
+
+    /**
+     * 上传一个资源并得到一个 [AssetMessage].
+     *
+     * @param resource 需要上传的资源
+     * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值，
+     * 即 `2`、`3`、`4`。
+     */
+    @JvmSynthetic
+    override suspend fun uploadAsset(resource: Resource, type: Int): SimpleAssetMessage {
+        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        return asset.asMessage(type)
     }
 
-    override suspend fun uploadImage(resource: Resource): Image<*> {
-        TODO("Not yet implemented")
+
+    /**
+     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     */
+    @OptIn(ApiResultType::class)
+    @JvmSynthetic
+    override suspend fun resolveImage(id: ID): AssetImage {
+        Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
+            "The id must be the resource id of the kaiheila and must start with $ASSET_PREFIX"
+        }
+        return AssetImage(AssetCreated(id.literal))
     }
 
-    @Api4J
-    override fun uploadImageBlocking(resource: Resource): Image<*> {
-        TODO("Not yet implemented")
-    }
-
-    @Api4J
-    override fun resolveImageBlocking(id: ID): Image<*> {
-        TODO("Not yet implemented")
+    override suspend fun uploadImage(resource: Resource): AssetImage {
+        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        return asset.asImage()
     }
 
     //endregion
@@ -234,7 +252,8 @@ internal class KaiheilaComponentBotImpl(
                     is JoinedGuildEventBody -> {
                         // query user info.
                         val guild = guilds[this.targetId.literal] ?: return
-                        val userInfo = UserViewRequest(guild.id, body.userId).requestDataBy(this@KaiheilaComponentBotImpl)
+                        val userInfo =
+                            UserViewRequest(guild.id, body.userId).requestDataBy(this@KaiheilaComponentBotImpl)
                         val member = KaiheilaMemberImpl(this@KaiheilaComponentBotImpl, guild, userInfo)
                         guild.members.merge(body.userId.literal, member) { old, now ->
                             old.cancel()
@@ -275,7 +294,7 @@ internal class KaiheilaComponentBotImpl(
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
                         val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KaiheilaComponentBotImpl)
-                        val guild =  KaiheilaGuildImpl(this@KaiheilaComponentBotImpl, guildInfo)
+                        val guild = KaiheilaGuildImpl(this@KaiheilaComponentBotImpl, guildInfo)
                         guilds.merge(guildInfo.id.literal, guild) { old, now ->
                             old.cancel()
                             now
@@ -296,6 +315,7 @@ internal class KaiheilaComponentBotImpl(
 
     companion object {
         val botStatus = UserStatus.builder().bot().fakeUser().build()
+        const val ASSET_PREFIX = "https://www.kaiheila.cn"
     }
 }
 

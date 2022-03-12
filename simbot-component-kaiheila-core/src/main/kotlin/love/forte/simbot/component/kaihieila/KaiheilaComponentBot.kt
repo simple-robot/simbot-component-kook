@@ -19,11 +19,13 @@ package love.forte.simbot.component.kaihieila
 
 import kotlinx.coroutines.flow.*
 import love.forte.simbot.*
+import love.forte.simbot.component.kaihieila.message.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.event.*
 import love.forte.simbot.kaiheila.*
-import love.forte.simbot.message.*
+import love.forte.simbot.kaiheila.api.message.*
 import love.forte.simbot.resources.*
+import love.forte.simbot.utils.*
 import org.slf4j.*
 import java.util.stream.*
 import kotlin.coroutines.*
@@ -91,18 +93,47 @@ public abstract class KaiheilaComponentBot : Bot {
 
 
     //region image api
-    abstract override suspend fun resolveImage(id: ID): Image<*>
-    abstract override suspend fun uploadImage(resource: Resource): Image<*>
+    /**
+     * 上传一个资源并得到一个 [AssetMessage].
+     *
+     * @param resource 需要上传的资源
+     * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值，即 `2`、`3`、`4`。
+     */
+    @JvmSynthetic
+    public abstract suspend fun uploadAsset(resource: Resource, type: Int): SimpleAssetMessage
 
-    @Api4J
-    override fun resolveImageBlocking(id: ID): Image<*> {
-        return super.resolveImageBlocking(id)
-    }
+    /**
+     * 上传一个资源并得到一个 [AssetMessage].
+     * @param resource 需要上传的资源
+     * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值.
+     */
+    @JvmSynthetic
+    public suspend fun uploadAsset(resource: Resource, type: MessageType): SimpleAssetMessage = uploadAsset(resource, type.type)
 
+
+    /**
+     * 提供一个资源类型并将其上传后作为 [AssetImage] 使用。
+     */
+    @JvmSynthetic
+    abstract override suspend fun uploadImage(resource: Resource): AssetImage
+
+    /**
+     * 提供一个资源类型并将其上传后作为 [AssetImage] 使用。
+     */
     @Api4J
-    override fun uploadImageBlocking(resource: Resource): Image<*> {
-        return super.uploadImageBlocking(resource)
-    }
+    override fun uploadImageBlocking(resource: Resource): AssetImage = runInBlocking { uploadImage(resource) }
+
+    /**
+     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     *
+     * 但是需要验证此 [id] 是否为 `https://www.kaiheila.cn` 开头，即是否为kaiheila的资源。
+     *
+     */
+    @JvmSynthetic
+    abstract override suspend fun resolveImage(id: ID): AssetImage
+
+    @OptIn(Api4J::class)
+    override fun resolveImageBlocking(id: ID): AssetImage = runInBlocking { resolveImage(id) }
     //endregion
 
     abstract override suspend fun friend(id: ID): Friend?

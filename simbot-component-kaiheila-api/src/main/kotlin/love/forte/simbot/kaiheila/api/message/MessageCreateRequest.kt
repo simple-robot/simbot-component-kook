@@ -29,7 +29,8 @@ public class MessageCreateRequest(
     /**
      * 消息类型, 见[type], 不传默认为1, 代表文本类型。9代表 kmarkdown 消息, 10代表卡片消息。
      *
-     * 只支持 1、9、10.
+     *
+     * *Note: 经测试，似乎也支持 [MessageType.IMAGE]、[MessageType.FILE]等格式。*
      *
      * 默认为 [MessageType.TEXT]
      * @see MessageType

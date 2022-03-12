@@ -69,6 +69,7 @@ public abstract class KaiheilaApiRequest<T> {
      * 可以为 [request] 提供更多行为的函数，例如提供body、重置contentType等。
      */
     protected open fun HttpRequestBuilder.requestFinishingAction() {
+        headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
     }
 
 
@@ -213,10 +214,7 @@ private suspend inline fun KaiheilaApiRequest<*>.requestForResponse(
         // set url
         url(this@requestForResponse.url)
 
-        headers {
-            this[HttpHeaders.Authorization] = authorization
-            this[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
-        }
+        headers[HttpHeaders.Authorization] = authorization
 
         // 收尾动作
         finishingAction()
@@ -318,6 +316,7 @@ public abstract class KaiheilaPostRequest<T>(
      * 通过 [body] 构建提供 body 属性。
      */
     override fun HttpRequestBuilder.requestFinishingAction() {
+        headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
         body = this@KaiheilaPostRequest.body ?: EmptyContent
     }
 

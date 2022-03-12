@@ -18,8 +18,13 @@
 package love.forte.simbot.component.kaihieila.message
 
 /**
- *
+ * 开黑啦消息事件所收到的消息正文类型。
  * @author ForteScarlet
  */
-public class KaiheilaReceiveMessageContent {
+public sealed class KaiheilaReceiveMessageContent {
+
+
+
+
+
 }

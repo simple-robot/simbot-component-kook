@@ -15,36 +15,45 @@
  *
  */
 
-package love.forte.simbot.kaiheila.api.asserts
+package love.forte.simbot.kaiheila.api.asset
 
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.utils.io.streams.*
 import kotlinx.serialization.*
 import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.resources.*
+import love.forte.simbot.utils.*
+import org.slf4j.*
 import java.net.*
 
 
 /**
  *
+ * [上传媒体文件](https://developer.kaiheila.cn/doc/http/asset).
+ *
  * 创建（上传）文件资源，例如图片等。
  *
  *
  * @param resource 资源对象。
- * @param name 需要能够体现出文件的扩展名（以文件扩展名结尾），否则尽可能提供 `resourceContentType` 参数。
+ * @param name 需要能够体现出文件的扩展名（例如 `mov`, `jpg`），否则尽可能提供 `resourceContentType` 参数。
  * @param resourceContentType 资源的content类型。
  * @author ForteScarlet
  */
-public class AssertCreateRequest(
+public class AssetCreateRequest(
     private val resource: Resource,
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
 ) : KaiheilaPostRequest<AssetCreated>(false) {
-    public companion object Key : BaseApiRequestKey("assert", "create")
+    public companion object Key : BaseApiRequestKey("asset", "create") {
+        private val logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.api.asset.AssetCreateRequest")
+    }
 
     private val contentType: ContentType
+    private val inputProvider = InputProvider { resource.openStream().asInput() }
 
     init {
         contentType = resourceContentType ?: run {
@@ -73,26 +82,34 @@ public class AssertCreateRequest(
     override val apiPaths: List<String> get() = apiPathList
 
     override fun HttpRequestBuilder.requestFinishingAction() {
-        headers {
-            remove(HttpHeaders.ContentType)
+        body = this@AssetCreateRequest.body ?: EmptyContent
+        onUpload { bytesSentTotal, contentLength ->
+            if (bytesSentTotal == 0L || bytesSentTotal.mod(10000L) == 0L) {
+            logger.info("Uploading {}, bytesSentTotal: {}, contentLength: {}", resource, bytesSentTotal, contentLength)
+            }
         }
+        // headers {
+        //     //remove(HttpHeaders.ContentType)
+        //     this[HttpHeaders.ContentType] // = ContentType.Application
+        // }
     }
 
     override fun createBody(): Any {
+
         return MultiPartFormDataContent(
             formData {
 
-                val headers = if (name != null) {
-                    headersOf(
+                val headers = headersOf(
+                    if (name != null) {
                         HttpHeaders.ContentDisposition to listOf("filename=$name")
-                    )
-                } else {
-                    headersOf()
-                }
+                    } else {
+                        HttpHeaders.ContentDisposition to listOf("filename=simbot-${RandomIDUtil.randomID()}")
+                    }
+                )
 
                 append(
                     "file",
-                    InputProvider { resource.openStream().asInput() },
+                    inputProvider,
                     headers
                 )
             }
@@ -103,7 +120,7 @@ public class AssertCreateRequest(
 }
 
 /**
- * api [AssertCreateRequest] 的响应体，得到上传后的资源路径。
+ * api [AssetCreateRequest] 的响应体，得到上传后的资源路径。
  */
 @Serializable
 public data class AssetCreated @ApiResultType constructor(val url: String) {
