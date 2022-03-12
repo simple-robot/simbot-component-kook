@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.*
+import love.forte.simbot.component.kaihieila.event.*
+import love.forte.simbot.component.kaihieila.internal.event.*
 import love.forte.simbot.component.kaihieila.message.*
 import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asImage
 import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asMessage
@@ -46,6 +48,8 @@ import java.util.concurrent.*
 import java.util.stream.*
 import kotlin.coroutines.*
 import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kaiheila.event.message.MessageEvent as KhlMessageEvent
+import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
 
 /**
  *
@@ -73,11 +77,13 @@ internal class KaiheilaComponentBotImpl(
     init {
         // register some event processors
         sourceBot.preProcessor { _, decoded ->
-            decoded().internalProcessor()
+            decoded().internalPreProcessor()
         }
 
         // register standard event processors
-
+        sourceBot.processor { _, decoded ->
+            decoded().internalProcessor()
+        }
     }
 
 
@@ -171,14 +177,14 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region guild api
-    override suspend fun guild(id: ID): KaiheilaGuild? = guilds[id.literal]
+    override suspend fun guild(id: ID): KaiheilaGuildImpl? = guilds[id.literal]
 
-    override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuild> =
+    override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuildImpl> =
         guilds.values.asFlow().withLimiter(limiter)
 
-    override fun getGuild(id: ID): KaiheilaGuild? = guilds[id.literal]
+    override fun getGuild(id: ID): KaiheilaGuildImpl? = guilds[id.literal]
 
-    override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuild> =
+    override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuildImpl> =
         guilds.values.stream().withLimiter(limiter)
     //endregion
 
@@ -236,7 +242,7 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region internal event process
-    private suspend fun KhlEvent<*>.internalProcessor() {
+    private suspend fun KhlEvent<*>.internalPreProcessor() {
         when (val ex = extra) {
             // 系统事件
             is Sys<*> -> {
@@ -311,6 +317,42 @@ internal class KaiheilaComponentBotImpl(
             }
         }
     }
+
+    private suspend fun KhlEvent<*>.internalProcessor() {
+        when (this) {
+            // 消息事件
+            is KhlMessageEvent<*> -> {
+                when (channelType) {
+                    KhlChannel.Type.PERSON -> {
+                        // TODO
+                        eventProcessor.pushIfProcessable(KaiheilaMessageEvent.Person) {
+                            //KaiheilaPersonMessageEventImpl
+                            TODO()
+                        }
+                    }
+                    KhlChannel.Type.GROUP -> {
+                        val guild = guilds[extra.guildId.literal] ?: return
+                        val author = guild.members[authorId.literal] ?: return
+                        val channel = guild.channels[targetId.literal] ?: return
+
+                        // push event
+                        eventProcessor.pushIfProcessable(KaiheilaMessageEvent.Group) {
+                            KaiheilaGroupMessageEventImpl(this@KaiheilaComponentBotImpl, this, author, channel)
+                        }
+
+                    }
+                }
+            }
+
+
+            else -> {
+                // TODO
+            }
+        }
+
+
+    }
+
     //endregion
 
     companion object {

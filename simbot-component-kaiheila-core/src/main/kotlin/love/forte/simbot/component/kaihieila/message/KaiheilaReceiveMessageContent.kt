@@ -17,14 +17,92 @@
 
 package love.forte.simbot.component.kaihieila.message
 
+import love.forte.simbot.*
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessages.AT_TYPE_ROLE
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessages.AT_TYPE_USER
+import love.forte.simbot.kaiheila.event.*
+import love.forte.simbot.kaiheila.event.message.*
+import love.forte.simbot.message.*
+
 /**
  * 开黑啦消息事件所收到的消息正文类型。
+ *
  * @author ForteScarlet
  */
-public sealed class KaiheilaReceiveMessageContent {
+public class KaiheilaReceiveMessageContent(source: Event<Event.Extra.Text>) : ReceivedMessageContent() {
 
+    /**
+     * 消息ID。
+     */
+    override val messageId: ID = source.msgId
 
+    /**
+     * 开黑啦消息事件中所收到的消息列表。
+     */
+    override val messages: Messages = source.toMessages()
+}
 
+/**
+ * 将消息事件相关内容转化为 [Messages].
+ */
+public fun Event<Event.Extra.Text>.toMessages(): Messages {
+    return when (val extra = extra) {
+        is TextEventExtra -> {
+            extra.toMessages { content.toText() }
+        }
+        is ImageEventExtra -> {
+            extra.toMessages { extra.attachments.asMessage() }
+        }
+        is FileEventExtra -> {
+            extra.toMessages { extra.attachments.asMessage() }
+        }
+        is VideoEventExtra -> {
+            extra.toMessages { extra.attachments.asMessage() }
+        }
+        is KMarkdownEventExtra -> {
+            extra.toMessages { extra.kmarkdown.asMessage() }
+        }
+        is CardEventExtra -> {
+            extra.toMessages { content.toText() }
+        }
+        else -> {
+            extra.toMessages { content.toText() }
+        }
+    }
+}
 
+private inline fun Event.Extra.Text.toMessages(contentElement: () -> Message.Element<*>?): Messages {
+    val contentMessage = contentElement()
+    if (mention.isEmpty() && mentionRoles.isEmpty() && !mentionAll && !mentionHere) {
+        return contentMessage?.toMessages() ?: emptyMessages()
+    }
+    val messages = buildList(mention.size + mentionRoles.size + 3) {
+        if (contentMessage != null) {
+            add(contentMessage)
+        }
+
+        if (mentionAll) {
+            add(AtAll)
+        }
+
+        if (mentionHere) {
+            add(AtAllHere)
+        }
+
+        for (mentionId in mention) {
+            add(At(mentionId, atType = AT_TYPE_USER))
+        }
+
+        for (mentionRoleId in mentionRoles) {
+            add(At(mentionRoleId, atType = AT_TYPE_ROLE))
+        }
+    }
+
+    return messages.toMessages()
 
 }
+
+/**
+ * 使用消息事件并将其中的消息内容转化为 [KaiheilaReceiveMessageContent].
+ */
+public fun Event<Event.Extra.Text>.toContent(): KaiheilaReceiveMessageContent = KaiheilaReceiveMessageContent(this)

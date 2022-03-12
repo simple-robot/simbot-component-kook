@@ -2,6 +2,7 @@ package love.forte.simbot.component.kaihieila
 
 import kotlinx.coroutines.flow.*
 import love.forte.simbot.*
+import love.forte.simbot.component.kaihieila.message.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.message.*
 import java.util.concurrent.*
@@ -83,18 +84,18 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
 
 
     //region send api
-    override suspend fun send(text: String): MessageReceipt
-    override suspend fun send(message: Message): MessageReceipt
-    override suspend fun send(message: MessageContent): MessageReceipt
+    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
 
     @Api4J
-    override fun sendBlocking(text: String): MessageReceipt
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt
 
     @Api4J
-    override fun sendBlocking(message: Message): MessageReceipt
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt
 
     @Api4J
-    override fun sendBlocking(message: MessageContent): MessageReceipt
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt
     //endregion
 
     //region Invalid api

@@ -2,6 +2,7 @@ package love.forte.simbot.component.kaihieila.event
 
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.*
+import love.forte.simbot.component.kaihieila.message.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.definition.Channel
 import love.forte.simbot.event.*
@@ -31,8 +32,7 @@ public sealed class KaiheilaMessageEvent<out EX : MessageEventExtra> :
         get() = Key
 
 
-    override val messageContent: ReceivedMessageContent
-        get() = TODO("Not yet implemented")
+    abstract override val messageContent: KaiheilaReceiveMessageContent
 
     /**
      * 频道消息事件
@@ -47,7 +47,10 @@ public sealed class KaiheilaMessageEvent<out EX : MessageEventExtra> :
 
         //region Impls
 
-        override val key: Event.Key<out KaiheilaMessageEvent<*>>
+        override val visibleScope: Event.VisibleScope
+            get() = Event.VisibleScope.PUBLIC
+
+        override val key: Event.Key<out Group<*>>
             get() = Key
 
         @OptIn(Api4J::class)
@@ -76,6 +79,21 @@ public sealed class KaiheilaMessageEvent<out EX : MessageEventExtra> :
      */
     public abstract class Person<out EX : MessageEventExtra> : KaiheilaMessageEvent<EX>(), ContactMessageEvent {
 
+        @OptIn(Api4J::class)
+        abstract override val user: Contact
+
+        //region Impls
+        @OptIn(Api4J::class)
+        override val source: Contact
+            get() = user
+
+        override suspend fun source(): Contact = user
+
+        override suspend fun user(): Contact = user
+
+        override val key: Event.Key<out Person<*>>
+            get() = Key
+        //endregion
 
         public companion object Key :
             BaseEventKey<Person<*>>("kaiheila.message_event_person", KaiheilaMessageEvent, ContactMessageEvent) {

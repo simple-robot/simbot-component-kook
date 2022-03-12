@@ -63,7 +63,7 @@ internal data class FileEventExtraImpl(
     /**
      * 附件
      */
-    override val attachments: FileAttachments,
+    override val attachments: FileAttachmentsImpl,
     override val author: UserImpl,
 ) : FileEventExtra
 
