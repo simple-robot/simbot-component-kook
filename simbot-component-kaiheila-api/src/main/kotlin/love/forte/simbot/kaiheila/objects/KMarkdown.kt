@@ -43,6 +43,7 @@ public annotation class KhlMarkdownBuilderTopDsl
  * @see KMarkdownBuilder
  * @see KhlMarkdownGrammar
  */
+@ExperimentalSimbotApi
 public interface KMarkdown {
 
     /**
@@ -67,6 +68,7 @@ public interface KMarkdown {
  */
 @Serializable
 @SerialName(RawValueKMarkdown.SERIAL_NAME)
+@ExperimentalSimbotApi
 internal data class RawValueKMarkdown(
     @SerialName("raw_content")
     override val rawContent: String,
@@ -88,6 +90,7 @@ internal data class RawValueKMarkdown(
  * 可以通过自定义 [appender] 来提供自定义的字符串拼接器，默认使用 [StringBuilder].
  */
 @Suppress("MemberVisibilityCanBePrivate")
+@ExperimentalSimbotApi
 public class KMarkdownBuilder(public val appender: Appendable = StringBuilder()) {
     public constructor(capacity: Int) : this(StringBuilder(capacity))
 
@@ -299,6 +302,7 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
 }
 
 @KhlMarkdownBuilderTopDsl
+@ExperimentalSimbotApi
 public inline fun KMarkdownBuilder.aroundLine(
     times: Int = 1,
     block: KMarkdownBuilder.() -> Unit,
@@ -315,6 +319,7 @@ public inline fun KMarkdownBuilder.aroundLine(
 }
 
 @KhlMarkdownBuilderTopDsl
+@ExperimentalSimbotApi
 public inline fun KMarkdownBuilder.preLine(times: Int = 1, block: KMarkdownBuilder.() -> Unit): KMarkdownBuilder {
     return apply {
         for (i in 1..times) {
@@ -325,6 +330,7 @@ public inline fun KMarkdownBuilder.preLine(times: Int = 1, block: KMarkdownBuild
 }
 
 @KhlMarkdownBuilderTopDsl
+@ExperimentalSimbotApi
 public inline fun KMarkdownBuilder.postLine(
     times: Int = 1,
     block: KMarkdownBuilder.() -> Unit,
@@ -342,6 +348,7 @@ public inline fun KMarkdownBuilder.postLine(
  * Build kmarkdown for raw string.
  */
 @KhlMarkdownBuilderDsl
+@ExperimentalSimbotApi
 public inline fun buildRawKMarkdown(block: KMarkdownBuilder.() -> Unit): String {
     return KMarkdownBuilder().apply(block).buildRaw()
 }
@@ -350,6 +357,7 @@ public inline fun buildRawKMarkdown(block: KMarkdownBuilder.() -> Unit): String 
  * Build [KMarkdown] instance.
  */
 @KhlMarkdownBuilderDsl
+@ExperimentalSimbotApi
 public inline fun buildKMarkdown(block: KMarkdownBuilder.() -> Unit): KMarkdown {
     return KMarkdownBuilder().apply(block).build()
 }
@@ -390,7 +398,7 @@ public interface KhlMarkdownGrammar<P> {
      * KMarkdown 的语法来源。
      *
      */
-    public sealed class Source(open public val name: String) {
+    public sealed class Source(public open val name: String) {
 
         /** 来源 - markdown官方 */
         public object Markdown : Source("official")
@@ -415,7 +423,7 @@ public interface KhlMarkdownGrammar<P> {
      * 追加一段原始字符串。即没有任何操作。
      */
     public object RawText : BaseMarkdownKhlMarkdownGrammar<CharSequence>() {
-        override public fun appendTo(param: CharSequence, appendable: Appendable) {
+        public override fun appendTo(param: CharSequence, appendable: Appendable) {
             appendable.append(param)
         }
     }
@@ -466,7 +474,7 @@ public interface KhlMarkdownGrammar<P> {
      * 换行会一直作用，直到遇见两个换行(\n\n),这两个换行实际不会显示换行
      */
     public object Quote : BaseMarkdownKhlMarkdownGrammar<CharSequence>() {
-        override public fun appendTo(param: CharSequence, appendable: Appendable) {
+        public override fun appendTo(param: CharSequence, appendable: Appendable) {
             appendable.append("> ").append(param)
         }
 
