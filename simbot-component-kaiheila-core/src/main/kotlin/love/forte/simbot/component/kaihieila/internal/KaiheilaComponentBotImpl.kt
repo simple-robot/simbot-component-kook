@@ -36,12 +36,14 @@ import love.forte.simbot.kaiheila.api.asset.*
 import love.forte.simbot.kaiheila.api.guild.*
 import love.forte.simbot.kaiheila.api.message.*
 import love.forte.simbot.kaiheila.api.user.*
+import love.forte.simbot.kaiheila.api.userchat.*
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
 import love.forte.simbot.kaiheila.event.system.guild.*
 import love.forte.simbot.kaiheila.event.system.guild.member.*
 import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.resources.*
+import love.forte.simbot.utils.*
 import org.slf4j.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.*
@@ -66,12 +68,7 @@ internal class KaiheilaComponentBotImpl(
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
 
-    private lateinit var _guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
-    private var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
-        get() = _guilds
-        set(value) {
-            _guilds = value
-        }
+    private lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
 
 
     init {
@@ -89,7 +86,11 @@ internal class KaiheilaComponentBotImpl(
 
     private suspend fun init() {
         updateMe(sourceBot.me())
+        initGuilds()
+        // clearFriendCache()
+    }
 
+    private suspend fun initGuilds() {
         val guildsMap = ConcurrentHashMap<String, KaiheilaGuildImpl>()
         flow {
             var page = 1
@@ -103,12 +104,11 @@ internal class KaiheilaComponentBotImpl(
                     emit(it)
                 }
             } while (guilds.isNotEmpty() && guildsResult.meta.page < guildsResult.meta.pageTotal)
-        }.buffer(100)
-            .map { guild ->
-                KaiheilaGuildImpl(this, guild)
-            }.collect {
-                guildsMap[it.id.literal] = it.also { it.init() }
-            }
+        }.buffer(100).map { guild ->
+            KaiheilaGuildImpl(this, guild)
+        }.collect {
+            guildsMap[it.id.literal] = it.also { it.init() }
+        }
 
         bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
 
@@ -190,17 +190,54 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region friend api
-    override suspend fun friend(id: ID): KaiheilaUserChat? {
-        TODO("Not yet implemented")
+
+    // @OptIn(ExperimentalSimbotApi::class)
+    // private val friendCaches = mutableMapOf<String, KaiheilaUserChatImpl>()
+    // private val friendCacheLock = Mutex()
+    //
+    // @OptIn(ExperimentalSimbotApi::class)
+    // internal suspend fun deleteFriend(id: ID): KaiheilaUserChatImpl? = friendCacheLock.withLock {
+    //     friendCaches.remove(id.literal)
+    // }
+    //
+    // @OptIn(ExperimentalSimbotApi::class)
+    // internal suspend inline fun getOrInitChat(id: ID, init: () -> KaiheilaUserChatImpl): KaiheilaUserChatImpl {
+    //     return friendCaches[id.literal] ?: friendCacheLock.withLock {
+    //         friendCaches[id.literal] ?: run {
+    //             init().also {
+    //                 friendCaches[id.literal] = it
+    //             }
+    //         }
+    //     }
+    // }
+
+
+    @OptIn(ExperimentalSimbotApi::class)
+    override suspend fun friend(id: ID): KaiheilaUserChatImpl {
+        val chat = UserChatCreateRequest(id).requestDataBy(bot)
+        return KaiheilaUserChatImpl(this, chat)
+        // return getOrInitChat(id) {
+        //     val sourceChat = UserChatCreateRequest(id).requestDataBy(this)
+        //     KaiheilaUserChatImpl(this, sourceChat)
+        // }
     }
 
-    override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChat> {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalSimbotApi::class)
+    override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChatImpl> {
+        return UserChatListRequest.requestDataBy(this).items.asFlow().map { chat ->
+            // getOrInitChat(sourceChat.targetInfo.id) {
+            //     KaiheilaUserChatImpl(this, sourceChat)
+            // }
+            KaiheilaUserChatImpl(this, chat)
+            // friendCaches.getOrDefault(it.targetInfo.id.literal, it)
+        }
     }
 
     @Api4J
-    override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChat> {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChatImpl> {
+        return runInBlocking { UserChatListRequest.requestDataBy(this@KaiheilaComponentBotImpl) }
+            .items.stream().map { chat -> KaiheilaUserChatImpl(this, chat) }
     }
     //endregion
 
