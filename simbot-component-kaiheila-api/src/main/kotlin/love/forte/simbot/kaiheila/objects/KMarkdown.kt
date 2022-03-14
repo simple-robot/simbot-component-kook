@@ -21,6 +21,7 @@
 package love.forte.simbot.kaiheila.objects
 
 import kotlinx.serialization.*
+import love.forte.simbot.*
 import love.forte.simbot.kaiheila.objects.AtTarget.*
 import love.forte.simbot.kaiheila.objects.AtTarget.User
 import love.forte.simbot.kaiheila.objects.impl.*
@@ -198,7 +199,7 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
      * 服务器表情。
      */
     @KhlMarkdownBuilderDsl
-    public fun serverEmoticons(name: CharSequence, id: CharSequence): KMarkdownBuilder =
+    public fun serverEmoticons(name: CharSequence, id: ID): KMarkdownBuilder =
         also { KhlMarkdownGrammar.ServerEmoticons.appendTo(name, id, appender) }
 
     /**
@@ -512,8 +513,8 @@ public interface KhlMarkdownGrammar<P> {
             appendTo(name, id, appendable)
         }
 
-        public fun appendTo(name: CharSequence, id: CharSequence, appendable: Appendable) {
-            appendable.append("(emj)").append(name).append("(emj)[").append(id).append(']')
+        public fun appendTo(name: CharSequence, id: ID, appendable: Appendable) {
+            appendable.append("(emj)").append(name).append("(emj)[").append(id.literal).append(']')
         }
     }
 
@@ -578,7 +579,7 @@ constructor(public val name: CharSequence? = null, public val url: CharSequence)
 
 
 /** 用于 [服务器表情][KhlMarkdownGrammar.ServerEmoticons] 的参数 */
-public data class MdServerEmoticons(public val name: CharSequence, public val id: CharSequence)
+public data class MdServerEmoticons(public val name: CharSequence, public val id: ID)
 
 /**
  * 可用于 [At][KhlMarkdownGrammar.At] 的目标类型，分为[指定用户][User]、[全体][All]和[在线][Here]。

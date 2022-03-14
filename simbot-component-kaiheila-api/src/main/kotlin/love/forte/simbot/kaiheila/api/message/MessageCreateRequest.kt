@@ -85,4 +85,13 @@ public class MessageCreateRequest(
         @Serializable(ID.AsCharSequenceIDSerializer::class)
         val tempTargetId: ID? = null,
     )
+
+    /**
+     * 将此api转化为 [DirectMessageCreateRequest].
+     */
+    @JvmOverloads
+    public fun toDirect(targetId: ID = this.targetId): DirectMessageCreateRequest {
+        return DirectMessageCreateRequest.byTargetId(targetId, content, type, quote, nonce)
+    }
+
 }

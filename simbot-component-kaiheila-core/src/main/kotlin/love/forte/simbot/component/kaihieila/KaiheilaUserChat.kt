@@ -23,6 +23,7 @@ import love.forte.simbot.component.kaihieila.message.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.kaiheila.api.userchat.*
 import love.forte.simbot.message.*
+import love.forte.simbot.utils.*
 
 /**
  * 开黑啦的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
@@ -78,17 +79,23 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt = runInBlocking {
+        send(text)
+    }
 
     /**
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt = runInBlocking {
+        send(message)
+    }
 
     /**
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt = runInBlocking {
+        send(message)
+    }
 }

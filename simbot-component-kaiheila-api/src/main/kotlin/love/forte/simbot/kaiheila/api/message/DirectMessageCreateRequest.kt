@@ -80,9 +80,7 @@ public class DirectMessageCreateRequest internal constructor(
             type: MessageType = MessageType.TEXT,
             quote: ID? = null,
             nonce: String? = null,
-        ): DirectMessageCreateRequest = DirectMessageCreateRequest(
-            type = type.type, chatCode = chatCode, targetId = null, content = content, quote = quote, nonce = nonce
-        )
+        ): DirectMessageCreateRequest = byChatCode(chatCode, content, type.type, quote, nonce)
 
         /**
          * 通过 [targetId] 构建一个 [DirectMessageCreateRequest] api实例。
@@ -96,8 +94,38 @@ public class DirectMessageCreateRequest internal constructor(
             type: MessageType = MessageType.TEXT,
             quote: ID? = null,
             nonce: String? = null,
+        ): DirectMessageCreateRequest = byTargetId(targetId, content, type.type, quote, nonce)
+
+        /**
+         * 通过 [chatCode] 构建一个 [DirectMessageCreateRequest] api实例。
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun byChatCode(
+            chatCode: ID,
+            content: String,
+            type: Int,
+            quote: ID? = null,
+            nonce: String? = null,
         ): DirectMessageCreateRequest = DirectMessageCreateRequest(
-            type = type.type, chatCode = null, targetId = targetId, content = content, quote = quote, nonce = nonce
+            type = type, chatCode = chatCode, targetId = null, content = content, quote = quote, nonce = nonce
+        )
+
+        /**
+         * 通过 [targetId] 构建一个 [DirectMessageCreateRequest] api实例。
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun byTargetId(
+            targetId: ID,
+            content: String,
+            type: Int,
+            quote: ID? = null,
+            nonce: String? = null,
+        ): DirectMessageCreateRequest = DirectMessageCreateRequest(
+            type = type, chatCode = null, targetId = targetId, content = content, quote = quote, nonce = nonce
         )
     }
 

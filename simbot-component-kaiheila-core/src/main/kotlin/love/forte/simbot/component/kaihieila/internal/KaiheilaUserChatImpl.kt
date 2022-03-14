@@ -20,8 +20,12 @@ package love.forte.simbot.component.kaihieila.internal
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.*
 import love.forte.simbot.component.kaihieila.message.*
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
+import love.forte.simbot.component.kaihieila.util.*
+import love.forte.simbot.kaiheila.api.message.*
 import love.forte.simbot.kaiheila.api.userchat.*
 import love.forte.simbot.message.*
+import love.forte.simbot.message.Message
 
 /**
  *
@@ -29,36 +33,36 @@ import love.forte.simbot.message.*
  */
 @ExperimentalSimbotApi
 internal class KaiheilaUserChatImpl(
-    override val bot: KaiheilaComponentBotImpl,
-    override val source: UserChatView
+    override val bot: KaiheilaComponentBotImpl, override val source: UserChatView
 ) : KaiheilaUserChat {
     override val id: ID
         get() = source.targetInfo.id
 
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
-        TODO("Not yet implemented")
+    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
+        return DirectMessageCreateRequest.byChatCode(
+            source.code, text, MessageType.TEXT, null, null
+        ).requestDataBy(bot).asReceipt(true, bot)
     }
 
-    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
-        TODO("Not yet implemented")
+    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
+        val request = message.toDirectRequest(
+            source.code, null, null, null
+        ) ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+        return request.requestDataBy(bot).asReceipt(true, bot)
     }
 
     override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
-        TODO("Not yet implemented")
-    }
-
-    @Api4J
-    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt {
-        TODO("Not yet implemented")
-    }
-
-    @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt {
-        TODO("Not yet implemented")
-    }
-
-    @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt {
-        TODO("Not yet implemented")
+        return if (message is KaiheilaReceiveMessageContent) {
+            val source = message.source
+            DirectMessageCreateRequest.byTargetId(
+                source.targetId,
+                content = source.content,
+                type = source.type.type,
+                quote = null,
+                nonce = null,
+            ).requestDataBy(bot).asReceipt(false, bot)
+        } else {
+            send(message.messages)
+        }
     }
 }
