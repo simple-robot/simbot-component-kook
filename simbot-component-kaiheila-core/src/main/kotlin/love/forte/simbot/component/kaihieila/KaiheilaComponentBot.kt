@@ -136,10 +136,13 @@ public abstract class KaiheilaComponentBot : Bot {
     override fun resolveImageBlocking(id: ID): AssetImage = runInBlocking { resolveImage(id) }
     //endregion
 
+    @OptIn(ExperimentalSimbotApi::class)
     abstract override suspend fun friend(id: ID): KaiheilaUserChat?
 
+    @OptIn(ExperimentalSimbotApi::class)
     abstract override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChat>
 
+    @OptIn(ExperimentalSimbotApi::class)
     @Api4J
     abstract override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChat>
 

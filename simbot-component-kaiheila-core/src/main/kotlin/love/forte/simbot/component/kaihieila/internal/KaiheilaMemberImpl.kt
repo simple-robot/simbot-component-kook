@@ -17,7 +17,6 @@
 
 package love.forte.simbot.component.kaihieila.internal
 
-import kotlinx.atomicfu.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import love.forte.simbot.*
@@ -29,6 +28,7 @@ import love.forte.simbot.definition.*
 import love.forte.simbot.definition.Role
 import love.forte.simbot.kaiheila.api.guild.*
 import love.forte.simbot.kaiheila.objects.User
+import java.util.concurrent.atomic.*
 import java.util.stream.*
 import kotlin.coroutines.*
 import kotlin.coroutines.cancellation.CancellationException
@@ -45,7 +45,12 @@ internal class KaiheilaMemberImpl(
 ) : KaiheilaGuildMember, CoroutineScope {
     internal val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
-    private val muteJob = atomic<Job?>(null)
+
+    @Volatile
+    @Suppress("unused")
+    private var _muteJob: Job? = null
+
+    // private val muteJob = atomic<Job?>(null)
 
 
     // private val muteJobUpdater =
@@ -67,10 +72,14 @@ internal class KaiheilaMemberImpl(
         return result.isSuccess.also { success ->
             if (success) {
                 // remove delete job
-                muteJob.update { cur ->
+                MUTE_JOB_ATOMIC.update(this) { cur ->
                     cur?.cancel()
                     null
                 }
+                // muteJob.update { cur ->
+                //     cur?.cancel()
+                //     null
+                // }
             }
         }
     }
@@ -86,7 +95,7 @@ internal class KaiheilaMemberImpl(
         return result.isSuccess.also { success ->
             if (milliseconds > 0 && success) {
                 val scope: CoroutineScope = this
-                muteJob.update { cur ->
+                MUTE_JOB_ATOMIC.update(this) { cur ->
                     cur?.cancel()
                     scope.launch {
                         delay(milliseconds)
@@ -120,6 +129,8 @@ internal class KaiheilaMemberImpl(
 
     companion object {
         private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaihieila.KaiheilaMember")
+        private val MUTE_JOB_ATOMIC =
+            AtomicReferenceFieldUpdater.newUpdater(KaiheilaMemberImpl::class.java, Job::class.java, "_muteJob")
     }
 
 }

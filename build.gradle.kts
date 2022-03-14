@@ -23,15 +23,7 @@ plugins {
 }
 
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
 
-    dependencies {
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.1")
-    }
-}
 
 repositories {
     mavenLocal()

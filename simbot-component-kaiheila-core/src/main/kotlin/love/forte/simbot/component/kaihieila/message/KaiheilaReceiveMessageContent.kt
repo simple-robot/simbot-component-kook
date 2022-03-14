@@ -40,11 +40,18 @@ public class KaiheilaReceiveMessageContent(internal val source: Event<Event.Extr
      * 开黑啦消息事件中所收到的消息列表。
      */
     override val messages: Messages = source.toMessages()
+
+
+    override fun toString(): String {
+        return "KaiheilaReceiveMessageContent(sourceEvent=$source)"
+    }
+
 }
 
 /**
  * 将消息事件相关内容转化为 [Messages].
  */
+@OptIn(ExperimentalSimbotApi::class)
 public fun Event<Event.Extra.Text>.toMessages(): Messages {
     return when (val extra = extra) {
         is TextEventExtra -> {

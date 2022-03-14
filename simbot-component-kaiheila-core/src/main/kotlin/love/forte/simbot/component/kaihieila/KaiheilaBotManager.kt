@@ -15,8 +15,10 @@
  *
  */
 
+
 package love.forte.simbot.component.kaihieila
 
+import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.internal.*
@@ -30,12 +32,39 @@ import kotlin.coroutines.*
  *
  * @author ForteScarlet
  */
+@Suppress("MemberVisibilityCanBePrivate")
 public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     abstract override val component: KaiheilaComponent
     public abstract val configuration: KaiheilaBotManagerConfiguration
 
-    override fun register(verifyInfo: BotVerifyInfo): Bot {
-        TODO("Not yet implemented")
+    /**
+     * 通过 `.bot` 的json配置文件注册一个bot信息。
+     */
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun register(verifyInfo: BotVerifyInfo): KaiheilaComponentBot {
+        val serializer = KaiheilaBotVerifyInfo.serializer()
+
+        val botInfo = verifyInfo.inputStream().use { inp -> registerJson.decodeFromStream(serializer, inp) }
+
+        val component =
+            botInfo.component ?: throw NoSuchComponentException("Component is not found in [${verifyInfo.infoName}]")
+
+        logger.debug("[{}] json element load: {}", verifyInfo.infoName, botInfo)
+
+        this.component.id.literal
+        if (component != KaiheilaComponent.ID_VALUE) {
+            logger.debug(
+                "[{}] mismatch: [{}] != [{}]",
+                verifyInfo.infoName,
+                component,
+                KaiheilaComponent.ID_VALUE
+            )
+            throw ComponentMismatchException("[$component] != [${KaiheilaComponent.ID_VALUE}]")
+        }
+
+        // no config
+        return register(botInfo.clientId, botInfo.token, botInfo::includeConfig)
+
     }
 
     /**
@@ -43,45 +72,58 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
      */
     public abstract fun register(
         ticket: KaiheilaBot.Ticket,
-        configuration: KaiheilaBotConfiguration
+        configuration: KaiheilaComponentBotConfiguration
     ): KaiheilaComponentBot
 
 
     /**
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
-    public fun register(clientId: ID, token: String, configuration: KaiheilaBotConfiguration): KaiheilaComponentBot {
+    public fun register(clientId: ID, token: String, configuration: KaiheilaComponentBotConfiguration): KaiheilaComponentBot {
         return register(SimpleTicket(clientId, token), configuration)
     }
 
     /**
      * 通过 [ticket] 和 [block] 注册bot。
      */
-    public fun register(ticket: KaiheilaBot.Ticket, block: KaiheilaBotConfiguration.() -> Unit = {}): KaiheilaComponentBot {
-        return register(ticket, KaiheilaBotConfiguration().also(block))
+    public fun register(
+        ticket: KaiheilaBot.Ticket,
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {}
+    ): KaiheilaComponentBot {
+        return register(ticket, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
     }
 
 
     /**
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
-    public fun register(clientId: ID, token: String, block: KaiheilaBotConfiguration.() -> Unit = {}): KaiheilaComponentBot {
-        return register(clientId, token, KaiheilaBotConfiguration().also(block))
+    public fun register(
+        clientId: ID,
+        token: String,
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {}
+    ): KaiheilaComponentBot {
+        return register(clientId, token, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
     }
 
 
     public companion object {
+        private val logger = LoggerFactory.getLogger(KaiheilaBotManager::class.java)
         private val registerJson = Json {
             isLenient = true
             ignoreUnknownKeys = true
         }
 
-
+        /**
+         * 通过 [EventProcessor] 构建bot管理器并使用默认配置。
+         */
         @JvmStatic
         public fun newInstance(eventProcessor: EventProcessor): KaiheilaBotManager {
             return KaiheilaBotManagerImpl(KaiheilaBotManagerConfiguration(eventProcessor))
         }
 
+        /**
+         * 提供配置类并构建bot管理器实例。
+         */
         @JvmStatic
         public fun newInstance(configuration: KaiheilaBotManagerConfiguration): KaiheilaBotManager {
             return KaiheilaBotManagerImpl(configuration)
@@ -93,6 +135,10 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
 
 }
 
+/**
+ * 配置并构建一个 [KaiheilaBotManager] 实例。
+ *
+ */
 public fun kaiheilaBotManager(
     eventProcessor: EventProcessor,
     block: KaiheilaBotManagerConfiguration.() -> Unit = {}
@@ -115,3 +161,63 @@ public class KaiheilaBotManagerConfiguration(public var eventProcessor: EventPro
     public var parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 
 }
+
+
+/**
+ * `.bot` 配置文件读取的配置信息实体。
+ *
+ * ```json
+ * {
+ *  "component": "simbot.kaiheila",
+ *  "clientId": "Your Client ID",
+ *  "token": "Your ws token",
+ *  "isCompress": true,
+ *  "syncPeriods": {
+ *      "guildSyncPeriod": 60000,
+ *      "memberSyncPeriods": 60000
+ *  }
+ * }
+ * ```
+ *
+ */
+@Serializable
+private data class KaiheilaBotVerifyInfo(
+    val component: String? = null,
+
+    /**
+     * client id
+     */
+    val clientId: CharSequenceID,
+
+    /**
+     * token
+     */
+    val token: String,
+
+    /**
+     * 是否压缩数据
+     */
+    val isCompress: Boolean = true,
+
+    /**
+     * 缓存对象信息的同步周期
+     */
+    val syncPeriods: KaiheilaComponentBotConfiguration.SyncPeriods = KaiheilaComponentBotConfiguration.SyncPeriods()
+
+) {
+    fun includeConfig(configuration: KaiheilaComponentBotConfiguration) {
+        configuration.syncPeriods = syncPeriods
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+

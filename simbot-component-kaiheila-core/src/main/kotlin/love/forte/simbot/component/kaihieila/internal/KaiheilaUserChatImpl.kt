@@ -55,7 +55,7 @@ internal class KaiheilaUserChatImpl(
         return if (message is KaiheilaReceiveMessageContent) {
             val source = message.source
             DirectMessageCreateRequest.byTargetId(
-                source.targetId,
+                targetId = source.authorId,
                 content = source.content,
                 type = source.type.type,
                 quote = null,

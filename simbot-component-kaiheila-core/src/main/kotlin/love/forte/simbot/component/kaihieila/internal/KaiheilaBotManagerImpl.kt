@@ -31,11 +31,11 @@ internal class KaiheilaBotManagerImpl(
         coroutineContext = parentContext.minusKey(Job) + job
     }
 
-    override fun register(ticket: KaiheilaBot.Ticket, configuration: KaiheilaBotConfiguration): KaiheilaComponentBot {
+    override fun register(ticket: KaiheilaBot.Ticket, configuration: KaiheilaComponentBotConfiguration): KaiheilaComponentBot {
         return bots.compute(ticket.clientId.literal) { key, old ->
             if (old != null) throw BotAlreadyRegisteredException(key)
-            val khlBot = kaiheilaBot(ticket, configuration)
-            KaiheilaComponentBotImpl(khlBot, this, eventProcessor, component)
+            val khlBot = kaiheilaBot(ticket, configuration.botConfiguration)
+            KaiheilaComponentBotImpl(khlBot, this, eventProcessor, component, configuration)
         }!!
     }
 

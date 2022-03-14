@@ -39,6 +39,7 @@ import love.forte.simbot.kaiheila.api.user.*
 import love.forte.simbot.kaiheila.api.userchat.*
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
+import love.forte.simbot.kaiheila.event.system.*
 import love.forte.simbot.kaiheila.event.system.guild.*
 import love.forte.simbot.kaiheila.event.system.guild.member.*
 import love.forte.simbot.kaiheila.event.system.user.*
@@ -62,6 +63,7 @@ internal class KaiheilaComponentBotImpl(
     override val manager: KaiheilaBotManager,
     override val eventProcessor: EventProcessor,
     override val component: KaiheilaComponent,
+    private val configuration: KaiheilaComponentBotConfiguration
 ) : KaiheilaComponentBot() {
     internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
@@ -361,30 +363,64 @@ internal class KaiheilaComponentBotImpl(
             is KhlMessageEvent<*> -> {
                 when (channelType) {
                     KhlChannel.Type.PERSON -> {
-                        // TODO
-                        eventProcessor.pushIfProcessable(KaiheilaMessageEvent.Person) {
-                            //KaiheilaPersonMessageEventImpl
-                            TODO()
+                        if (isMe(authorId)) {
+                            eventProcessor.pushIfProcessable(KaiheilaBotSelfMessageEvent.Person) {
+                                KaiheilaBotSelfPersonMessageEventImpl(this@KaiheilaComponentBotImpl, this)
+                            }
+                        } else {
+                            eventProcessor.pushIfProcessable(KaiheilaNormalMessageEvent.Person) {
+                                KaiheilaNormalPersonMessageEventImpl(this@KaiheilaComponentBotImpl, this)
+                            }
                         }
+                        return
                     }
                     KhlChannel.Type.GROUP -> {
                         val guild = guilds[extra.guildId.literal] ?: return
                         val author = guild.members[authorId.literal] ?: return
                         val channel = guild.channels[targetId.literal] ?: return
-
-                        // push event
-                        eventProcessor.pushIfProcessable(KaiheilaMessageEvent.Group) {
-                            KaiheilaGroupMessageEventImpl(this@KaiheilaComponentBotImpl, this, author, channel)
+                        if (isMe(authorId)) {
+                            eventProcessor.pushIfProcessable(KaiheilaBotSelfMessageEvent.Group) {
+                                KaiheilaBotSelfGroupMessageEventImpl(
+                                    this@KaiheilaComponentBotImpl,
+                                    this,
+                                    author,
+                                    channel
+                                )
+                            }
+                        } else {
+                            // push event
+                            eventProcessor.pushIfProcessable(KaiheilaNormalMessageEvent.Group) {
+                                KaiheilaNormalGroupMessageEventImpl(
+                                    this@KaiheilaComponentBotImpl,
+                                    this,
+                                    author,
+                                    channel
+                                )
+                            }
                         }
-
+                        return
                     }
                 }
             }
 
 
-            else -> {
-                // TODO
+            // 系统事件
+            is SystemEvent<*, *> -> {
+                // TODO 申请事件
+                // TODO 频道增减
+                // TODO 服务器增减
+                // TODO 成员增减
             }
+
+
+            else -> {
+                // Nothing, and push `unsupported`
+            }
+        }
+
+        @OptIn(DiscreetSimbotApi::class)
+        eventProcessor.pushIfProcessable(UnsupportedKaiheilaEvent) {
+            UnsupportedKaiheilaEvent(this@KaiheilaComponentBotImpl, this)
         }
 
 

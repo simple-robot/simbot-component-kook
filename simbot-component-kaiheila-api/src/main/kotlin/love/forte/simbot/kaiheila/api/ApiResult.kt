@@ -164,7 +164,7 @@ public class ApiResult(
      */
     public fun <T> parseDataOrThrow(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
         if (!isSuccess) {
-            throw KaiheilaApiException(code, message)
+            throw KaiheilaApiException(code, "$message, api=$this")
         }
         return parseData(json, deserializationStrategy)
     }
