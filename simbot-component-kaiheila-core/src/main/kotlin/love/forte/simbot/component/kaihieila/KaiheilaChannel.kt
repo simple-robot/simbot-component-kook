@@ -1,10 +1,32 @@
+/*
+ *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
+ *
+ */
+
 package love.forte.simbot.component.kaihieila
 
 import kotlinx.coroutines.flow.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.message.*
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
+import love.forte.simbot.component.kaihieila.util.*
 import love.forte.simbot.definition.*
+import love.forte.simbot.kaiheila.api.message.*
 import love.forte.simbot.message.*
+import love.forte.simbot.message.Message
+import love.forte.simbot.utils.*
 import java.util.concurrent.*
 import java.util.stream.*
 import kotlin.time.*
@@ -84,18 +106,72 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
 
 
     //region send api
-    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt
+    /**
+     * 根据 [MessageCreateRequest] api 构建并发送消息。
+     */
+    @JvmSynthetic
+    public suspend fun send(request: MessageCreateRequest): KaiheilaMessageCreatedReceipt {
+        return request.requestDataBy(bot).asReceipt(false, bot)
+    }
+
+    /**
+     * 根据 [MessageCreateRequest] api 构建并发送消息。
+     */
+    @JvmSynthetic
+    public suspend fun send(
+        type: Int,
+        content: String,
+        quote: ID?,
+        nonce: String?,
+        tempTargetId: ID?
+    ): KaiheilaMessageCreatedReceipt {
+        val request = MessageCreateRequest(type, source.id, content, quote, nonce, tempTargetId)
+        return send(request)
+    }
+
+    /**
+     * 发送纯文本消息。
+     */
+    @JvmSynthetic
+    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
+        return send(
+            MessageType.TEXT.type,
+            text,
+            null, null, null
+        )
+    }
+
+    /**
+     * 发送消息。
+     */
+    @JvmSynthetic
     override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+
+    /**
+     * 发送消息。
+     */
+    @JvmSynthetic
     override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
 
+    /**
+     * 发送纯文本消息。
+     */
     @Api4J
-    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt = runInBlocking {
+        sendBlocking(text)
+    }
 
+    /**
+     * 发送消息。
+     */
     @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt = runInBlocking { send(message) }
 
+    /**
+     * 发送消息。
+     */
     @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt = runInBlocking { send(message) }
     //endregion
 
     //region Invalid api

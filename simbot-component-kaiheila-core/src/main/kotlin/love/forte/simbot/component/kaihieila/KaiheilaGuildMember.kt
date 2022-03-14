@@ -133,8 +133,6 @@ public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<
     override val username: String
 
     public companion object {
-        internal val botUserStatus = UserStatus.builder().bot().fakeUser().build()
-        internal val normalUserStatus = UserStatus.builder().normal().build()
-    }
+        }
 
 }

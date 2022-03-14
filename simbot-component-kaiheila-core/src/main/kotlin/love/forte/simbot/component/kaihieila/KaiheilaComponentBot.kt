@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -136,12 +136,12 @@ public abstract class KaiheilaComponentBot : Bot {
     override fun resolveImageBlocking(id: ID): AssetImage = runInBlocking { resolveImage(id) }
     //endregion
 
-    abstract override suspend fun friend(id: ID): Friend?
+    abstract override suspend fun friend(id: ID): KaiheilaUserChat?
 
-    abstract override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<Friend>
+    abstract override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChat>
 
     @Api4J
-    abstract override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out Friend>
+    abstract override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChat>
 
     abstract override suspend fun cancel(reason: Throwable?): Boolean
 

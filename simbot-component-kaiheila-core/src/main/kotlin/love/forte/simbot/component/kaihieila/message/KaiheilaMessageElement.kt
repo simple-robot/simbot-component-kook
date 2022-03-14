@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -17,32 +17,21 @@
 
 package love.forte.simbot.component.kaihieila.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.kaiheila.objects.*
 import love.forte.simbot.message.*
 
-
 /**
+ * 开黑啦组件中对 [Message.Element] 消息实现的根类型。
  *
- * 将 [Attachments] 作为消息对象。
- *
- * 通常在接收时使用。
+ * @see AssetMessage
+ * @see AtAllHere
+ * @see CardMessage
+ * @see KMarkdownMessage
  *
  * @author ForteScarlet
  */
-@SerialName("khl.attachment")
-@Serializable
-public data class AttachmentMessage(public val attachment: Attachments) : KaiheilaMessageElement<AttachmentMessage> {
+public interface KaiheilaMessageElement<E : KaiheilaMessageElement<E>> : Message.Element<E> {
 
-    override val key: Message.Key<AttachmentMessage>
-        get() = Key
-
-    public companion object Key : Message.Key<AttachmentMessage> {
-        override fun safeCast(value: Any): AttachmentMessage? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaMessageElement<*>> {
+        override fun safeCast(value: Any): KaiheilaMessageElement<*>? = doSafeCast(value)
     }
 }
-
-/**
- * 将 [Attachments] 转化为 [AttachmentMessage]。
- */
-public fun Attachments.asMessage(): AttachmentMessage = AttachmentMessage(this)

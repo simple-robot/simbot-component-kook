@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -53,7 +53,8 @@ public class UserChatView @ApiResultType constructor(
     /**
      * 私信会话 Code
      */
-    public val code: CharSequenceID,
+    @Serializable(ID.AsCharSequenceIDSerializer::class)
+    public val code: ID,
 
     /**
      * 上次阅读消息的时间
@@ -70,6 +71,26 @@ public class UserChatView @ApiResultType constructor(
      */
     @SerialName("unread_count")
     public val unreadCount: Int,
+
+    /**
+     * 是否为好友
+     */
+    @SerialName("is_friend")
+    public val isFriend: Boolean,
+
+    /**
+     * 是否已屏蔽对方
+     */
+    @SerialName("is_blocked")
+    public val isBlocked: Boolean,
+
+
+    /**
+     * 是否已被对方屏蔽
+     */
+    @SerialName("is_target_blocked")
+    public val isTargetBlocked: Boolean,
+
 
     /**
      * 目标用户信息

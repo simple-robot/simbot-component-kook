@@ -29,7 +29,7 @@ import love.forte.simbot.message.*
  *
  * @author ForteScarlet
  */
-public class KaiheilaReceiveMessageContent(source: Event<Event.Extra.Text>) : ReceivedMessageContent() {
+public class KaiheilaReceiveMessageContent(internal val source: Event<Event.Extra.Text>) : ReceivedMessageContent() {
 
     /**
      * 消息ID。

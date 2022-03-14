@@ -190,16 +190,16 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region friend api
-    override suspend fun friend(id: ID): Friend? {
+    override suspend fun friend(id: ID): KaiheilaUserChat? {
         TODO("Not yet implemented")
     }
 
-    override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<Friend> {
+    override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChat> {
         TODO("Not yet implemented")
     }
 
     @Api4J
-    override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out Friend> {
+    override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChat> {
         TODO("Not yet implemented")
     }
     //endregion

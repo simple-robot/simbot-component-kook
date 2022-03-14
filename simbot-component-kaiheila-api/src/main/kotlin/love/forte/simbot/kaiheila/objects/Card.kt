@@ -1,14 +1,17 @@
 /*
+ *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
  *
- *  * Copyright (c) 2021. ForteScarlet All rights reserved.
- *  * Project  simple-robot
- *  * File     MiraiAvatar.kt
- *  *
- *  * You can contact the author through the following channels:
- *  * github https://github.com/ForteScarlet
- *  * gitee  https://gitee.com/ForteScarlet
- *  * email  ForteScarlet@163.com
- *  * QQ     1149159218
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
  *
  */
 
@@ -18,7 +21,10 @@ package love.forte.simbot.kaiheila.objects
 
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.*
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.*
+import love.forte.simbot.*
 
 
 /**
@@ -60,13 +66,44 @@ import kotlinx.serialization.json.*
  * ```
  * @author ForteScarlet
  */
+@ExperimentalSimbotApi
+@Serializable(CardMessageSerializer::class)
 public class CardMessage(private val delegate: List<Card>) : List<Card> by delegate {
     init {
         check(delegate.size <= 5) { "A card message can only allow up to 5 cards." }
     }
 
+    public fun decode(decoder: Json = DEFAULT_DECODER): String {
+        return decoder.encodeToString(serializer(), this)
+    }
+
     public companion object Serializer {
-        public fun <T : Card> serializer(elementSerializer: KSerializer<T>): KSerializer<List<T>> = ListSerializer(elementSerializer)
+        private val DEFAULT_DECODER: Json = Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
+
+        // public val serializer = ListSerializer(Card.serializer())
+
+        // public fun <T : Card> serializer(elementSerializer: KSerializer<T>): KSerializer<List<T>> =
+        //     ListSerializer(elementSerializer)
+    }
+}
+
+@ExperimentalSimbotApi
+public object CardMessageSerializer : KSerializer<CardMessage> {
+    private val listSerializer = ListSerializer(Card.serializer())
+    override fun deserialize(decoder: Decoder): CardMessage {
+        val cards = decoder.decodeSerializableValue(listSerializer)
+        return CardMessage(cards)
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    override val descriptor: SerialDescriptor =
+        listSerialDescriptor(listSerializer.descriptor) // SerialDescriptor("CardMessage", listSerializer.descriptor)
+
+    override fun serialize(encoder: Encoder, value: CardMessage) {
+        return listSerializer.serialize(encoder, value)
     }
 }
 
@@ -142,29 +179,10 @@ public enum class Size {
  *
  */
 @Serializable
+@ExperimentalSimbotApi
 public sealed class Card {
     public abstract val type: String
 
-    // companion object : SerializerModuleRegistrar {
-    //     override fun SerializersModuleBuilder.serializerModule() {
-    //         Element.apply {
-    //             serializerModule()
-    //         }
-    //
-    //         Module.apply {
-    //             serializerModule()
-    //         }
-    //
-    //         polymorphic(love.forte.simbot.kaiheila.objects.Card::class) {
-    //             subclass(Card::class)
-    //             subclass(Module::class)
-    //             subclass(Element::class)
-    //         }
-    //
-    //
-    //         TODO("Not yet implemented")
-    //     }
-    // }
 
     /**
      * [卡片](https://developer.kaiheila.cn/doc/cardmessage#%E5%8D%A1%E7%89%87)
@@ -207,13 +225,6 @@ public sealed class Card {
      */
     @Serializable
     public abstract class Element(override val type: String) : love.forte.simbot.kaiheila.objects.Card() {
-        // companion object : SerializerModuleRegistrar {
-        //     override fun SerializersModuleBuilder.serializerModule() {
-        //         polymorphic(Module::class) {
-        //             // TODO
-        //         }
-        //     }
-        // }
 
         /**
          * 普通文本

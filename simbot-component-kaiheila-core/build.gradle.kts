@@ -22,7 +22,7 @@ plugins {
     kotlin("plugin.serialization")
 
     id("org.jetbrains.dokka")
-
+    id("kotlinx-atomicfu")
 }
 
 
@@ -30,7 +30,7 @@ plugins {
 
 dependencies {
     api(project(":simbot-component-kaiheila-stdlib"))
-
+    implementation("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.1")
     compileOnly(V.Jetbrains.Annotations.NOTATION)
 
     testImplementation(kotlin("test-junit5"))

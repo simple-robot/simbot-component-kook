@@ -17,17 +17,21 @@
 
 package love.forte.simbot.component.kaihieila.internal
 
+import kotlinx.atomicfu.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaihieila.*
-import love.forte.simbot.component.kaihieila.KaiheilaGuildMember.Companion.botUserStatus
-import love.forte.simbot.component.kaihieila.KaiheilaGuildMember.Companion.normalUserStatus
+import love.forte.simbot.component.kaihieila.KaiheilaComponent.Registrar.botUserStatus
+import love.forte.simbot.component.kaihieila.KaiheilaComponent.Registrar.normalUserStatus
+import love.forte.simbot.component.kaihieila.util.*
 import love.forte.simbot.definition.*
 import love.forte.simbot.definition.Role
+import love.forte.simbot.kaiheila.api.guild.*
 import love.forte.simbot.kaiheila.objects.User
 import java.util.stream.*
 import kotlin.coroutines.*
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.*
 
 /**
@@ -41,12 +45,11 @@ internal class KaiheilaMemberImpl(
 ) : KaiheilaGuildMember, CoroutineScope {
     internal val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
+    private val muteJob = atomic<Job?>(null)
 
-    // @Suppress("RedundantSuspendModifier")
-    // internal suspend fun init() {
-    // userView = source // 暂时观望
-    // this.userView = UserViewRequest(sourceUser.id, channel.guildId).requestDataBy(bot)
-    // }
+
+    // private val muteJobUpdater =
+    //     AtomicReferenceFieldUpdater.newUpdater(KaiheilaMemberImpl::class.java, Job::class.java, "muteJob")
 
 
     override var nickname: String = source.nickname ?: ""
@@ -59,11 +62,47 @@ internal class KaiheilaMemberImpl(
         get() = source.id
 
     override suspend fun unmute(type: Int): Boolean {
-        TODO("Not yet implemented")
+        // do unmute
+        val result = GuildMuteDeleteRequest(guild.id, source.id, type).requestBy(bot)
+        return result.isSuccess.also { success ->
+            if (success) {
+                // remove delete job
+                muteJob.update { cur ->
+                    cur?.cancel()
+                    null
+                }
+            }
+        }
     }
 
     override suspend fun mute(duration: Duration, type: Int): Boolean {
-        TODO("Not yet implemented")
+        // do mute
+        val milliseconds = duration.inWholeMilliseconds
+        if (milliseconds == 0L) {
+            return unmute(type)
+        }
+
+        val result = GuildMuteCreateRequest(guild.id, source.id, type).requestBy(bot)
+        return result.isSuccess.also { success ->
+            if (milliseconds > 0 && success) {
+                val scope: CoroutineScope = this
+                muteJob.update { cur ->
+                    cur?.cancel()
+                    scope.launch {
+                        delay(milliseconds)
+                        unmute(type)
+                    }.also {
+                        it.invokeOnCompletion { e ->
+                            if (e is CancellationException) {
+                                logger.debug("Member({}) from Bot({}) unmute job cancelled.", source.id, bot.id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     @Api4J
@@ -77,6 +116,10 @@ internal class KaiheilaMemberImpl(
 
     override fun toString(): String {
         return "KaiheilaMember(source=$source)"
+    }
+
+    companion object {
+        private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaihieila.KaiheilaMember")
     }
 
 }
