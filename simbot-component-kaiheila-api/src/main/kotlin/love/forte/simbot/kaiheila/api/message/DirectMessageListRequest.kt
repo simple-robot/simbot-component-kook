@@ -17,9 +17,9 @@
 
 package love.forte.simbot.kaiheila.api.message
 
-import com.sun.xml.internal.bind.v2.model.core.*
 import io.ktor.http.*
 import kotlinx.serialization.*
+import love.forte.simbot.*
 import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Key.byChatCode
 import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Key.byTargetId
