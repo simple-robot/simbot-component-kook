@@ -19,37 +19,56 @@ package love.forte.simbot.component.kaihieila.internal
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.*
-import love.forte.simbot.component.kaihieila.*
-import love.forte.simbot.component.kaihieila.event.*
+import love.forte.simbot.component.kaihieila.KaiheilaBotManager
+import love.forte.simbot.component.kaihieila.KaiheilaComponent
+import love.forte.simbot.component.kaihieila.KaiheilaComponentBot
+import love.forte.simbot.component.kaihieila.KaiheilaComponentBotConfiguration
+import love.forte.simbot.component.kaihieila.event.KaiheilaBotSelfMessageEvent
+import love.forte.simbot.component.kaihieila.event.KaiheilaBotStartedEvent
+import love.forte.simbot.component.kaihieila.event.KaiheilaNormalMessageEvent
+import love.forte.simbot.component.kaihieila.event.UnsupportedKaiheilaEvent
 import love.forte.simbot.component.kaihieila.internal.event.*
-import love.forte.simbot.component.kaihieila.message.*
+import love.forte.simbot.component.kaihieila.message.AssetImage
+import love.forte.simbot.component.kaihieila.message.AssetMessage
 import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asImage
 import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asMessage
-import love.forte.simbot.component.kaihieila.util.*
-import love.forte.simbot.definition.*
-import love.forte.simbot.event.*
-import love.forte.simbot.kaiheila.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.api.asset.*
-import love.forte.simbot.kaiheila.api.guild.*
-import love.forte.simbot.kaiheila.api.message.*
-import love.forte.simbot.kaiheila.api.user.*
-import love.forte.simbot.kaiheila.api.userchat.*
+import love.forte.simbot.component.kaihieila.message.SimpleAssetMessage
+import love.forte.simbot.component.kaihieila.util.requestDataBy
+import love.forte.simbot.definition.UserStatus
+import love.forte.simbot.event.EventProcessor
+import love.forte.simbot.event.pushIfProcessable
+import love.forte.simbot.kaiheila.KaiheilaBot
+import love.forte.simbot.kaiheila.api.ApiResultType
+import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
+import love.forte.simbot.kaiheila.api.asset.AssetCreated
+import love.forte.simbot.kaiheila.api.guild.GuildListRequest
+import love.forte.simbot.kaiheila.api.guild.GuildViewRequest
+import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kaiheila.api.user.Me
+import love.forte.simbot.kaiheila.api.user.UserViewRequest
+import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
+import love.forte.simbot.kaiheila.api.userchat.UserChatListRequest
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
-import love.forte.simbot.kaiheila.event.system.*
-import love.forte.simbot.kaiheila.event.system.guild.*
-import love.forte.simbot.kaiheila.event.system.guild.member.*
-import love.forte.simbot.kaiheila.event.system.user.*
-import love.forte.simbot.resources.*
-import love.forte.simbot.utils.*
-import org.slf4j.*
+import love.forte.simbot.kaiheila.event.system.SystemEvent
+import love.forte.simbot.kaiheila.event.system.guild.DeletedGuildExtraBody
+import love.forte.simbot.kaiheila.event.system.guild.UpdatedGuildExtraBody
+import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.UpdatedGuildMemberEventBody
+import love.forte.simbot.kaiheila.event.system.user.SelfExitedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEventBody
+import love.forte.simbot.resources.Resource
+import love.forte.simbot.utils.runInBlocking
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.*
-import java.util.stream.*
-import kotlin.coroutines.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.stream.Stream
+import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kaiheila.event.Event as KhlEvent
 import love.forte.simbot.kaiheila.event.message.MessageEvent as KhlMessageEvent
 import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
@@ -148,7 +167,7 @@ internal class KaiheilaComponentBotImpl(
                 requestGuilds().collect { guild ->
                     if (!guilds.containsKey(guild.id.literal)) {
                         val guildImpl = KaiheilaGuildImpl(this, guild).also { it.init() }
-                        guilds.computeIfPresent(guild.id.literal) { id, cur ->
+                        guilds.computeIfPresent(guild.id.literal) { _, cur ->
                             if (cur.initTimestamp >= guildImpl.initTimestamp) {
                                 guildImpl.cancel()
                                 cur

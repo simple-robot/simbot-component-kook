@@ -17,19 +17,24 @@
 
 package love.forte.simbot.component.kaihieila
 
-import kotlinx.coroutines.flow.*
-import love.forte.simbot.*
-import love.forte.simbot.component.kaihieila.message.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import love.forte.simbot.Api4J
+import love.forte.simbot.ID
+import love.forte.simbot.Limiter
+import love.forte.simbot.Timestamp
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kaihieila.util.*
+import love.forte.simbot.component.kaihieila.util.requestDataBy
 import love.forte.simbot.definition.*
-import love.forte.simbot.kaiheila.api.message.*
-import love.forte.simbot.message.*
+import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
+import love.forte.simbot.kaiheila.api.message.MessageType
 import love.forte.simbot.message.Message
-import love.forte.simbot.utils.*
-import java.util.concurrent.*
-import java.util.stream.*
-import kotlin.time.*
+import love.forte.simbot.message.MessageContent
+import love.forte.simbot.utils.runInBlocking
+import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
+import kotlin.time.Duration
 import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
 
 
