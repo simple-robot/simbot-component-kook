@@ -26,9 +26,9 @@ object P {
     object ComponentKaiheila {
         val isSnapshot: Boolean get() = Simbot.isSnapshot
         const val GROUP = "${Simbot.GROUP}.component"
-        // 3: v3 api
-        const val REAL_VERSION = "3.0.1"
-        val VERSION = if (isSnapshot) "${Simbot.VERSION}-$REAL_VERSION-SNAPSHOT"
-        else "${Simbot.VERSION}-$REAL_VERSION"
+        // 0: v3 api
+        const val REAL_VERSION = "0.0.1"
+        val VERSION = if (isSnapshot) "${Simbot.REAL_VERSION}-$REAL_VERSION-SNAPSHOT"
+        else "${Simbot.REAL_VERSION}-$REAL_VERSION"
     }
 }

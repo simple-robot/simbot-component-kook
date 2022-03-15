@@ -1,3 +1,5 @@
+import util.*
+
 /*
  *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
  *
@@ -20,8 +22,16 @@ plugins {
     kotlin("jvm") apply false
     kotlin("plugin.serialization") apply false
     id("org.jetbrains.dokka")
+    `maven-publish`
+    signing
+    // see https://github.com/gradle-nexus/publish-plugin
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
+group = P.ComponentKaiheila.GROUP
+version = P.ComponentKaiheila.VERSION
+
+println("=== Current version: $version ===")
 
 
 
@@ -51,8 +61,6 @@ println("isSnapshotOnly: $isSnapshotOnly")
 println("isReleaseOnly: $isReleaseOnly")
 println("isPublishConfigurable: $isPublishConfigurable")
 
-group = P.ComponentKaiheila.GROUP
-version = P.ComponentKaiheila.VERSION
 
 subprojects {
     group = P.ComponentKaiheila.GROUP
@@ -80,17 +88,18 @@ subprojects {
     if (isPublishConfigurable) {
         apply(plugin = "maven-publish")
         apply(plugin = "signing")
-        // configurePublishing(name)
-        // println("[publishing-configure] - [$name] configured.")
+        configurePublishing(name)
+        println("[publishing-configure] - [$name] configured.")
         // set gpg file path to root
-        // val secretKeyRingFileKey = "signing.secretKeyRingFile"
-        // val secretRingFile = File(project.rootDir, getProp(secretKeyRingFileKey)?.toString() ?: "ForteScarlet.gpg")
-        // extra[secretKeyRingFileKey] = secretRingFile
-        // setProperty(secretKeyRingFileKey, secretRingFile)
+        val secretKeyRingFileKey = "signing.secretKeyRingFile"
+        val secretRingFile = File(project.rootDir, getProp(secretKeyRingFileKey)?.toString() ?: "ForteScarlet.gpg")
+        extra[secretKeyRingFileKey] = secretRingFile
+        setProperty(secretKeyRingFileKey, secretRingFile)
 
-        // signing {
-        //     sign(publishing.publications)
-        // }
+        signing {
+            sign(publishing.publications)
+        }
+
     }
 
 
@@ -107,34 +116,36 @@ tasks.withType<JavaCompile>() {
 
 
 
-// val sonatypeUsername: String? = getProp("sonatype.username")?.toString()
-// val sonatypePassword: String? = getProp("sonatype.password")?.toString()
+if (isPublishConfigurable) {
+    val sonatypeUsername: String? = getProp("sonatype.username")?.toString()
+    val sonatypePassword: String? = getProp("sonatype.password")?.toString()
 
-// if (sonatypeUsername != null && sonatypePassword != null) {
-    // nexusPublishing {
-    //     packageGroup.set(P.ComponentTencentGuild.GROUP)
-    //
-    //     useStaging.set(
-    //         project.provider { !project.version.toString().endsWith("SNAPSHOT", ignoreCase = true) }
-    //     )
-    //
-    //     transitionCheckOptions {
-    //         maxRetries.set(20)
-    //         delayBetween.set(java.time.Duration.ofSeconds(5))
-    //     }
-    //
-    //     repositories {
-    //         sonatype {
-    //             snapshotRepositoryUrl.set(uri(Sonatype.`snapshot-oss`.URL))
-    //             username.set(sonatypeUsername)
-    //             password.set(sonatypePassword)
-    //         }
-    //
-    //     }
-    // }
-// } else {
-//     println("[WARN] - sonatype.username or sonatype.password is null, cannot config nexus publishing.")
-// }
+    if (sonatypeUsername != null && sonatypePassword != null) {
+        nexusPublishing {
+            packageGroup.set(P.ComponentKaiheila.GROUP)
+
+            useStaging.set(
+                project.provider { !project.version.toString().endsWith("SNAPSHOT", ignoreCase = true) }
+            )
+
+            transitionCheckOptions {
+                maxRetries.set(20)
+                delayBetween.set(java.time.Duration.ofSeconds(5))
+            }
+
+            repositories {
+                sonatype {
+                    snapshotRepositoryUrl.set(uri(Sonatype.`snapshot-oss`.URL))
+                    username.set(sonatypeUsername)
+                    password.set(sonatypePassword)
+                }
+
+            }
+        }
+    } else {
+        println("[WARN] - sonatype.username or sonatype.password is null, cannot config nexus publishing.")
+    }
+}
 
 
 fun org.jetbrains.dokka.gradle.AbstractDokkaTask.configOutput(format: String) {

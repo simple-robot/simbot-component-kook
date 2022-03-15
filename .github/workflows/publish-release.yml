@@ -18,7 +18,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 8
-          cache: 'gradle'
 
       # the gpg
       - name: Decode Gpg File
