@@ -3,7 +3,7 @@ on: # push
   push:
     tags:
       - doc**
-      - v3.*.*
+      - v3.**.**
 
 jobs:
   deploy-doc:
@@ -22,7 +22,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11
-          cache: 'gradle'
 
       - name: Create gradle.properties
         run: |
