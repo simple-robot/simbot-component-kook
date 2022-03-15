@@ -15,20 +15,49 @@
  *
  */
 
-rootProject.name = "simbot-component-kaiheila"
 
-pluginManagement {
-    plugins {
-        kotlin("jvm") version "1.6.10"
-        kotlin("plugin.serialization") version "1.6.10"
-        id("org.jetbrains.dokka") version "1.6.10"
+plugins {
+    `java-library`
+    kotlin("jvm")
+    kotlin("plugin.serialization")
 
-        // see https://github.com/gradle-nexus/publish-plugin
-        id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("org.jetbrains.dokka")
+}
+
+
+dependencies {
+    api(project(":simbot-component-kaiheila-core"))
+    api(V.Simbot.BootApi.NOTATION)
+    testImplementation(V.Simbot.BootCore.NOTATION)
+
+}
+repositories {
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
+        name = "ktor-eap"
     }
 }
 
-include("simbot-component-kaiheila-api")
-include("simbot-component-kaiheila-stdlib")
-include("simbot-component-kaiheila-core")
-include("simbot-component-kaiheila-boot")
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        javaParameters = true
+        jvmTarget = "1.8"
+    }
+}
+
+
+kotlin {
+    // 严格模式
+    explicitApiWarning()
+
+
+    sourceSets.all {
+        languageSettings {
+            optIn("kotlin.RequiresOptIn")
+        }
+    }
+}

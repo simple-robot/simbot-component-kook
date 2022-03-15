@@ -15,32 +15,28 @@
  *
  */
 
-package love.forte.simbot.component.kaihieila.message
+package love.forte.simbot.component.kaihieila.event
 
-import kotlinx.serialization.*
 import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.component.kaihieila.*
+import love.forte.simbot.event.internal.*
 import love.forte.simbot.message.*
 
-
 /**
- * 将 [KMarkdown] 作为消息使用。
+ *
  * @author ForteScarlet
  */
-@SerialName("khl.kmd")
-@Serializable
-@OptIn(ExperimentalSimbotApi::class)
-public data class KMarkdownMessage(public val kMarkdown: KMarkdown) : KaiheilaMessageElement<KMarkdownMessage> {
-    override val key: Message.Key<KMarkdownMessage>
+public abstract class KaiheilaBotRegisteredEvent : BotRegisteredEvent() {
+
+    override val id: ID = randomID()
+    override val timestamp: Timestamp = Timestamp.now()
+    abstract override val bot: KaiheilaComponentBot
+    override val key: InternalEvent.Key<KaiheilaBotRegisteredEvent>
         get() = Key
 
-    public companion object Key : Message.Key<KMarkdownMessage> {
-        override fun safeCast(value: Any): KMarkdownMessage? = doSafeCast(value)
+    public companion object Key : BaseInternalKey<KaiheilaBotRegisteredEvent>(
+        "kaiheila.registered", BotRegisteredEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaBotRegisteredEvent? = doSafeCast(value)
     }
 }
-
-/**
- * 将 [KMarkdown] 作为 [KMarkdownMessage] 使用。
- */
-@OptIn(ExperimentalSimbotApi::class)
-public fun KMarkdown.asMessage(): KMarkdownMessage = KMarkdownMessage(this)

@@ -29,6 +29,11 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.*
 import love.forte.simbot.kaiheila.*
+import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
+import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
+import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
+import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_REMAINING
+import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_RESET
 import love.forte.simbot.utils.*
 import java.util.function.*
 
@@ -106,7 +111,32 @@ public abstract class KaiheilaApiRequest<T> {
 
         postChecker(response)
 
-        return response.receive()
+        val result: ApiResult = response.receive()
+
+        // init rate limit info.
+        val headers = response.headers
+
+
+        val limit = headers[X_RATE_LIMIT_LIMIT]?.toLongOrNull() // ?: RateLimit.DEFAULT.limit
+        val remaining = headers[X_RATE_LIMIT_REMAINING]?.toLongOrNull() // ?: RateLimit.DEFAULT.remaining
+        val reset = headers[X_RATE_LIMIT_RESET]?.toLongOrNull() // ?: RateLimit.DEFAULT.reset
+        val bucket = headers[X_RATE_LIMIT_BUCKET] // ?: RateLimit.DEFAULT.bucket
+        val global = headers[X_RATE_LIMIT_GLOBAL] != null
+
+        val rateLimit = if (limit != null || remaining != null || reset != null || bucket != null || global) {
+            RateLimit(
+                limit ?: RateLimit.DEFAULT.limit,
+                remaining ?: RateLimit.DEFAULT.remaining,
+                reset ?: RateLimit.DEFAULT.reset,
+                bucket ?: RateLimit.DEFAULT.bucket,
+                global
+            )
+        } else {
+            RateLimit.DEFAULT
+        }
+
+        result.rateLimit = rateLimit
+        return result
     }
 
 

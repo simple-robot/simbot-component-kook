@@ -138,12 +138,21 @@ public object KaiheilaApiResult {
  */
 @Suppress("MemberVisibilityCanBePrivate")
 @Serializable
-public class ApiResult(
+public class ApiResult @ApiResultType constructor(
     public val code: Int,
     public val message: String,
     public val data: JsonElement
 ) {
 
+    /**
+     * 当前api响应值的 [速率限制][RateLimit] 信息。会在当前类实例化之后在进行初始化。
+     */
+    @Transient
+    public var rateLimit: RateLimit = RateLimit.DEFAULT
+
+    /**
+     * 此接口的响应码是否为成功的响应码.
+     */
     public val isSuccess: Boolean get() = code == KaiheilaApiResult.SUCCESS_CODE
 
     /**
@@ -170,7 +179,7 @@ public class ApiResult(
     }
 
 
-    override fun toString(): String = "ApiResult(code=$code, message=$message, data=$data)"
+    override fun toString(): String = "ApiResult(code=$code, message=$message, rateLimit=$rateLimit, data=$data)"
 
 
     override fun equals(other: Any?): Boolean {
@@ -194,3 +203,45 @@ public class ApiResult(
 
 }
 
+
+/**
+ * [速率限制](https://developer.kaiheila.cn/doc/rate-limit) 请求头中的数据体。
+ */
+@Serializable
+public data class RateLimit(
+    /**
+     * `X-Rate-Limit-Limit`, 一段时间内允许的最大请求次数
+     */
+    public val limit: Long,
+
+    /**
+     * `X-Rate-Limit-Remaining`, 一段时间内还剩下的请求数
+     */
+    public val remaining: Long,
+
+    /**
+     * `X-Rate-Limit-Reset`, 回复到最大请求次数需要等待的时间
+     */
+    public val reset: Long,
+
+    /**
+     * `X-Rate-Limit-Bucket`, 请求数的bucket
+     */
+    public val bucket: String,
+
+    /**
+     * `X-Rate-Limit-Global`, 触犯全局请求次数限制
+     */
+    public val isGlobalLimit: Boolean,
+
+    ) {
+    public companion object {
+        public const val X_RATE_LIMIT_LIMIT: String = "X-Rate-Limit-Limit"
+        public const val X_RATE_LIMIT_REMAINING: String = "X-Rate-Limit-Remaining"
+        public const val X_RATE_LIMIT_RESET: String = "X-Rate-Limit-Reset"
+        public const val X_RATE_LIMIT_BUCKET: String = "X-Rate-Limit-Bucket"
+        public const val X_RATE_LIMIT_GLOBAL: String = "X-Rate-Limit-Global"
+
+        public val DEFAULT: RateLimit = RateLimit(99999, 99999, 0, "default/not-init", false)
+    }
+}

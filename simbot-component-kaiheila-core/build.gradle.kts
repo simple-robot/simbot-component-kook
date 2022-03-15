@@ -24,17 +24,6 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
-// buildscript {
-//     repositories {
-//         mavenCentral()
-//     }
-//
-//     dependencies {
-//         classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.1")
-//     }
-// }
-
-
 
 dependencies {
     api(project(":simbot-component-kaiheila-stdlib"))

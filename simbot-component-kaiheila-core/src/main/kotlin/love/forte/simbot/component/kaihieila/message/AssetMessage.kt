@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -97,6 +97,7 @@ public data class SimpleAssetMessage(
      *
      * @see MessageType
      */
+    @SerialName("assetType")
     override val type: Int
 ) : AssetMessage<SimpleAssetMessage>() {
     public constructor(asset: AssetCreated, type: MessageType) : this(asset, type.type)

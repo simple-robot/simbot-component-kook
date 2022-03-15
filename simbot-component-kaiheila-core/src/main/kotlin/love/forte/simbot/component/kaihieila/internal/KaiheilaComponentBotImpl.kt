@@ -86,15 +86,19 @@ internal class KaiheilaComponentBotImpl(
     }
 
 
+    // invoke with initLock
     private suspend fun init() {
         updateMe(sourceBot.me())
         initGuilds()
+        initSyncJob()
         // clearFriendCache()
     }
 
-    private suspend fun initGuilds() {
-        val guildsMap = ConcurrentHashMap<String, KaiheilaGuildImpl>()
-        flow {
+    /**
+     * 以 flow 的方式查询guild列表
+     */
+    private fun requestGuilds(): Flow<love.forte.simbot.kaiheila.objects.Guild> {
+        return flow {
             var page = 1
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
@@ -106,15 +110,73 @@ internal class KaiheilaComponentBotImpl(
                     emit(it)
                 }
             } while (guilds.isNotEmpty() && guildsResult.meta.page < guildsResult.meta.pageTotal)
-        }.buffer(100).map { guild ->
-            KaiheilaGuildImpl(this, guild)
-        }.collect {
-            guildsMap[it.id.literal] = it.also { it.init() }
         }
+    }
+
+    private suspend fun initGuilds() {
+        val guildsMap = ConcurrentHashMap<String, KaiheilaGuildImpl>()
+        requestGuilds()
+            .buffer(100)
+            .map { guild ->
+                KaiheilaGuildImpl(this, guild)
+            }.collect {
+                guildsMap[it.id.literal] = it.also { it.init() }
+            }
 
         bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
 
         this.guilds = guildsMap
+    }
+
+
+    private fun initSyncJob() {
+        initGuildSyncJob()
+        initMemberSyncJob()
+    }
+
+    @Volatile
+    private var guildSyncJob: Job? = null
+
+    private fun initGuildSyncJob() {
+        guildSyncJob?.cancel()
+        guildSyncJob = null
+
+        val guildSyncPeriod = configuration.syncPeriods.guildSyncPeriod
+        if (guildSyncPeriod > 0) {
+            // 同步guild信息。
+            suspend fun syncGuild() {
+                requestGuilds().collect { guild ->
+                    if (!guilds.containsKey(guild.id.literal)) {
+                        val guildImpl = KaiheilaGuildImpl(this, guild).also { it.init() }
+                        guilds.computeIfPresent(guild.id.literal) { id, cur ->
+                            if (cur.initTimestamp >= guildImpl.initTimestamp) {
+                                guildImpl.cancel()
+                                cur
+                            } else {
+                                cur.cancel()
+                                guildImpl
+                            }
+                        }
+                    }
+                }
+            }
+
+            guildSyncJob = launch {
+                while (isActive) {
+                    delay(guildSyncPeriod)
+                    syncGuild()
+                }
+            }
+        }
+    }
+
+
+    @Volatile
+    private var memberSyncJob: Job? = null
+
+    private fun initMemberSyncJob() {
+        memberSyncJob?.cancel()
+        memberSyncJob = null
     }
 
 
@@ -174,6 +236,10 @@ internal class KaiheilaComponentBotImpl(
         }
         initLock.withLock {
             init()
+            // push event
+            eventProcessor.pushIfProcessable(KaiheilaBotStartedEvent) {
+                KaiheilaBotStartedEventImpl(this)
+            }
         }
     }
 
@@ -383,8 +449,8 @@ internal class KaiheilaComponentBotImpl(
                                 KaiheilaBotSelfGroupMessageEventImpl(
                                     this@KaiheilaComponentBotImpl,
                                     this,
-                                    author,
-                                    channel
+                                    channel = channel,
+                                    member = author
                                 )
                             }
                         } else {

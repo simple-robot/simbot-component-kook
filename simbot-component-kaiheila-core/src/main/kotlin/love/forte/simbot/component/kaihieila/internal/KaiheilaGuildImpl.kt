@@ -54,7 +54,7 @@ internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
         internal set(value) {
             if (field != value) {
                 field = value
-                _owner = members[value.literal] ?: runBlocking {
+                ownerMember = members[value.literal] ?: runBlocking {
                     KaiheilaMemberImpl(
                         bot,
                         this@KaiheilaGuildImpl,
@@ -72,8 +72,10 @@ internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
     internal lateinit var channels: ConcurrentHashMap<String, KaiheilaChannelImpl>
     internal lateinit var members: ConcurrentHashMap<String, KaiheilaMemberImpl>
 
-    private lateinit var _owner: KaiheilaMemberImpl
+    private lateinit var ownerMember: KaiheilaMemberImpl
 
+    @Volatile
+    internal var initTimestamp: Long = 0L
 
     internal suspend fun init() {
         val channelsMap = ConcurrentHashMap<String, KaiheilaChannelImpl>()
@@ -120,7 +122,8 @@ internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
 
         this.channels = channelsMap
         this.members = membersMap
-        this._owner = owner ?: KaiheilaMemberImpl(bot, this, UserViewRequest(ownerId, source.id).requestDataBy(bot))
+        this.ownerMember = owner ?: KaiheilaMemberImpl(bot, this, UserViewRequest(ownerId, source.id).requestDataBy(bot))
+        initTimestamp = System.currentTimeMillis()
     }
 
     override val currentMember: Int
@@ -130,9 +133,9 @@ internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
         get() = channels.size
 
 
-    override suspend fun owner(): KaiheilaGuildMember = _owner
+    override suspend fun owner(): KaiheilaGuildMember = ownerMember
 
-    override val owner: KaiheilaGuildMember get() = _owner
+    override val owner: KaiheilaGuildMember get() = ownerMember
 
 
     override suspend fun member(id: ID): KaiheilaGuildMember? {

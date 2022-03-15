@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -19,7 +19,11 @@ package love.forte.simbot.component.kaihieila
 
 import kotlinx.serialization.modules.*
 import love.forte.simbot.*
+import love.forte.simbot.component.kaihieila.message.*
+import love.forte.simbot.component.kaihieila.message.CardMessage
 import love.forte.simbot.definition.*
+import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.message.*
 
 /**
  *
@@ -62,9 +66,27 @@ public class KaiheilaComponent : Component {
         /**
          * [KaiheilaComponent] 组件所使用的消息序列化信息。
          */
+        @OptIn(ExperimentalSimbotApi::class)
         public val messageSerializersModule: SerializersModule = SerializersModule {
-            //
+            fun PolymorphicModuleBuilder<KaiheilaMessageElement<*>>.include() {
+                subclass(SimpleAssetMessage::class, SimpleAssetMessage.serializer())
+                subclass(AssetImage::class, AssetImage.serializer())
+                subclass(AtAllHere::class, AtAllHere.serializer())
+                subclass(AttachmentMessage::class, AttachmentMessage.serializer())
+                subclass(CardMessage::class, CardMessage.serializer())
+                subclass(KMarkdownMessage::class, KMarkdownMessage.serializer())
+            }
+            polymorphic(KMarkdown::class) {
+                subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer())
+            }
 
+            polymorphic(KaiheilaMessageElement::class) {
+                include()
+            }
+
+            polymorphic(Message.Element::class) {
+                include()
+            }
         }
 
         override fun register(block: KaiheilaComponentConfiguration.() -> Unit): KaiheilaComponent {

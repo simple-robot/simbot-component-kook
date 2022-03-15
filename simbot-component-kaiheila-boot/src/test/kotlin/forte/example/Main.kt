@@ -15,32 +15,33 @@
  *
  */
 
-package love.forte.simbot.component.kaihieila.message
+package forte.example
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
-import love.forte.simbot.message.*
-
+import love.forte.simboot.*
+import love.forte.simboot.annotation.*
+import love.forte.simboot.core.*
+import love.forte.simbot.event.*
+import love.forte.simbot.event.internal.*
 
 /**
- * 将 [KMarkdown] 作为消息使用。
+ *
  * @author ForteScarlet
  */
-@SerialName("khl.kmd")
-@Serializable
-@OptIn(ExperimentalSimbotApi::class)
-public data class KMarkdownMessage(public val kMarkdown: KMarkdown) : KaiheilaMessageElement<KMarkdownMessage> {
-    override val key: Message.Key<KMarkdownMessage>
-        get() = Key
+@SimbootApplication
+class Main
 
-    public companion object Key : Message.Key<KMarkdownMessage> {
-        override fun safeCast(value: Any): KMarkdownMessage? = doSafeCast(value)
-    }
+suspend fun main() {
+    SimbootApp.run(Main::class).join()
 }
 
-/**
- * 将 [KMarkdown] 作为 [KMarkdownMessage] 使用。
- */
-@OptIn(ExperimentalSimbotApi::class)
-public fun KMarkdown.asMessage(): KMarkdownMessage = KMarkdownMessage(this)
+@Listener
+suspend fun ContactMessageEvent.hello() {
+    source().send(messageContent)
+}
+
+@Listener
+suspend fun BotRegisteredEvent.callback() {
+    println(this.bot)
+    println(this.bot.id)
+    println(this.bot.username)
+}

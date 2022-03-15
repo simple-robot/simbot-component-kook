@@ -61,6 +61,9 @@ public interface KMarkdown {
      */
     public val mentionRolePart: List<Role>
 
+    public companion object {
+        public val rawKMarkdownSerializer: KSerializer<RawValueKMarkdown> = RawValueKMarkdown.serializer()
+    }
 }
 
 /**
@@ -69,7 +72,7 @@ public interface KMarkdown {
 @Serializable
 @SerialName(RawValueKMarkdown.SERIAL_NAME)
 @ExperimentalSimbotApi
-internal data class RawValueKMarkdown(
+public data class RawValueKMarkdown(
     @SerialName("raw_content")
     override val rawContent: String,
     @SerialName("mention_part")
@@ -77,8 +80,8 @@ internal data class RawValueKMarkdown(
     @SerialName("mention_role_part")
     override val mentionRolePart: List<RoleImpl> = emptyList(),
 ) : KMarkdown {
-    internal companion object {
-        const val SERIAL_NAME = "RAW_V_K_MD"
+    public companion object {
+        internal const val SERIAL_NAME = "RAW_V_K_MD"
     }
 
 
