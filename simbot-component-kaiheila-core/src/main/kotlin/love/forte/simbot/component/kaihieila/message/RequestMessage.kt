@@ -17,36 +17,35 @@
 
 package love.forte.simbot.component.kaihieila.message
 
+import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 
 /**
- * 此注解标记一个 [KaiheilaMessageElement] 的实现类型，用于标记其为一个**仅用于发送**的消息。
+ * 提供一个 [KaiheilaApiRequest] 作为原始的消息发送请求（例如 [MessageCreateRequest]）。
  *
- * 仅用于发送的消息通常情况下只能由程序构建并发送，不会在事件中收到此消息，且大概率**不支持**序列化。
+ * 此消息会直接使用 [request] 作为消息发送的请求。
  *
- */
-@MustBeDocumented
-@Retention(AnnotationRetention.BINARY)
-public annotation class SendOnlyMessage
-
-
-/**
- * 开黑啦组件中对 [Message.Element] 消息实现的根类型。
+ * 这是一个**仅用于发送**的消息，且**不支持**序列化。
  *
- * ## SendOnlyMessage
- * 对于一些**仅用于发送**的消息，它们会被标记上 [SendOnlyMessage] 注解，并大概率无法支持序列化。
- *
- * @see AssetMessage
- * @see AtAllHere
- * @see CardMessage
- * @see KMarkdownMessage
+ * @see KaiheilaApiRequest
  *
  * @author ForteScarlet
  */
-public interface KaiheilaMessageElement<E : KaiheilaMessageElement<E>> : Message.Element<E> {
+@SendOnlyMessage
+public data class RequestMessage(public val request: KaiheilaApiRequest<*>) :
+    KaiheilaMessageElement<RequestMessage> {
 
-    public companion object Key : Message.Key<KaiheilaMessageElement<*>> {
-        override fun safeCast(value: Any): KaiheilaMessageElement<*>? = doSafeCast(value)
+    override val key: Message.Key<RequestMessage>
+        get() = Key
+
+    public companion object Key : Message.Key<RequestMessage> {
+        override fun safeCast(value: Any): RequestMessage? = doSafeCast(value)
     }
 }
+
+/**
+ * 通过 [RequestMessage] 构建 [RequestMessage].
+ */
+public fun KaiheilaApiRequest<*>.toRequest(): RequestMessage = RequestMessage(this)

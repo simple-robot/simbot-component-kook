@@ -17,15 +17,23 @@
 
 package love.forte.simbot.component.kaihieila.internal
 
-import love.forte.simbot.*
-import love.forte.simbot.component.kaihieila.*
-import love.forte.simbot.component.kaihieila.message.*
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
+import love.forte.simbot.SimbotIllegalArgumentException
+import love.forte.simbot.component.kaihieila.KaiheilaUserChat
+import love.forte.simbot.component.kaihieila.message.KaiheilaApiRequestedReceipt
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kaihieila.util.*
-import love.forte.simbot.kaiheila.api.message.*
-import love.forte.simbot.kaiheila.api.userchat.*
-import love.forte.simbot.message.*
+import love.forte.simbot.component.kaihieila.message.KaiheilaReceiveMessageContent
+import love.forte.simbot.component.kaihieila.message.toRequest
+import love.forte.simbot.component.kaihieila.util.requestDataBy
+import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
+import love.forte.simbot.kaiheila.api.message.MessageCreated
+import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kaiheila.api.userchat.UserChatView
 import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.MessageReceipt
 
 /**
  *
@@ -44,14 +52,19 @@ internal class KaiheilaUserChatImpl(
         ).requestDataBy(bot).asReceipt(true, bot)
     }
 
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
-        val request = message.toDirectRequest(
-            source.code, null, null, null
-        ) ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-        return request.requestDataBy(bot).asReceipt(true, bot)
+    override suspend fun send(message: Message): MessageReceipt {
+        val request = message.toRequest(source.code, null, null, null)
+            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+
+        val result = request.requestDataBy(bot)
+        return if (result is MessageCreated) {
+            result.asReceipt(true, bot)
+        } else {
+            KaiheilaApiRequestedReceipt(result, true)
+        }
     }
 
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: MessageContent): MessageReceipt {
         return if (message is KaiheilaReceiveMessageContent) {
             val source = message.source
             DirectMessageCreateRequest.byTargetId(

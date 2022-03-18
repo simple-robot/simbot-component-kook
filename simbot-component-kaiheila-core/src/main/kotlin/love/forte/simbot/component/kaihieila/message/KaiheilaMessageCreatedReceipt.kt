@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -17,21 +17,26 @@
 
 package love.forte.simbot.component.kaihieila.message
 
-import love.forte.simbot.*
-import love.forte.simbot.action.*
-import love.forte.simbot.component.kaihieila.*
-import love.forte.simbot.component.kaihieila.util.*
-import love.forte.simbot.kaiheila.api.message.*
-import love.forte.simbot.message.*
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.action.DeleteSupport
+import love.forte.simbot.component.kaihieila.KaiheilaComponentBot
+import love.forte.simbot.component.kaihieila.util.requestBy
+import love.forte.simbot.kaiheila.api.message.DirectMessageDeleteRequest
+import love.forte.simbot.kaiheila.api.message.MessageCreated
+import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
+import love.forte.simbot.message.MessageReceipt
+import love.forte.simbot.randomID
 
 
 /**
  * 消息创建后的回执实例。
  * @author ForteScarlet
  */
+@Suppress("MemberVisibilityCanBePrivate")
 public class KaiheilaMessageCreatedReceipt(
-    private val created: MessageCreated,
-    private val direct: Boolean,
+    public val created: MessageCreated,
+    public val isDirect: Boolean,
     private val bot: KaiheilaComponentBot
 ) : MessageReceipt, DeleteSupport {
     override val id: ID
@@ -51,7 +56,7 @@ public class KaiheilaMessageCreatedReceipt(
      * 尝试删除（撤回）发送的这条消息。
      */
     override suspend fun delete(): Boolean {
-        val request = if (direct) DirectMessageDeleteRequest(id) else MessageDeleteRequest(id)
+        val request = if (isDirect) DirectMessageDeleteRequest(id) else MessageDeleteRequest(id)
         return request.requestBy(bot).isSuccess
     }
 
@@ -62,4 +67,23 @@ public class KaiheilaMessageCreatedReceipt(
         ): KaiheilaMessageCreatedReceipt = KaiheilaMessageCreatedReceipt(this, direct, bot)
     }
 
+}
+
+/**
+ * 消息发送后的回执。
+ *
+ * 与 [KaiheilaMessageCreatedReceipt] 不同的是，
+ * [KaiheilaApiRequestedReceipt] 很可能并不是通过执行的消息api，
+ * 例如通过 [RequestMessage] 执行了一个任意的请求。
+ *
+ * 也正因此，此回执不支持 [删除][DeleteSupport] 操作。
+ *
+ */
+public class KaiheilaApiRequestedReceipt(
+    public val result: Any?,
+    public val isDirect: Boolean,
+    // private val bot: KaiheilaComponentBot
+) : MessageReceipt {
+    override val id: ID = randomID()
+    override val isSuccess: Boolean get() = true
 }

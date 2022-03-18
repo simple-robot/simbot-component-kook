@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -31,6 +31,7 @@ import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
@@ -150,13 +151,13 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
      * 发送消息。
      */
     @JvmSynthetic
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: Message): MessageReceipt
 
     /**
      * 发送消息。
      */
     @JvmSynthetic
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: MessageContent): MessageReceipt
 
     /**
      * 发送纯文本消息。
@@ -170,13 +171,13 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
      * 发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt = runInBlocking { send(message) }
+    override fun sendBlocking(message: Message): MessageReceipt = runInBlocking { send(message) }
 
     /**
      * 发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt = runInBlocking { send(message) }
+    override fun sendBlocking(message: MessageContent): MessageReceipt = runInBlocking { send(message) }
     //endregion
 
     //region Invalid api

@@ -17,13 +17,19 @@
 
 package love.forte.simbot.component.kaihieila
 
-import love.forte.simbot.*
+import love.forte.simbot.Api4J
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.Grouping
+import love.forte.simbot.ID
 import love.forte.simbot.component.kaihieila.KaiheilaComponent.Registrar.normalUserStatus
-import love.forte.simbot.component.kaihieila.message.*
-import love.forte.simbot.definition.*
-import love.forte.simbot.kaiheila.api.userchat.*
-import love.forte.simbot.message.*
-import love.forte.simbot.utils.*
+import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt
+import love.forte.simbot.definition.Friend
+import love.forte.simbot.definition.UserStatus
+import love.forte.simbot.kaiheila.api.userchat.UserChatView
+import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.MessageReceipt
+import love.forte.simbot.utils.runInBlocking
 
 /**
  * 开黑啦的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
@@ -63,7 +69,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: Message): MessageReceipt
 
     /**
      * 向当前好友（私聊会话）发送消息。
@@ -73,7 +79,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: MessageContent): MessageReceipt
 
     /**
      * 向当前好友（私聊会话）发送消息。
@@ -87,7 +93,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt = runInBlocking {
+    override fun sendBlocking(message: Message): MessageReceipt = runInBlocking {
         send(message)
     }
 
@@ -95,7 +101,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt = runInBlocking {
+    override fun sendBlocking(message: MessageContent): MessageReceipt = runInBlocking {
         send(message)
     }
 }

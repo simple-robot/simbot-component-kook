@@ -17,12 +17,15 @@
 
 package love.forte.simbot.component.kaihieila.message
 
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.message.*
-import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
+import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
+import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kaiheila.objects.KMarkdown
+import love.forte.simbot.literal
 import love.forte.simbot.message.*
-import love.forte.simbot.message.Emoji
-import love.forte.simbot.message.Message
 
 /**
  * 提供开黑啦组件中一些会用到的信息。
@@ -80,7 +83,7 @@ public fun Message.toRequest(
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
-): MessageCreateRequest? {
+): KaiheilaApiRequest<*>? {
     when (this) {
         is Message.Element<*> -> return elementToRequestOrNull(targetId, quote, nonce, tempTargetId)
         is Messages -> {
@@ -110,7 +113,7 @@ private fun Message.Element<*>.elementToRequestOrNull(
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
-): MessageCreateRequest? {
+): KaiheilaApiRequest<*>? {
     fun request(type: Int, content: String): MessageCreateRequest {
         return MessageCreateRequest(
             type = type,
@@ -134,6 +137,9 @@ private fun Message.Element<*>.elementToRequestOrNull(
             is KMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
             // card message
             is CardMessage -> request(MessageType.CARD.type, cards.decode())
+
+            // request message
+            is RequestMessage -> this.request
 
             // other, ignore.
             else -> null
@@ -173,5 +179,5 @@ public fun Message.toDirectRequest(
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): DirectMessageCreateRequest? {
-    return toRequest(targetId, quote, nonce, tempTargetId)?.toDirect()
+    return (toRequest(targetId, quote, nonce, tempTargetId) as? MessageCreateRequest)?.toDirect()
 }

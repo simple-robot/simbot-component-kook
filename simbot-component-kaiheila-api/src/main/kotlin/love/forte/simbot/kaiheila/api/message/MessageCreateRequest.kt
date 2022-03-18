@@ -16,9 +16,12 @@
  */
 package love.forte.simbot.kaiheila.api.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
 
 /**
  * [发送频道聊天消息](https://developer.kaiheila.cn/doc/http/message#%E5%8F%91%E9%80%81%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
@@ -40,6 +43,7 @@ public class MessageCreateRequest(
     /**
      * 	目标频道 id
      */
+    @Serializable(ID.AsCharSequenceIDSerializer::class)
     private val targetId: ID,
 
     /**
@@ -50,6 +54,7 @@ public class MessageCreateRequest(
     /**
      * 回复某条消息的 msgId
      */
+    @Serializable(ID.AsCharSequenceIDSerializer::class)
     private val quote: ID? = null,
 
     /**
@@ -60,6 +65,7 @@ public class MessageCreateRequest(
     /**
      * 用户id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。用于在频道内针对用户的操作进行单独的回应通知等。
      */
+    @Serializable(ID.AsCharSequenceIDSerializer::class)
     private val tempTargetId: ID? = null,
 ) : KaiheilaPostRequest<MessageCreated>() {
     public companion object Key : BaseApiRequestKey("message", "create")
