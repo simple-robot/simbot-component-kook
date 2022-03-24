@@ -17,6 +17,8 @@
 
 package love.forte.simbot.component.kaihieila.event
 
+import love.forte.simbot.Api4J
+import love.forte.simbot.component.kaihieila.KaiheilaGuild
 import love.forte.simbot.component.kaihieila.KaiheilaGuildMember
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.MemberChangedEvent
@@ -34,11 +36,12 @@ public abstract class KaiheilaMemberChangedEvent<
         > :
     KaiheilaEvent<EX, E>(), MemberChangedEvent<Before, After> {
 
+    abstract override val source: KaiheilaGuild
+    override suspend fun source(): KaiheilaGuild = source
 
-
-
-
-
+    @OptIn(Api4J::class)
+    abstract override val operator: KaiheilaGuildMember?
+    override suspend fun operator(): KaiheilaGuildMember? = operator
 
     public companion object Key : BaseEventKey<KaiheilaMemberChangedEvent<*, *, *, *>>(
         "kaiheila.member_changed", KaiheilaEvent, MemberChangedEvent
