@@ -92,6 +92,13 @@ internal class KaiheilaComponentBotImpl(
     private lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
 
 
+    @JvmSynthetic
+    internal fun internalGuild(id: ID): KaiheilaGuildImpl? = internalGuild(id.literal)
+
+    @JvmSynthetic
+    internal fun internalGuild(id: String): KaiheilaGuildImpl? = guilds[id]
+
+
     init {
         // register some event processors
         sourceBot.preProcessor { _, decoded ->
@@ -375,13 +382,13 @@ internal class KaiheilaComponentBotImpl(
                     //region guild members
                     // 退出频道服务器
                     is ExitedGuildEventBody -> {
-                        val guild = guilds[this.targetId.literal] ?: return
+                        val guild = internalGuild(this.targetId) ?: return
                         guild.members.remove(body.userId.literal)?.also { it.cancel() }
                     }
                     // 加入频道服务器
                     is JoinedGuildEventBody -> {
                         // query user info.
-                        val guild = guilds[this.targetId.literal] ?: return
+                        val guild = internalGuild(this.targetId) ?: return
                         val userInfo =
                             UserViewRequest(guild.id, body.userId).requestDataBy(this@KaiheilaComponentBotImpl)
                         val member = KaiheilaMemberImpl(this@KaiheilaComponentBotImpl, guild, userInfo)
@@ -392,7 +399,7 @@ internal class KaiheilaComponentBotImpl(
                     }
                     // 信息变更 （昵称变更）
                     is UpdatedGuildMemberEventBody -> {
-                        val guild = guilds[this.targetId.literal] ?: return
+                        val guild = internalGuild(this.targetId) ?: return
                         val member = guild.members[body.userId.literal] ?: return
                         member.nickname = body.nickname
                     }
@@ -404,7 +411,7 @@ internal class KaiheilaComponentBotImpl(
                     }
                     // 服务器更新
                     is UpdatedGuildExtraBody -> {
-                        val guild = guilds[body.id.literal] ?: return
+                        val guild = internalGuild(body.id) ?: return
                         guild.name = body.name
                         guild.icon = body.icon
                         guild.ownerId = body.openId
@@ -460,7 +467,7 @@ internal class KaiheilaComponentBotImpl(
                         return
                     }
                     KhlChannel.Type.GROUP -> {
-                        val guild = guilds[extra.guildId.literal] ?: return
+                        val guild = internalGuild(extra.guildId) ?: return
                         val author = guild.members[authorId.literal] ?: return
                         val channel = guild.channels[targetId.literal] ?: return
                         if (isMe(authorId)) {
@@ -491,6 +498,11 @@ internal class KaiheilaComponentBotImpl(
 
             // 系统事件
             is SystemEvent<*, *> -> {
+                // yes
+                val guild = internalGuild(targetId) ?: return
+                val author = guild.members[authorId.literal] ?: return
+                val channel = guild.channels[targetId.literal] ?: return
+
                 // TODO 申请事件
                 // TODO 频道增减
                 // TODO 服务器增减

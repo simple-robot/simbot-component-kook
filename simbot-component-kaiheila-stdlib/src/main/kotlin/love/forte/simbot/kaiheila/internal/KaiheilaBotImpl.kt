@@ -25,20 +25,34 @@ import io.ktor.client.request.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.*
-import kotlinx.serialization.json.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.api.user.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import love.forte.simbot.SimbotIllegalArgumentException
+import love.forte.simbot.SimbotIllegalStateException
+import love.forte.simbot.kaiheila.KaiheilaBot
+import love.forte.simbot.kaiheila.KaiheilaBotConfiguration
+import love.forte.simbot.kaiheila.api.Gateway
+import love.forte.simbot.kaiheila.api.GatewayRequest
+import love.forte.simbot.kaiheila.api.KaiheilaApiException
+import love.forte.simbot.kaiheila.api.err
+import love.forte.simbot.kaiheila.api.user.Me
+import love.forte.simbot.kaiheila.api.user.MeRequest
+import love.forte.simbot.kaiheila.api.user.OfflineRequest
 import love.forte.simbot.kaiheila.event.*
-import org.slf4j.*
+import love.forte.simbot.kaiheila.requestDataBy
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.*
-import java.util.concurrent.atomic.*
-import java.util.zip.*
-import kotlin.coroutines.*
-import kotlin.math.*
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
+import java.util.zip.InflaterInputStream
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
 
 /**
  *
@@ -259,7 +273,9 @@ internal class KaiheilaBotImpl(
             }
         }.onEach { event ->
             val nowSn = event.sn
-            if (preProcessorQueue.isNotEmpty() && processorQueue.isNotEmpty()) {
+            val currPreProcessorQueue = preProcessorQueue
+            val currProcessorQueue = processorQueue
+            if (currPreProcessorQueue.isNotEmpty() || currProcessorQueue.isNotEmpty()) {
                 clientLogger.debug("On event: $event")
                 val eventType = event.type
                 val eventExtraType = event.extraType
@@ -279,7 +295,7 @@ internal class KaiheilaBotImpl(
                 val lazyDecoded = lazy::value
 
                 // pre process
-                preProcessorQueue.forEach { pre ->
+                currPreProcessorQueue.forEach { pre ->
                     try {
                         pre(event, decoder, lazyDecoded)
                     } catch (e: Throwable) {
@@ -287,12 +303,14 @@ internal class KaiheilaBotImpl(
                     }
                 }
 
-                launch {
-                    processorQueue.forEach { p ->
-                        try {
-                            p(event, decoder, lazyDecoded)
-                        } catch (e: Throwable) {
-                            clientLogger.error("Event process failed.", e)
+                if (currProcessorQueue.isNotEmpty()) {
+                    launch {
+                        currProcessorQueue.forEach { p ->
+                            try {
+                                p(event, decoder, lazyDecoded)
+                            } catch (e: Throwable) {
+                                clientLogger.error("Event process failed.", e)
+                            }
                         }
                     }
                 }

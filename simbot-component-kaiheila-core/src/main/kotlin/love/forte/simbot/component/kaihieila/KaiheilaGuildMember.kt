@@ -89,7 +89,8 @@ public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
     @Api4J
-    override fun muteBlocking(time: Long, unit: TimeUnit): Boolean = runInBlocking { mute(unit.toMillis(time).milliseconds) }
+    override fun muteBlocking(time: Long, unit: TimeUnit): Boolean =
+        runInBlocking { mute(unit.toMillis(time).milliseconds) }
 
     /**
      * 对此用户进行静音操作。
@@ -97,7 +98,8 @@ public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
     @Api4J
-    public fun muteBlocking(time: Long, unit: TimeUnit, type: Int): Boolean = runInBlocking { mute(unit.toMillis(time).milliseconds, type) }
+    public fun muteBlocking(time: Long, unit: TimeUnit, type: Int): Boolean =
+        runInBlocking { mute(unit.toMillis(time).milliseconds, type) }
 
     /**
      * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
@@ -139,7 +141,6 @@ public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<
     override val status: UserStatus
     override val username: String
 
-    public companion object {
-        }
+    public companion object
 
 }

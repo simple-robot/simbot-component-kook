@@ -17,16 +17,19 @@
 
 package love.forte.simbot.kaiheila.event
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import love.forte.simbot.kaiheila.event.message.*
-import love.forte.simbot.kaiheila.event.system.*
-import love.forte.simbot.kaiheila.event.system.channel.*
-import love.forte.simbot.kaiheila.event.system.guild.*
-import love.forte.simbot.kaiheila.event.system.guild.member.*
-import love.forte.simbot.kaiheila.event.system.guild.role.*
-import love.forte.simbot.kaiheila.event.system.message.*
-import love.forte.simbot.kaiheila.event.system.user.*
+import love.forte.simbot.kaiheila.event.system.SimpleSystemEventExtra
+import love.forte.simbot.kaiheila.event.system.SystemEvent
+import love.forte.simbot.kaiheila.event.system.SystemEventImpl
+import love.forte.simbot.kaiheila.event.system.channel.channelEventParsers
+import love.forte.simbot.kaiheila.event.system.guild.guildEventParsers
+import love.forte.simbot.kaiheila.event.system.guild.member.guildMemberEventParsers
+import love.forte.simbot.kaiheila.event.system.guild.role.guildRoleEventParsers
+import love.forte.simbot.kaiheila.event.system.message.messageEventParsers
+import love.forte.simbot.kaiheila.event.system.user.userEventParsers
 
 /**
  * 事件原始数据处理器，提供一个从事件得到的原始 [JsonElement]，将其反序列化为一个 [Event] 实例。
@@ -138,6 +141,12 @@ public object EventSignals {
 
 /**
  * 描述一个事件的解析定义, 使用对象或伴生对象实现此接口，提供于用户做事件监听的目标参数。
+ * ```kotlin
+ * bot.processor(XxxEvent) { event ->
+ *      // do..
+ * }
+ * ```
+ *
  */
 public interface KaiheilaEventParserDefinition<out EX : Event.Extra, out E : Event<EX>> {
 

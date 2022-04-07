@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -20,14 +20,14 @@ object P {
     object Simbot {
         val isSnapshot: Boolean = System.getProperty("isSnapshot")?.equals("true", true) ?: false
         const val GROUP = "love.forte.simbot"
-        const val REAL_VERSION = "3.0.0.preview.5.0"
+        const val REAL_VERSION = "3.0.0.preview.6.0"
         val VERSION = if (isSnapshot) "$REAL_VERSION-SNAPSHOT" else REAL_VERSION
     }
     object ComponentKaiheila {
         val isSnapshot: Boolean get() = Simbot.isSnapshot
         const val GROUP = "${Simbot.GROUP}.component"
         // 0: v3 api
-        const val REAL_VERSION = "0.0.2"
+        const val REAL_VERSION = "0.0.3"
         val VERSION = if (isSnapshot) "${Simbot.REAL_VERSION}-$REAL_VERSION-SNAPSHOT"
         else "${Simbot.REAL_VERSION}-$REAL_VERSION"
     }

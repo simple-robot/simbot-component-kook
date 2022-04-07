@@ -39,7 +39,7 @@ import love.forte.simbot.kaiheila.objects.Guild as KhlGuild
  *
  * @author ForteScarlet
  */
-internal class KaiheilaGuildImpl @OptIn(Api4J::class) constructor(
+internal class KaiheilaGuildImpl constructor(
     override val bot: KaiheilaComponentBotImpl,
     override val source: KhlGuild,
 ) : KaiheilaGuild, CoroutineScope {
