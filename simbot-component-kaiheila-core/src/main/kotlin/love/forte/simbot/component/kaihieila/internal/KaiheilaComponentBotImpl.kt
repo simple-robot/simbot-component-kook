@@ -26,10 +26,7 @@ import love.forte.simbot.component.kaihieila.KaiheilaBotManager
 import love.forte.simbot.component.kaihieila.KaiheilaComponent
 import love.forte.simbot.component.kaihieila.KaiheilaComponentBot
 import love.forte.simbot.component.kaihieila.KaiheilaComponentBotConfiguration
-import love.forte.simbot.component.kaihieila.event.KaiheilaBotSelfMessageEvent
-import love.forte.simbot.component.kaihieila.event.KaiheilaBotStartedEvent
-import love.forte.simbot.component.kaihieila.event.KaiheilaNormalMessageEvent
-import love.forte.simbot.component.kaihieila.event.UnsupportedKaiheilaEvent
+import love.forte.simbot.component.kaihieila.event.*
 import love.forte.simbot.component.kaihieila.internal.event.*
 import love.forte.simbot.component.kaihieila.message.AssetImage
 import love.forte.simbot.component.kaihieila.message.AssetMessage
@@ -38,6 +35,8 @@ import love.forte.simbot.component.kaihieila.message.AssetMessage.Key.asMessage
 import love.forte.simbot.component.kaihieila.message.SimpleAssetMessage
 import love.forte.simbot.component.kaihieila.util.requestDataBy
 import love.forte.simbot.definition.UserStatus
+import love.forte.simbot.event.Event
+import love.forte.simbot.event.EventProcessingResult
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kaiheila.KaiheilaBot
@@ -59,9 +58,7 @@ import love.forte.simbot.kaiheila.event.system.guild.UpdatedGuildExtraBody
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.guild.member.UpdatedGuildMemberEventBody
-import love.forte.simbot.kaiheila.event.system.user.SelfExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEventBody
+import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.resources.Resource
 import love.forte.simbot.utils.runInBlocking
 import org.slf4j.Logger
@@ -69,7 +66,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kaiheila.event.Event as khlEvent
 import love.forte.simbot.kaiheila.event.message.MessageEvent as KhlMessageEvent
 import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
 
@@ -373,19 +370,19 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region internal event process
-    private suspend fun KhlEvent<*>.internalPreProcessor() {
+    private suspend fun khlEvent<*>.internalPreProcessor() {
         when (val ex = extra) {
             // 系统事件
             is Sys<*> -> {
                 when (val body = ex.body) {
 
                     //region guild members
-                    // 退出频道服务器
+                    // 某人退出频道服务器
                     is ExitedGuildEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
                         guild.members.remove(body.userId.literal)?.also { it.cancel() }
                     }
-                    // 加入频道服务器
+                    // 某人加入频道服务器
                     is JoinedGuildEventBody -> {
                         // query user info.
                         val guild = internalGuild(this.targetId) ?: return
@@ -449,18 +446,18 @@ internal class KaiheilaComponentBotImpl(
         }
     }
 
-    private suspend fun KhlEvent<*>.internalProcessor() {
+    private suspend fun khlEvent<*>.internalProcessor() {
         when (this) {
             // 消息事件
             is KhlMessageEvent<*> -> {
                 when (channelType) {
                     KhlChannel.Type.PERSON -> {
                         if (isMe(authorId)) {
-                            eventProcessor.pushIfProcessable(KaiheilaBotSelfMessageEvent.Person) {
+                            pushIfProcessable(KaiheilaBotSelfMessageEvent.Person) {
                                 KaiheilaBotSelfPersonMessageEventImpl(this@KaiheilaComponentBotImpl, this)
                             }
                         } else {
-                            eventProcessor.pushIfProcessable(KaiheilaNormalMessageEvent.Person) {
+                            pushIfProcessable(KaiheilaNormalMessageEvent.Person) {
                                 KaiheilaNormalPersonMessageEventImpl(this@KaiheilaComponentBotImpl, this)
                             }
                         }
@@ -468,10 +465,10 @@ internal class KaiheilaComponentBotImpl(
                     }
                     KhlChannel.Type.GROUP -> {
                         val guild = internalGuild(extra.guildId) ?: return
-                        val author = guild.members[authorId.literal] ?: return
-                        val channel = guild.channels[targetId.literal] ?: return
+                        val author = guild.internalMember(authorId) ?: return
+                        val channel = guild.internalChannel(targetId) ?: return
                         if (isMe(authorId)) {
-                            eventProcessor.pushIfProcessable(KaiheilaBotSelfMessageEvent.Group) {
+                            pushIfProcessable(KaiheilaBotSelfMessageEvent.Group) {
                                 KaiheilaBotSelfGroupMessageEventImpl(
                                     this@KaiheilaComponentBotImpl,
                                     this,
@@ -481,7 +478,7 @@ internal class KaiheilaComponentBotImpl(
                             }
                         } else {
                             // push event
-                            eventProcessor.pushIfProcessable(KaiheilaNormalMessageEvent.Group) {
+                            pushIfProcessable(KaiheilaNormalMessageEvent.Group) {
                                 KaiheilaNormalGroupMessageEventImpl(
                                     this@KaiheilaComponentBotImpl,
                                     this,
@@ -497,16 +494,41 @@ internal class KaiheilaComponentBotImpl(
 
 
             // 系统事件
-            is SystemEvent<*, *> -> {
-                // yes
+            is SystemEvent<*, Sys<*>> -> {
+                // 准备资源
                 val guild = internalGuild(targetId) ?: return
-                val author = guild.members[authorId.literal] ?: return
-                val channel = guild.channels[targetId.literal] ?: return
+                val author = guild.internalMember(authorId) ?: return
+                val channel = guild.internalChannel(targetId) ?: return
+
+                @Suppress("UNCHECKED_CAST")
+                when(extra.body) {
+                    //region 成员变更相关
+                    is UserExitedChannelEventBody -> pushIfProcessable(KaiheilaMemberExitedChannelEvent) {
+                        KaiheilaMemberExitedChannelEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<UserExitedChannelEventBody>>, channel, author)
+                    }
+
+                    is UserJoinedChannelEventBody -> pushIfProcessable(KaiheilaMemberJoinedChannelEvent) {
+                        KaiheilaMemberJoinedChannelEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<UserJoinedChannelEventBody>>, channel, author) }
+
+                    is ExitedGuildEventBody -> pushIfProcessable(KaiheilaMemberExitedGuildEvent) {
+                        KaiheilaMemberExitedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<ExitedGuildEventBody>>, guild, author) }
+
+                    is JoinedGuildEventBody -> pushIfProcessable(KaiheilaMemberJoinedGuildEvent) {
+                        KaiheilaMemberJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<JoinedGuildEventBody>>, guild, author) }
+
+                    is SelfExitedGuildEventBody -> pushIfProcessable(KaiheilaBotSelfExitedGuildEvent) {
+                        KaiheilaBotSelfExitedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<SelfExitedGuildEventBody>>, guild, author) }
+
+                    is SelfJoinedGuildEventBody -> pushIfProcessable(KaiheilaBotSelfJoinedGuildEvent) {
+                        KaiheilaBotSelfJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<SelfJoinedGuildEventBody>>, guild, author) }
+                    //endregion
+                }
+
 
                 // TODO 申请事件
-                // TODO 频道增减
-                // TODO 服务器增减
-                // TODO 成员增减
+
+                // TODO other..
+
             }
 
 
@@ -521,6 +543,10 @@ internal class KaiheilaComponentBotImpl(
         }
 
 
+    }
+
+    private suspend inline fun pushIfProcessable(eventKey: Event.Key<*>, block: () -> Event): EventProcessingResult? {
+        return eventProcessor.pushIfProcessable(eventKey, block)
     }
 
     //endregion
