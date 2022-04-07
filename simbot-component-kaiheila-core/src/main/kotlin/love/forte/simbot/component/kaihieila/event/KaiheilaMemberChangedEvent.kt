@@ -21,22 +21,30 @@ import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.ActionType
+import love.forte.simbot.component.kaihieila.KaiheilaChannel
 import love.forte.simbot.component.kaihieila.KaiheilaGuild
 import love.forte.simbot.component.kaihieila.KaiheilaGuildMember
+import love.forte.simbot.definition.Organization
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.MemberChangedEvent
 import love.forte.simbot.event.MemberDecreaseEvent
 import love.forte.simbot.event.MemberIncreaseEvent
 import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEvent
+import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEvent
+import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.message.doSafeCast
 
 /**
  * 开黑啦的频道成员变更事件。
  *
- * 对应的开黑啦基础事件类型有：
+ * 相关的开黑啦**原始**事件类型有：
  * - [UserExitedChannelEvent]
  * - [UserJoinedChannelEvent]
+ * - [JoinedGuildEvent]
+ * - [ExitedGuildEvent]
  * - [SelfExitedGuildEvent]
  * - [SelfJoinedGuildEvent]
  *
@@ -45,32 +53,43 @@ import love.forte.simbot.message.doSafeCast
  * 因此会额外提供相对应的 [bot成员变动][KaiheilaBotMemberChangedEvent]
  * 事件类型来进行更精准的事件监听。
  *
- * @see KaiheilaBotMemberChangedEvent
- * @see UserExitedChannelEvent
- * @see UserJoinedChannelEvent
- * @see SelfExitedGuildEvent
- * @see SelfJoinedGuildEvent
+ * ## 相关事件
+ * ### 频道成员变更事件
+ * [KaiheilaMemberChannelChangedEvent] 事件及其子类型
+ * [KaiheilaMemberJoinedChannelEvent]、[KaiheilaMemberExitedChannelEvent]
+ * 代表了一个频道服务器中的某个群成员加入、离开某一个频道（通常为语音频道）的事件。
+ *
+ * ### 频道服务器成员变更事件
+ * [KaiheilaMemberGuildChangedEvent] 事件及其子类型
+ * [KaiheilaMemberJoinedGuildEvent]、[KaiheilaMemberExitedGuildEvent]
+ * 代表了一个频道服务器中有新群成员加入、旧成员离开此服务器的事件。
+ *
+ * ### Bot频道服务器事件
+ * [KaiheilaBotMemberChangedEvent] 事件及其子类型
+ * [KaiheilaBotSelfJoinedGuildEvent]、[KaiheilaBotSelfExitedGuildEvent]
+ * 代表了当前bot加入新频道服务器、离开旧频道服务器的事件。
+ *
  * @author forte
  */
-public abstract class KaiheilaMemberChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+public abstract class KaiheilaMemberChangedEvent<out B, Source : Organization, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
     KaiheilaEvent<Event.Extra.Sys<B>, Event<Event.Extra.Sys<B>>>(),
-    MemberChangedEvent<KaiheilaGuild, Before, After> {
+    MemberChangedEvent<Source, Before, After> {
 
 
     abstract override val before: Before
     abstract override val after: After
-    abstract override val source: KaiheilaGuild
+    abstract override val source: Source
 
     //// impl
     override suspend fun before(): Before = before
     override suspend fun after(): After = after
-    override suspend fun source(): KaiheilaGuild = source
+    override suspend fun source(): Source = source
 
     @OptIn(Api4J::class)
-    override val organization: KaiheilaGuild
+    override val organization: Source
         get() = source
 
-    override suspend fun organization(): KaiheilaGuild = source
+    override suspend fun organization(): Source = source
 
     override val id: ID
         get() = sourceEvent.msgId
@@ -86,24 +105,42 @@ public abstract class KaiheilaMemberChangedEvent<out B, Before : KaiheilaGuildMe
     abstract override val operator: KaiheilaGuildMember?
     override suspend fun operator(): KaiheilaGuildMember? = operator
 
-    public companion object Key : BaseEventKey<KaiheilaMemberChangedEvent<*, *, *>>(
+    public companion object Key : BaseEventKey<KaiheilaMemberChangedEvent<*, *, *, *>>(
         "kaiheila.member_changed", KaiheilaEvent, MemberChangedEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaMemberChangedEvent<*, *, *>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaMemberChangedEvent<*, *, *, *>? = doSafeCast(value)
     }
 
 }
+
+//region member相关
+
+//region 频道进出相关
+/**
+ * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道进出**相关的变更事件。
+ * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
+ */
+public abstract class KaiheilaMemberChannelChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+    KaiheilaMemberChangedEvent<B, KaiheilaChannel, Before, After>() {
+
+    public companion object Key : BaseEventKey<KaiheilaMemberChannelChangedEvent<*, *, *>>(
+        "kaiheila.member_channel_changed", KaiheilaMemberChangedEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaMemberChannelChangedEvent<*, *, *>? = doSafeCast(value)
+    }
+
+}
+
 
 /**
  * 开黑啦成员离开(频道)事件。
  *
  * @see UserExitedChannelEvent
- * @see SelfExitedGuildEvent
  * @author forte
  */
-public abstract class KaiheilaMemberExitedEvent :
-    KaiheilaMemberChangedEvent<UserExitedChannelEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
-    MemberDecreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+public abstract class KaiheilaMemberExitedChannelEvent :
+    KaiheilaMemberChannelChangedEvent<UserExitedChannelEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
+    MemberDecreaseEvent<KaiheilaChannel, KaiheilaGuildMember> {
 
     abstract override val target: KaiheilaGuildMember
 
@@ -113,6 +150,7 @@ public abstract class KaiheilaMemberExitedEvent :
         get() = target
     override val before: KaiheilaGuildMember
         get() = target
+
     override suspend fun target(): KaiheilaGuildMember = target
     override suspend fun after(): KaiheilaGuildMember? = after
     override suspend fun before(): KaiheilaGuildMember = before
@@ -124,17 +162,20 @@ public abstract class KaiheilaMemberExitedEvent :
         get() = ActionType.PROACTIVE
 
     /**
-     * 开黑啦群员离开频道事件的操作者始终为他自己 （无法确定操作者）。
+     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
-    override val operator: KaiheilaGuildMember get() = target
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(Api4J::class)
+    override val operator: KaiheilaGuildMember?
+        get() = null
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberExitedEvent>
+    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberExitedChannelEvent>
         get() = Key
 
-    public companion object Key : BaseEventKey<KaiheilaMemberExitedEvent>(
-        "kaiheila.member_exited", KaiheilaMemberChangedEvent, MemberDecreaseEvent
+    public companion object Key : BaseEventKey<KaiheilaMemberExitedChannelEvent>(
+        "kaiheila.member_exited_channel", KaiheilaMemberChannelChangedEvent, MemberDecreaseEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaMemberExitedEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaMemberExitedChannelEvent? = doSafeCast(value)
     }
 }
 
@@ -142,42 +183,177 @@ public abstract class KaiheilaMemberExitedEvent :
  * 开黑啦成员加入(频道)事件。
  *
  * @see UserJoinedChannelEvent
- * @see UserExitedChannelEvent
  * @author forte
  */
-public abstract class KaiheilaMemberJoinedEvent :
-    KaiheilaMemberChangedEvent<UserJoinedChannelEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
-    MemberIncreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+public abstract class KaiheilaMemberJoinedChannelEvent :
+    KaiheilaMemberChannelChangedEvent<UserJoinedChannelEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
+    MemberIncreaseEvent<KaiheilaChannel, KaiheilaGuildMember> {
 
     abstract override val target: KaiheilaGuildMember
 
     //// Impl props
+    override val after: KaiheilaGuildMember
+        get() = target
+    override val before: KaiheilaGuildMember?
+        get() = target
+
     override suspend fun target(): KaiheilaGuildMember = target
     override suspend fun after(): KaiheilaGuildMember = after
     override suspend fun before(): KaiheilaGuildMember? = before
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberJoinedEvent>
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     */
+    override val actionType: ActionType
+        get() = ActionType.PROACTIVE
+
+
+    /**
+     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(Api4J::class)
+    override val operator: KaiheilaGuildMember?
+        get() = null
+
+    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberJoinedChannelEvent>
         get() = Key
 
-    public companion object Key : BaseEventKey<KaiheilaMemberJoinedEvent>(
-        "kaiheila.member_joined", KaiheilaMemberChangedEvent, MemberIncreaseEvent
+    public companion object Key : BaseEventKey<KaiheilaMemberJoinedChannelEvent>(
+        "kaiheila.member_joined_channel", KaiheilaMemberChannelChangedEvent, MemberIncreaseEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaMemberJoinedEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaMemberJoinedChannelEvent? = doSafeCast(value)
+    }
+}
+//endregion
+
+
+//region 频道服务器进出
+/**
+ * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
+ * 这类事件代表某人加入、离开某个频道服务器。
+ */
+public abstract class KaiheilaMemberGuildChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+    KaiheilaMemberChangedEvent<B, KaiheilaGuild, Before, After>() {
+
+    public companion object Key : BaseEventKey<KaiheilaMemberGuildChangedEvent<*, *, *>>(
+        "kaiheila.member_guild_changed", KaiheilaMemberChangedEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaMemberGuildChangedEvent<*, *, *>? = doSafeCast(value)
     }
 }
 
 
 /**
- * 频道成员的变动事件中，变动本体为bot自身时的事件。对应开黑啦基础事件的 [SelfExitedGuildEvent] 和 [SelfJoinedGuildEvent]。
+ * 开黑啦成员离开(频道)事件。
+ *
+ * @see ExitedGuildEvent
+ * @author forte
+ */
+public abstract class KaiheilaMemberExitedGuildEvent :
+    KaiheilaMemberGuildChangedEvent<ExitedGuildEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
+    MemberDecreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+
+    abstract override val target: KaiheilaGuildMember
+
+
+    //// Impl props
+    override val after: KaiheilaGuildMember?
+        get() = target
+    override val before: KaiheilaGuildMember
+        get() = target
+
+    override suspend fun target(): KaiheilaGuildMember = target
+    override suspend fun after(): KaiheilaGuildMember? = after
+    override suspend fun before(): KaiheilaGuildMember = before
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     */
+    override val actionType: ActionType
+        get() = ActionType.PROACTIVE
+
+    /**
+     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(Api4J::class)
+    override val operator: KaiheilaGuildMember?
+        get() = null
+
+    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberExitedChannelEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KaiheilaMemberExitedChannelEvent>(
+        "kaiheila.member_exited_channel", KaiheilaMemberChannelChangedEvent, MemberDecreaseEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaMemberExitedChannelEvent? = doSafeCast(value)
+    }
+}
+
+/**
+ * 开黑啦成员加入(频道)事件。
+ *
+ * @see JoinedGuildEvent
+ * @author forte
+ */
+public abstract class KaiheilaMemberJoinedGuildEvent :
+    KaiheilaMemberGuildChangedEvent<JoinedGuildEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
+    MemberIncreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+
+    abstract override val target: KaiheilaGuildMember
+
+    //// Impl props
+    override val after: KaiheilaGuildMember
+        get() = target
+    override val before: KaiheilaGuildMember?
+        get() = target
+
+    override suspend fun target(): KaiheilaGuildMember = target
+    override suspend fun after(): KaiheilaGuildMember = after
+    override suspend fun before(): KaiheilaGuildMember? = before
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     */
+    override val actionType: ActionType
+        get() = ActionType.PROACTIVE
+
+
+    /**
+     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(Api4J::class)
+    override val operator: KaiheilaGuildMember?
+        get() = null
+
+    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberJoinedGuildEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KaiheilaMemberJoinedGuildEvent>(
+        "kaiheila.member_joined_guild", KaiheilaMemberGuildChangedEvent, MemberIncreaseEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaMemberJoinedGuildEvent? = doSafeCast(value)
+    }
+}
+
+//endregion
+
+
+//endregion
+
+
+//region bot相关
+/**
+ * 频道成员的变动事件中，变动本体为bot自身时的事件。对应开黑啦原始事件的 [SelfExitedGuildEvent] 和 [SelfJoinedGuildEvent]。
  *
  * @see KaiheilaBotMemberChangedEvent
- * @see SelfExitedGuildEvent
- * @see SelfJoinedGuildEvent
  *
  * @author forte
  */
 public abstract class KaiheilaBotMemberChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<B, Before, After>() {
+    KaiheilaMemberChangedEvent<B, KaiheilaGuild, Before, After>() {
     public companion object Key : BaseEventKey<KaiheilaBotMemberChangedEvent<*, *, *>>(
         "kaiheila.bot_member_changed", KaiheilaMemberChangedEvent
     ) {
@@ -192,44 +368,104 @@ public abstract class KaiheilaBotMemberChangedEvent<out B, Before : KaiheilaGuil
  * @see SelfExitedGuildEvent
  * @author forte
  */
-public abstract class KaiheilaBotSelfExitedEvent<out B> :
-    KaiheilaBotMemberChangedEvent<B, KaiheilaGuildMember, KaiheilaGuildMember>() {
-    // TODO
-
-    abstract override val before: KaiheilaGuildMember
-    abstract override val after: KaiheilaGuildMember
+public abstract class KaiheilaBotSelfExitedGuildEvent :
+    KaiheilaBotMemberChangedEvent<SelfExitedGuildEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
+    MemberDecreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+    /**
+     * 即bot自身在频道服务器内的信息。
+     */
+    abstract override val target: KaiheilaGuildMember
 
     //// Impl props
-    override suspend fun after(): KaiheilaGuildMember = before
-    override suspend fun before(): KaiheilaGuildMember = after
+    override val before: KaiheilaGuildMember
+        get() = target
 
-    public companion object Key : BaseEventKey<KaiheilaBotSelfExitedEvent<*>>(
-        "kaiheila.bot_self_exited", KaiheilaMemberExitedEvent
+    /**
+     * `after` 恒为null。
+     */
+    override val after: KaiheilaGuildMember?
+        get() = null
+
+
+    /**
+     * 开黑啦bot离开频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(Api4J::class)
+    override val operator: KaiheilaGuildMember?
+        get() = null
+
+    override suspend fun target(): KaiheilaGuildMember = target
+    override suspend fun after(): KaiheilaGuildMember? = after
+    override suspend fun before(): KaiheilaGuildMember = before
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     */
+    override val actionType: ActionType
+        get() = ActionType.PROACTIVE
+
+    override val key: love.forte.simbot.event.Event.Key<out KaiheilaBotSelfExitedGuildEvent>
+        get() = Key
+
+
+    public companion object Key : BaseEventKey<KaiheilaBotSelfExitedGuildEvent>(
+        "kaiheila.bot_self_exited", KaiheilaBotMemberChangedEvent, MemberDecreaseEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaBotSelfExitedEvent<*>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaBotSelfExitedGuildEvent? = doSafeCast(value)
     }
 }
 
 /**
  * 开黑啦BOT自身加入(频道)事件。
  *
- * @see UserExitedChannelEvent
+ * @see SelfJoinedGuildEvent
  * @author forte
  */
-public abstract class KaiheilaBotSelfJoinedEvent<out B> :
-    KaiheilaBotMemberChangedEvent<B, KaiheilaGuildMember, KaiheilaGuildMember>() {
-    // TODO
-
-    abstract override val before: KaiheilaGuildMember
-    abstract override val after: KaiheilaGuildMember
+public abstract class KaiheilaBotSelfJoinedGuildEvent :
+    KaiheilaBotMemberChangedEvent<SelfJoinedGuildEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
+    MemberIncreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+    /**
+     * 即bot自身在频道服务器内的信息。
+     */
+    abstract override val target: KaiheilaGuildMember
 
     //// Impl props
-    override suspend fun after(): KaiheilaGuildMember = before
-    override suspend fun before(): KaiheilaGuildMember = after
+    override val after: KaiheilaGuildMember
+        get() = target
 
-    public companion object Key : BaseEventKey<KaiheilaBotSelfExitedEvent<*>>(
-        "kaiheila.bot_self_joined", KaiheilaMemberExitedEvent
+    /**
+     * `before` 恒为null。
+     */
+    override val before: KaiheilaGuildMember?
+        get() = null
+
+    /**
+     * 开黑啦bot进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(Api4J::class)
+    override val operator: KaiheilaGuildMember?
+        get() = null
+
+
+    override suspend fun target(): KaiheilaGuildMember = target
+    override suspend fun after(): KaiheilaGuildMember = after
+    override suspend fun before(): KaiheilaGuildMember? = before
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     */
+    override val actionType: ActionType
+        get() = ActionType.PROACTIVE
+
+    override val key: love.forte.simbot.event.Event.Key<out KaiheilaBotSelfJoinedGuildEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KaiheilaBotSelfJoinedGuildEvent>(
+        "kaiheila.bot_self_joined", KaiheilaBotMemberChangedEvent, MemberIncreaseEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaBotSelfExitedEvent<*>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaBotSelfJoinedGuildEvent? = doSafeCast(value)
     }
 }
+//endregion
