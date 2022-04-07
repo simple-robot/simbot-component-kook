@@ -20,6 +20,7 @@ package love.forte.simbot.component.kaihieila.event
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
+import love.forte.simbot.action.ActionType
 import love.forte.simbot.component.kaihieila.KaiheilaGuild
 import love.forte.simbot.component.kaihieila.KaiheilaGuildMember
 import love.forte.simbot.event.BaseEventKey
@@ -108,9 +109,24 @@ public abstract class KaiheilaMemberExitedEvent :
 
 
     //// Impl props
+    override val after: KaiheilaGuildMember?
+        get() = target
+    override val before: KaiheilaGuildMember
+        get() = target
     override suspend fun target(): KaiheilaGuildMember = target
     override suspend fun after(): KaiheilaGuildMember? = after
     override suspend fun before(): KaiheilaGuildMember = before
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     */
+    override val actionType: ActionType
+        get() = ActionType.PROACTIVE
+
+    /**
+     * 开黑啦群员离开频道事件的操作者始终为他自己 （无法确定操作者）。
+     */
+    override val operator: KaiheilaGuildMember get() = target
 
     override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberExitedEvent>
         get() = Key

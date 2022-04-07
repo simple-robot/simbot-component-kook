@@ -468,8 +468,8 @@ internal class KaiheilaComponentBotImpl(
                     }
                     KhlChannel.Type.GROUP -> {
                         val guild = internalGuild(extra.guildId) ?: return
-                        val author = guild.members[authorId.literal] ?: return
-                        val channel = guild.channels[targetId.literal] ?: return
+                        val author = guild.internalMember(authorId) ?: return
+                        val channel = guild.internalChannel(targetId) ?: return
                         if (isMe(authorId)) {
                             eventProcessor.pushIfProcessable(KaiheilaBotSelfMessageEvent.Group) {
                                 KaiheilaBotSelfGroupMessageEventImpl(
@@ -498,10 +498,10 @@ internal class KaiheilaComponentBotImpl(
 
             // 系统事件
             is SystemEvent<*, *> -> {
-                // yes
+                // 准备资源
                 val guild = internalGuild(targetId) ?: return
-                val author = guild.members[authorId.literal] ?: return
-                val channel = guild.channels[targetId.literal] ?: return
+                val author = guild.internalMember(authorId) ?: return
+                val channel = guild.internalChannel(targetId) ?: return
 
                 // TODO 申请事件
                 // TODO 频道增减

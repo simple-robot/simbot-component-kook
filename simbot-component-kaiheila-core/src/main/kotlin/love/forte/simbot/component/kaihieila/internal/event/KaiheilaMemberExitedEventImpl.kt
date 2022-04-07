@@ -17,12 +17,10 @@
 
 package love.forte.simbot.component.kaihieila.internal.event
 
-import love.forte.simbot.Timestamp
-import love.forte.simbot.action.ActionType
-import love.forte.simbot.component.kaihieila.KaiheilaGuild
-import love.forte.simbot.component.kaihieila.KaiheilaGuildMember
 import love.forte.simbot.component.kaihieila.event.KaiheilaMemberExitedEvent
 import love.forte.simbot.component.kaihieila.internal.KaiheilaComponentBotImpl
+import love.forte.simbot.component.kaihieila.internal.KaiheilaGuildImpl
+import love.forte.simbot.component.kaihieila.internal.KaiheilaMemberImpl
 import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.system.user.UserExitedChannelEventBody
 
@@ -33,21 +31,8 @@ import love.forte.simbot.kaiheila.event.system.user.UserExitedChannelEventBody
 internal class KaiheilaMemberExitedEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
-) : KaiheilaMemberExitedEvent() {
-
-    override val timestamp: Timestamp = sourceEvent.extra.body.exitedAt
-
-    /**
-     * 开黑啦事件无法区分用户的离开是否为被踢。
-     * 因此统一视为 [主动][ActionType.PROACTIVE] 离开。
-     */
-    override val actionType: ActionType get() = ActionType.PROACTIVE
+    override val source: KaiheilaGuildImpl,
+    override val target: KaiheilaMemberImpl
+) : KaiheilaMemberExitedEvent()
 
 
-    override val source: KaiheilaGuild = TODO()
-
-    override val operator: KaiheilaGuildMember?
-        get() = TODO("Not yet implemented")
-    override val target: KaiheilaGuildMember
-        get() = TODO("Not yet implemented")
-}

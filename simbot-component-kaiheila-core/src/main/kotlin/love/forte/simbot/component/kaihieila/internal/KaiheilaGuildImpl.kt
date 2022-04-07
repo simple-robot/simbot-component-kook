@@ -72,9 +72,21 @@ internal class KaiheilaGuildImpl constructor(
     override var icon: String = source.icon
         internal set
 
+    @JvmSynthetic
     internal lateinit var channels: ConcurrentHashMap<String, KaiheilaChannelImpl>
+    @JvmSynthetic
     internal lateinit var members: ConcurrentHashMap<String, KaiheilaMemberImpl>
 
+    @JvmSynthetic
+    internal fun internalChannel(id: ID): KaiheilaChannelImpl? = internalChannel(id.literal)
+    @JvmSynthetic
+    internal fun internalChannel(id: String): KaiheilaChannelImpl? = channels[id]
+    @JvmSynthetic
+    internal fun internalMember(id: ID): KaiheilaMemberImpl? = internalMember(id.literal)
+    @JvmSynthetic
+    internal fun internalMember(id: String): KaiheilaMemberImpl? = members[id]
+
+    @JvmSynthetic
     private lateinit var ownerMember: KaiheilaMemberImpl
 
     @Volatile
