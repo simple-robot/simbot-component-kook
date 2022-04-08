@@ -22,8 +22,11 @@ import love.forte.simbot.component.kaihieila.internal.KaiheilaChannelImpl
 import love.forte.simbot.component.kaihieila.internal.KaiheilaComponentBotImpl
 import love.forte.simbot.component.kaihieila.internal.KaiheilaGuildImpl
 import love.forte.simbot.component.kaihieila.internal.KaiheilaGuildMemberImpl
+import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOfflineEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOnlineEventBody
 import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.SelfExitedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
@@ -77,3 +80,21 @@ internal data class KaiheilaBotSelfJoinedGuildEventImpl(
     override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaBotSelfJoinedGuildEvent()
 
+
+internal data class KaiheilaMemberOnlineEventImpl(
+    override val bot: KaiheilaComponentBotImpl,
+    override val sourceEvent: Event<Event.Extra.Sys<GuildMemberOnlineEventBody>>,
+    override val source: UserInfo
+) : KaiheilaUserOnlineStatusChangedEvent.Online() {
+    override val guilds: Sequence<KaiheilaGuildImpl?>
+        get() = guildIds.asSequence().map { bot.internalGuild(it) }
+}
+
+internal data class KaiheilaMemberOfflineEventImpl(
+    override val bot: KaiheilaComponentBotImpl,
+    override val sourceEvent: Event<Event.Extra.Sys<GuildMemberOfflineEventBody>>,
+    override val source: UserInfo
+) : KaiheilaUserOnlineStatusChangedEvent.Offline() {
+    override val guilds: Sequence<KaiheilaGuildImpl?>
+        get() = guildIds.asSequence().map { bot.internalGuild(it) }
+}

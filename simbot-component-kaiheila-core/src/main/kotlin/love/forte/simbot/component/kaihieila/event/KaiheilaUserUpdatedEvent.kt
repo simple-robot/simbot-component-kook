@@ -46,9 +46,6 @@ public abstract class KaiheilaUserUpdatedEvent :
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 
-    override val visibleScope: Event.VisibleScope
-        get() = Event.VisibleScope.PUBLIC
-
     override val source: ID
         get() = sourceBody.userId
 

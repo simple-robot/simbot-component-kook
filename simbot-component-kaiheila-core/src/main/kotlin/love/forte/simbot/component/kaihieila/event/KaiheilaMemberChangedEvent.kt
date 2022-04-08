@@ -18,22 +18,24 @@
 package love.forte.simbot.component.kaihieila.event
 
 import love.forte.simbot.Api4J
+import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.ActionType
 import love.forte.simbot.component.kaihieila.KaiheilaChannel
 import love.forte.simbot.component.kaihieila.KaiheilaGuild
 import love.forte.simbot.component.kaihieila.KaiheilaGuildMember
+import love.forte.simbot.component.kaihieila.event.KaiheilaUserOnlineStatusChangedEvent.Offline
+import love.forte.simbot.component.kaihieila.event.KaiheilaUserOnlineStatusChangedEvent.Online
 import love.forte.simbot.definition.Organization
-import love.forte.simbot.event.BaseEventKey
-import love.forte.simbot.event.MemberChangedEvent
-import love.forte.simbot.event.MemberDecreaseEvent
-import love.forte.simbot.event.MemberIncreaseEvent
-import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEvent
-import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEvent
-import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
+import love.forte.simbot.definition.UserInfo
+import love.forte.simbot.event.*
+import love.forte.simbot.kaiheila.event.Event.Extra.Sys
+import love.forte.simbot.kaiheila.event.system.guild.member.*
 import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.message.doSafeCast
+import java.util.stream.Stream
+import kotlin.streams.asStream
+import love.forte.simbot.kaiheila.event.Event as KhlEvent
 
 /**
  * 开黑啦的频道成员变更事件。
@@ -91,9 +93,6 @@ public abstract class KaiheilaMemberChangedEvent<out Body, Source : Organization
 
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
-
-    override val visibleScope: love.forte.simbot.event.Event.VisibleScope
-        get() = love.forte.simbot.event.Event.VisibleScope.PUBLIC
 
 
     @OptIn(Api4J::class)
@@ -164,7 +163,7 @@ public abstract class KaiheilaMemberExitedChannelEvent :
     override val operator: KaiheilaGuildMember?
         get() = null
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberExitedChannelEvent>
+    override val key: Event.Key<out KaiheilaMemberExitedChannelEvent>
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberExitedChannelEvent>(
@@ -211,7 +210,7 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
     override val operator: KaiheilaGuildMember?
         get() = null
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberJoinedChannelEvent>
+    override val key: Event.Key<out KaiheilaMemberJoinedChannelEvent>
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberJoinedChannelEvent>(
@@ -276,7 +275,7 @@ public abstract class KaiheilaMemberExitedGuildEvent :
     override val operator: KaiheilaGuildMember?
         get() = null
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberExitedChannelEvent>
+    override val key: Event.Key<out KaiheilaMemberExitedChannelEvent>
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberExitedChannelEvent>(
@@ -323,7 +322,7 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
     override val operator: KaiheilaGuildMember?
         get() = null
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaMemberJoinedGuildEvent>
+    override val key: Event.Key<out KaiheilaMemberJoinedGuildEvent>
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberJoinedGuildEvent>(
@@ -400,7 +399,7 @@ public abstract class KaiheilaBotSelfExitedGuildEvent :
     override val actionType: ActionType
         get() = ActionType.PROACTIVE
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaBotSelfExitedGuildEvent>
+    override val key: Event.Key<out KaiheilaBotSelfExitedGuildEvent>
         get() = Key
 
 
@@ -454,7 +453,7 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
     override val actionType: ActionType
         get() = ActionType.PROACTIVE
 
-    override val key: love.forte.simbot.event.Event.Key<out KaiheilaBotSelfJoinedGuildEvent>
+    override val key: Event.Key<out KaiheilaBotSelfJoinedGuildEvent>
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaBotSelfJoinedGuildEvent>(
@@ -465,4 +464,165 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
 }
 //endregion
 
+/**
+ * 开黑啦用户在线状态变更相关事件的抽象父类。
+ *
+ * 涉及到的原始事件有：
+ * - [GuildMemberOfflineEvent]
+ * - [GuildMemberOnlineEvent]
+ *
+ * 此事件及相关事件属于 [ChangedEvent] 事件，[变化主体][source] 为相对应的[基础用户信息][UserInfo]，变更[前][before] [后][after] 为其上下线的状态。
+ * 其中变更前后的值满足 [before] == ![after], 且 [after] 永远代表此事件发生后此用户的在线状态。
+ * 也因此而满足 [after] == [isOnline].
+ *
+ * 当 [after] == true 时，代表此人由离线状态变为在线状态，反之同理。
+ *
+ * ## 变化主体
+ * 因为用户在线/离线事件所提供的用户并未一个具体的频道用户，因此事件主体是一个基础的 [用户信息][UserInfo]
+ *
+ * ## 子类型
+ * 此事件是密封的，如果你只想监听某人的上线或下线中的其中一种事件，则考虑监听此事件类的具体子类型。
+ *
+ * @see Online
+ * @see Offline
+ *
+ * @author forte
+ */
+public sealed class KaiheilaUserOnlineStatusChangedEvent :
+    KaiheilaSystemEvent<GuildMemberEventExtraBody>(),
+    ChangedEvent<UserInfo, Boolean, Boolean> {
+    abstract override val source: UserInfo
+    public abstract val isOnline: Boolean
 
+    /**
+     * 此用户与当前bot所同处的频道服务器的id列表。
+     *
+     * @see GuildMemberOnlineEventBody.guilds
+     * @see GuildMemberOfflineEventBody.guilds
+     */
+    public abstract val guildIds: List<ID>
+
+    /**
+     * 通过 [guildIds] 信息获取各个ID对应的 [KaiheilaGuild] 实例。
+     *
+     * 可能存在获取不到的情况，因此 [guilds] 序列中的元素 **可能为null**。
+     *
+     * 可以考虑过滤空值：
+     * ```kotlin
+     * val guilds = event.guilds.filterNotNull()
+     * ```
+     *
+     * 来相对安全的使用序列。
+     *
+     */
+    @get:JvmSynthetic
+    public abstract val guilds: Sequence<KaiheilaGuild?>
+
+
+    /**
+     * 通过 [guildIds] 信息获取各个ID对应的 [KaiheilaGuild] 实例。
+     *
+     * 可能存在获取不到的情况，因此 [guilds] 序列中的元素 **可能为null**。
+     *
+     * 可以考虑过滤空值：
+     * ```java
+     * final Stream<KaiheilaGuild> guilds = event.getGuilds().filter(Objects::nonNull)
+     * ```
+     *
+     * 来相对安全的使用流。
+     *
+     */
+    @Api4J
+    @get:JvmName("getGuilds")
+    public val guildStream: Stream<KaiheilaGuild?> get() = guilds.asStream()
+
+
+    //// Impls
+
+
+    override val before: Boolean get() = !isOnline
+    override val after: Boolean get() = isOnline
+
+    override suspend fun source(): UserInfo = source
+    override suspend fun before(): Boolean = before
+    override suspend fun after(): Boolean = after
+
+    override val changedTime: Timestamp
+        get() = sourceEvent.msgTimestamp
+
+
+    override val key: Event.Key<out KaiheilaUserOnlineStatusChangedEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KaiheilaUserOnlineStatusChangedEvent>(
+        "kaiheila.guild_member_online_status_changed", KaiheilaSystemEvent, ChangedEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaUserOnlineStatusChangedEvent? = doSafeCast(value)
+    }
+
+
+    /**
+     * [KaiheilaUserOnlineStatusChangedEvent] 对于用户上线的事件子类型。
+     *
+     */
+    public abstract class Online : KaiheilaUserOnlineStatusChangedEvent() {
+        abstract override val sourceEvent: KhlEvent<Sys<GuildMemberOnlineEventBody>>
+
+        /**
+         * 此事件代表上线，[isOnline] == true.
+         */
+        override val isOnline: Boolean
+            get() = true
+
+        override val sourceBody: GuildMemberOnlineEventBody
+            get() = sourceEvent.extra.body
+
+        public val userId: ID
+            get() = sourceBody.userId
+
+        override val changedTime: Timestamp
+            get() = sourceBody.eventTime
+
+        override val guildIds: List<ID>
+            get() = sourceBody.guilds
+
+
+        public companion object Key :
+            BaseEventKey<Online>("kaiheila.member_online", KaiheilaUserOnlineStatusChangedEvent) {
+            override fun safeCast(value: Any): Online? = doSafeCast(value)
+        }
+    }
+
+    /**
+     * [KaiheilaUserOnlineStatusChangedEvent] 对于用户离线的事件子类型。
+     *
+     */
+    public abstract class Offline : KaiheilaUserOnlineStatusChangedEvent() {
+        abstract override val sourceEvent: KhlEvent<Sys<GuildMemberOfflineEventBody>>
+
+        /**
+         * 此事件代表下线，[isOnline] == false.
+         */
+        override val isOnline: Boolean
+            get() = false
+
+        override val sourceBody: GuildMemberOfflineEventBody
+            get() = sourceEvent.extra.body
+
+        public val userId: ID
+            get() = sourceBody.userId
+
+        override val changedTime: Timestamp
+            get() = sourceBody.eventTime
+
+        override val guildIds: List<ID>
+            get() = sourceBody.guilds
+
+        public companion object Key :
+            BaseEventKey<Offline>("kaiheila.member_offline", KaiheilaUserOnlineStatusChangedEvent) {
+            override fun safeCast(value: Any): Offline? = doSafeCast(value)
+        }
+    }
+
+
+}
