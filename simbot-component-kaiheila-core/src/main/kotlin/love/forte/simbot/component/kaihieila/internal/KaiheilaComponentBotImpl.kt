@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
-import love.forte.simbot.kaiheila.event.Event as khlEvent
+import love.forte.simbot.kaiheila.event.Event as KhlEvent
 import love.forte.simbot.kaiheila.event.message.MessageEvent as KhlMessageEvent
 import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
 
@@ -370,7 +370,7 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region internal event process
-    private suspend fun khlEvent<*>.internalPreProcessor() {
+    private suspend fun KhlEvent<*>.internalPreProcessor() {
         when (val ex = extra) {
             // 系统事件
             is Sys<*> -> {
@@ -446,7 +446,7 @@ internal class KaiheilaComponentBotImpl(
         }
     }
 
-    private suspend fun khlEvent<*>.internalProcessor() {
+    private suspend fun KhlEvent<*>.internalProcessor() {
         when (this) {
             // 消息事件
             is KhlMessageEvent<*> -> {
@@ -504,23 +504,29 @@ internal class KaiheilaComponentBotImpl(
                 when(extra.body) {
                     //region 成员变更相关
                     is UserExitedChannelEventBody -> pushIfProcessable(KaiheilaMemberExitedChannelEvent) {
-                        KaiheilaMemberExitedChannelEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<UserExitedChannelEventBody>>, channel, author)
+                        KaiheilaMemberExitedChannelEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<UserExitedChannelEventBody>>, channel, author)
                     }
 
                     is UserJoinedChannelEventBody -> pushIfProcessable(KaiheilaMemberJoinedChannelEvent) {
-                        KaiheilaMemberJoinedChannelEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<UserJoinedChannelEventBody>>, channel, author) }
+                        KaiheilaMemberJoinedChannelEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<UserJoinedChannelEventBody>>, channel, author) }
 
                     is ExitedGuildEventBody -> pushIfProcessable(KaiheilaMemberExitedGuildEvent) {
-                        KaiheilaMemberExitedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<ExitedGuildEventBody>>, guild, author) }
+                        KaiheilaMemberExitedGuildEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<ExitedGuildEventBody>>, guild, author) }
 
                     is JoinedGuildEventBody -> pushIfProcessable(KaiheilaMemberJoinedGuildEvent) {
-                        KaiheilaMemberJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<JoinedGuildEventBody>>, guild, author) }
+                        KaiheilaMemberJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<JoinedGuildEventBody>>, guild, author) }
 
                     is SelfExitedGuildEventBody -> pushIfProcessable(KaiheilaBotSelfExitedGuildEvent) {
-                        KaiheilaBotSelfExitedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<SelfExitedGuildEventBody>>, guild, author) }
+                        KaiheilaBotSelfExitedGuildEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<SelfExitedGuildEventBody>>, guild, author) }
 
                     is SelfJoinedGuildEventBody -> pushIfProcessable(KaiheilaBotSelfJoinedGuildEvent) {
-                        KaiheilaBotSelfJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<SelfJoinedGuildEventBody>>, guild, author) }
+                        KaiheilaBotSelfJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<SelfJoinedGuildEventBody>>, guild, author) }
+                    //endregion
+
+                    //region 用户信息更新事件
+                    is UserUpdatedEventBody -> pushIfProcessable(KaiheilaUserUpdatedEvent) {
+                        KaiheilaUserUpdatedEventImpl(this@KaiheilaComponentBotImpl, this as KhlEvent<Sys<UserUpdatedEventBody>>)
+                    }
                     //endregion
 
                     // TODO 申请事件
