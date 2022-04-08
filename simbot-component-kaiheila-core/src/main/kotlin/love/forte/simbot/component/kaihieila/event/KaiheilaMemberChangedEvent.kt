@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kaihieila.event
 
 import love.forte.simbot.Api4J
-import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.ActionType
 import love.forte.simbot.component.kaihieila.KaiheilaChannel
@@ -29,7 +28,6 @@ import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.MemberChangedEvent
 import love.forte.simbot.event.MemberDecreaseEvent
 import love.forte.simbot.event.MemberIncreaseEvent
-import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEvent
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEvent
@@ -71,8 +69,8 @@ import love.forte.simbot.message.doSafeCast
  *
  * @author forte
  */
-public abstract class KaiheilaMemberChangedEvent<out B, Source : Organization, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaEvent<Event.Extra.Sys<B>, Event<Event.Extra.Sys<B>>>(),
+public abstract class KaiheilaMemberChangedEvent<out Body, Source : Organization, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+    KaiheilaSystemEvent<Body>(),
     MemberChangedEvent<Source, Before, After> {
 
 
@@ -90,9 +88,6 @@ public abstract class KaiheilaMemberChangedEvent<out B, Source : Organization, B
         get() = source
 
     override suspend fun organization(): Source = source
-
-    override val id: ID
-        get() = sourceEvent.msgId
 
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
@@ -120,8 +115,8 @@ public abstract class KaiheilaMemberChangedEvent<out B, Source : Organization, B
  * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道进出**相关的变更事件。
  * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
-public abstract class KaiheilaMemberChannelChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<B, KaiheilaChannel, Before, After>() {
+public abstract class KaiheilaMemberChannelChangedEvent<out Body, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+    KaiheilaMemberChangedEvent<Body, KaiheilaChannel, Before, After>() {
 
     public companion object Key : BaseEventKey<KaiheilaMemberChannelChangedEvent<*, *, *>>(
         "kaiheila.member_channel_changed", KaiheilaMemberChangedEvent
@@ -233,8 +228,8 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
  * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
  */
-public abstract class KaiheilaMemberGuildChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<B, KaiheilaGuild, Before, After>() {
+public abstract class KaiheilaMemberGuildChangedEvent<out Body, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+    KaiheilaMemberChangedEvent<Body, KaiheilaGuild, Before, After>() {
 
     public companion object Key : BaseEventKey<KaiheilaMemberGuildChangedEvent<*, *, *>>(
         "kaiheila.member_guild_changed", KaiheilaMemberChangedEvent
@@ -352,8 +347,8 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
  *
  * @author forte
  */
-public abstract class KaiheilaBotMemberChangedEvent<out B, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<B, KaiheilaGuild, Before, After>() {
+public abstract class KaiheilaBotMemberChangedEvent<out Body, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+    KaiheilaMemberChangedEvent<Body, KaiheilaGuild, Before, After>() {
     public companion object Key : BaseEventKey<KaiheilaBotMemberChangedEvent<*, *, *>>(
         "kaiheila.bot_member_changed", KaiheilaMemberChangedEvent
     ) {
@@ -469,3 +464,5 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
     }
 }
 //endregion
+
+

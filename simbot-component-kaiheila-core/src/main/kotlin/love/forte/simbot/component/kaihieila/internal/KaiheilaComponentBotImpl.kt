@@ -522,12 +522,16 @@ internal class KaiheilaComponentBotImpl(
                     is SelfJoinedGuildEventBody -> pushIfProcessable(KaiheilaBotSelfJoinedGuildEvent) {
                         KaiheilaBotSelfJoinedGuildEventImpl(this@KaiheilaComponentBotImpl, this as khlEvent<Sys<SelfJoinedGuildEventBody>>, guild, author) }
                     //endregion
+
+                    // TODO 申请事件
+
+
+                    // TODO other..
+
                 }
 
 
-                // TODO 申请事件
 
-                // TODO other..
 
             }
 
