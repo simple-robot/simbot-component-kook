@@ -17,10 +17,11 @@
 
 package love.forte.simboot.component.kaiheila
 
-import love.forte.di.annotation.*
-import love.forte.simbot.*
-import love.forte.simbot.component.kaihieila.*
-import javax.inject.*
+import love.forte.di.annotation.Configurable
+import love.forte.di.annotation.SpareBean
+import love.forte.simbot.LoggerFactory
+import love.forte.simbot.component.kaiheila.KaiheilaBotManagerConfiguration
+import javax.inject.Named
 
 
 /**

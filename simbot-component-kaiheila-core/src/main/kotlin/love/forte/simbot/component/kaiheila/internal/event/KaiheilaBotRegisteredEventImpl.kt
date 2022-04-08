@@ -15,27 +15,15 @@
  *
  */
 
-package love.forte.simboot.component.kaiheila
+package love.forte.simbot.component.kaiheila.internal.event
 
-import love.forte.di.annotation.Depend
-import love.forte.simboot.factory.BotRegistrarFactory
-import love.forte.simbot.BotRegistrar
-import love.forte.simbot.component.kaiheila.kaiheilaBotManager
-import love.forte.simbot.event.EventProcessor
-import javax.inject.Named
-
+import love.forte.simbot.component.kaiheila.event.KaiheilaBotRegisteredEvent
+import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
 
 /**
  *
  * @author ForteScarlet
  */
-@Named("tencentGuildBotRegistrarFactory")
-public class KaiheilaBotRegistrarFactory @Depend(required = false) constructor(
-    @Depend(required = false) private val configure: KaiheilaBotManagerConfigure? = null
-) : BotRegistrarFactory {
-    override fun invoke(processor: EventProcessor): BotRegistrar {
-        return kaiheilaBotManager(processor) {
-            configure?.config(this)
-        }
-    }
+internal class KaiheilaBotRegisteredEventImpl(override val bot: KaiheilaComponentBotImpl) :
+    KaiheilaBotRegisteredEvent() {
 }
