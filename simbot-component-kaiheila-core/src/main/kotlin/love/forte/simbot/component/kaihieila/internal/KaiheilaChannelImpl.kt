@@ -20,6 +20,7 @@ package love.forte.simbot.component.kaihieila.internal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Limiter
@@ -29,6 +30,7 @@ import love.forte.simbot.component.kaihieila.KaiheilaGuildMember
 import love.forte.simbot.component.kaihieila.message.KaiheilaApiRequestedReceipt
 import love.forte.simbot.component.kaihieila.message.KaiheilaChannelMessageDetailsContent
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
+import love.forte.simbot.component.kaihieila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.component.kaihieila.message.toRequest
 import love.forte.simbot.component.kaihieila.util.requestDataBy
 import love.forte.simbot.definition.Role
@@ -81,8 +83,8 @@ internal class KaiheilaChannelImpl(
         guild.members(groupingId, limiter)
 
 
-    override suspend fun send(message: Message): MessageReceipt {
-        val request = message.toRequest(targetId = source.id)
+    override suspend fun send(message: Message, tempTargetId: ID?): MessageReceipt {
+        val request = message.toRequest(targetId = source.id, tempTargetId = tempTargetId)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
 
         val result = request.requestDataBy(bot)
@@ -94,29 +96,45 @@ internal class KaiheilaChannelImpl(
         }
     }
 
-    override suspend fun send(message: MessageContent): MessageReceipt {
-        return if (message is KaiheilaChannelMessageDetailsContent) {
-            val source = message.source
-            MessageCreateRequest(
-                type = source.type.type,
-                targetId = source.targetId,
-                content = source.content,
-                quote = null,
-                nonce = null,
-                tempTargetId = null,
-            ).requestDataBy(bot).asReceipt(false, bot)
-        } else {
-            send(message.messages)
+    override suspend fun send(message: MessageContent, tempTargetId: ID?): MessageReceipt {
+        return when (message) {
+            is KaiheilaReceiveMessageContent -> {
+                val source = message.source
+                MessageCreateRequest(
+                    type = source.type.type,
+                    targetId = this.id,
+                    content = source.content,
+                    quote = null,
+                    nonce = null,
+                    tempTargetId = tempTargetId,
+                ).requestDataBy(bot).asReceipt(false, bot)
+            }
+            is KaiheilaChannelMessageDetailsContent -> {
+                val details = message.details
+                MessageCreateRequest(
+                    type = details.type,
+                    targetId = this.id,
+                    content = details.content,
+                    quote = details.quote?.id,
+                    nonce = null,
+                    tempTargetId = tempTargetId,
+                ).requestDataBy(bot).asReceipt(false, bot)
+            }
+            else -> {
+                send(message.messages)
+            }
         }
     }
 
     @Api4J
     override fun getRoles(groupingId: ID?, limiter: Limiter): Stream<out Role> {
-        TODO("Not yet implemented")
+        return Stream.empty()
+        // TODO("Not yet implemented")
     }
 
     override suspend fun roles(groupingId: ID?, limiter: Limiter): Flow<Role> {
-        TODO("Not yet implemented")
+        return emptyFlow()
+        // TODO("Not yet implemented")
     }
 
     override fun toString(): String {

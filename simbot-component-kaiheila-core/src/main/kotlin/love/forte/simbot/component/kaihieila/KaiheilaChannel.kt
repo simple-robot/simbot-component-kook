@@ -135,6 +135,38 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
         return send(request)
     }
 
+
+    /**
+     * 发送纯文本消息，并指定 [tempTargetId].
+     *
+     * @see MessageCreateRequest.tempTargetId
+     */
+    @JvmSynthetic
+    public suspend fun send(text: String, tempTargetId: ID?): KaiheilaMessageCreatedReceipt {
+        return send(
+            MessageType.TEXT.type,
+            text,
+            null, null, tempTargetId
+        )
+    }
+
+    /**
+     * 发送消息，并指定 [tempTargetId].
+     *
+     * @see MessageCreateRequest.tempTargetId
+     */
+    @JvmSynthetic
+    public suspend fun send(message: Message, tempTargetId: ID?): MessageReceipt
+
+    /**
+     * 发送消息，并指定 [tempTargetId].
+     *
+     * @see MessageCreateRequest.tempTargetId
+     */
+    @JvmSynthetic
+    public suspend fun send(message: MessageContent, tempTargetId: ID?): MessageReceipt
+
+
     /**
      * 发送纯文本消息。
      */
@@ -146,38 +178,64 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
             null, null, null
         )
     }
+    /**
+     * 发送消息。
+     */
+    @JvmSynthetic
+    override suspend fun send(message: Message): MessageReceipt = send(message, null)
 
     /**
      * 发送消息。
      */
     @JvmSynthetic
-    override suspend fun send(message: Message): MessageReceipt
+    override suspend fun send(message: MessageContent): MessageReceipt = send(message, null)
+
+
 
     /**
-     * 发送消息。
+     * 发送纯文本消息，并指定 [tempTargetId].
+     *
+     * @see MessageCreateRequest.tempTargetId
      */
-    @JvmSynthetic
-    override suspend fun send(message: MessageContent): MessageReceipt
+    @Api4J
+    public fun sendBlocking(text: String, tempTargetId: ID?): KaiheilaMessageCreatedReceipt = runInBlocking {
+        send(text, tempTargetId)
+    }
+
+    /**
+     * 发送消息，并指定 [tempTargetId].
+     *
+     * @see MessageCreateRequest.tempTargetId
+     */
+    @Api4J
+    public fun sendBlocking(message: Message, tempTargetId: ID?): MessageReceipt = runInBlocking { send(message, tempTargetId) }
+
+    /**
+     * 发送消息，并指定 [tempTargetId].
+     *
+     * @see MessageCreateRequest.tempTargetId
+     */
+    @Api4J
+    public fun sendBlocking(message: MessageContent, tempTargetId: ID?): MessageReceipt = runInBlocking { send(message, tempTargetId) }
 
     /**
      * 发送纯文本消息。
      */
     @Api4J
-    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt = runInBlocking {
-        sendBlocking(text)
-    }
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt = sendBlocking(text, null)
 
     /**
      * 发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: Message): MessageReceipt = runInBlocking { send(message) }
+    override fun sendBlocking(message: Message): MessageReceipt = sendBlocking(message, null)
 
     /**
      * 发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): MessageReceipt = runInBlocking { send(message) }
+    override fun sendBlocking(message: MessageContent): MessageReceipt = sendBlocking(message, null)
+
     //endregion
 
     //region Invalid api
