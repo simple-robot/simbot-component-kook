@@ -17,16 +17,19 @@
 
 package example
 
-import kotlinx.serialization.json.*
-import kotlinx.serialization.modules.*
-import love.forte.simbot.*
-import love.forte.simbot.component.kaihieila.*
-import love.forte.simbot.component.kaihieila.message.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.api.asset.*
-import love.forte.simbot.kaiheila.objects.*
-import love.forte.simbot.message.*
-import kotlin.test.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.plus
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.component.kaiheila.KaiheilaComponent
+import love.forte.simbot.component.kaiheila.message.AssetImage
+import love.forte.simbot.component.kaiheila.message.AtAllHere
+import love.forte.simbot.component.kaiheila.message.KMarkdownMessage
+import love.forte.simbot.kaiheila.api.ApiResultType
+import love.forte.simbot.kaiheila.api.asset.AssetCreated
+import love.forte.simbot.kaiheila.objects.buildKMarkdown
+import love.forte.simbot.message.Messages
+import love.forte.simbot.message.buildMessages
+import kotlin.test.Test
 
 /**
  *
