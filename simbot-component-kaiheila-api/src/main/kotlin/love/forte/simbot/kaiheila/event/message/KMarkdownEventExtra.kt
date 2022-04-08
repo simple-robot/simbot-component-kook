@@ -17,10 +17,15 @@
 
 package love.forte.simbot.kaiheila.event.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.event.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.LongID
+import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kaiheila.objects.KMarkdown
+import love.forte.simbot.kaiheila.objects.RawValueKMarkdown
+import love.forte.simbot.kaiheila.objects.User
 
 /**
  * [KMarkdown消息事件](https://developer.kaiheila.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF)
@@ -32,9 +37,9 @@ public interface KMarkdownEventExtra : MessageEventExtra {
     override val guildId: ID
     override val channelName: String
     override val mention: List<ID>
-    override val mentionAll: Boolean
+    override val isMentionAll: Boolean
     override val mentionRoles: List<ID>
-    override val mentionHere: Boolean
+    override val isMentionHere: Boolean
 
     override val author: User
     public val kmarkdown: KMarkdown
@@ -55,11 +60,11 @@ internal data class KMarkdownEventExtraImpl(
     override val channelName: String = "",
     override val mention: List<CharSequenceID> = emptyList(),
     @SerialName("mention_all")
-    override val mentionAll: Boolean = false,
+    override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
     override val mentionRoles: List<LongID> = emptyList(),
     @SerialName("mention_here")
-    override val mentionHere: Boolean = false,
+    override val isMentionHere: Boolean = false,
 
     override val author: User,
     override val kmarkdown: RawValueKMarkdown,

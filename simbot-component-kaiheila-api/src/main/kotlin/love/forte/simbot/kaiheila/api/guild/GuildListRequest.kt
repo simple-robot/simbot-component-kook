@@ -18,10 +18,15 @@
 package love.forte.simbot.kaiheila.api.guild
 
 import io.ktor.http.*
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
 import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.kaiheila.objects.Channel
+import love.forte.simbot.kaiheila.objects.Guild
+import love.forte.simbot.kaiheila.objects.Role
 
 
 /**
@@ -51,6 +56,7 @@ public class GuildListRequest @JvmOverloads constructor(
     KaiheilaGetRequest<KaiheilaApiResult.ListData<Guild>>() {
     public companion object Key : BaseApiRequestKey("guild", "list") {
         private val serializer = KaiheilaApiResult.ListData.serializer(GuildListElement.serializer())
+        public val DEFAULT: GuildListRequest = GuildListRequest()
     }
 
     override val apiPaths: List<String>

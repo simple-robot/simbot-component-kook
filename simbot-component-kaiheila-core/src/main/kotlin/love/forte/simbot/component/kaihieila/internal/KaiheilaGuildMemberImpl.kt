@@ -19,6 +19,7 @@ package love.forte.simbot.component.kaihieila.internal
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaihieila.KaiheilaComponent.Registrar.botUserStatus
@@ -41,7 +42,7 @@ import kotlin.time.Duration
  *
  * @author ForteScarlet
  */
-internal class KaiheilaMemberImpl(
+internal class KaiheilaGuildMemberImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val guild: KaiheilaGuildImpl,
     override val source: User
@@ -119,10 +120,11 @@ internal class KaiheilaMemberImpl(
 
     @Api4J
     override val roles: Stream<out Role>
-        get() = TODO("Not yet implemented")
+        get() = Stream.empty() // TODO("Not yet implemented")
 
     override suspend fun roles(): Flow<Role> {
-        TODO("Not yet implemented")
+        return emptyFlow()
+        // TODO("Not yet implemented")
     }
 
 
@@ -133,7 +135,11 @@ internal class KaiheilaMemberImpl(
     companion object {
         private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaihieila.KaiheilaMember")
         private val MUTE_JOB_ATOMIC =
-            AtomicReferenceFieldUpdater.newUpdater(KaiheilaMemberImpl::class.java, Job::class.java, "_muteJob")
+            AtomicReferenceFieldUpdater.newUpdater(KaiheilaGuildMemberImpl::class.java, Job::class.java, "_muteJob")
     }
 
 }
+
+
+
+//  by KaiheilaGuildMemberImpl(bot, guild, SystemUser)

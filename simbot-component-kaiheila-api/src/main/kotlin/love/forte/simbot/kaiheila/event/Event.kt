@@ -20,11 +20,17 @@
 
 package love.forte.simbot.kaiheila.event
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.kaiheila.objects.Channel
+import love.forte.simbot.kaiheila.objects.User
 import java.util.*
 
 
@@ -240,7 +246,7 @@ public interface Event<out Extra : Event.Extra> {
             /**
              * 是否 mention 所有用户
              */
-            public val mentionAll: Boolean
+            public val isMentionAll: Boolean
 
             /**
              * mention 用户角色的数组
@@ -250,7 +256,7 @@ public interface Event<out Extra : Event.Extra> {
             /**
              * 是否 mention 在线用户
              */
-            public val mentionHere: Boolean
+            public val isMentionHere: Boolean
 
             /**
              * 用户信息, 见 [对象-用户User](https://developer.kaiheila.cn/doc/objects#%E7%94%A8%E6%88%B7User) ([User])

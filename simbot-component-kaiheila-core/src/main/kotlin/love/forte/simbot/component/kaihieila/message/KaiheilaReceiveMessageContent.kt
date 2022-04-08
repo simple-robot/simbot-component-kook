@@ -17,10 +17,11 @@
 
 package love.forte.simbot.component.kaihieila.message
 
-import love.forte.simbot.*
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessages.AT_TYPE_USER
-import love.forte.simbot.kaiheila.event.*
+import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.message.*
 import love.forte.simbot.message.*
 
@@ -79,8 +80,25 @@ public fun Event<Event.Extra.Text>.toMessages(): Messages {
 }
 
 private inline fun Event.Extra.Text.toMessages(contentElement: () -> Message.Element<*>?): Messages {
-    val contentMessage = contentElement()
-    if (mention.isEmpty() && mentionRoles.isEmpty() && !mentionAll && !mentionHere) {
+    return toMessages(
+        contentElement(),
+        mention, mentionRoles, isMentionAll, isMentionHere
+    )
+
+}
+
+/**
+ * 使用消息事件并将其中的消息内容转化为 [KaiheilaChannelMessageDetailsContent].
+ */
+public fun Event<Event.Extra.Text>.toContent(): KaiheilaReceiveMessageContent = KaiheilaReceiveMessageContent(this)
+
+
+internal fun toMessages(
+    contentMessage: Message.Element<*>?,
+    mention: Collection<ID>, mentionRoles: Collection<ID>,
+    isMentionAll: Boolean, isMentionHere: Boolean
+): Messages {
+    if (mention.isEmpty() && mentionRoles.isEmpty() && !isMentionAll && !isMentionHere) {
         return contentMessage?.toMessages() ?: emptyMessages()
     }
     val messages = buildList(mention.size + mentionRoles.size + 3) {
@@ -88,11 +106,11 @@ private inline fun Event.Extra.Text.toMessages(contentElement: () -> Message.Ele
             add(contentMessage)
         }
 
-        if (mentionAll) {
+        if (isMentionAll) {
             add(AtAll)
         }
 
-        if (mentionHere) {
+        if (isMentionHere) {
             add(AtAllHere)
         }
 
@@ -106,10 +124,7 @@ private inline fun Event.Extra.Text.toMessages(contentElement: () -> Message.Ele
     }
 
     return messages.toMessages()
-
 }
 
-/**
- * 使用消息事件并将其中的消息内容转化为 [KaiheilaReceiveMessageContent].
- */
-public fun Event<Event.Extra.Text>.toContent(): KaiheilaReceiveMessageContent = KaiheilaReceiveMessageContent(this)
+
+

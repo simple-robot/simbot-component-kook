@@ -21,7 +21,7 @@ import love.forte.simbot.component.kaihieila.event.*
 import love.forte.simbot.component.kaihieila.internal.KaiheilaChannelImpl
 import love.forte.simbot.component.kaihieila.internal.KaiheilaComponentBotImpl
 import love.forte.simbot.component.kaihieila.internal.KaiheilaGuildImpl
-import love.forte.simbot.component.kaihieila.internal.KaiheilaMemberImpl
+import love.forte.simbot.component.kaihieila.internal.KaiheilaGuildMemberImpl
 import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
@@ -34,7 +34,7 @@ internal data class KaiheilaMemberExitedChannelEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
     override val source: KaiheilaChannelImpl,
-    override val target: KaiheilaMemberImpl
+    override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaMemberExitedChannelEvent()
 
 
@@ -42,7 +42,7 @@ internal data class KaiheilaMemberJoinedChannelEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserJoinedChannelEventBody>>,
     override val source: KaiheilaChannelImpl,
-    override val target: KaiheilaMemberImpl
+    override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaMemberJoinedChannelEvent()
 
 
@@ -50,7 +50,7 @@ internal data class KaiheilaMemberExitedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<ExitedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaMemberImpl
+    override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaMemberExitedGuildEvent()
 
 
@@ -58,7 +58,7 @@ internal data class KaiheilaMemberJoinedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<JoinedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaMemberImpl
+    override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaMemberJoinedGuildEvent()
 
 
@@ -66,7 +66,7 @@ internal data class KaiheilaBotSelfExitedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaMemberImpl
+    override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaBotSelfExitedGuildEvent()
 
 
@@ -74,6 +74,6 @@ internal data class KaiheilaBotSelfJoinedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaMemberImpl
+    override val target: KaiheilaGuildMemberImpl
 ) : KaiheilaBotSelfJoinedGuildEvent()
 
