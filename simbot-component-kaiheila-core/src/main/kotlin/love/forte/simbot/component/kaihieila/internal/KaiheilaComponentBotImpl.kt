@@ -283,46 +283,16 @@ internal class KaiheilaComponentBotImpl(
 
 
     //region friend api
-
-    // @OptIn(ExperimentalSimbotApi::class)
-    // private val friendCaches = mutableMapOf<String, KaiheilaUserChatImpl>()
-    // private val friendCacheLock = Mutex()
-    //
-    // @OptIn(ExperimentalSimbotApi::class)
-    // internal suspend fun deleteFriend(id: ID): KaiheilaUserChatImpl? = friendCacheLock.withLock {
-    //     friendCaches.remove(id.literal)
-    // }
-    //
-    // @OptIn(ExperimentalSimbotApi::class)
-    // internal suspend inline fun getOrInitChat(id: ID, init: () -> KaiheilaUserChatImpl): KaiheilaUserChatImpl {
-    //     return friendCaches[id.literal] ?: friendCacheLock.withLock {
-    //         friendCaches[id.literal] ?: run {
-    //             init().also {
-    //                 friendCaches[id.literal] = it
-    //             }
-    //         }
-    //     }
-    // }
-
-
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun friend(id: ID): KaiheilaUserChatImpl {
         val chat = UserChatCreateRequest(id).requestDataBy(bot)
         return KaiheilaUserChatImpl(this, chat)
-        // return getOrInitChat(id) {
-        //     val sourceChat = UserChatCreateRequest(id).requestDataBy(this)
-        //     KaiheilaUserChatImpl(this, sourceChat)
-        // }
     }
 
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChatImpl> {
         return UserChatListRequest.requestDataBy(this).items.asFlow().map { chat ->
-            // getOrInitChat(sourceChat.targetInfo.id) {
-            //     KaiheilaUserChatImpl(this, sourceChat)
-            // }
             KaiheilaUserChatImpl(this, chat)
-            // friendCaches.getOrDefault(it.targetInfo.id.literal, it)
         }
     }
 
