@@ -21,11 +21,8 @@ import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kaihieila.KaiheilaUserChat
-import love.forte.simbot.component.kaihieila.message.KaiheilaApiRequestedReceipt
-import love.forte.simbot.component.kaihieila.message.KaiheilaChannelMessageDetailsContent
-import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt
+import love.forte.simbot.component.kaihieila.message.*
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kaihieila.message.toRequest
 import love.forte.simbot.component.kaihieila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreated
@@ -65,17 +62,30 @@ internal class KaiheilaUserChatImpl(
     }
 
     override suspend fun send(message: MessageContent): MessageReceipt {
-        return if (message is KaiheilaChannelMessageDetailsContent) {
-            val source = message.source
-            DirectMessageCreateRequest.byTargetId(
-                targetId = source.authorId,
-                content = source.content,
-                type = source.type.type,
-                quote = null,
-                nonce = null,
-            ).requestDataBy(bot).asReceipt(false, bot)
-        } else {
-            send(message.messages)
+        return when (message) {
+            is KaiheilaReceiveMessageContent -> {
+                val source = message.source
+                DirectMessageCreateRequest.byTargetId(
+                    targetId = this.id,
+                    content = source.content,
+                    type = source.type.type,
+                    quote = null,
+                    nonce = null,
+                ).requestDataBy(bot).asReceipt(false, bot)
+            }
+            is KaiheilaChannelMessageDetailsContent -> {
+                val details = message.details
+                DirectMessageCreateRequest.byTargetId(
+                    targetId = this.id,
+                    content = details.content,
+                    type = details.type,
+                    quote = details.quote?.id,
+                    nonce = null,
+                ).requestDataBy(bot).asReceipt(false, bot)
+            }
+            else -> {
+                send(message.messages)
+            }
         }
     }
 }
