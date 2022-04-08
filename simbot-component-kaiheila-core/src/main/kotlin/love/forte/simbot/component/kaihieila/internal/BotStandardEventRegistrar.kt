@@ -24,12 +24,17 @@ import love.forte.simbot.ID
 import love.forte.simbot.component.kaihieila.KaiheilaComponentBot
 import love.forte.simbot.component.kaihieila.event.*
 import love.forte.simbot.component.kaihieila.internal.event.*
+import love.forte.simbot.component.kaihieila.util.requestDataBy
+import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.event.Event.Key
+import love.forte.simbot.kaiheila.api.user.UserViewRequest
 import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.message.MessageEvent
 import love.forte.simbot.kaiheila.event.system.SystemEvent
 import love.forte.simbot.kaiheila.event.system.channel.*
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOfflineEventBody
+import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOnlineEventBody
 import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.*
 import love.forte.simbot.kaiheila.objects.Channel
@@ -38,7 +43,7 @@ import love.forte.simbot.kaiheila.objects.SystemUser
 /**
  * 注册各种标准事件。
  */
-internal fun Event<*>.register(bot: KaiheilaComponentBotImpl) {
+internal suspend fun Event<*>.register(bot: KaiheilaComponentBotImpl) {
     when (this) {
         // 消息事件
         is MessageEvent<*> -> registerMessageEvent(bot)
@@ -110,7 +115,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
 /**
  * 系统事件
  */
-private fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponentBotImpl) {
+private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponentBotImpl) {
 
     // 准备资源
     val guild = bot.internalGuild(targetId) ?: return
@@ -178,6 +183,33 @@ private fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponentBotImpl)
                 author
             )
         }
+
+        // online
+        is GuildMemberOnlineEventBody -> {
+            val userInfo = bot.findUserInGuilds(body.userId, body.guilds) ?: return
+
+            bot.pushIfProcessable(KaiheilaUserOnlineStatusChangedEvent.Online) {
+                KaiheilaMemberOnlineEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<GuildMemberOnlineEventBody>>,
+                    userInfo
+                )
+            }
+        }
+
+        // offline
+        is GuildMemberOfflineEventBody -> {
+            val userInfo = bot.findUserInGuilds(body.userId, body.guilds) ?: return
+
+            bot.pushIfProcessable(KaiheilaUserOnlineStatusChangedEvent.Offline) {
+                KaiheilaMemberOfflineEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<GuildMemberOfflineEventBody>>,
+                    userInfo
+                )
+            }
+        }
+
         //endregion
 
         //region 用户信息更新事件
@@ -244,6 +276,16 @@ private fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponentBotImpl)
     }
 
 
+}
+
+private suspend fun KaiheilaComponentBotImpl.findUserInGuilds(userId: ID, guildIds: Collection<ID>): UserInfo? {
+    return guildIds.ifEmpty { return null }
+        .asSequence()
+        .mapNotNull { id -> internalGuild(id) }
+        .mapNotNull { g -> g.internalMember(userId) }
+        .firstOrNull() ?: userId.let {
+        UserViewRequest(userId, guildIds.first()).requestDataBy(bot)
+    }
 }
 
 

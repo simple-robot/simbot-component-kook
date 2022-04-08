@@ -68,9 +68,6 @@ public abstract class KaiheilaChannelChangedEvent<out Body : ChannelEventExtraBo
     override suspend fun source(): KaiheilaGuild = source
 
 
-    override val visibleScope: Event.VisibleScope
-        get() = Event.VisibleScope.PUBLIC
-
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 

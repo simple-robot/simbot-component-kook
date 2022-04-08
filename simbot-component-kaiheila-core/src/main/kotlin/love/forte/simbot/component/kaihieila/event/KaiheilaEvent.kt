@@ -75,7 +75,13 @@ public abstract class KaiheilaSystemEvent<out Body> :
     KaiheilaEvent<Sys<Body>, KhlEvent<Sys<Body>>>() {
 
     override val id: ID get() = sourceEvent.msgId
-    public val sourceBody: Body get() = sourceEvent.extra.body
+    public open val sourceBody: Body get() = sourceEvent.extra.body
+
+    /**
+     * 此属性意义不大，默认均为 `PUBLIC` .
+     */
+    override val visibleScope: Event.VisibleScope
+        get() = Event.VisibleScope.PUBLIC
 
     abstract override val key: Event.Key<out KaiheilaSystemEvent<*>>
 

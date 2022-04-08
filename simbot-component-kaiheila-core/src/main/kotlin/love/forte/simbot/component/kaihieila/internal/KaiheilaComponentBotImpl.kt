@@ -83,7 +83,8 @@ internal class KaiheilaComponentBotImpl(
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
 
-    private lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
+    internal lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
+    private set
 
 
     @JvmSynthetic
@@ -102,7 +103,7 @@ internal class KaiheilaComponentBotImpl(
 
             // register standard event processors
             /*
-                事件的验证、准备是同步的（借preProcessor的特性），
+                事件的验证、准备是(协程下)同步的（借preProcessor的特性），
                 但是事件的触发是异步的。
              */
             decodedEvent.internalProcessor()
@@ -418,7 +419,7 @@ internal class KaiheilaComponentBotImpl(
         }
     }
 
-    private fun KhlEvent<*>.internalProcessor() {
+    private suspend fun KhlEvent<*>.internalProcessor() {
         register(this@KaiheilaComponentBotImpl)
     }
 
