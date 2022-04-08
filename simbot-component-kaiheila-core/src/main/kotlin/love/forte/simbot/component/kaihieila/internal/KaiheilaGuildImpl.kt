@@ -58,7 +58,7 @@ internal class KaiheilaGuildImpl constructor(
             if (field != value) {
                 field = value
                 ownerMember = members[value.literal] ?: runBlocking {
-                    KaiheilaMemberImpl(
+                    KaiheilaGuildMemberImpl(
                         bot,
                         this@KaiheilaGuildImpl,
                         UserViewRequest(ownerId, source.id).requestDataBy(bot)
@@ -75,19 +75,19 @@ internal class KaiheilaGuildImpl constructor(
     @JvmSynthetic
     internal lateinit var channels: ConcurrentHashMap<String, KaiheilaChannelImpl>
     @JvmSynthetic
-    internal lateinit var members: ConcurrentHashMap<String, KaiheilaMemberImpl>
+    internal lateinit var members: ConcurrentHashMap<String, KaiheilaGuildMemberImpl>
 
     @JvmSynthetic
     internal fun internalChannel(id: ID): KaiheilaChannelImpl? = internalChannel(id.literal)
     @JvmSynthetic
     internal fun internalChannel(id: String): KaiheilaChannelImpl? = channels[id]
     @JvmSynthetic
-    internal fun internalMember(id: ID): KaiheilaMemberImpl? = internalMember(id.literal)
+    internal fun internalMember(id: ID): KaiheilaGuildMemberImpl? = internalMember(id.literal)
     @JvmSynthetic
-    internal fun internalMember(id: String): KaiheilaMemberImpl? = members[id]
+    internal fun internalMember(id: String): KaiheilaGuildMemberImpl? = members[id]
 
     @JvmSynthetic
-    private lateinit var ownerMember: KaiheilaMemberImpl
+    private lateinit var ownerMember: KaiheilaGuildMemberImpl
 
     @Volatile
     internal var initTimestamp: Long = 0L
@@ -99,7 +99,7 @@ internal class KaiheilaGuildImpl constructor(
             ChannelListRequest(source.id).requestDataBy(bot).items
         }
 
-        var owner: KaiheilaMemberImpl? = null
+        var owner: KaiheilaGuildMemberImpl? = null
 
         channelInfoList.forEach {
             val channelImpl = KaiheilaChannelImpl(bot, this, it)
@@ -109,7 +109,7 @@ internal class KaiheilaGuildImpl constructor(
         bot.logger.debug("Sync channel data, {} channel data have been cached.", channelsMap.size)
 
 
-        val membersMap = ConcurrentHashMap<String, KaiheilaMemberImpl>()
+        val membersMap = ConcurrentHashMap<String, KaiheilaGuildMemberImpl>()
 
         flow {
             var page = 0
@@ -124,7 +124,7 @@ internal class KaiheilaGuildImpl constructor(
                 }
             } while (users.isNotEmpty() && usersResult.meta.page < usersResult.meta.pageTotal)
         }.buffer(100).map { user ->
-            KaiheilaMemberImpl(bot, this, user)
+            KaiheilaGuildMemberImpl(bot, this, user)
         }.collect {
             membersMap[it.id.literal] = it
             if (owner == null && it.id == ownerId) {
@@ -137,7 +137,7 @@ internal class KaiheilaGuildImpl constructor(
 
         this.channels = channelsMap
         this.members = membersMap
-        this.ownerMember = owner ?: KaiheilaMemberImpl(bot, this, UserViewRequest(ownerId, source.id).requestDataBy(bot))
+        this.ownerMember = owner ?: KaiheilaGuildMemberImpl(bot, this, UserViewRequest(ownerId, source.id).requestDataBy(bot))
         initTimestamp = System.currentTimeMillis()
     }
 

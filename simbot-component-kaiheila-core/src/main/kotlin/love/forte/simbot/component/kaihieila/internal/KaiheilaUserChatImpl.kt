@@ -22,9 +22,9 @@ import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kaihieila.KaiheilaUserChat
 import love.forte.simbot.component.kaihieila.message.KaiheilaApiRequestedReceipt
+import love.forte.simbot.component.kaihieila.message.KaiheilaChannelMessageDetailsContent
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.component.kaihieila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kaihieila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.component.kaihieila.message.toRequest
 import love.forte.simbot.component.kaihieila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
@@ -65,7 +65,7 @@ internal class KaiheilaUserChatImpl(
     }
 
     override suspend fun send(message: MessageContent): MessageReceipt {
-        return if (message is KaiheilaReceiveMessageContent) {
+        return if (message is KaiheilaChannelMessageDetailsContent) {
             val source = message.source
             DirectMessageCreateRequest.byTargetId(
                 targetId = source.authorId,

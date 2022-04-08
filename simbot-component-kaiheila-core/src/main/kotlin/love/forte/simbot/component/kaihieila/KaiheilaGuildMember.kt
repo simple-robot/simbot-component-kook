@@ -18,6 +18,7 @@
 package love.forte.simbot.component.kaihieila
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
@@ -25,6 +26,7 @@ import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteType
+import love.forte.simbot.kaiheila.objects.SystemUser
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
@@ -41,7 +43,8 @@ import love.forte.simbot.kaiheila.objects.User as KhlUser
  *
  * @author ForteScarlet
  */
-public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<KhlUser> {
+public interface KaiheilaGuildMember :
+    GuildMember, KaiheilaComponentDefinition<KhlUser> {
     override val bot: KaiheilaComponentBot
     override val id: ID
 
@@ -143,4 +146,50 @@ public interface KaiheilaGuildMember : GuildMember, KaiheilaComponentDefinition<
 
     public companion object
 
+}
+
+
+/**
+ * 使用 [SystemUser] 作为基础用户对象来作为一个频道内的用户。
+ *
+ * @see SystemUser
+ */
+public class KaiheilaGuildSystemMember(
+    override val bot: KaiheilaComponentBot,
+    override val guild: KaiheilaGuild
+) : KaiheilaGuildMember {
+    override val source: SystemUser
+        get() = SystemUser
+
+    override val id: ID
+        get() = source.id
+
+    /**
+     * 系统用户不支持禁言相关操作，永远得到 `false`.
+     */
+    override suspend fun unmute(type: Int): Boolean = false
+
+    /**
+     * 系统用户不支持禁言相关操作，永远得到 `false`.
+     */
+    override suspend fun mute(duration: Duration, type: Int): Boolean = false
+
+    @Api4J
+    override val roles: Stream<out Role>
+        get() = Stream.empty()
+
+    override suspend fun roles(): Flow<Role> = emptyFlow()
+
+    override val username: String
+        get() = source.username
+    override val nickname: String
+        get() = source.nickname
+    override val avatar: String
+        get() = source.avatar
+    override val status: UserStatus
+        get() = STATUS
+
+    public companion object {
+        private val STATUS = UserStatus.builder().fakeUser().official().build()
+    }
 }

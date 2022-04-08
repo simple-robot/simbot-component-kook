@@ -19,13 +19,19 @@
 
 package love.forte.simbot.kaiheila.event.system.channel
 
-import love.forte.simbot.kaiheila.event.*
-import love.forte.simbot.kaiheila.event.system.*
+import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kaiheila.event.EventParser
+import love.forte.simbot.kaiheila.event.SysEventParser
+import love.forte.simbot.kaiheila.event.system.SystemEventParserDefinition
+import love.forte.simbot.kaiheila.event.system.registerParsers
+import love.forte.simbot.kaiheila.event.system.sysParser
 
 
 /**
  *
  * [频道相关事件列表](https://developer.kaiheila.cn/doc/event/channel)
+ *
+ * _Note: 由于官方尚未明确频道相关事件中相似的几个事件body之间的共同性，因此此接口暂不提供任何抽象定义。_
  *
  * @see Event.Extra.Sys.body
  */

@@ -17,10 +17,15 @@
 
 package love.forte.simbot.kaiheila.event.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.event.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.LongID
+import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kaiheila.objects.Attachments
+import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.kaiheila.objects.UserImpl
 
 /**
  *
@@ -32,9 +37,9 @@ public interface VideoEventExtra : MessageEventExtra, AttachmentsMessageEventExt
     override val guildId: ID
     override val channelName: String
     override val mention: List<ID>
-    override val mentionAll: Boolean
+    override val isMentionAll: Boolean
     override val mentionRoles: List<ID>
-    override val mentionHere: Boolean
+    override val isMentionHere: Boolean
     override val author: User
 
     /** 附件信息 */
@@ -56,11 +61,11 @@ internal data class VideoEventExtraImpl(
     override val channelName: String = "",
     override val mention: List<CharSequenceID> = emptyList(),
     @SerialName("mention_all")
-    override val mentionAll: Boolean = false,
+    override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
     override val mentionRoles: List<LongID> = emptyList(),
     @SerialName("mention_here")
-    override val mentionHere: Boolean = false,
+    override val isMentionHere: Boolean = false,
     /** 附件信息 */
     override val attachments: VideoAttachmentsImpl,
     override val author: UserImpl,
