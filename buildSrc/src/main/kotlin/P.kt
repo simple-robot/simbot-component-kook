@@ -22,9 +22,7 @@ object P {
         const val GROUP = "love.forte.simbot"
 
         val version = Version(
-            major = "3",
-            minor = 0,
-            patch = 0,
+            major = "3", minor = 0, patch = 0,
             status = preview(6, 0),
             isSnapshot = System.getProperty("isSnapshot")?.equals("true", true) ?: false
         )
@@ -85,12 +83,12 @@ data class Version(
      * ```
      *
      */
-    val status: PVS?,
+    val status: PVS? = null,
 
     /**
      * 是否快照。如果是，将会在版本号结尾处拼接 `-SNAPSHOT`。
      */
-    val isSnapshot: Boolean
+    val isSnapshot: Boolean = false
 ) {
     companion object {
         const val SNAPSHOT_SUFFIX = "-SNAPSHOT"
