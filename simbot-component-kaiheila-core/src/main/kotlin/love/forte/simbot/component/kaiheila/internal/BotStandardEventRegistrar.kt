@@ -17,7 +17,6 @@
 
 package love.forte.simbot.component.kaiheila.internal
 
-import jdk.nashorn.internal.objects.NativeArray
 import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.ID
@@ -295,7 +294,7 @@ private inline fun KaiheilaComponentBot.pushIfProcessable(
 ): Boolean {
     if (eventProcessor.isProcessable(eventKey)) {
         val event = block() ?: return false
-        launch { NativeArray.push(event) }
+        launch { eventProcessor.push(event) }
         return true
     }
 
