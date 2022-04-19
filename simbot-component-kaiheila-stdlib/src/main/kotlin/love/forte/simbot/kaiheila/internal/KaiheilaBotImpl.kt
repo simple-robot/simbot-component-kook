@@ -283,8 +283,13 @@ internal class KaiheilaBotImpl(
                 val eventType = event.type
                 val eventExtraType = event.extraType
 
+                // Event(s=0,
+                // d={"channel_type":"GROUP","type":9,"target_id":"4587833303764121","author_id":"2371258185","content":"我是RBQ",
+                // "extra":{"type":1,
+                // "code":"","guild_id":"8582739890554982","channel_name":"查价bot (机器人)","author":{"id":"2371258185","username":"芦苇测试机","identify_num":"5173","online":true,"os":"Websocket","status":0,"avatar":"https://img.kaiheila.cn/assets/bot.png/icon","vip_avatar":"https://img.kaiheila.cn/assets/bot.png/icon","banner":"","nickname":"芦苇测试机","roles":[2842315],"is_vip":false,"is_ai_reduce_noise":false,"bot":true,"tag_info":{"color":"#34A853","text":"机器人"},"client_id":"OPYfwS3t0hPuVZZx"},"mention":[],"mention_all":false,"mention_roles":[],"mention_here":false,"nav_channels":[],"kmarkdown":{"raw_content":"我是RBQ","mention_part":[],"mention_role_part":[]},"last_msg_content":"芦苇测试机：我是RBQ"},"msg_id":"ee8b14c1-22eb-44d3-bb65-a1274ade96db","msg_timestamp":1650354611204,"nonce":"","from_type":1}, sn=2)
+
                 val parser = EventSignals[eventType, eventExtraType] ?: run {
-                    val e = SimbotIllegalStateException("Unknown event type: $eventType. data: $event")
+                    val e = SimbotIllegalStateException("Unknown event type: $eventType, subType: $eventExtraType. data: $event")
                     this.clientLogger.error(e.localizedMessage, e)
                     // e.process(logger) { "Event receiving" } // TODO process exception?
                     return@onEach
