@@ -1,7 +1,7 @@
 package love.forte.simbot.kaiheila
 
 import io.ktor.http.*
-import love.forte.simbot.kaiheila.util.*
+import love.forte.simbot.kaiheila.util.buildUrl
 
 /**
  * 部分当前开黑啦api的信息常量，例如api版本信息。
@@ -38,7 +38,7 @@ public object KaiheilaApi {
     /**
      * 得到一个完整的路径前置。
      */
-    public fun pathPrefix(withVersion: Boolean): String = if(withVersion) "/api/v$VERSION/" else "/api/"
+    public fun pathPrefix(withVersion: Boolean): String = if (withVersion) "/api/v$VERSION/" else "/api/"
 
 
     /**

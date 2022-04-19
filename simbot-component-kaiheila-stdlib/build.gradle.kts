@@ -32,6 +32,9 @@ dependencies {
     api(project(":simbot-component-kaiheila-api"))
     api(V.Simbot.Api.NOTATION)
     api(V.Ktor.Client.Websockets.NOTATION)
+    api(V.Ktor.Client.ContentNegotiation.NOTATION)
+    api(V.Ktor.Serialization.KotlinxJson.NOTATION)
+    // api(V.Ktor.Client.Serialization)
 
     compileOnly(V.Jetbrains.Annotations.NOTATION)
 

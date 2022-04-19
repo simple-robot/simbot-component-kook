@@ -87,9 +87,18 @@ object V {
 
     object Ktor {
         const val GROUP = "io.ktor"
-        const val VERSION = "1.6.4"
+        const val VERSION = "2.0.0"
+
+        object Serialization {
+            object KotlinxJson {
+                const val NOTATION = "$GROUP:ktor-serialization-kotlinx-json:$VERSION"
+            }
+        }
 
         object Server {
+            object ContentNegotiation {
+                const val NOTATION = "$GROUP:ktor-server-content-negotiation:$VERSION"
+            }
             object Core {
                 const val NOTATION = "$GROUP:ktor-server-core:$VERSION"
             }
@@ -108,6 +117,9 @@ object V {
         }
 
         object Client {
+            object ContentNegotiation {
+                const val NOTATION = "$GROUP:ktor-client-content-negotiation:$VERSION"
+            }
             object Serialization {
                 const val NOTATION = "$GROUP:ktor-client-serialization:$VERSION"
             }
