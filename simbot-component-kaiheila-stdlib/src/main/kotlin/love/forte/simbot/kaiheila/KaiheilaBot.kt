@@ -18,13 +18,17 @@
 package love.forte.simbot.kaiheila
 
 import io.ktor.client.*
-import kotlinx.coroutines.*
-import kotlinx.serialization.json.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.user.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.serialization.json.Json
+import love.forte.simbot.Api4J
+import love.forte.simbot.ID
+import love.forte.simbot.LoggerContainer
+import love.forte.simbot.kaiheila.api.user.Me
+import love.forte.simbot.kaiheila.api.user.MeRequest
+import love.forte.simbot.kaiheila.api.user.OfflineRequest
 import love.forte.simbot.kaiheila.event.*
-import org.slf4j.*
-import kotlin.coroutines.*
+import org.slf4j.Logger
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 开黑啦Bot对应的bot类型。
@@ -56,7 +60,6 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      * 此实例代表的用于进行API请求（xxxRequest）的http client。
      */
     public val httpClient: HttpClient
-
 
 
     /**
@@ -166,7 +169,6 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      * 此bot是否启动过了。
      */
     public val isStarted: Boolean
-
 
 
     /**

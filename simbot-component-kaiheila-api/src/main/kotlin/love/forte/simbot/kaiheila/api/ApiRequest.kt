@@ -25,17 +25,18 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.json.Json
+import love.forte.simbot.Api4J
+import love.forte.simbot.kaiheila.KaiheilaApi
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_REMAINING
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_RESET
-import love.forte.simbot.utils.*
-import java.util.function.*
+import love.forte.simbot.utils.runInBlocking
+import love.forte.simbot.utils.runWithInterruptible
+import java.util.function.Consumer
 
 
 /**
@@ -111,7 +112,7 @@ public abstract class KaiheilaApiRequest<T> {
 
         postChecker(response)
 
-        val result: ApiResult = response.receive()
+        val result: ApiResult = response.body()
 
         // init rate limit info.
         val headers = response.headers
@@ -347,7 +348,7 @@ public abstract class KaiheilaPostRequest<T>(
      */
     override fun HttpRequestBuilder.requestFinishingAction() {
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
-        body = this@KaiheilaPostRequest.body ?: EmptyContent
+        setBody(this@KaiheilaPostRequest.body ?: EmptyContent)
     }
 
 
