@@ -8,6 +8,8 @@
 # BlueJ files
 *.ctxt
 
+.git
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 dokka
