@@ -18,11 +18,11 @@
 package love.forte.simbot.kaiheila.internal
 
 import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
-import io.ktor.http.cio.websocket.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -93,9 +93,12 @@ internal class KaiheilaBotImpl(
         val engineFactory = configuration.clientEngineFactory
 
         fun HttpClientConfig<*>.configClient() {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(decoder)
+            install(ContentNegotiation) {
+                json(decoder)
             }
+            // install(JsonFeature) {
+            //     serializer = KotlinxSerializer(decoder)
+            // }
             // install ws
             install(WebSockets)
 

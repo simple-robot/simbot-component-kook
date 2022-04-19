@@ -17,18 +17,22 @@
 
 package love.forte.simbot.kaiheila.api.asset
 
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.utils.io.streams.*
-import kotlinx.serialization.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.resources.*
-import love.forte.simbot.utils.*
-import org.slf4j.*
-import java.net.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
+import love.forte.simbot.kaiheila.api.ApiResultType
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.resources.Resource
+import love.forte.simbot.resources.URLResource
+import love.forte.simbot.utils.RandomIDUtil
+import org.slf4j.LoggerFactory
+import java.net.URL
 
 
 /**
@@ -82,10 +86,15 @@ public class AssetCreateRequest(
     override val apiPaths: List<String> get() = apiPathList
 
     override fun HttpRequestBuilder.requestFinishingAction() {
-        body = this@AssetCreateRequest.body ?: EmptyContent
+        setBody(this@AssetCreateRequest.body ?: EmptyContent)
         onUpload { bytesSentTotal, contentLength ->
             if (bytesSentTotal == 0L || bytesSentTotal.mod(10000L) == 0L) {
-            logger.info("Uploading {}, bytesSentTotal: {}, contentLength: {}", resource, bytesSentTotal, contentLength)
+                logger.debug(
+                    "Uploading {}, bytesSentTotal: {}, contentLength: {}",
+                    resource,
+                    bytesSentTotal,
+                    contentLength
+                )
             }
         }
         // headers {

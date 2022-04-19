@@ -19,12 +19,21 @@ package love.forte.simbot.kaiheila.api.channel
 
 import io.ktor.client.*
 import io.ktor.http.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
-import love.forte.simbot.kaiheila.objects.impl.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.json.Json
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.ApiResultType
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaApiResult
+import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.objects.Channel
+import love.forte.simbot.kaiheila.objects.ChannelPermissionOverwrites
+import love.forte.simbot.kaiheila.objects.impl.ChannelPermissionOverwritesImpl
+import love.forte.simbot.literal
 
 
 /**
@@ -72,26 +81,32 @@ public interface ChannelInfo : Channel {
      * 频道id
      */
     override val id: ID
+
     /**
      *	频道名称
      */
     override val name: String
+
     /**
      * 是否为分组类型
      */
     override val isCategory: Boolean
+
     /**
      *	频道创建者id
      */
     override val userId: ID
+
     /**
      *	父分组频道id
      */
     override val parentId: ID
+
     /**
      * 频道排序
      */
     override val level: Int
+
     /**
      * 频道类型
      */
@@ -107,10 +122,6 @@ public interface ChannelInfo : Channel {
     override val permissionUsers: List<ID> // TODO User type
     override val permissionSync: Int
 }
-
-
-
-
 
 
 @Serializable

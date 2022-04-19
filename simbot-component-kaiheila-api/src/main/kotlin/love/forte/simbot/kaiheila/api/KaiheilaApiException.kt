@@ -17,8 +17,8 @@
 
 package love.forte.simbot.kaiheila.api
 
-import io.ktor.http.cio.websocket.*
-import love.forte.simbot.*
+import io.ktor.websocket.*
+import love.forte.simbot.SimbotIllegalStateException
 
 
 /**
