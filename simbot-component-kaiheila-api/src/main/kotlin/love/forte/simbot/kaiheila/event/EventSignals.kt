@@ -101,13 +101,24 @@ public class SysEventParser<out B>(
 public object EventSignals {
     private val eventParsers: Array<Map<Any, EventParser<*, *>>> = Array(Event.Type.values().size) { emptyMap() }
 
+    private val MESSAGE_EVENT_STANDARD_PARSERS: Map<Any, MessageEventParser<MessageEventExtra>> = mapOf(
+        Event.Type.TEXT to TextEventParser,
+        Event.Type.IMAGE to ImageEventParser,
+        Event.Type.VIDEO to VideoEventParser,
+        Event.Type.FILE to FileEventParser,
+        Event.Type.KMD to KMarkdownEventParser,
+        Event.Type.CARD to CardEventParser
+    )
+
     init {
-        eventParsers[Event.Type.TEXT.ordinal] = mapOf(Event.Type.TEXT to TextEventParser)
-        eventParsers[Event.Type.IMAGE.ordinal] = mapOf(Event.Type.IMAGE to ImageEventParser)
-        eventParsers[Event.Type.VIDEO.ordinal] = mapOf(Event.Type.VIDEO to VideoEventParser)
-        eventParsers[Event.Type.FILE.ordinal] = mapOf(Event.Type.FILE to FileEventParser)
-        eventParsers[Event.Type.KMD.ordinal] = mapOf(Event.Type.KMD to KMarkdownEventParser)
-        eventParsers[Event.Type.CARD.ordinal] = mapOf(Event.Type.CARD to CardEventParser)
+        eventParsers[Event.Type.TEXT.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
+        eventParsers[Event.Type.IMAGE.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
+        eventParsers[Event.Type.VIDEO.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
+        eventParsers[Event.Type.FILE.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
+        // Voice?
+        eventParsers[Event.Type.VOICE.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
+        eventParsers[Event.Type.KMD.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
+        eventParsers[Event.Type.CARD.ordinal] = MESSAGE_EVENT_STANDARD_PARSERS
         eventParsers[Event.Type.SYS.ordinal] = buildMap {
             userEventParsers()
             messageEventParsers()
