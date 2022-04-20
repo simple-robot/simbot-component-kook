@@ -23,7 +23,10 @@ import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kaiheila.objects.AtTarget
 import love.forte.simbot.kaiheila.objects.KMarkdown
+import love.forte.simbot.kaiheila.objects.KMarkdownBuilder
+import love.forte.simbot.kaiheila.objects.buildRawKMarkdown
 import love.forte.simbot.literal
 import love.forte.simbot.message.*
 
@@ -78,6 +81,7 @@ public object KaiheilaMessages {
  * 如果当前 [Message] 是一个消息链，则可能会根据消息类型的情况将消息转化为 `KMarkdown` 类型的消息。
  *
  */
+@OptIn(ExperimentalSimbotApi::class)
 public fun Message.toRequest(
     targetId: ID,
     quote: ID? = null,
@@ -89,6 +93,23 @@ public fun Message.toRequest(
         is Messages -> {
             // TODO 如果存在at，atAll，atAllRole，
             //  转为kmarkdown消息。
+
+            val content = buildRawKMarkdown {
+
+            }
+
+            MessageCreateRequest(
+                type = MessageType.KMARKDOWN.type,
+                targetId = targetId,
+                content = content,
+                quote = quote,
+                nonce = nonce,
+                tempTargetId = tempTargetId
+            )
+
+            // for (i in this.indices.reversed()) {
+            //
+            // }
 
             // buildKMarkdown {
             //
@@ -107,6 +128,9 @@ public fun Message.toRequest(
 }
 
 
+/**
+ * 尝试将一个消息元素转化为用于发送消息的请求。
+ */
 @OptIn(ExperimentalSimbotApi::class)
 private fun Message.Element<*>.elementToRequestOrNull(
     targetId: ID,
@@ -141,6 +165,23 @@ private fun Message.Element<*>.elementToRequestOrNull(
             // request message
             is RequestMessage -> this.request
 
+            is AtAllHere -> {
+                val content = buildRawKMarkdown {
+                    at(AtTarget.Here)
+                }
+
+                request(MessageType.KMARKDOWN.type, content)
+            }
+
+            is AttachmentMessage -> {
+                // TODO
+                // buildRawKMarkdown {
+                //
+                // }
+                null
+            }
+
+
             // other, ignore.
             else -> null
         }
@@ -150,6 +191,9 @@ private fun Message.Element<*>.elementToRequestOrNull(
         is Image<*> -> request(MessageType.IMAGE.type, id.literal)
 
         is At -> {
+            // buildRawKMarkdown {
+            //     // TODO
+            // }
             // TODO
             null
         }
@@ -168,6 +212,16 @@ private fun Message.Element<*>.elementToRequestOrNull(
         else -> null
     }
 }
+
+
+/**
+ * 尝试将一个 [Message.Element] 拼接进目标的 KMarkdown 消息。
+ */
+@ExperimentalSimbotApi
+private fun Message.Element<*>.appendToKMarkdownMessage(builder: KMarkdownBuilder): KMarkdownBuilder {
+    TODO()
+}
+
 
 /**
  * 将一个 [Message] 转化为用于发送消息的请求api。

@@ -191,7 +191,7 @@ internal class KaiheilaBotImpl(
 
 
     /**
-     * 创建一个连接。
+     * 创建一个会话。
      */
     private suspend fun createSession(gateway: Gateway, connectTimeout: Long): SessionInfo {
         val sn = AtomicLong(0)
