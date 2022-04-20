@@ -20,8 +20,7 @@ package love.forte.simbot.component.kaiheila
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
 import love.forte.simbot.event.EventProcessor
@@ -49,10 +48,18 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     override fun register(verifyInfo: BotVerifyInfo): KaiheilaComponentBot {
         val serializer = KaiheilaBotVerifyInfo.serializer()
 
-        val botInfo = verifyInfo.inputStream().use { inp -> registerJson.decodeFromStream(serializer, inp) }
+        val jsonElement =
+            verifyInfo.inputStream().use { inp -> registerJson.decodeFromStream(JsonElement.serializer(), inp) }
+        val componentString = kotlin.runCatching {
+            jsonElement.jsonObject["component"]?.jsonPrimitive?.content
+        }.getOrElse {
+            throw ComponentMismatchException("", it)
+        }
 
         val component =
-            botInfo.component ?: throw NoSuchComponentException("Component is not found in [${verifyInfo.infoName}]")
+            componentString ?: throw NoSuchComponentException("Component is not found in [${verifyInfo.infoName}]")
+
+        val botInfo: KaiheilaBotVerifyInfo = registerJson.decodeFromJsonElement(serializer, jsonElement)
 
         logger.debug("[{}] json element load: {}", verifyInfo.infoName, botInfo)
 
@@ -77,14 +84,18 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
      */
     public abstract fun register(
         ticket: KaiheilaBot.Ticket,
-        configuration: KaiheilaComponentBotConfiguration
+        configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot
 
 
     /**
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
-    public fun register(clientId: ID, token: String, configuration: KaiheilaComponentBotConfiguration): KaiheilaComponentBot {
+    public fun register(
+        clientId: ID,
+        token: String,
+        configuration: KaiheilaComponentBotConfiguration,
+    ): KaiheilaComponentBot {
         return register(SimpleTicket(clientId, token), configuration)
     }
 
@@ -93,7 +104,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
      */
     public fun register(
         ticket: KaiheilaBot.Ticket,
-        block: KaiheilaComponentBotConfiguration.() -> Unit = {}
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
     ): KaiheilaComponentBot {
         return register(ticket, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
     }
@@ -105,7 +116,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     public fun register(
         clientId: ID,
         token: String,
-        block: KaiheilaComponentBotConfiguration.() -> Unit = {}
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
     ): KaiheilaComponentBot {
         return register(clientId, token, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
     }
@@ -146,7 +157,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
  */
 public fun kaiheilaBotManager(
     eventProcessor: EventProcessor,
-    block: KaiheilaBotManagerConfiguration.() -> Unit = {}
+    block: KaiheilaBotManagerConfiguration.() -> Unit = {},
 ): KaiheilaBotManager {
     return KaiheilaBotManager.newInstance(KaiheilaBotManagerConfiguration(eventProcessor).also(block))
 }
@@ -207,9 +218,9 @@ private data class KaiheilaBotVerifyInfo(
     /**
      * 缓存对象信息的同步周期
      */
-    val syncPeriods: KaiheilaComponentBotConfiguration.SyncPeriods = KaiheilaComponentBotConfiguration.SyncPeriods()
+    val syncPeriods: KaiheilaComponentBotConfiguration.SyncPeriods = KaiheilaComponentBotConfiguration.SyncPeriods(),
 
-) {
+    ) {
     fun includeConfig(configuration: KaiheilaComponentBotConfiguration) {
         configuration.syncPeriods = syncPeriods
     }
