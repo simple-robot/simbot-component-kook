@@ -21,8 +21,10 @@ import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
-import love.forte.simbot.component.kaiheila.event.KaiheilaBotSelfMessageEvent
-import love.forte.simbot.component.kaiheila.event.KaiheilaNormalMessageEvent
+import love.forte.simbot.component.kaiheila.event.KaiheilaBotSelfGroupMessageEvent
+import love.forte.simbot.component.kaiheila.event.KaiheilaBotSelfPersonMessageEvent
+import love.forte.simbot.component.kaiheila.event.KaiheilaNormalGroupMessageEvent
+import love.forte.simbot.component.kaiheila.event.KaiheilaNormalPersonMessageEvent
 import love.forte.simbot.component.kaiheila.internal.KaiheilaChannelImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaGuildMemberImpl
@@ -43,7 +45,7 @@ internal class KaiheilaNormalGroupMessageEventImpl(
     override val sourceEvent: MessageEvent<MessageEventExtra>,
     override val author: KaiheilaGuildMemberImpl,
     override val channel: KaiheilaChannelImpl,
-) : KaiheilaNormalMessageEvent.Group() {
+) : KaiheilaNormalGroupMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
 
     /**
@@ -64,7 +66,7 @@ internal class KaiheilaNormalGroupMessageEventImpl(
 internal class KaiheilaNormalPersonMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
-) : KaiheilaNormalMessageEvent.Person() {
+) : KaiheilaNormalPersonMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
 
     @OptIn(ExperimentalSimbotApi::class)
@@ -86,7 +88,7 @@ internal class KaiheilaBotSelfGroupMessageEventImpl(
     override val sourceEvent: MessageEvent<MessageEventExtra>,
     override val channel: KaiheilaChannelImpl,
     override val member: KaiheilaGuildMemberImpl,
-) : KaiheilaBotSelfMessageEvent.Group() {
+) : KaiheilaBotSelfGroupMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
 
 
@@ -108,7 +110,7 @@ internal class KaiheilaBotSelfGroupMessageEventImpl(
 internal class KaiheilaBotSelfPersonMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
-) : KaiheilaBotSelfMessageEvent.Person() {
+) : KaiheilaBotSelfPersonMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
 
 

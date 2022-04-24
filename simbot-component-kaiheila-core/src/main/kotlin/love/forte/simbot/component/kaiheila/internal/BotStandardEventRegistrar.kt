@@ -72,11 +72,11 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
     when (channelType) {
         Channel.Type.PERSON -> {
             if (bot.isMe(authorId)) {
-                bot.pushIfProcessable(KaiheilaBotSelfMessageEvent.Person) {
+                bot.pushIfProcessable(KaiheilaBotSelfPersonMessageEvent) {
                     KaiheilaBotSelfPersonMessageEventImpl(bot, this)
                 }
             } else {
-                bot.pushIfProcessable(KaiheilaNormalMessageEvent.Person) {
+                bot.pushIfProcessable(KaiheilaNormalPersonMessageEvent) {
                     KaiheilaNormalPersonMessageEventImpl(bot, this)
                 }
             }
@@ -86,7 +86,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
             val author = guild.internalMember(authorId) ?: return
             val channel = guild.internalChannel(targetId) ?: return
             if (bot.isMe(authorId)) {
-                bot.pushIfProcessable(KaiheilaBotSelfMessageEvent.Group) {
+                bot.pushIfProcessable(KaiheilaBotSelfGroupMessageEvent) {
                     KaiheilaBotSelfGroupMessageEventImpl(
                         bot,
                         this,
@@ -96,7 +96,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
                 }
             } else {
                 // push event
-                bot.pushIfProcessable(KaiheilaNormalMessageEvent.Group) {
+                bot.pushIfProcessable(KaiheilaNormalGroupMessageEvent) {
                     KaiheilaNormalGroupMessageEventImpl(
                         bot,
                         this,
