@@ -71,38 +71,107 @@ import love.forte.simbot.kaiheila.event.Event as KhlEvent
  *
  * @author forte
  */
-public abstract class KaiheilaMemberChangedEvent<out Body, Source : Organization, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
+@BaseEvent
+public abstract class KaiheilaMemberChangedEvent<out Body> :
     KaiheilaSystemEvent<Body>(),
-    MemberChangedEvent<Source, Before, After> {
+    MemberChangedEvent {
 
-
-    abstract override val before: Before
-    abstract override val after: After
-    abstract override val source: Source
-
-    //// impl
-    override suspend fun before(): Before = before
-    override suspend fun after(): After = after
-    override suspend fun source(): Source = source
-
+    /**
+     * 本次变更涉及的频道成员信息。同 [user]
+     */
     @OptIn(Api4J::class)
-    override val organization: Source
-        get() = source
+    abstract override val member: KaiheilaGuildMember
 
-    override suspend fun organization(): Source = source
+    /**
+     * 本次变更涉及的频道成员信息。同 [user]
+     */
+    @JvmSynthetic
+    override suspend fun member(): KaiheilaGuildMember = member
 
+    /**
+     * 本次变更涉及的频道成员信息。同 [member]
+     */
+    @OptIn(Api4J::class)
+    override val user: KaiheilaGuildMember get() = member
+
+    /**
+     * 本次变更涉及的频道成员信息。同 [member]
+     */
+    @JvmSynthetic
+    override suspend fun user(): KaiheilaGuildMember = user
+
+    /**
+     * 可能存在的变更前成员信息。
+     */
+    @OptIn(Api4J::class)
+    abstract override val before: KaiheilaGuildMember?
+
+    /**
+     * 可能存在的变更前成员信息。
+     */
+    @JvmSynthetic
+    abstract override suspend fun before(): KaiheilaGuildMember?
+
+    /**
+     * 可能存在的变更后成员信息。
+     */
+    @OptIn(Api4J::class)
+    abstract override val after: KaiheilaGuildMember?
+
+    /**
+     * 可能存在的变更后成员信息。
+     */
+    @JvmSynthetic
+    abstract override suspend fun after(): KaiheilaGuildMember?
+
+    /**
+     * 变更成员所处组织。
+     */
+    @OptIn(Api4J::class)
+    abstract override val source: Organization
+
+    /**
+     * 变更成员所处组织。
+     */
+    @JvmSynthetic
+    abstract override suspend fun source(): Organization
+
+
+    /**
+     * 变更成员所处组织。同 [source].
+     */
+    @OptIn(Api4J::class)
+    abstract override val organization: Organization
+
+    /**
+     * 变更成员所处组织。同 [source].
+     */
+    @JvmSynthetic
+    abstract override suspend fun organization(): Organization
+
+    /**
+     * 变更时间。
+     */
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 
 
+    /**
+     * 可能存在的变更操作者。
+     */
     @OptIn(Api4J::class)
     abstract override val operator: KaiheilaGuildMember?
+
+    /**
+     * 可能存在的变更操作者。
+     */
+    @JvmSynthetic
     override suspend fun operator(): KaiheilaGuildMember? = operator
 
-    public companion object Key : BaseEventKey<KaiheilaMemberChangedEvent<*, *, *, *>>(
+    public companion object Key : BaseEventKey<KaiheilaMemberChangedEvent<*>>(
         "kaiheila.member_changed", KaiheilaEvent, MemberChangedEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaMemberChangedEvent<*, *, *, *>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaMemberChangedEvent<*>? = doSafeCast(value)
     }
 
 }
@@ -114,13 +183,35 @@ public abstract class KaiheilaMemberChangedEvent<out Body, Source : Organization
  * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道进出**相关的变更事件。
  * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
-public abstract class KaiheilaMemberChannelChangedEvent<out Body, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<Body, KaiheilaChannel, Before, After>() {
+@BaseEvent
+public abstract class KaiheilaMemberChannelChangedEvent<out Body> : KaiheilaMemberChangedEvent<Body>() {
 
-    public companion object Key : BaseEventKey<KaiheilaMemberChannelChangedEvent<*, *, *>>(
+    /**
+     * 事件涉及的频道信息。同 [organization].
+     */
+    abstract override val source: KaiheilaChannel
+
+    /**
+     * 事件涉及的频道信息。同 [organization].
+     */
+    override suspend fun source(): KaiheilaChannel = source
+
+
+    /**
+     * 事件涉及的频道信息。同 [source].
+     */
+    override val organization: KaiheilaChannel get() = source
+
+    /**
+     * 事件涉及的频道信息。同 [source].
+     */
+    override suspend fun organization(): KaiheilaChannel = organization
+
+
+    public companion object Key : BaseEventKey<KaiheilaMemberChannelChangedEvent<*>>(
         "kaiheila.member_channel_changed", KaiheilaMemberChangedEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaMemberChannelChangedEvent<*, *, *>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaMemberChannelChangedEvent<*>? = doSafeCast(value)
     }
 
 }
@@ -133,35 +224,52 @@ public abstract class KaiheilaMemberChannelChangedEvent<out Body, Before : Kaihe
  * @author forte
  */
 public abstract class KaiheilaMemberExitedChannelEvent :
-    KaiheilaMemberChannelChangedEvent<UserExitedChannelEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
-    MemberDecreaseEvent<KaiheilaChannel, KaiheilaGuildMember> {
+    KaiheilaMemberChannelChangedEvent<UserExitedChannelEventBody>(),
+    MemberDecreaseEvent {
 
-    abstract override val target: KaiheilaGuildMember
+    /**
+     * 离开的成员。
+     */
+    @OptIn(Api4J::class)
+    abstract override val before: KaiheilaGuildMember
 
-
-    //// Impl props
-    override val after: KaiheilaGuildMember?
-        get() = target
-    override val before: KaiheilaGuildMember
-        get() = target
-
-    override suspend fun target(): KaiheilaGuildMember = target
-    override suspend fun after(): KaiheilaGuildMember? = after
+    /**
+     * 离开的成员。
+     */
+    @JvmSynthetic
     override suspend fun before(): KaiheilaGuildMember = before
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     * 成员离开后。始终为null。
      */
-    override val actionType: ActionType
-        get() = ActionType.PROACTIVE
+    @OptIn(Api4J::class)
+    override val after: KaiheilaGuildMember? get() = null
+
+    /**
+     * 成员离开后。始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaGuildMember? = null
+
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     */
+    override val actionType: ActionType get() = ActionType.PROACTIVE
 
     /**
      * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
-    override val operator: KaiheilaGuildMember?
-        get() = null
+    override val operator: KaiheilaGuildMember? get() = null
+
+    /**
+     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmSynthetic
+    override suspend fun operator(): KaiheilaGuildMember? = null
+
 
     override val key: Event.Key<out KaiheilaMemberExitedChannelEvent>
         get() = Key
@@ -180,26 +288,39 @@ public abstract class KaiheilaMemberExitedChannelEvent :
  * @author forte
  */
 public abstract class KaiheilaMemberJoinedChannelEvent :
-    KaiheilaMemberChannelChangedEvent<UserJoinedChannelEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
-    MemberIncreaseEvent<KaiheilaChannel, KaiheilaGuildMember> {
-
-    abstract override val target: KaiheilaGuildMember
-
-    //// Impl props
-    override val after: KaiheilaGuildMember
-        get() = target
-    override val before: KaiheilaGuildMember?
-        get() = target
-
-    override suspend fun target(): KaiheilaGuildMember = target
-    override suspend fun after(): KaiheilaGuildMember = after
-    override suspend fun before(): KaiheilaGuildMember? = before
+    KaiheilaMemberChannelChangedEvent<UserJoinedChannelEventBody>(),
+    MemberIncreaseEvent {
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     * 增加的成员。
      */
-    override val actionType: ActionType
-        get() = ActionType.PROACTIVE
+    @OptIn(Api4J::class)
+    abstract override val after: KaiheilaGuildMember
+
+    /**
+     * 增加的成员。
+     */
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaGuildMember = after
+
+
+    /**
+     * 始终为null。
+     */
+    @OptIn(Api4J::class)
+    override val before: KaiheilaGuildMember? get() = null
+
+    /**
+     * 始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun before(): KaiheilaGuildMember? = null
+
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     */
+    override val actionType: ActionType get() = ActionType.PROACTIVE
 
 
     /**
@@ -207,8 +328,14 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
-    override val operator: KaiheilaGuildMember?
-        get() = null
+    override val operator: KaiheilaGuildMember? get() = null
+
+    /**
+     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmSynthetic
+    override suspend fun operator(): KaiheilaGuildMember? = null
+
 
     override val key: Event.Key<out KaiheilaMemberJoinedChannelEvent>
         get() = Key
@@ -227,13 +354,37 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
  * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
  */
-public abstract class KaiheilaMemberGuildChangedEvent<out Body, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<Body, KaiheilaGuild, Before, After>() {
+@BaseEvent
+public abstract class KaiheilaMemberGuildChangedEvent<out Body> :
+    KaiheilaMemberChangedEvent<Body>() {
 
-    public companion object Key : BaseEventKey<KaiheilaMemberGuildChangedEvent<*, *, *>>(
+    /**
+     * 涉及的相关频道服务器。同 [organization].
+     */
+    abstract override val source: KaiheilaGuild
+
+    /**
+     * 涉及的相关频道服务器。同 [organization].
+     */
+    @JvmSynthetic
+    override suspend fun source(): KaiheilaGuild = source
+
+    /**
+     * 涉及的相关频道服务器。同 [source].
+     */
+    override val organization: KaiheilaGuild get() = source
+
+    /**
+     * 涉及的相关频道服务器。同 [source].
+     */
+    @JvmSynthetic
+    override suspend fun organization(): KaiheilaGuild = organization
+
+
+    public companion object Key : BaseEventKey<KaiheilaMemberGuildChangedEvent<*>>(
         "kaiheila.member_guild_changed", KaiheilaMemberChangedEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaMemberGuildChangedEvent<*, *, *>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaMemberGuildChangedEvent<*>? = doSafeCast(value)
     }
 }
 
@@ -245,27 +396,39 @@ public abstract class KaiheilaMemberGuildChangedEvent<out Body, Before : Kaiheil
  * @author forte
  */
 public abstract class KaiheilaMemberExitedGuildEvent :
-    KaiheilaMemberGuildChangedEvent<ExitedGuildEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
-    MemberDecreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+    KaiheilaMemberGuildChangedEvent<ExitedGuildEventBody>(),
+    MemberDecreaseEvent {
 
-    abstract override val target: KaiheilaGuildMember
-
-
-    //// Impl props
-    override val after: KaiheilaGuildMember?
-        get() = target
-    override val before: KaiheilaGuildMember
-        get() = target
-
-    override suspend fun target(): KaiheilaGuildMember = target
-    override suspend fun after(): KaiheilaGuildMember? = after
-    override suspend fun before(): KaiheilaGuildMember = before
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     * 离开的成员。
      */
-    override val actionType: ActionType
-        get() = ActionType.PROACTIVE
+    @OptIn(Api4J::class)
+    abstract override val before: KaiheilaGuildMember
+
+    /**
+     * 离开的成员。
+     */
+    @JvmSynthetic
+    override suspend fun before(): KaiheilaGuildMember = before
+
+
+    /**
+     * 成员离开后，始终为null。
+     */
+    @OptIn(Api4J::class)
+    override val after: KaiheilaGuildMember? get() = null
+
+    /**
+     * 成员离开后，始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaGuildMember? = null
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     */
+    override val actionType: ActionType get() = ActionType.PROACTIVE
 
     /**
      * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
@@ -274,6 +437,13 @@ public abstract class KaiheilaMemberExitedGuildEvent :
     @OptIn(Api4J::class)
     override val operator: KaiheilaGuildMember?
         get() = null
+
+    /**
+     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmSynthetic
+    override suspend fun operator(): KaiheilaGuildMember? = null
+
 
     override val key: Event.Key<out KaiheilaMemberExitedChannelEvent>
         get() = Key
@@ -292,26 +462,39 @@ public abstract class KaiheilaMemberExitedGuildEvent :
  * @author forte
  */
 public abstract class KaiheilaMemberJoinedGuildEvent :
-    KaiheilaMemberGuildChangedEvent<JoinedGuildEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
-    MemberIncreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
-
-    abstract override val target: KaiheilaGuildMember
-
-    //// Impl props
-    override val after: KaiheilaGuildMember
-        get() = target
-    override val before: KaiheilaGuildMember?
-        get() = target
-
-    override suspend fun target(): KaiheilaGuildMember = target
-    override suspend fun after(): KaiheilaGuildMember = after
-    override suspend fun before(): KaiheilaGuildMember? = before
+    KaiheilaMemberGuildChangedEvent<JoinedGuildEventBody>(),
+    MemberIncreaseEvent {
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     * 加入的成员。
      */
-    override val actionType: ActionType
-        get() = ActionType.PROACTIVE
+    @OptIn(Api4J::class)
+    abstract override val after: KaiheilaGuildMember
+
+    /**
+     * 加入的成员。
+     */
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaGuildMember = after
+
+
+    /**
+     * 成员加入前，始终为null。
+     */
+    @OptIn(Api4J::class)
+    override val before: KaiheilaGuildMember?
+        get() = null
+
+    /**
+     * 成员加入前，始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun before(): KaiheilaGuildMember? = null
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     */
+    override val actionType: ActionType get() = ActionType.PROACTIVE
 
 
     /**
@@ -319,8 +502,13 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
-    override val operator: KaiheilaGuildMember?
-        get() = null
+    override val operator: KaiheilaGuildMember? get() = null
+
+    /**
+     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmSynthetic
+    override suspend fun operator(): KaiheilaGuildMember? = null
 
     override val key: Event.Key<out KaiheilaMemberJoinedGuildEvent>
         get() = Key
@@ -346,12 +534,38 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
  *
  * @author forte
  */
-public abstract class KaiheilaBotMemberChangedEvent<out Body, Before : KaiheilaGuildMember?, After : KaiheilaGuildMember?> :
-    KaiheilaMemberChangedEvent<Body, KaiheilaGuild, Before, After>() {
-    public companion object Key : BaseEventKey<KaiheilaBotMemberChangedEvent<*, *, *>>(
+@BaseEvent
+public abstract class KaiheilaBotMemberChangedEvent<out Body> :
+    KaiheilaMemberChangedEvent<Body>() {
+
+
+    /**
+     * 涉及的相关频道服务器。同 [organization].
+     */
+    abstract override val source: KaiheilaGuild
+
+    /**
+     * 涉及的相关频道服务器。同 [organization].
+     */
+    @JvmSynthetic
+    override suspend fun source(): KaiheilaGuild = source
+
+    /**
+     * 涉及的相关频道服务器。同 [source].
+     */
+    override val organization: KaiheilaGuild get() = source
+
+    /**
+     * 涉及的相关频道服务器。同 [source].
+     */
+    @JvmSynthetic
+    override suspend fun organization(): KaiheilaGuild = organization
+
+
+    public companion object Key : BaseEventKey<KaiheilaBotMemberChangedEvent<*>>(
         "kaiheila.bot_member_changed", KaiheilaMemberChangedEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaBotMemberChangedEvent<*, *, *>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaBotMemberChangedEvent<*>? = doSafeCast(value)
     }
 }
 
@@ -363,41 +577,52 @@ public abstract class KaiheilaBotMemberChangedEvent<out Body, Before : KaiheilaG
  * @author forte
  */
 public abstract class KaiheilaBotSelfExitedGuildEvent :
-    KaiheilaBotMemberChangedEvent<SelfExitedGuildEventBody, KaiheilaGuildMember, KaiheilaGuildMember?>(),
-    MemberDecreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+    KaiheilaBotMemberChangedEvent<SelfExitedGuildEventBody>(),
+    MemberDecreaseEvent {
+
     /**
      * 即bot自身在频道服务器内的信息。
      */
-    abstract override val target: KaiheilaGuildMember
-
-    //// Impl props
-    override val before: KaiheilaGuildMember
-        get() = target
+    @OptIn(Api4J::class)
+    abstract override val before: KaiheilaGuildMember
 
     /**
-     * `after` 恒为null。
+     * 即bot自身在频道服务器内的信息。
      */
-    override val after: KaiheilaGuildMember?
-        get() = null
+    @JvmSynthetic
+    override suspend fun before(): KaiheilaGuildMember = before
 
+    /**
+     * 始终为null。
+     */
+    @OptIn(Api4J::class)
+    override val after: KaiheilaGuildMember? get() = null
+
+    /**
+     * 始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaGuildMember? = after
 
     /**
      * 开黑啦bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
-    override val operator: KaiheilaGuildMember?
-        get() = null
-
-    override suspend fun target(): KaiheilaGuildMember = target
-    override suspend fun after(): KaiheilaGuildMember? = after
-    override suspend fun before(): KaiheilaGuildMember = before
+    override val operator: KaiheilaGuildMember? get() = null
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     * 开黑啦bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
-    override val actionType: ActionType
-        get() = ActionType.PROACTIVE
+    @JvmSynthetic
+    override suspend fun operator(): KaiheilaGuildMember? = null
+
+
+    /**
+     * 开黑啦群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
+     */
+    override val actionType: ActionType get() = ActionType.PROACTIVE
+
 
     override val key: Event.Key<out KaiheilaBotSelfExitedGuildEvent>
         get() = Key
@@ -417,35 +642,46 @@ public abstract class KaiheilaBotSelfExitedGuildEvent :
  * @author forte
  */
 public abstract class KaiheilaBotSelfJoinedGuildEvent :
-    KaiheilaBotMemberChangedEvent<SelfJoinedGuildEventBody, KaiheilaGuildMember?, KaiheilaGuildMember>(),
-    MemberIncreaseEvent<KaiheilaGuild, KaiheilaGuildMember> {
+    KaiheilaBotMemberChangedEvent<SelfJoinedGuildEventBody>(),
+    MemberIncreaseEvent {
     /**
      * 即bot自身在频道服务器内的信息。
      */
-    abstract override val target: KaiheilaGuildMember
-
-    //// Impl props
-    override val after: KaiheilaGuildMember
-        get() = target
+    @OptIn(Api4J::class)
+    abstract override val after: KaiheilaGuildMember
 
     /**
-     * `before` 恒为null。
+     * 即bot自身在频道服务器内的信息。
      */
-    override val before: KaiheilaGuildMember?
-        get() = null
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaGuildMember = after
+
+    /**
+     * 始终为null。
+     */
+    @OptIn(Api4J::class)
+    override val before: KaiheilaGuildMember? get() = null
+
+    /**
+     * 始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun before(): KaiheilaGuildMember? = before
 
     /**
      * 开黑啦bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
-    override val operator: KaiheilaGuildMember?
-        get() = null
+    override val operator: KaiheilaGuildMember? get() = null
 
+    /**
+     * 开黑啦bot进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmSynthetic
+    override
+    suspend fun operator(): KaiheilaGuildMember? = null
 
-    override suspend fun target(): KaiheilaGuildMember = target
-    override suspend fun after(): KaiheilaGuildMember = after
-    override suspend fun before(): KaiheilaGuildMember? = before
 
     /**
      * 开黑啦群员离开频道事件的行为类型始终为主动的。
@@ -490,8 +726,24 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
  */
 public sealed class KaiheilaUserOnlineStatusChangedEvent :
     KaiheilaSystemEvent<GuildMemberEventExtraBody>(),
-    ChangedEvent<UserInfo, Boolean, Boolean> {
+    ChangedEvent {
+
+    /**
+     * 发生变化的用户信息。
+     */
+    @OptIn(Api4J::class)
     abstract override val source: UserInfo
+
+    /**
+     * 发生变化的用户信息。
+     */
+    @JvmSynthetic
+    override suspend fun source(): UserInfo = source
+
+
+    /**
+     * 状态变化后，此用户是否为_在线_状态。
+     */
     public abstract val isOnline: Boolean
 
     /**
@@ -537,16 +789,33 @@ public sealed class KaiheilaUserOnlineStatusChangedEvent :
     public val guildStream: Stream<KaiheilaGuild?> get() = guilds.asStream()
 
 
-    //// Impls
-
-
+    /**
+     * 变更前的在线状态。相当于 `!isOnline`.
+     */
+    @OptIn(Api4J::class)
     override val before: Boolean get() = !isOnline
+
+    /**
+     * 变更前的在线状态。相当于 `!isOnline`.
+     */
+    @JvmSynthetic
+    override suspend fun before(): Boolean = before
+
+    /**
+     * 变更后的在线状态。同 [isOnline].
+     */
+    @OptIn(Api4J::class)
     override val after: Boolean get() = isOnline
 
-    override suspend fun source(): UserInfo = source
-    override suspend fun before(): Boolean = before
+    /**
+     * 变更后的在线状态。同 [isOnline].
+     */
+    @JvmSynthetic
     override suspend fun after(): Boolean = after
 
+    /**
+     * 变更时间。
+     */
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 

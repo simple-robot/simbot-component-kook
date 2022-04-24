@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -40,7 +40,7 @@ object P {
 
         val version = Version(
             major = "3", minor = 0, patch = 0,
-            status = preview(7, 0),
+            status = preview(8, 0),
             isSnapshot = System.getProperty("isSnapshot")?.equals("true", true) ?: false
         )
 
@@ -60,7 +60,7 @@ object P {
             major = "${Simbot.version.major}.${Simbot.version.minor}",
             minor = 0,
             patch = 0,
-            status = preview(1, 2),
+            status = preview(2, 0),
             isSnapshot = isSnapshot
         )
 

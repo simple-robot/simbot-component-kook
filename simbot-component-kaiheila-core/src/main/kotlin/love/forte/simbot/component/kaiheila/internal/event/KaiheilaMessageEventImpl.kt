@@ -42,8 +42,8 @@ internal class KaiheilaNormalGroupMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
     override val author: KaiheilaGuildMemberImpl,
-    override val channel: KaiheilaChannelImpl
-) : KaiheilaNormalMessageEvent.Group<MessageEventExtra>() {
+    override val channel: KaiheilaChannelImpl,
+) : KaiheilaNormalMessageEvent.Group() {
     override val id: ID get() = sourceEvent.msgId
 
     /**
@@ -63,8 +63,8 @@ internal class KaiheilaNormalGroupMessageEventImpl(
 
 internal class KaiheilaNormalPersonMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
-    override val sourceEvent: MessageEvent<MessageEventExtra>
-) : KaiheilaNormalMessageEvent.Person<MessageEventExtra>() {
+    override val sourceEvent: MessageEvent<MessageEventExtra>,
+) : KaiheilaNormalMessageEvent.Person() {
     override val id: ID get() = sourceEvent.msgId
 
     @OptIn(ExperimentalSimbotApi::class)
@@ -85,8 +85,8 @@ internal class KaiheilaBotSelfGroupMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
     override val channel: KaiheilaChannelImpl,
-    override val member: KaiheilaGuildMemberImpl
-) : KaiheilaBotSelfMessageEvent.Group<MessageEventExtra>() {
+    override val member: KaiheilaGuildMemberImpl,
+) : KaiheilaBotSelfMessageEvent.Group() {
     override val id: ID get() = sourceEvent.msgId
 
 
@@ -107,10 +107,9 @@ internal class KaiheilaBotSelfGroupMessageEventImpl(
 
 internal class KaiheilaBotSelfPersonMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
-    override val sourceEvent: MessageEvent<MessageEventExtra>
-) : KaiheilaBotSelfMessageEvent.Person<MessageEventExtra>() {
+    override val sourceEvent: MessageEvent<MessageEventExtra>,
+) : KaiheilaBotSelfMessageEvent.Person() {
     override val id: ID get() = sourceEvent.msgId
-
 
 
     @OptIn(ExperimentalSimbotApi::class)

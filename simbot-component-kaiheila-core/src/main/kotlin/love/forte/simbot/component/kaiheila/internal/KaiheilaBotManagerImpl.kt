@@ -75,7 +75,7 @@ internal class KaiheilaBotManagerImpl(
     }
 
 
-    override fun all(): Sequence<KaiheilaComponentBot> = bots.values.asSequence()
+    override fun all(): List<KaiheilaComponentBot> = bots.values.toList()
 
     override suspend fun doCancel(reason: Throwable?): Boolean {
         if (job.isCancelled) return false

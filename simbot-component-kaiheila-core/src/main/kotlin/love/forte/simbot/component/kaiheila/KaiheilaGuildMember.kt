@@ -27,6 +27,9 @@ import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteType
 import love.forte.simbot.kaiheila.objects.SystemUser
+import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
@@ -156,7 +159,7 @@ public interface KaiheilaGuildMember :
  */
 public class KaiheilaGuildSystemMember(
     override val bot: KaiheilaComponentBot,
-    override val guild: KaiheilaGuild
+    override val guild: KaiheilaGuild,
 ) : KaiheilaGuildMember {
     override val source: SystemUser
         get() = SystemUser
@@ -174,7 +177,37 @@ public class KaiheilaGuildSystemMember(
      */
     override suspend fun mute(duration: Duration, type: Int): Boolean = false
 
+
+    //region TODO send 相关
+    override suspend fun send(text: String): MessageReceipt {
+        return super.send(text)
+    }
+
+    override suspend fun send(message: Message): MessageReceipt {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun send(message: MessageContent): MessageReceipt {
+        return super.send(message)
+    }
+
     @Api4J
+    override fun sendBlocking(text: String): MessageReceipt {
+        return super.sendBlocking(text)
+    }
+
+    @Api4J
+    override fun sendBlocking(message: Message): MessageReceipt {
+        return super.sendBlocking(message)
+    }
+
+    @Api4J
+    override fun sendBlocking(message: MessageContent): MessageReceipt {
+        return super.sendBlocking(message)
+    }
+    //endregion
+
+    @OptIn(Api4J::class)
     override val roles: Stream<out Role>
         get() = Stream.empty()
 

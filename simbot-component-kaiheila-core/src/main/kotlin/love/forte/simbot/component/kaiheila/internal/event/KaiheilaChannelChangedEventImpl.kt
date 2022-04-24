@@ -15,8 +15,11 @@
  *
  */
 
+@file:Suppress("UnnecessaryOptInAnnotation")
+
 package love.forte.simbot.component.kaiheila.internal.event
 
+import love.forte.simbot.Api4J
 import love.forte.simbot.component.kaiheila.event.*
 import love.forte.simbot.component.kaiheila.internal.KaiheilaChannelImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
@@ -33,11 +36,12 @@ import love.forte.simbot.kaiheila.event.Event as KhlEvent
  * @see IncreaseEvent
  * @see AddedChannelEvent
  */
+@OptIn(Api4J::class)
 internal data class KaiheilaAddedChannelChangedEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: KhlEvent<Sys<AddedChannelExtraBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaChannelImpl,
+    override val after: KaiheilaChannelImpl,
 ) : KaiheilaAddedChannelChangedEvent() {
     override val operator: KaiheilaGuildMemberImpl? = source.internalMember(sourceBody.masterId)
 }
@@ -45,6 +49,8 @@ internal data class KaiheilaAddedChannelChangedEventImpl(
 /**
  * 频道更新事件impl
  */
+@Suppress("UnnecessaryOptInAnnotation")
+@OptIn(Api4J::class)
 internal data class KaiheilaUpdatedChannelChangedEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: KhlEvent<Sys<UpdatedChannelExtraBody>>,
@@ -56,31 +62,37 @@ internal data class KaiheilaUpdatedChannelChangedEventImpl(
 /**
  * 频道删除事件impl
  */
+@Suppress("UnnecessaryOptInAnnotation")
+@OptIn(Api4J::class)
 internal data class KaiheilaDeletedChannelChangedEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: KhlEvent<Sys<DeletedChannelExtraBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaChannelImpl,
+    override val before: KaiheilaChannelImpl,
 ) : KaiheilaDeletedChannelChangedEvent()
 
 /**
  * 消息置顶事件impl。
  */
+@Suppress("UnnecessaryOptInAnnotation")
+@OptIn(Api4J::class)
 internal data class KaiheilaPinnedMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: KhlEvent<Sys<PinnedMessageExtraBody>>,
     override val source: KaiheilaGuildImpl,
     override val channel: KaiheilaChannelImpl,
-    override val operator: KaiheilaGuildMemberImpl?
+    override val operator: KaiheilaGuildMemberImpl?,
 ) : KaiheilaPinnedMessageEvent()
 
 /**
  * 消息取消置顶事件impl。
  */
+@Suppress("UnnecessaryOptInAnnotation")
+@OptIn(Api4J::class)
 internal data class KaiheilaUnpinnedMessageEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: KhlEvent<Sys<UnpinnedMessageExtraBody>>,
     override val source: KaiheilaGuildImpl,
     override val channel: KaiheilaChannelImpl,
-    override val operator: KaiheilaGuildMemberImpl?
+    override val operator: KaiheilaGuildMemberImpl?,
 ) : KaiheilaUnpinnedMessageEvent()

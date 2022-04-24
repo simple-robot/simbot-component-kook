@@ -19,6 +19,7 @@ package love.forte.simbot.component.kaiheila.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
 import love.forte.simbot.kaiheila.api.asset.AssetCreated
@@ -27,6 +28,7 @@ import love.forte.simbot.message.Image
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.resources.Resource
+import love.forte.simbot.resources.URLResource
 
 /**
  * 与上传后的媒体资源相关的消息类型。
@@ -124,8 +126,11 @@ public data class AssetImage(override val asset: AssetCreated) : AssetMessage<As
         get() = MessageType.IMAGE.type
 
     override val id: ID = asset.url.ID
-    private val resource = asset.toResource()
 
+    @OptIn(Api4J::class)
+    override val resource: URLResource = asset.toResource()
+
+    @JvmSynthetic
     override suspend fun resource(): Resource = resource
 
     override val key: Message.Key<AssetImage>

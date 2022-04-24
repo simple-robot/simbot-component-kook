@@ -38,6 +38,7 @@ import love.forte.simbot.kaiheila.event.Event as KhlEvent
  *
  * @author ForteScarlet
  */
+@BaseEvent
 public abstract class KaiheilaEvent<out EX : KhlEvent.Extra, out E : KhlEvent<EX>> : BotContainer, Event {
     /**
      * 此事件对应的bot示例。
@@ -71,17 +72,17 @@ public abstract class KaiheilaEvent<out EX : KhlEvent.Extra, out E : KhlEvent<EX
  *
  * @param Body 事件消息的 [extra][KhlEvent.Extra] 作为 [Sys] 时，其 [Sys.body] 的类型。
  */
+@BaseEvent
 public abstract class KaiheilaSystemEvent<out Body> :
     KaiheilaEvent<Sys<Body>, KhlEvent<Sys<Body>>>() {
 
     override val id: ID get() = sourceEvent.msgId
-    public open val sourceBody: Body get() = sourceEvent.extra.body
 
     /**
-     * 此属性意义不大，默认均为 `PUBLIC` .
+     * [sourceEvent] 中的 `extra.body` 信息。
      */
-    override val visibleScope: Event.VisibleScope
-        get() = Event.VisibleScope.PUBLIC
+    public open val sourceBody: Body get() = sourceEvent.extra.body
+
 
     abstract override val key: Event.Key<out KaiheilaSystemEvent<*>>
 

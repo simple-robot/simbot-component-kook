@@ -20,7 +20,6 @@ package love.forte.simbot.component.kaiheila
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
 import love.forte.simbot.*
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
 import love.forte.simbot.event.EventProcessor
@@ -48,31 +47,22 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     override fun register(verifyInfo: BotVerifyInfo): KaiheilaComponentBot {
         val serializer = KaiheilaBotVerifyInfo.serializer()
 
-        val jsonElement =
-            verifyInfo.inputStream().use { inp -> registerJson.decodeFromStream(JsonElement.serializer(), inp) }
-        val componentString = kotlin.runCatching {
-            jsonElement.jsonObject["component"]?.jsonPrimitive?.content
-        }.getOrElse {
-            throw ComponentMismatchException("", it)
-        }
+        val component = verifyInfo.componentId
+        val currentComponent = this.component.id.literal
 
-        val component =
-            componentString ?: throw NoSuchComponentException("Component is not found in [${verifyInfo.infoName}]")
-
-        val botInfo: KaiheilaBotVerifyInfo = registerJson.decodeFromJsonElement(serializer, jsonElement)
-
-        logger.debug("[{}] json element load: {}", verifyInfo.infoName, botInfo)
-
-        this.component.id.literal
-        if (component != KaiheilaComponent.ID_VALUE) {
+        if (component != currentComponent) {
             logger.debug(
                 "[{}] mismatch: [{}] != [{}]",
-                verifyInfo.infoName,
+                verifyInfo.name,
                 component,
-                KaiheilaComponent.ID_VALUE
+                currentComponent
             )
-            throw ComponentMismatchException("[$component] != [${KaiheilaComponent.ID_VALUE}]")
+            throw ComponentMismatchException("[$component] != [$currentComponent]")
         }
+
+        val botInfo = verifyInfo.decode(serializer)
+
+        logger.debug("[{}] json element load: {}", verifyInfo.name, botInfo)
 
         // no config
         return register(botInfo.clientId, botInfo.token, botInfo::includeConfig)
@@ -124,10 +114,6 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
 
     public companion object {
         private val logger = LoggerFactory.getLogger(KaiheilaBotManager::class.java)
-        private val registerJson = Json {
-            isLenient = true
-            ignoreUnknownKeys = true
-        }
 
         /**
          * 通过 [EventProcessor] 构建bot管理器并使用默认配置。
