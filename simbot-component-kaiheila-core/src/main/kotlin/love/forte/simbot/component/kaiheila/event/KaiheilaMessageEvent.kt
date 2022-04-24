@@ -24,7 +24,6 @@ import love.forte.simbot.component.kaiheila.KaiheilaChannel
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
 import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
-import love.forte.simbot.definition.*
 import love.forte.simbot.event.*
 import love.forte.simbot.kaiheila.event.message.MessageEventExtra
 import love.forte.simbot.message.doSafeCast
@@ -46,291 +45,359 @@ import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
  * ## 来源
  * 开黑啦的消息推送同样会推送bot自己所发送的消息。在stdlib模块下，
  * 你可能需要自己手动处理对于消息来自于bot自身的情况。但是在当前组件下，[KaiheilaMessageEvent]
- * 提供了两个类型用于区别消息是否来自于 bot 自身：[KaiheilaNormalMessageEvent]、[KaiheilaBotSelfMessageEvent].
  *
- * @see KhlEvent.Extra.Text
+ * 来自其他人的事件：[KaiheilaNormalGroupMessageEvent]、[KaiheilaNormalPersonMessageEvent]；
+ * 来自bot自己的事件：[KaiheilaBotSelfGroupMessageEvent]、[KaiheilaBotSelfPersonMessageEvent]。
  *
- * @see KaiheilaNormalMessageEvent
- * @see KaiheilaBotSelfMessageEvent
+ *
  *
  * @author ForteScarlet
  */
-public sealed class KaiheilaMessageEvent<out EX : MessageEventExtra> :
-    KaiheilaEvent<KhlEvent.Extra.Text, KhlMessageEvent<EX>>(), MessageEvent {
-    override val key: Event.Key<out KaiheilaMessageEvent<*>>
+@BaseEvent
+public sealed class KaiheilaMessageEvent :
+    KaiheilaEvent<KhlEvent.Extra.Text, KhlMessageEvent<MessageEventExtra>>(), MessageEvent {
+    override val key: Event.Key<out KaiheilaMessageEvent>
         get() = Key
 
+    /**
+     * 接收到的消息体。
+     */
     abstract override val messageContent: KaiheilaReceiveMessageContent
 
 
     /**
      * 频道消息事件。
      *
-     * 此类型可能是 [KaiheilaNormalMessageEvent.Group], 则代表为一个普通的频道成员发送的消息事件；
-     * 或者是 [KaiheilaBotSelfMessageEvent.Group], 则代表为bot自己所发出的消息。
+     * 此类型可能是 [KaiheilaNormalGroupMessageEvent], 则代表为一个普通的频道成员发送的消息事件；
+     * 或者是 [KaiheilaBotSelfGroupMessageEvent], 则代表为bot自己所发出的消息。
      *
-     * [普通成员消息][KaiheilaNormalMessageEvent.Group] 会实现 [ChannelMessageEvent],
-     * 但是 [bot频道消息][KaiheilaBotSelfMessageEvent.Group] 只会实现基础的 [MessageEvent]、[ChannelEvent]、[MemberEvent].
+     * [普通成员消息][KaiheilaNormalGroupMessageEvent] 会实现 [ChannelMessageEvent],
+     * 但是 [bot频道消息][KaiheilaBotSelfGroupMessageEvent] 只会实现基础的 [MessageEvent]、[ChannelEvent]、[MemberEvent].
      *
-     * @see KaiheilaNormalMessageEvent.Group
-     * @see KaiheilaBotSelfMessageEvent.Group
+     * @see KaiheilaNormalGroupMessageEvent
+     * @see KaiheilaBotSelfGroupMessageEvent
      *
      */
-    public abstract class Group<out EX : MessageEventExtra> : KaiheilaMessageEvent<EX>(), MessageEvent, DeleteSupport {
+    public abstract class Group : KaiheilaMessageEvent(), MessageEvent, DeleteSupport {
 
-
-        //region Impls
 
         /**
-         * 可见性。始终为 [Event.VisibleScope.PUBLIC].
+         * 消息事件发生的频道。
          */
-        override val visibleScope: Event.VisibleScope
-            get() = Event.VisibleScope.PUBLIC
+        @Api4J
+        abstract override val source: KaiheilaChannel
+
+        /**
+         * 消息事件发生的频道。
+         */
+        @JvmSynthetic
+        abstract override suspend fun source(): KaiheilaChannel
+
 
         /**
          * Event Key.
          */
-        override val key: Event.Key<out Group<*>>
+        override val key: Event.Key<out Group>
             get() = Key
 
-        //endregion
 
         public companion object Key :
-            BaseEventKey<Group<*>>("kaiheila.message_group", KaiheilaMessageEvent, MessageEvent) {
-            override fun safeCast(value: Any): Group<*>? = doSafeCast(value)
+            BaseEventKey<Group>("kaiheila.message_group", KaiheilaMessageEvent, MessageEvent) {
+            override fun safeCast(value: Any): Group? = doSafeCast(value)
         }
     }
 
     /**
      * 私聊消息事件。
      *
-     * 此类型可能是 [KaiheilaNormalMessageEvent.Person], 则代表为一个普通的联系人发送的私聊消息事件；
-     * 或者是 [KaiheilaBotSelfMessageEvent.Person], 则代表为bot自己所发出的私聊消息。
+     * 此类型可能是 [KaiheilaNormalPersonMessageEvent], 则代表为一个普通的联系人发送的私聊消息事件；
+     * 或者是 [KaiheilaBotSelfPersonMessageEvent], 则代表为bot自己所发出的私聊消息。
      *
-     * [普通联系人私聊消息][KaiheilaNormalMessageEvent.Person] 会实现 [ContactMessageEvent],
-     * 但是 [bot私聊消息][KaiheilaBotSelfMessageEvent.Person] 只会实现基础的 [MessageEvent]
+     * [普通联系人私聊消息][KaiheilaNormalPersonMessageEvent] 会实现 [ContactMessageEvent],
+     * 但是 [bot私聊消息][KaiheilaBotSelfPersonMessageEvent] 只会实现基础的 [MessageEvent]
      *
-     * @see KaiheilaNormalMessageEvent.Person
-     * @see KaiheilaBotSelfMessageEvent.Person
+     * @see KaiheilaNormalPersonMessageEvent
+     * @see KaiheilaBotSelfPersonMessageEvent
      */
-    public abstract class Person<out EX : MessageEventExtra> : KaiheilaMessageEvent<EX>(), MessageEvent {
-
-        //region Impls
-        override val key: Event.Key<out Person<*>>
-            get() = Key
-        //endregion
-
-        public companion object Key :
-            BaseEventKey<Person<*>>("kaiheila.message_person", KaiheilaMessageEvent, MessageEvent) {
-            override fun safeCast(value: Any): Person<*>? = doSafeCast(value)
-        }
-    }
-
-    public companion object Key : BaseEventKey<KaiheilaMessageEvent<*>>(
-        "kaiheila.message", MessageEvent
-    ) {
-        override fun safeCast(value: Any): KaiheilaMessageEvent<*>? = doSafeCast(value)
-    }
-}
-
-
-/**
- * 开黑啦普通消息事件类型，即非来自bot自身发送的消息的类型。
- *
- * 此事件下接收的消息不会是bot自己所发的消息。
- *
- *
- */
-public sealed class KaiheilaNormalMessageEvent<out EX : MessageEventExtra> : KaiheilaMessageEvent<EX>() {
-
-    /**
-     * 频道消息事件。
-     *
-     * 此事件只会由 bot 自身以外的人触发。
-     */
-    public abstract class Group<out EX : MessageEventExtra> : KaiheilaMessageEvent.Group<EX>(), ChannelMessageEvent {
+    public abstract class Person : KaiheilaMessageEvent(), MessageEvent {
 
         /**
-         * 消息的发送者。不会是bot自己。
+         * 消息事件发生的对话。
          */
-        @OptIn(Api4J::class)
-        abstract override val author: KaiheilaGuildMember
-
-        /**
-         * 消息产生的频道。
-         */
-        @OptIn(Api4J::class)
-        abstract override val channel: KaiheilaChannel
-
-        /**
-         * 消息产生的频道。
-         */
-        @OptIn(Api4J::class)
-        override val source: Channel
-            get() = channel
-
-        /**
-         * 消息的发送者。不会是bot自己。
-         */
-        override suspend fun author(): KaiheilaGuildMember = author
-
-        /**
-         * 消息产生的频道。
-         */
-        override suspend fun channel(): KaiheilaChannel = channel
-
-        /**
-         * 消息产生的频道。
-         */
-        override suspend fun source(): KaiheilaChannel = channel
-
-        /**
-         * 消息产生的频道。
-         */
-        @OptIn(Api4J::class)
-        override val organization: KaiheilaChannel
-            get() = channel
-
-        /**
-         * 消息产生的频道。
-         */
-        override suspend fun organization(): KaiheilaChannel = channel
-
-        /**
-         * Event Key.
-         */
-        override val key: Event.Key<out Group<*>>
-            get() = Key
-
-        public companion object Key :
-            BaseEventKey<Group<*>>("kaiheila.normal_message_group", Group, ChannelMessageEvent) {
-            override fun safeCast(value: Any): Group<*>? = doSafeCast(value)
-        }
-    }
-
-    /**
-     * 私聊消息事件。
-     *
-     * 此事件只会由 bot 以外的人触发。
-     */
-    public abstract class Person<out EX : MessageEventExtra> : KaiheilaMessageEvent.Person<EX>(), ContactMessageEvent {
-
-        @OptIn(ExperimentalSimbotApi::class)
-        abstract override suspend fun user(): KaiheilaUserChat
-
-        @OptIn(ExperimentalSimbotApi::class)
-        override suspend fun source(): KaiheilaUserChat = user()
-
         @Api4J
         @OptIn(ExperimentalSimbotApi::class)
-        override val user: KaiheilaUserChat
-            get() = runInBlocking { user() }
-
-        @Api4J
-        @OptIn(ExperimentalSimbotApi::class)
-        override val source: KaiheilaUserChat
-            get() = user
-
-
-        override val key: Event.Key<out Person<*>>
-            get() = Key
-        //endregion
-
-        public companion object Key :
-            BaseEventKey<Person<*>>("kaiheila.normal_message_person", Person, ContactMessageEvent) {
-            override fun safeCast(value: Any): Person<*>? = doSafeCast(value)
-        }
-    }
-}
-
-/**
- * 开黑啦bot消息事件类型，即来自bot自身发送的消息的类型。
- *
- * 此事件下接收的消息只会是bot自己所发的消息。
- *
- *
- */
-public sealed class KaiheilaBotSelfMessageEvent<out EX : MessageEventExtra> : KaiheilaMessageEvent<EX>() {
-
-
-    /**
-     * 频道消息事件。
-     *
-     * 此事件只会由 bot 自身触发。
-     */
-    public abstract class Group<out EX : MessageEventExtra> : KaiheilaMessageEvent.Group<EX>(), ChannelEvent,
-        MemberEvent {
-        @OptIn(Api4J::class)
-        abstract override val channel: KaiheilaChannel
+        abstract override val source: KaiheilaUserChat
 
         /**
-         * 事件的源头，也就是发生事件的频道。
+         * 消息事件发生的对话。
          */
-        @OptIn(Api4J::class)
-        override val source: KaiheilaChannel
-            get() = channel
-
-        override suspend fun source(): Objectives = source
-
-
-        override suspend fun channel(): KaiheilaChannel = channel
-
-        @OptIn(Api4J::class)
-        override val organization: KaiheilaChannel
-            get() = channel
-
-        override suspend fun organization(): KaiheilaChannel = channel
-
-
-        @OptIn(Api4J::class)
-        abstract override val member: KaiheilaGuildMember
-        override suspend fun member(): KaiheilaGuildMember = member
-
-        /**
-         * 可见性。始终为 [Event.VisibleScope.PUBLIC].
-         */
-        override val visibleScope: Event.VisibleScope
-            get() = Event.VisibleScope.PUBLIC
-
-        override val key: Event.Key<out Group<*>>
-            get() = Key
-
-        public companion object Key :
-            BaseEventKey<Group<*>>("kaiheila.bot_self_message_group", Group, ChannelEvent, MemberEvent) {
-            override fun safeCast(value: Any): Group<*>? = doSafeCast(value)
-        }
-    }
-
-    /**
-     * 私聊消息事件。
-     *
-     * 此事件只会由 bot 自身触发。
-     */
-    public abstract class Person<out EX : MessageEventExtra> : KaiheilaMessageEvent.Person<EX>() {
-
-        @OptIn(Api4J::class, ExperimentalSimbotApi::class)
-        override val source: KaiheilaUserChat
-            get() = runInBlocking { source() }
-
+        @JvmSynthetic
         @OptIn(ExperimentalSimbotApi::class)
         abstract override suspend fun source(): KaiheilaUserChat
 
-        override val key: Event.Key<out Person<*>>
+
+        override val key: Event.Key<out Person>
             get() = Key
 
-        /**
-         * 可见性。始终为 [Event.VisibleScope.PUBLIC].
-         */
-        override val visibleScope: Event.VisibleScope
-            get() = Event.VisibleScope.PUBLIC
-
-
         public companion object Key :
-            BaseEventKey<Person<*>>(
-                "kaiheila.bot_self_message_person",
-                Person
-            ) {
-            override fun safeCast(value: Any): Person<*>? = doSafeCast(value)
+            BaseEventKey<Person>("kaiheila.message_person", KaiheilaMessageEvent, MessageEvent) {
+            override fun safeCast(value: Any): Person? = doSafeCast(value)
         }
+    }
+
+    public companion object Key : BaseEventKey<KaiheilaMessageEvent>(
+        "kaiheila.message", MessageEvent
+    ) {
+        override fun safeCast(value: Any): KaiheilaMessageEvent? = doSafeCast(value)
+    }
+}
+
+
+/**
+ * 开黑啦普通频道消息事件。即来自bot以外的人发送的消息的类型。
+ *
+ * 此事件只会由 bot 自身以外的人触发。
+ */
+public abstract class KaiheilaNormalGroupMessageEvent : KaiheilaMessageEvent.Group(), ChannelMessageEvent {
+
+    /**
+     * 消息的发送者。不会是bot自己。
+     */
+    @OptIn(Api4J::class)
+    abstract override val author: KaiheilaGuildMember
+
+    /**
+     * 消息的发送者。不会是bot自己。
+     */
+    @JvmSynthetic
+    override suspend fun author(): KaiheilaGuildMember = author
+
+    /**
+     * 消息产生的频道。同 [source].
+     */
+    @OptIn(Api4J::class)
+    abstract override val channel: KaiheilaChannel
+
+    /**
+     * 消息产生的频道。同 [source].
+     */
+    @JvmSynthetic
+    override suspend fun channel(): KaiheilaChannel = channel
+
+    /**
+     * 消息产生的频道。同 [channel].
+     */
+    @OptIn(Api4J::class)
+    override val source: KaiheilaChannel
+        get() = channel
+
+    /**
+     * 消息产生的频道。同 [channel].
+     */
+    @JvmSynthetic
+    override suspend fun source(): KaiheilaChannel = channel
+
+    /**
+     * 消息产生的频道。同 [channel].
+     */
+    @OptIn(Api4J::class)
+    override val organization: KaiheilaChannel
+        get() = channel
+
+    /**
+     * 消息产生的频道。同 [channel].
+     */
+    @JvmSynthetic
+    override suspend fun organization(): KaiheilaChannel = channel
+
+    /**
+     * Event Key.
+     */
+    override val key: Event.Key<out Group>
+        get() = Key
+
+    public companion object Key :
+        BaseEventKey<Group>("kaiheila.normal_group_message", Group, ChannelMessageEvent) {
+        override fun safeCast(value: Any): Group? = doSafeCast(value)
+    }
+}
+
+/**
+ * 开黑啦普通私聊消息事件。即来自bot以外的人发送的消息的类型。
+ *
+ * 此事件只会由 bot 以外的人触发。
+ */
+public abstract class KaiheilaNormalPersonMessageEvent : KaiheilaMessageEvent.Person(), ContactMessageEvent {
+
+    /**
+     * 私聊消息所来自的聊天会话。
+     *
+     * 会在获取的时候通过api进行查询，没有内部缓存。
+     */
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override val user: KaiheilaUserChat
+        get() = runInBlocking { user() }
+
+    /**
+     * 私聊消息所来自的聊天会话。
+     *
+     * 会在获取的时候通过api进行查询，没有内部缓存。
+     */
+    @JvmSynthetic
+    @OptIn(ExperimentalSimbotApi::class)
+    abstract override suspend fun user(): KaiheilaUserChat
+
+    /**
+     * 私聊消息所来自的聊天会话。同 [user]。
+     *
+     * 会在获取的时候通过api进行查询，没有内部缓存。
+     */
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override val source: KaiheilaUserChat
+        get() = user
+
+
+    /**
+     * 私聊消息所来自的聊天会话。同 [user]。
+     *
+     * 会在获取的时候通过api进行查询，没有内部缓存。
+     */
+    @JvmSynthetic
+    @OptIn(ExperimentalSimbotApi::class)
+    override suspend fun source(): KaiheilaUserChat = user()
+
+
+    override val key: Event.Key<out Person>
+        get() = Key
+    //endregion
+
+    public companion object Key :
+        BaseEventKey<Person>(
+            "kaiheila.normal_person_message",
+            Person, ContactMessageEvent
+        ) {
+        override fun safeCast(value: Any): Person? = doSafeCast(value)
+    }
+}
+
+
+/**
+ * 开黑啦bot频道消息事件。即来自bot自身发送的消息的类型。
+ *
+ * 此事件只会由 bot 自身触发。
+ */
+public abstract class KaiheilaBotSelfGroupMessageEvent : KaiheilaMessageEvent.Group(), ChannelEvent, MemberEvent {
+
+
+    /**
+     * 发生事件的频道。
+     */
+    @OptIn(Api4J::class)
+    abstract override val channel: KaiheilaChannel
+
+
+    /**
+     * 发生事件的频道。
+     */
+    @JvmSynthetic
+    override suspend fun channel(): KaiheilaChannel = channel
+
+
+    /**
+     * 发生事件的频道。同 [channel]。
+     */
+    @OptIn(Api4J::class)
+    override val source: KaiheilaChannel
+        get() = channel
+
+    /**
+     * 发生事件的频道。同 [channel]。
+     */
+    @JvmSynthetic
+    override suspend fun source(): KaiheilaChannel = source
+
+
+    /**
+     * 发生事件的频道。同 [channel]。
+     */
+    @OptIn(Api4J::class)
+    override val organization: KaiheilaChannel
+        get() = channel
+
+    /**
+     * 发生事件的频道。同 [channel]。
+     */
+    @JvmSynthetic
+    override suspend fun organization(): KaiheilaChannel = channel
+
+    /**
+     * 消息发送者，也就是bot自身的信息。
+     */
+    @OptIn(Api4J::class)
+    abstract override val member: KaiheilaGuildMember
+
+    /**
+     * 消息发送者，也就是bot自身的信息。
+     */
+    @JvmSynthetic
+    override suspend fun member(): KaiheilaGuildMember = member
+
+    /**
+     * 消息发送者，也就是bot自身的信息。同 [member].
+     */
+    @OptIn(Api4J::class)
+    override val user: KaiheilaGuildMember get() = member
+
+    /**
+     * 消息发送者，也就是bot自身的信息。同 [member].
+     */
+    @JvmSynthetic
+    override suspend fun user(): KaiheilaGuildMember = member
+
+
+    override val key: Event.Key<out Group>
+        get() = Key
+
+    public companion object Key :
+        BaseEventKey<Group>("kaiheila.bot_self_group_message", Group, ChannelEvent, MemberEvent) {
+        override fun safeCast(value: Any): Group? = doSafeCast(value)
+    }
+}
+
+/**
+ * 私聊消息事件。
+ *
+ * 此事件只会由 bot 自身触发，代表bot在私聊会话中发出的消息。
+ */
+public abstract class KaiheilaBotSelfPersonMessageEvent : KaiheilaMessageEvent.Person() {
+
+    /**
+     * 发生事件的私聊会话。
+     */
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override val source: KaiheilaUserChat
+        get() = runInBlocking { source() }
+
+    /**
+     * 发生事件的私聊会话。
+     */
+    @JvmSynthetic
+    @OptIn(ExperimentalSimbotApi::class)
+    abstract override suspend fun source(): KaiheilaUserChat
+
+
+    override val key: Event.Key<out Person>
+        get() = Key
+
+
+    public companion object Key :
+        BaseEventKey<Person>(
+            "kaiheila.bot_self_person_message",
+            Person
+        ) {
+        override fun safeCast(value: Any): Person? = doSafeCast(value)
     }
 }

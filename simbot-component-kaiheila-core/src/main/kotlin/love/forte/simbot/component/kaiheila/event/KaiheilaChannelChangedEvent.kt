@@ -45,38 +45,38 @@ import love.forte.simbot.utils.runInBlocking
  * - [PinnedMessageEvent]
  *
  *
- *
  * @see ChangedEvent
  *
  * @author ForteScarlet
  */
-public abstract class KaiheilaChannelChangedEvent<out Body : ChannelEventExtraBody, out Before, out After> :
-    KaiheilaSystemEvent<Body>(), ChangedEvent<KaiheilaGuild, Before, After> {
+@BaseEvent
+public abstract class KaiheilaChannelChangedEvent<out Body : ChannelEventExtraBody> :
+    KaiheilaSystemEvent<Body>(), ChangedEvent {
 
     /**
      * 此事件涉及的频道所属的频道服务器。
      */
+    @OptIn(Api4J::class)
     abstract override val source: KaiheilaGuild
-    abstract override val before: Before
-    abstract override val after: After
 
+    /**
+     * 此事件涉及的频道所属的频道服务器。
+     */
+    @JvmSynthetic
+    override suspend fun source(): KaiheilaGuild = source
 
     //// Impl
-
-    override suspend fun after(): After = after
-    override suspend fun before(): Before = before
-    override suspend fun source(): KaiheilaGuild = source
 
 
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 
-    abstract override val key: Event.Key<out KaiheilaChannelChangedEvent<*, *, *>>
+    abstract override val key: Event.Key<out KaiheilaChannelChangedEvent<*>>
 
-    public companion object Key : BaseEventKey<KaiheilaChannelChangedEvent<*, *, *>>(
+    public companion object Key : BaseEventKey<KaiheilaChannelChangedEvent<*>>(
         "kaiheila.channel_changed", KaiheilaSystemEvent, ChangedEvent
     ) {
-        override fun safeCast(value: Any): KaiheilaChannelChangedEvent<*, *, *>? = doSafeCast(value)
+        override fun safeCast(value: Any): KaiheilaChannelChangedEvent<*>? = doSafeCast(value)
     }
 }
 
@@ -87,12 +87,8 @@ public abstract class KaiheilaChannelChangedEvent<out Body : ChannelEventExtraBo
  * @see AddedChannelEvent
  */
 public abstract class KaiheilaAddedChannelChangedEvent :
-    KaiheilaChannelChangedEvent<AddedChannelExtraBody, KaiheilaChannel?, KaiheilaChannel>(),
-    IncreaseEvent<KaiheilaGuild, KaiheilaChannel> {
-    /**
-     * 增加的频道。
-     */
-    abstract override val target: KaiheilaChannel
+    KaiheilaChannelChangedEvent<AddedChannelExtraBody>(),
+    IncreaseEvent {
 
     /**
      * 操作者，即此频道的创建者。
@@ -103,12 +99,18 @@ public abstract class KaiheilaAddedChannelChangedEvent :
      */
     public abstract val operator: KaiheilaGuildMember?
 
-    //// Impl
-    override val before: KaiheilaChannel? get() = null
-    override val after: KaiheilaChannel get() = target
-    override suspend fun target(): KaiheilaChannel = target
+    /**
+     * 增加的频道。
+     */
+    @OptIn(Api4J::class)
+    abstract override val after: KaiheilaChannel
+
+    /**
+     * 增加的频道。
+     */
+    @JvmSynthetic
     override suspend fun after(): KaiheilaChannel = after
-    override suspend fun before(): KaiheilaChannel? = before
+
 
     override val key: Event.Key<out KaiheilaAddedChannelChangedEvent>
         get() = Key
@@ -128,26 +130,44 @@ public abstract class KaiheilaAddedChannelChangedEvent :
  * @see UpdatedChannelEvent
  */
 public abstract class KaiheilaUpdatedChannelChangedEvent :
-    KaiheilaChannelChangedEvent<UpdatedChannelExtraBody, UpdatedChannelExtraBody?, UpdatedChannelExtraBody>(),
-    ChangedEvent<KaiheilaGuild, UpdatedChannelExtraBody?, UpdatedChannelExtraBody>,
+    KaiheilaChannelChangedEvent<UpdatedChannelExtraBody>(),
+    ChangedEvent,
     ChannelInfoContainer {
 
-    abstract override val source: KaiheilaGuild
 
     @OptIn(Api4J::class)
     abstract override val channel: KaiheilaChannel
 
-    //// Impl
+    /**
+     * 频道信息。
+     */
+    @JvmSynthetic
+    override suspend fun channel(): KaiheilaChannel = channel
 
+    /**
+     * 无法获取变更前的信息，[before] 恒为null。
+     */
+    @OptIn(Api4J::class)
     override val before: UpdatedChannelExtraBody?
         get() = null
 
-    override val after: UpdatedChannelExtraBody
-        get() = sourceBody
-
+    /**
+     * 无法获取变更前的信息，[before] 恒为null。
+     */
+    @JvmSynthetic
     override suspend fun before(): UpdatedChannelExtraBody? = before
+
+    /**
+     * 信息变更内容。
+     */
+    @OptIn(Api4J::class)
+    override val after: UpdatedChannelExtraBody get() = sourceBody
+
+    /**
+     * 信息变更内容。
+     */
+    @JvmSynthetic
     override suspend fun after(): UpdatedChannelExtraBody = after
-    override suspend fun channel(): KaiheilaChannel = channel
 
 
     override val key: Event.Key<out KaiheilaUpdatedChannelChangedEvent>
@@ -166,23 +186,33 @@ public abstract class KaiheilaUpdatedChannelChangedEvent :
  * @see DeletedChannelEvent
  */
 public abstract class KaiheilaDeletedChannelChangedEvent :
-    KaiheilaChannelChangedEvent<DeletedChannelExtraBody, KaiheilaChannel, KaiheilaChannel?>(),
-    DecreaseEvent<KaiheilaGuild, KaiheilaChannel> {
+    KaiheilaChannelChangedEvent<DeletedChannelExtraBody>(),
+    DecreaseEvent {
 
-    abstract override val target: KaiheilaChannel
+    /**
+     * 被删除的频道。
+     */
+    @OptIn(Api4J::class)
+    abstract override val before: KaiheilaChannel
 
-    //// Impl
-    override suspend fun target(): KaiheilaChannel = target
-
-    override val before: KaiheilaChannel
-        get() = target
-
+    /**
+     * 被删除的频道。
+     */
+    @JvmSynthetic
     override suspend fun before(): KaiheilaChannel = before
 
+    /**
+     * 始终为null。
+     */
+    @OptIn(Api4J::class)
     override val after: KaiheilaChannel?
         get() = null
 
-    override suspend fun after(): KaiheilaChannel? = after
+    /**
+     * 始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun after(): KaiheilaChannel? = null
 
 
     override val key: Event.Key<out KaiheilaDeletedChannelChangedEvent>
@@ -209,15 +239,24 @@ public abstract class KaiheilaDeletedChannelChangedEvent :
  * 如果你只关心相关消息的ID，可以直接使用 [msgId] 属性获取。
  *
  */
+@BaseEvent
 public abstract class KaiheilaMessagePinEvent<Body : ChannelEventExtraBody> :
-    KaiheilaChannelChangedEvent<Body, ID?, ID?>(),
-    ChangedEvent<KaiheilaGuild, ID?, ID?>, ChannelInfoContainer {
+    KaiheilaChannelChangedEvent<Body>(),
+    ChangedEvent, ChannelInfoContainer {
 
     /**
      * 此事件涉及的频道信息。
      */
     @OptIn(Api4J::class)
     abstract override val channel: KaiheilaChannel
+
+
+    /**
+     * 此事件涉及的频道信息。
+     */
+    @JvmSynthetic
+    override suspend fun channel(): KaiheilaChannel = channel
+
 
     /**
      * 此事件涉及的操作者。会通过 [operatorId] 获取。
@@ -242,8 +281,34 @@ public abstract class KaiheilaMessagePinEvent<Body : ChannelEventExtraBody> :
     public abstract val channelId: ID
 
 
-    //// Impl
-    override suspend fun channel(): KaiheilaChannel = channel
+    /**
+     * 变更前ID。如果此事件是 [KaiheilaUnpinnedMessageEvent], 则有值，否则为null。
+     * 有值时同 [msgId].
+     */
+    @OptIn(Api4J::class)
+    abstract override val before: ID?
+
+    /**
+     * 变更前ID。如果此事件是 [KaiheilaUnpinnedMessageEvent], 则有值，否则为null。
+     * 有值时同 [msgId].
+     */
+    @JvmSynthetic
+    abstract override suspend fun before(): ID?
+
+    /**
+     * 变更后ID。如果此事件是 [KaiheilaUnpinnedMessageEvent], 则有值，否则为null。
+     * 有值时同 [msgId].
+     */
+    @OptIn(Api4J::class)
+    abstract override val after: ID?
+
+    /**
+     * 变更后ID。如果此事件是 [KaiheilaUnpinnedMessageEvent], 则有值，否则为null。
+     * 有值时同 [msgId].
+     */
+    @JvmSynthetic
+    abstract override suspend fun after(): ID?
+
 
     //// Api
 
@@ -257,7 +322,7 @@ public abstract class KaiheilaMessagePinEvent<Body : ChannelEventExtraBody> :
     }
 
     /**
-     * 通过 [msgId] 查询这条被置顶的消息。
+     * 通过 [msgId] 查询这条置顶相关的消息。
      */
     @Api4J
     public fun queryMsgBlocking(): MessageContent = runInBlocking { queryMsg() }
@@ -288,24 +353,48 @@ public abstract class KaiheilaMessagePinEvent<Body : ChannelEventExtraBody> :
 public abstract class KaiheilaPinnedMessageEvent :
     KaiheilaMessagePinEvent<PinnedMessageExtraBody>() {
 
-    //// Impl
+    /**
+     * 涉及消息的ID。
+     *
+     */
     override val msgId: ID
         get() = sourceBody.msgId
 
+
+    /**
+     * 操作者ID。
+     */
     override val operatorId: ID
         get() = sourceBody.operatorId
 
+    /**
+     * 频道ID。
+     */
     override val channelId: ID
         get() = sourceBody.channelId
 
+    /**
+     * 始终为null。
+     */
     override val before: ID?
         get() = null
 
-    override suspend fun before(): ID? = before
+    /**
+     * 始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun before(): ID? = null
 
+    /**
+     * 同 [msgId].
+     */
     override val after: ID
         get() = msgId
 
+    /**
+     * 同 [msgId].
+     */
+    @JvmSynthetic
     override suspend fun after(): ID = after
 
     override val key: Event.Key<out KaiheilaPinnedMessageEvent>
@@ -343,15 +432,31 @@ public abstract class KaiheilaUnpinnedMessageEvent :
     override val channelId: ID
         get() = sourceBody.channelId
 
+    /**
+     * 同 [msgId].
+     */
+
     override val before: ID
         get() = msgId
 
+    /**
+     * 同 [msgId].
+     */
+
+    @JvmSynthetic
     override suspend fun before(): ID = before
 
+    /**
+     * 始终为null。
+     */
     override val after: ID?
         get() = null
 
-    override suspend fun after(): ID? = after
+    /**
+     * 始终为null。
+     */
+    @JvmSynthetic
+    override suspend fun after(): ID? = null
 
 
     override val key: Event.Key<out KaiheilaUnpinnedMessageEvent>

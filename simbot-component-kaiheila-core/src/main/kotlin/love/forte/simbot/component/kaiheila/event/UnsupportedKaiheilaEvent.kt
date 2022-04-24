@@ -1,3 +1,20 @@
+/*
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *
+ *  本文件是 simbot-component-kaiheila 的一部分。
+ *
+ *  simbot-component-kaiheila 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kaiheila 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
+ *
+ */
+
 package love.forte.simbot.component.kaiheila.event
 
 import love.forte.simbot.DiscreetSimbotApi
@@ -11,6 +28,7 @@ import love.forte.simbot.message.doSafeCast
 
 /**
  * 所有未提供针对性实现的其他开黑啦事件。
+ *
  * [UnsupportedKaiheilaEvent] 不实现任何其他事件类型，
  * 仅实现开黑啦组件中的事件父类型 [KaiheilaEvent]，是一个完全独立的事件类型。
  *
@@ -28,18 +46,35 @@ import love.forte.simbot.message.doSafeCast
 @DiscreetSimbotApi
 public class UnsupportedKaiheilaEvent(
     override val bot: KaiheilaComponentBot,
-    override val sourceEvent: Event<Event.Extra>
+    override val sourceEvent: Event<Event.Extra>,
 ) : KaiheilaEvent<Event.Extra, Event<Event.Extra>>() {
+    /**
+     * 事件ID。
+     */
+    override val id: ID get() = sourceEvent.msgId
+
+    /**
+     * 事件时间。
+     */
+    override val timestamp: Timestamp
+        get() = sourceEvent.msgTimestamp
+
+
+
     override fun toString(): String {
         return "UnsupportedKaiheilaEvent(sourceEvent=$sourceEvent)"
     }
 
-    override val id: ID get() = sourceEvent.msgId
-    override val timestamp: Timestamp
-        get() = sourceEvent.msgTimestamp
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is UnsupportedKaiheilaEvent) return false
 
-    override val visibleScope: love.forte.simbot.event.Event.VisibleScope
-        get() = love.forte.simbot.event.Event.VisibleScope.PRIVATE
+        return sourceEvent == other.sourceEvent
+    }
+
+    override fun hashCode(): Int {
+        return sourceEvent.hashCode()
+    }
 
 
     override val key: love.forte.simbot.event.Event.Key<UnsupportedKaiheilaEvent>

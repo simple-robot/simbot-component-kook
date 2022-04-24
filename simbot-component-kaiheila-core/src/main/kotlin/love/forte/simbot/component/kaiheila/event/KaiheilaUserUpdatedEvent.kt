@@ -17,6 +17,7 @@
 
 package love.forte.simbot.component.kaiheila.event
 
+import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.event.BaseEventKey
@@ -38,33 +39,50 @@ import love.forte.simbot.message.doSafeCast
  */
 public abstract class KaiheilaUserUpdatedEvent :
     KaiheilaSystemEvent<UserUpdatedEventBody>(),
-    ChangedEvent<ID, Any?, UserUpdatedEventBody> {
-
-    //// Impl
-
+    ChangedEvent {
 
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 
+
+    /**
+     * 变化源。为发生变更的用户的id。
+     */
+    @OptIn(Api4J::class)
     override val source: ID
         get() = sourceBody.userId
 
+    /**
+     * 变化源。为发生变更的用户的id。
+     */
+    @JvmSynthetic
     override suspend fun source(): ID = source
 
     /**
      * before 无法确定，始终为null。
      */
+    @OptIn(Api4J::class)
     override val before: Any?
         get() = null
 
     /**
      * before 无法确定，始终为null。
      */
+    @JvmSynthetic
     override suspend fun before(): Any? = null
 
+
+    /**
+     * 变化事件的主要内容。
+     */
+    @OptIn(Api4J::class)
     override val after: UserUpdatedEventBody
         get() = sourceBody
 
+    /**
+     * 变化事件的主要内容。
+     */
+    @JvmSynthetic
     override suspend fun after(): UserUpdatedEventBody = after
 
 

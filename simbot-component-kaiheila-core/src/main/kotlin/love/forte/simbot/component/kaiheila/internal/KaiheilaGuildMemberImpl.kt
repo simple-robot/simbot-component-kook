@@ -32,6 +32,9 @@ import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kaiheila.api.guild.GuildMuteDeleteRequest
 import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.MessageReceipt
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
 import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
@@ -45,7 +48,7 @@ import kotlin.time.Duration
 internal class KaiheilaGuildMemberImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val guild: KaiheilaGuildImpl,
-    override val source: User
+    override val source: User,
 ) : KaiheilaGuildMember, CoroutineScope {
     internal val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
@@ -53,12 +56,6 @@ internal class KaiheilaGuildMemberImpl(
     @Volatile
     @Suppress("unused")
     private var _muteJob: Job? = null
-
-    // private val muteJob = atomic<Job?>(null)
-
-
-    // private val muteJobUpdater =
-    //     AtomicReferenceFieldUpdater.newUpdater(KaiheilaMemberImpl::class.java, Job::class.java, "muteJob")
 
 
     override var nickname: String = source.nickname ?: ""
@@ -70,6 +67,7 @@ internal class KaiheilaGuildMemberImpl(
     override val id: ID
         get() = source.id
 
+    //region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
         val result = GuildMuteDeleteRequest(guild.id, source.id, type).requestBy(bot)
@@ -80,10 +78,6 @@ internal class KaiheilaGuildMemberImpl(
                     cur?.cancel()
                     null
                 }
-                // muteJob.update { cur ->
-                //     cur?.cancel()
-                //     null
-                // }
             }
         }
     }
@@ -117,7 +111,39 @@ internal class KaiheilaGuildMemberImpl(
 
 
     }
+    //endregion
 
+
+    //region TODO send 相关
+    override suspend fun send(text: String): MessageReceipt {
+        return super.send(text)
+    }
+
+    override suspend fun send(message: Message): MessageReceipt {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun send(message: MessageContent): MessageReceipt {
+        return super.send(message)
+    }
+
+    @Api4J
+    override fun sendBlocking(text: String): MessageReceipt {
+        return super.sendBlocking(text)
+    }
+
+    @Api4J
+    override fun sendBlocking(message: Message): MessageReceipt {
+        return super.sendBlocking(message)
+    }
+
+    @Api4J
+    override fun sendBlocking(message: MessageContent): MessageReceipt {
+        return super.sendBlocking(message)
+    }
+    //endregion
+
+    //region roles相关
     @Api4J
     override val roles: Stream<out Role>
         get() = Stream.empty() // TODO("Not yet implemented")
@@ -126,6 +152,7 @@ internal class KaiheilaGuildMemberImpl(
         return emptyFlow()
         // TODO("Not yet implemented")
     }
+    //endregion
 
 
     override fun toString(): String {
@@ -139,7 +166,6 @@ internal class KaiheilaGuildMemberImpl(
     }
 
 }
-
 
 
 //  by KaiheilaGuildMemberImpl(bot, guild, SystemUser)

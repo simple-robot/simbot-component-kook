@@ -15,8 +15,12 @@
  *
  */
 
+@file:Suppress("UnnecessaryOptInAnnotation")
+
 package love.forte.simbot.component.kaiheila.internal.event
 
+import love.forte.simbot.Api4J
+import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.event.*
 import love.forte.simbot.component.kaiheila.internal.KaiheilaChannelImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
@@ -33,58 +37,82 @@ import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.UserExitedChannelEventBody
 import love.forte.simbot.kaiheila.event.system.user.UserJoinedChannelEventBody
 
+@OptIn(Api4J::class)
 internal data class KaiheilaMemberExitedChannelEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
     override val source: KaiheilaChannelImpl,
-    override val target: KaiheilaGuildMemberImpl
-) : KaiheilaMemberExitedChannelEvent()
+    override val before: KaiheilaGuildMemberImpl,
+) : KaiheilaMemberExitedChannelEvent() {
+    override val member: KaiheilaGuildMember
+        get() = before
+}
 
 
+@OptIn(Api4J::class)
 internal data class KaiheilaMemberJoinedChannelEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserJoinedChannelEventBody>>,
     override val source: KaiheilaChannelImpl,
-    override val target: KaiheilaGuildMemberImpl
-) : KaiheilaMemberJoinedChannelEvent()
+    override val after: KaiheilaGuildMemberImpl,
+) : KaiheilaMemberJoinedChannelEvent() {
+    override val member: KaiheilaGuildMember
+        get() = after
+}
 
 
+@OptIn(Api4J::class)
 internal data class KaiheilaMemberExitedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<ExitedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaGuildMemberImpl
-) : KaiheilaMemberExitedGuildEvent()
+    override val before: KaiheilaGuildMemberImpl,
+) : KaiheilaMemberExitedGuildEvent() {
+    override val member: KaiheilaGuildMember
+        get() = before
+}
 
 
+@OptIn(Api4J::class)
 internal data class KaiheilaMemberJoinedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<JoinedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaGuildMemberImpl
-) : KaiheilaMemberJoinedGuildEvent()
+    override val after: KaiheilaGuildMemberImpl,
+) : KaiheilaMemberJoinedGuildEvent() {
+    override val member: KaiheilaGuildMember
+        get() = after
+}
 
 
+@OptIn(Api4J::class)
 internal data class KaiheilaBotSelfExitedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaGuildMemberImpl
-) : KaiheilaBotSelfExitedGuildEvent()
+    override val before: KaiheilaGuildMemberImpl,
+) : KaiheilaBotSelfExitedGuildEvent() {
+    override val member: KaiheilaGuildMember
+        get() = before
+}
 
 
+@OptIn(Api4J::class)
 internal data class KaiheilaBotSelfJoinedGuildEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
     override val source: KaiheilaGuildImpl,
-    override val target: KaiheilaGuildMemberImpl
-) : KaiheilaBotSelfJoinedGuildEvent()
+    override val after: KaiheilaGuildMemberImpl,
+) : KaiheilaBotSelfJoinedGuildEvent() {
+    override val member: KaiheilaGuildMember
+        get() = after
+}
 
 
 internal data class KaiheilaMemberOnlineEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<GuildMemberOnlineEventBody>>,
-    override val source: UserInfo
+    override val source: UserInfo,
 ) : KaiheilaUserOnlineStatusChangedEvent.Online() {
     override val guilds: Sequence<KaiheilaGuildImpl?>
         get() = guildIds.asSequence().map { bot.internalGuild(it) }
@@ -93,7 +121,7 @@ internal data class KaiheilaMemberOnlineEventImpl(
 internal data class KaiheilaMemberOfflineEventImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<GuildMemberOfflineEventBody>>,
-    override val source: UserInfo
+    override val source: UserInfo,
 ) : KaiheilaUserOnlineStatusChangedEvent.Offline() {
     override val guilds: Sequence<KaiheilaGuildImpl?>
         get() = guildIds.asSequence().map { bot.internalGuild(it) }
