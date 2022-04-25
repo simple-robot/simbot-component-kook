@@ -73,7 +73,7 @@ import love.forte.simbot.Simbot
  * @author ForteScarlet
  */
 @Serializable(CardMessageSerializer::class)
-public data class CardMessage(public val cards: List<Card>) : List<Card> by cards {
+public data class CardMessage(private val cards: List<Card>) : List<Card> by cards {
     init {
         check(cards.size <= 5) { "A card message can only allow up to 5 cards." }
     }
@@ -98,7 +98,7 @@ public data class CardMessage(public val cards: List<Card>) : List<Card> by card
 
     }
 
-    public companion object Serializer {
+    public companion object {
         private val DEFAULT_DECODER: Json = Json {
             isLenient = true
             ignoreUnknownKeys = true
@@ -106,7 +106,8 @@ public data class CardMessage(public val cards: List<Card>) : List<Card> by card
     }
 }
 
-public object CardMessageSerializer : KSerializer<CardMessage> {
+
+internal object CardMessageSerializer : KSerializer<CardMessage> {
     private val listSerializer = ListSerializer(Card.serializer())
     override fun deserialize(decoder: Decoder): CardMessage {
         val cards = decoder.decodeSerializableValue(listSerializer)
