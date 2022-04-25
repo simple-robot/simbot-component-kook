@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -202,7 +202,7 @@ tasks.register("dokkaHtmlMultiModuleAndPost") {
 tasks.create("createChangelog") {
     group = "build"
     doFirst {
-        val version = "v${rootProject.version}"
+        val version = "v${P.ComponentKaiheila.version.fullVersion(false)}"
         println("Generate change log for $version ...")
         // configurations.runtimeClasspath
         val changelogDir = rootProject.file(".changelog").also {

@@ -121,7 +121,14 @@ public object CardMessageSerializer : KSerializer<CardMessage> {
     }
 }
 
-
+/**
+ * 主题。
+ * 可选的值为：`primary`, `success`, `danger`, `warning`, `info`, `secondary`, `none`.
+ * 默认为 `primary`，
+ * 为 none 时不显示侧边框。
+ *
+ * see [整体结构说明](https://developer.kaiheila.cn/doc/cardmessage#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E)。
+ */
 @Serializable
 public enum class Theme {
     @SerialName("primary")
@@ -141,6 +148,9 @@ public enum class Theme {
 
     @SerialName("secondary")
     SECONDARY,
+
+    @SerialName("none")
+    NONE,
     ;
 
     public companion object {
@@ -151,6 +161,12 @@ public enum class Theme {
     }
 }
 
+/**
+ *
+ * 大小。可选值为：`xs`, `sm`, `md`, `lg`, 一般默认为 `lg`。
+ *
+ * see [整体结构说明](https://developer.kaiheila.cn/doc/cardmessage#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E)。
+ */
 @Serializable
 public enum class Size {
 
@@ -210,7 +226,7 @@ public data class Card @JvmOverloads constructor(
     /**
      * 目前只支持sm与lg, 如果不填为lg。 lg仅在PC端有效, 在移动端不管填什么，均为sm。
      */
-    val size: Size = Size.SM,
+    val size: Size = Size.Default,
 
     /**
      * modules只能为模块.
@@ -245,7 +261,7 @@ public sealed class CardElement {
      */
     @Serializable
     @SerialName(PlainText.TYPE)
-    public data class PlainText(
+    public data class PlainText @JvmOverloads constructor(
         /**
          * 为了方便书写，所有plain-text的使用处可以简单的用字符串代替。
          */
@@ -450,7 +466,7 @@ public sealed class CardModule {
     }
 
     /**
-     * Sect内容模块
+     * 内容模块
      *
      * 作用说明： 结构化的内容，显示文本+其它元素。
      *
@@ -485,7 +501,7 @@ public sealed class CardModule {
          */
         public val mode: SectionMode = SectionMode.LEFT,
         public val text: CardElement,
-        public val accessory: CardElement,
+        public val accessory: CardElement? = null,
 
         ) : CardModule() {
         init {
@@ -672,7 +688,7 @@ public sealed class CardModule {
      */
     @Serializable
     @SerialName(Context.TYPE)
-    public data class Context(public val elements: List<CardElement>) {
+    public data class Context(public val elements: List<CardElement>) : CardModule() {
         init {
             Simbot.require(elements.size <= 10) { "The size of elements must be <= 10, but ${elements.size}" }
             Simbot.require(elements.all { it is CardElement.Text || it is CardElement.Image }) {
@@ -702,7 +718,7 @@ public sealed class CardModule {
      */
     @Serializable
     @SerialName(Divider.TYPE)
-    public object Divider : CardElement() {
+    public object Divider : CardModule() {
         public const val TYPE: String = "divider"
     }
 
@@ -714,7 +730,7 @@ public sealed class CardModule {
      *
      */
     @Serializable
-    public sealed class Files : CardElement() {
+    public sealed class Files : CardModule() {
         /**
          * 文件|音频|视频地址
          */
@@ -795,10 +811,17 @@ public sealed class CardModule {
     @Serializable
     @SerialName(Countdown.TYPE)
     public data class Countdown(
-        public val startTime: Long,
-        public val endTime: Long,
-        public val mode: CountdownMode
+        public val mode: CountdownMode,
+        public val startTime: Long? = null,
+        public val endTime: Long
     ) : CardModule() {
+        init {
+            Simbot.require(mode == CountdownMode.SECOND && startTime != null) {
+                "When mode is 'SECOND', 'startTime' must not be null."
+
+            }
+        }
+
         public companion object {
             public const val TYPE: String = "countdown"
         }
