@@ -20,9 +20,9 @@ package love.forte.simbot.component.kaiheila
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.*
-import love.forte.simbot.component.kaiheila.message.AssetImage
-import love.forte.simbot.component.kaiheila.message.AssetMessage
-import love.forte.simbot.component.kaiheila.message.SimpleAssetMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.event.EventProcessor
@@ -98,34 +98,34 @@ public abstract class KaiheilaComponentBot : Bot {
 
     //region image api
     /**
-     * 上传一个资源并得到一个 [AssetMessage].
+     * 上传一个资源并得到一个 [KaiheilaAssetMessage].
      *
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值，即 `2`、`3`、`4`。
      */
     @JvmSynthetic
-    public abstract suspend fun uploadAsset(resource: Resource, type: Int): SimpleAssetMessage
+    public abstract suspend fun uploadAsset(resource: Resource, type: Int): KaiheilaSimpleAssetMessage
 
     /**
-     * 上传一个资源并得到一个 [AssetMessage].
+     * 上传一个资源并得到一个 [KaiheilaAssetMessage].
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值.
      */
     @JvmSynthetic
-    public suspend fun uploadAsset(resource: Resource, type: MessageType): SimpleAssetMessage = uploadAsset(resource, type.type)
+    public suspend fun uploadAsset(resource: Resource, type: MessageType): KaiheilaSimpleAssetMessage = uploadAsset(resource, type.type)
 
 
     /**
-     * 提供一个资源类型并将其上传后作为 [AssetImage] 使用。
+     * 提供一个资源类型并将其上传后作为 [KaiheilaAssetImage] 使用。
      */
     @JvmSynthetic
-    abstract override suspend fun uploadImage(resource: Resource): AssetImage
+    abstract override suspend fun uploadImage(resource: Resource): KaiheilaAssetImage
 
     /**
-     * 提供一个资源类型并将其上传后作为 [AssetImage] 使用。
+     * 提供一个资源类型并将其上传后作为 [KaiheilaAssetImage] 使用。
      */
     @Api4J
-    override fun uploadImageBlocking(resource: Resource): AssetImage = runInBlocking { uploadImage(resource) }
+    override fun uploadImageBlocking(resource: Resource): KaiheilaAssetImage = runInBlocking { uploadImage(resource) }
 
     /**
      * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
@@ -134,10 +134,10 @@ public abstract class KaiheilaComponentBot : Bot {
      *
      */
     @JvmSynthetic
-    abstract override suspend fun resolveImage(id: ID): AssetImage
+    abstract override suspend fun resolveImage(id: ID): KaiheilaAssetImage
 
     @OptIn(Api4J::class)
-    override fun resolveImageBlocking(id: ID): AssetImage = runInBlocking { resolveImage(id) }
+    override fun resolveImageBlocking(id: ID): KaiheilaAssetImage = runInBlocking { resolveImage(id) }
     //endregion
 
     @OptIn(ExperimentalSimbotApi::class)

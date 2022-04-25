@@ -19,6 +19,8 @@ package love.forte.simbot.component.kaiheila.message
 
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.component.kaiheila.message.KaiheilaAttachmentMessage.Key.asMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaKMarkdownMessage.Key.asMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessages.AT_TYPE_USER
 import love.forte.simbot.kaiheila.event.Event
@@ -111,7 +113,7 @@ internal fun toMessages(
         }
 
         if (isMentionHere) {
-            add(AtAllHere)
+            add(KaiheilaAtAllHere)
         }
 
         for (mentionId in mention) {

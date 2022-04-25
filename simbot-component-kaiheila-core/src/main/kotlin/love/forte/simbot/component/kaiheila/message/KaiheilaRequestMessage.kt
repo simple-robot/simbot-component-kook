@@ -34,18 +34,21 @@ import love.forte.simbot.message.doSafeCast
  * @author ForteScarlet
  */
 @SendOnlyMessage
-public data class RequestMessage(public val request: KaiheilaApiRequest<*>) :
-    KaiheilaMessageElement<RequestMessage> {
+public data class KaiheilaRequestMessage(public val request: KaiheilaApiRequest<*>) :
+    KaiheilaMessageElement<KaiheilaRequestMessage> {
 
-    override val key: Message.Key<RequestMessage>
+    override val key: Message.Key<KaiheilaRequestMessage>
         get() = Key
 
-    public companion object Key : Message.Key<RequestMessage> {
-        override fun safeCast(value: Any): RequestMessage? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaRequestMessage> {
+        override fun safeCast(value: Any): KaiheilaRequestMessage? = doSafeCast(value)
+
+        /**
+         * 通过 [KaiheilaRequestMessage] 构建 [KaiheilaRequestMessage].
+         */
+        @JvmStatic
+        public fun KaiheilaApiRequest<*>.toRequest(): KaiheilaRequestMessage = KaiheilaRequestMessage(this)
+
     }
 }
 
-/**
- * 通过 [RequestMessage] 构建 [RequestMessage].
- */
-public fun KaiheilaApiRequest<*>.toRequest(): RequestMessage = RequestMessage(this)

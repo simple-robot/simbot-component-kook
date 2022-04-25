@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -33,17 +33,19 @@ import love.forte.simbot.kaiheila.objects.CardMessage as KhlCardMessage
 @ExperimentalSimbotApi
 @SerialName("khl.card")
 @Serializable
-public data class CardMessage(public val cards: KhlCardMessage) : KaiheilaMessageElement<CardMessage> {
-    override val key: Message.Key<CardMessage>
+public data class KaiheilaCardMessage(public val cards: KhlCardMessage) : KaiheilaMessageElement<KaiheilaCardMessage> {
+    override val key: Message.Key<KaiheilaCardMessage>
         get() = Key
 
-    public companion object Key : Message.Key<CardMessage> {
-        override fun safeCast(value: Any): CardMessage? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaCardMessage> {
+        override fun safeCast(value: Any): KaiheilaCardMessage? = doSafeCast(value)
+
+
+        /**
+         * 将 [Card] 作为 [KaiheilaCardMessage] 使用。
+         */
+        @JvmStatic
+        @ExperimentalSimbotApi
+        public fun KhlCardMessage.asMessage(): KaiheilaCardMessage = KaiheilaCardMessage(this)
     }
 }
-
-/**
- * 将 [Card] 作为 [CardMessage] 使用。
- */
-@ExperimentalSimbotApi
-public fun KhlCardMessage.asMessage(): CardMessage = CardMessage(this)

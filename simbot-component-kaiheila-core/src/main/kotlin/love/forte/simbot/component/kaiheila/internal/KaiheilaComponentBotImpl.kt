@@ -28,11 +28,11 @@ import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBotConfiguration
 import love.forte.simbot.component.kaiheila.event.KaiheilaBotStartedEvent
 import love.forte.simbot.component.kaiheila.internal.event.KaiheilaBotStartedEventImpl
-import love.forte.simbot.component.kaiheila.message.AssetImage
-import love.forte.simbot.component.kaiheila.message.AssetMessage
-import love.forte.simbot.component.kaiheila.message.AssetMessage.Key.asImage
-import love.forte.simbot.component.kaiheila.message.AssetMessage.Key.asMessage
-import love.forte.simbot.component.kaiheila.message.SimpleAssetMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage.Key.asImage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage.Key.asMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.event.EventProcessor
@@ -309,14 +309,14 @@ internal class KaiheilaComponentBotImpl(
     //region image api / assert api
 
     /**
-     * 上传一个资源并得到一个 [AssetMessage].
+     * 上传一个资源并得到一个 [KaiheilaAssetMessage].
      *
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值，
      * 即 `2`、`3`、`4`。
      */
     @JvmSynthetic
-    override suspend fun uploadAsset(resource: Resource, type: Int): SimpleAssetMessage {
+    override suspend fun uploadAsset(resource: Resource, type: Int): KaiheilaSimpleAssetMessage {
         val asset = AssetCreateRequest(resource).requestDataBy(this)
         return asset.asMessage(type)
     }
@@ -327,14 +327,14 @@ internal class KaiheilaComponentBotImpl(
      */
     @OptIn(ApiResultType::class)
     @JvmSynthetic
-    override suspend fun resolveImage(id: ID): AssetImage {
+    override suspend fun resolveImage(id: ID): KaiheilaAssetImage {
         Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
             "The id must be the resource id of the kaiheila and must start with $ASSET_PREFIX"
         }
-        return AssetImage(AssetCreated(id.literal))
+        return KaiheilaAssetImage(AssetCreated(id.literal))
     }
 
-    override suspend fun uploadImage(resource: Resource): AssetImage {
+    override suspend fun uploadImage(resource: Resource): KaiheilaAssetImage {
         val asset = AssetCreateRequest(resource).requestDataBy(this)
         return asset.asImage()
     }

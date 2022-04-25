@@ -74,7 +74,7 @@ public class KaiheilaMessageCreatedReceipt(
  *
  * 与 [KaiheilaMessageCreatedReceipt] 不同的是，
  * [KaiheilaApiRequestedReceipt] 很可能并不是通过执行的消息api，
- * 例如通过 [RequestMessage] 执行了一个任意的请求。
+ * 例如通过 [KaiheilaRequestMessage] 执行了一个任意的请求。
  *
  * 也正因此，此回执不支持 [删除][DeleteSupport] 操作。
  *

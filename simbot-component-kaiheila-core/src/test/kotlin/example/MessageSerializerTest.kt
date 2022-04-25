@@ -21,9 +21,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.plus
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.component.kaiheila.KaiheilaComponent
-import love.forte.simbot.component.kaiheila.message.AssetImage
-import love.forte.simbot.component.kaiheila.message.AtAllHere
-import love.forte.simbot.component.kaiheila.message.KMarkdownMessage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
+import love.forte.simbot.component.kaiheila.message.KaiheilaAtAllHere
+import love.forte.simbot.component.kaiheila.message.KaiheilaKMarkdownMessage
 import love.forte.simbot.kaiheila.api.ApiResultType
 import love.forte.simbot.kaiheila.api.asset.AssetCreated
 import love.forte.simbot.kaiheila.objects.buildKMarkdown
@@ -41,12 +41,12 @@ class MessageSerializerTest {
     @Test
     fun encodeTest() {
         val messages = buildMessages {
-            +AtAllHere
-            +KMarkdownMessage(buildKMarkdown {
+            +KaiheilaAtAllHere
+            +KaiheilaKMarkdownMessage(buildKMarkdown {
                 at("1234")
                 link("Simbot Home", "http://simbot.forte.love")
             })
-            +AssetImage(AssetCreated("https://baidu.com"))
+            +KaiheilaAssetImage(AssetCreated("https://baidu.com"))
         }
 
         println(messages)

@@ -71,12 +71,12 @@ public class KaiheilaComponent : Component {
         @OptIn(ExperimentalSimbotApi::class)
         public val messageSerializersModule: SerializersModule = SerializersModule {
             fun PolymorphicModuleBuilder<KaiheilaMessageElement<*>>.include() {
-                subclass(SimpleAssetMessage::class, SimpleAssetMessage.serializer())
-                subclass(AssetImage::class, AssetImage.serializer())
-                subclass(AtAllHere::class, AtAllHere.serializer())
-                subclass(AttachmentMessage::class, AttachmentMessage.serializer())
-                subclass(CardMessage::class, CardMessage.serializer())
-                subclass(KMarkdownMessage::class, KMarkdownMessage.serializer())
+                subclass(KaiheilaSimpleAssetMessage::class, KaiheilaSimpleAssetMessage.serializer())
+                subclass(KaiheilaAssetImage::class, KaiheilaAssetImage.serializer())
+                subclass(KaiheilaAtAllHere::class, KaiheilaAtAllHere.serializer())
+                subclass(KaiheilaAttachmentMessage::class, KaiheilaAttachmentMessage.serializer())
+                subclass(KaiheilaCardMessage::class, KaiheilaCardMessage.serializer())
+                subclass(KaiheilaKMarkdownMessage::class, KaiheilaKMarkdownMessage.serializer())
             }
             polymorphic(KMarkdown::class) {
                 subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer())

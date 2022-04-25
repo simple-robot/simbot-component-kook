@@ -44,15 +44,23 @@ public data class KaiheilaChannelMessageDetailsContent(internal val details: Cha
      */
     override val messages: Messages = details.toMessages()
 
+    public companion object {
+        /**
+         * 使用消息事件并将其中的消息内容转化为 [Messages].
+         */
+        @JvmStatic
+        public fun ChannelMessageDetails.toMessages(): Messages {
+            return toMessages(content.toText(), mention, mentionRoles, isMentionAll, isMentionHere)
+        }
+
+        /**
+         * 使用消息事件并将其中的消息内容转化为 [KaiheilaChannelMessageDetailsContent].
+         */
+        @JvmStatic
+        public fun ChannelMessageDetails.toContent(): KaiheilaChannelMessageDetailsContent =
+            KaiheilaChannelMessageDetailsContent(this)
+
+    }
 
 }
 
-public fun ChannelMessageDetails.toMessages(): Messages {
-    return toMessages(content.toText(), mention, mentionRoles, isMentionAll, isMentionHere)
-}
-
-/**
- * 使用消息事件并将其中的消息内容转化为 [KaiheilaChannelMessageDetailsContent].
- */
-public fun ChannelMessageDetails.toContent(): KaiheilaChannelMessageDetailsContent =
-    KaiheilaChannelMessageDetailsContent(this)

@@ -19,30 +19,35 @@ package love.forte.simbot.component.kaiheila.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.kaiheila.objects.KMarkdown
+import love.forte.simbot.kaiheila.objects.Attachments
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 
 
 /**
- * 将 [KMarkdown] 作为消息使用。
+ *
+ * 将 [Attachments] 作为消息对象。
+ *
+ * 通常在接收时使用。
+ *
  * @author ForteScarlet
  */
-@SerialName("khl.kmd")
+@SerialName("khl.attachment")
 @Serializable
-@OptIn(ExperimentalSimbotApi::class)
-public data class KMarkdownMessage(public val kMarkdown: KMarkdown) : KaiheilaMessageElement<KMarkdownMessage> {
-    override val key: Message.Key<KMarkdownMessage>
+public data class KaiheilaAttachmentMessage(public val attachment: Attachments) : KaiheilaMessageElement<KaiheilaAttachmentMessage> {
+
+    override val key: Message.Key<KaiheilaAttachmentMessage>
         get() = Key
 
-    public companion object Key : Message.Key<KMarkdownMessage> {
-        override fun safeCast(value: Any): KMarkdownMessage? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaAttachmentMessage> {
+        override fun safeCast(value: Any): KaiheilaAttachmentMessage? = doSafeCast(value)
+
+
+        /**
+         * 将 [Attachments] 转化为 [KaiheilaAttachmentMessage]。
+         */
+        @JvmStatic
+        public fun Attachments.asMessage(): KaiheilaAttachmentMessage = KaiheilaAttachmentMessage(this)
+
     }
 }
-
-/**
- * 将 [KMarkdown] 作为 [KMarkdownMessage] 使用。
- */
-@OptIn(ExperimentalSimbotApi::class)
-public fun KMarkdown.asMessage(): KMarkdownMessage = KMarkdownMessage(this)
