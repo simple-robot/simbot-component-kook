@@ -23,7 +23,7 @@ import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kaiheila.KaiheilaChannel
 import love.forte.simbot.component.kaiheila.KaiheilaGuild
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
-import love.forte.simbot.component.kaiheila.message.toContent
+import love.forte.simbot.component.kaiheila.message.KaiheilaChannelMessageDetailsContent.Companion.toContent
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.ChannelInfoContainer
 import love.forte.simbot.event.*

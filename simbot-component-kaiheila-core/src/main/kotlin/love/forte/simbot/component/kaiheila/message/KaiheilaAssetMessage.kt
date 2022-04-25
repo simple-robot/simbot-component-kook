@@ -33,12 +33,12 @@ import love.forte.simbot.resources.URLResource
 /**
  * 与上传后的媒体资源相关的消息类型。
  *
- * @see SimpleAssetMessage
- * @see AssetImage
+ * @see KaiheilaSimpleAssetMessage
+ * @see KaiheilaAssetImage
  *
  */
 @Serializable
-public sealed class AssetMessage<M : AssetMessage<M>> : KaiheilaMessageElement<M> {
+public sealed class KaiheilaAssetMessage<M : KaiheilaAssetMessage<M>> : KaiheilaMessageElement<M> {
     abstract override val key: Message.Key<M>
 
     /**
@@ -54,30 +54,30 @@ public sealed class AssetMessage<M : AssetMessage<M>> : KaiheilaMessageElement<M
      */
     public abstract val type: Int
 
-    public companion object Key : Message.Key<AssetMessage<*>> {
-        override fun safeCast(value: Any): AssetMessage<*>? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaAssetMessage<*>> {
+        override fun safeCast(value: Any): KaiheilaAssetMessage<*>? = doSafeCast(value)
 
 
         /**
-         * 使用当前的 [AssetCreated] 构建一个 [AssetMessage] 实例。
+         * 使用当前的 [AssetCreated] 构建一个 [KaiheilaAssetMessage] 实例。
          * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值，即 `2`、`3`、`4`。
          */
         @JvmStatic
-        public fun AssetCreated.asMessage(type: Int): SimpleAssetMessage = SimpleAssetMessage(this, type)
+        public fun AssetCreated.asMessage(type: Int): KaiheilaSimpleAssetMessage = KaiheilaSimpleAssetMessage(this, type)
 
         /**
-         * 使用当前的 [AssetCreated] 构建一个 [AssetMessage] 实例。
+         * 使用当前的 [AssetCreated] 构建一个 [KaiheilaAssetMessage] 实例。
          * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值。
          */
         @JvmStatic
-        public fun AssetCreated.asMessage(type: MessageType): SimpleAssetMessage = SimpleAssetMessage(this, type)
+        public fun AssetCreated.asMessage(type: MessageType): KaiheilaSimpleAssetMessage = KaiheilaSimpleAssetMessage(this, type)
 
 
         /**
-         * 使用当前的 [AssetCreated] 构建一个 [AssetImage] 实例。
+         * 使用当前的 [AssetCreated] 构建一个 [KaiheilaAssetImage] 实例。
          */
         @JvmStatic
-        public fun AssetCreated.asImage(): AssetImage = AssetImage(this)
+        public fun AssetCreated.asImage(): KaiheilaAssetImage = KaiheilaAssetImage(this)
     }
 }
 
@@ -90,7 +90,7 @@ public sealed class AssetMessage<M : AssetMessage<M>> : KaiheilaMessageElement<M
  */
 @SerialName("khl.asset.std")
 @Serializable
-public data class SimpleAssetMessage(
+public data class KaiheilaSimpleAssetMessage(
     /**
      * 创建的文件资源。
      */
@@ -104,14 +104,14 @@ public data class SimpleAssetMessage(
      */
     @SerialName("assetType")
     override val type: Int
-) : AssetMessage<SimpleAssetMessage>() {
+) : KaiheilaAssetMessage<KaiheilaSimpleAssetMessage>() {
     public constructor(asset: AssetCreated, type: MessageType) : this(asset, type.type)
 
-    override val key: Message.Key<SimpleAssetMessage>
+    override val key: Message.Key<KaiheilaSimpleAssetMessage>
         get() = Key
 
-    public companion object Key : Message.Key<SimpleAssetMessage> {
-        override fun safeCast(value: Any): SimpleAssetMessage? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaSimpleAssetMessage> {
+        override fun safeCast(value: Any): KaiheilaSimpleAssetMessage? = doSafeCast(value)
     }
 }
 
@@ -121,7 +121,7 @@ public data class SimpleAssetMessage(
  */
 @SerialName("khl.asset.img")
 @Serializable
-public data class AssetImage(override val asset: AssetCreated) : AssetMessage<AssetImage>(), Image<AssetImage> {
+public data class KaiheilaAssetImage(override val asset: AssetCreated) : KaiheilaAssetMessage<KaiheilaAssetImage>(), Image<KaiheilaAssetImage> {
     override val type: Int
         get() = MessageType.IMAGE.type
 
@@ -133,11 +133,11 @@ public data class AssetImage(override val asset: AssetCreated) : AssetMessage<As
     @JvmSynthetic
     override suspend fun resource(): Resource = resource
 
-    override val key: Message.Key<AssetImage>
+    override val key: Message.Key<KaiheilaAssetImage>
         get() = Key
 
-    public companion object Key : Message.Key<AssetImage> {
-        override fun safeCast(value: Any): AssetImage? = doSafeCast(value)
+    public companion object Key : Message.Key<KaiheilaAssetImage> {
+        override fun safeCast(value: Any): KaiheilaAssetImage? = doSafeCast(value)
     }
 
 }

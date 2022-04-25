@@ -156,16 +156,16 @@ private fun Message.Element<*>.elementToRequestOrNull(
 
         is KaiheilaMessageElement<*> -> when (this) {
             // 媒体资源
-            is AssetMessage<*> -> request(type, asset.url)
+            is KaiheilaAssetMessage<*> -> request(type, asset.url)
             // KMarkdown
-            is KMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
+            is KaiheilaKMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
             // card message
-            is CardMessage -> request(MessageType.CARD.type, cards.decode())
+            is KaiheilaCardMessage -> request(MessageType.CARD.type, cards.decode())
 
             // request message
-            is RequestMessage -> this.request
+            is KaiheilaRequestMessage -> this.request
 
-            is AtAllHere -> {
+            is KaiheilaAtAllHere -> {
                 val content = buildRawKMarkdown {
                     at(AtTarget.Here)
                 }
@@ -173,7 +173,7 @@ private fun Message.Element<*>.elementToRequestOrNull(
                 request(MessageType.KMARKDOWN.type, content)
             }
 
-            is AttachmentMessage -> {
+            is KaiheilaAttachmentMessage -> {
                 // TODO
                 // buildRawKMarkdown {
                 //

@@ -37,10 +37,10 @@ public annotation class SendOnlyMessage
  * ## SendOnlyMessage
  * 对于一些**仅用于发送**的消息，它们会被标记上 [SendOnlyMessage] 注解，并大概率无法支持序列化。
  *
- * @see AssetMessage
- * @see AtAllHere
- * @see CardMessage
- * @see KMarkdownMessage
+ * @see KaiheilaAssetMessage
+ * @see KaiheilaAtAllHere
+ * @see KaiheilaCardMessage
+ * @see KaiheilaKMarkdownMessage
  *
  * @author ForteScarlet
  */

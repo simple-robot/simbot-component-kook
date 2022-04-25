@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -19,39 +19,33 @@ package love.forte.simbot.component.kaiheila.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.message.At
-import love.forte.simbot.message.AtAll
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.kaiheila.objects.KMarkdown
 import love.forte.simbot.message.Message
+import love.forte.simbot.message.doSafeCast
 
 
 /**
- *
- * 通知(mention)所有当前的 **在线用户**。
- *
- * 行为与概念与 [AtAll] 类似。
- *
- * **注意，目前来看，发消息bot无法at他人，
- * 因此目前此参数只能来自于事件，发送时会被忽略。
- * 此情况也适用于 [At] 和 [AtAll]。**
- *
+ * 将 [KMarkdown] 作为消息使用。
+ * @author ForteScarlet
  */
-@SerialName("khl.AtAllHere")
+@SerialName("khl.kmd")
 @Serializable
-public object AtAllHere : KaiheilaMessageElement<AtAllHere>, Message.Key<AtAllHere> {
-    override val key: Message.Key<AtAllHere>
-        get() = this
+@OptIn(ExperimentalSimbotApi::class)
+public data class KaiheilaKMarkdownMessage(public val kMarkdown: KMarkdown) : KaiheilaMessageElement<KaiheilaKMarkdownMessage> {
+    override val key: Message.Key<KaiheilaKMarkdownMessage>
+        get() = Key
 
-    override fun equals(other: Any?): Boolean = other === this
+    public companion object Key : Message.Key<KaiheilaKMarkdownMessage> {
+        override fun safeCast(value: Any): KaiheilaKMarkdownMessage? = doSafeCast(value)
 
-    override fun toString(): String = "AtAllHere"
 
-    override fun safeCast(value: Any): AtAllHere? = if (value === this) this else null
+        /**
+         * 将 [KMarkdown] 作为 [KaiheilaKMarkdownMessage] 使用。
+         */
+        @JvmStatic
+        public fun KMarkdown.asMessage(): KaiheilaKMarkdownMessage = KaiheilaKMarkdownMessage(this)
 
+    }
 }
 
-
-
-/**
- * @see AtAllHere
- */
-public typealias MentionAllHere = AtAllHere

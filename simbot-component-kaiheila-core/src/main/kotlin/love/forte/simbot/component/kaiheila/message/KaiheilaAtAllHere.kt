@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kaiheila 的一部分。
  *
@@ -19,32 +19,32 @@ package love.forte.simbot.component.kaiheila.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.kaiheila.objects.Attachments
+import love.forte.simbot.message.At
+import love.forte.simbot.message.AtAll
 import love.forte.simbot.message.Message
-import love.forte.simbot.message.doSafeCast
 
 
 /**
  *
- * 将 [Attachments] 作为消息对象。
+ * 通知(mention)所有当前的 **在线用户**。
  *
- * 通常在接收时使用。
+ * 行为与概念与 [AtAll] 类似。
  *
- * @author ForteScarlet
+ * **注意，目前来看，发消息bot无法at他人，
+ * 因此目前此参数只能来自于事件，发送时会被忽略。
+ * 此情况也适用于 [At] 和 [AtAll]。**
+ *
  */
-@SerialName("khl.attachment")
+@SerialName("khl.AtAllHere")
 @Serializable
-public data class AttachmentMessage(public val attachment: Attachments) : KaiheilaMessageElement<AttachmentMessage> {
+public object KaiheilaAtAllHere : KaiheilaMessageElement<KaiheilaAtAllHere>, Message.Key<KaiheilaAtAllHere> {
+    override val key: Message.Key<KaiheilaAtAllHere>
+        get() = this
 
-    override val key: Message.Key<AttachmentMessage>
-        get() = Key
+    override fun equals(other: Any?): Boolean = other === this
 
-    public companion object Key : Message.Key<AttachmentMessage> {
-        override fun safeCast(value: Any): AttachmentMessage? = doSafeCast(value)
-    }
+    override fun toString(): String = "AtAllHere"
+
+    override fun safeCast(value: Any): KaiheilaAtAllHere? = if (value === this) this else null
+
 }
-
-/**
- * 将 [Attachments] 转化为 [AttachmentMessage]。
- */
-public fun Attachments.asMessage(): AttachmentMessage = AttachmentMessage(this)
