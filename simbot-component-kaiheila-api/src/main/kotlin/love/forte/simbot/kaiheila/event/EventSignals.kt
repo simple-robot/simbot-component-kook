@@ -70,6 +70,10 @@ public class MessageEventParser<out EX : MessageEventExtra>(
     override fun deserialize(decoder: Json, rawData: JsonElement): MessageEvent<EX> {
         return decoder.decodeFromJsonElement(eventSerializer, rawData)
     }
+
+    override fun toString(): String {
+        return "MessageEventParser(type=$type, serializer=$eventSerializer)"
+    }
 }
 
 /**

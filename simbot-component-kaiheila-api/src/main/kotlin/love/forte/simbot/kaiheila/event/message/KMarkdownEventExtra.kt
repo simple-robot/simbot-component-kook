@@ -26,6 +26,7 @@ import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.objects.KMarkdown
 import love.forte.simbot.kaiheila.objects.RawValueKMarkdown
 import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.kaiheila.objects.UserImpl
 
 /**
  * [KMarkdown消息事件](https://developer.kaiheila.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF)
@@ -66,9 +67,11 @@ internal data class KMarkdownEventExtraImpl(
     @SerialName("mention_here")
     override val isMentionHere: Boolean = false,
 
-    override val author: User,
+    override val author: UserImpl,
     override val kmarkdown: RawValueKMarkdown,
-) : KMarkdownEventExtra
+) : KMarkdownEventExtra {
+
+}
 
 
 // @Serializable
