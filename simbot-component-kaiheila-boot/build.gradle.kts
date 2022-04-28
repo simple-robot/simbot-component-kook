@@ -36,7 +36,7 @@ dependencies {
     // testImplementation(V.Simbot.BootCore.NOTATION)
     testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
-    testImplementation(kotlin("test-junit"))
+    testImplementation(kotlin("test-junit5"))
 }
 repositories {
     maven {
