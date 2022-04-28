@@ -30,6 +30,9 @@ object V {
         object BootCore {
             val NOTATION = "${P.Simbot.GROUP}.boot:simboot-core:${P.Simbot.VERSION}"
         }
+        object BootCoreSpringBootStarter {
+            val NOTATION = "${P.Simbot.GROUP}.boot:simboot-core-spring-boot-starter:${P.Simbot.VERSION}"
+        }
     }
 
 

@@ -24,12 +24,19 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
+val springBootVersion = "2.6.7"
 
 dependencies {
     api(project(":simbot-component-kaiheila-core"))
-    api(V.Simbot.BootApi.NOTATION)
-    testImplementation(V.Simbot.BootCore.NOTATION)
+    api(V.Simbot.BootApi.NOTATION) {
+        exclude("love.forte.simbot:simbot-logger")
+    }
 
+    testImplementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
+    // testImplementation(V.Simbot.BootCore.NOTATION)
+    testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    testImplementation(kotlin("test-junit"))
 }
 repositories {
     maven {

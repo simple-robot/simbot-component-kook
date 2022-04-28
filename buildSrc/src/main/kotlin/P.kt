@@ -40,7 +40,7 @@ object P {
 
         val version = Version(
             major = "3", minor = 0, patch = 0,
-            status = preview(8, 0),
+            status = preview(8, 1),
             isSnapshot = System.getProperty("isSnapshot")?.equals("true", true) ?: false
         )
 
@@ -60,7 +60,7 @@ object P {
             major = "${Simbot.version.major}.${Simbot.version.minor}",
             minor = 0,
             patch = 0,
-            status = preview(3, 0),
+            status = preview(3, 1),
             isSnapshot = isSnapshot
         )
 

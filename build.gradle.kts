@@ -119,7 +119,6 @@ subprojects {
 
     }
 
-
     configurations.all {
         // check for updates every build
         resolutionStrategy.cacheChangingModulesFor(0, "seconds")
@@ -127,7 +126,7 @@ subprojects {
 }
 
 
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
