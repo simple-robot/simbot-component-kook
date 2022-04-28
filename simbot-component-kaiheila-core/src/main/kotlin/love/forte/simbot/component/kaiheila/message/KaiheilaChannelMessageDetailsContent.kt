@@ -50,7 +50,7 @@ public data class KaiheilaChannelMessageDetailsContent(internal val details: Cha
          */
         @JvmStatic
         public fun ChannelMessageDetails.toMessages(): Messages {
-            return toMessages(content.toText(), mention, mentionRoles, isMentionAll, isMentionHere)
+            return toMessages(listOf(content.toText()), mention, mentionRoles, isMentionAll, isMentionHere)
         }
 
         /**

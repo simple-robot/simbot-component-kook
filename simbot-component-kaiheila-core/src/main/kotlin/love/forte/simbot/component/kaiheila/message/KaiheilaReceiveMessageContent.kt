@@ -58,30 +58,32 @@ public class KaiheilaReceiveMessageContent(internal val source: Event<Event.Extr
 public fun Event<Event.Extra.Text>.toMessages(): Messages {
     return when (val extra = extra) {
         is TextEventExtra -> {
-            extra.toMessages { content.toText() }
+            extra.toMessages { listOf(content.toText()) }
         }
         is ImageEventExtra -> {
-            extra.toMessages { extra.attachments.asMessage() }
+            extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
         is FileEventExtra -> {
-            extra.toMessages { extra.attachments.asMessage() }
+            extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
         is VideoEventExtra -> {
-            extra.toMessages { extra.attachments.asMessage() }
+            extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
         is KMarkdownEventExtra -> {
-            extra.toMessages { extra.kmarkdown.asMessage() }
+            extra.toMessages {
+                listOf(content.toText(), extra.kmarkdown.asMessage())
+            }
         }
         is CardEventExtra -> {
-            extra.toMessages { content.toText() }
+            extra.toMessages { listOf(content.toText()) }
         }
         else -> {
-            extra.toMessages { content.toText() }
+            extra.toMessages { listOf(content.toText()) }
         }
     }
 }
 
-private inline fun Event.Extra.Text.toMessages(contentElement: () -> Message.Element<*>?): Messages {
+private inline fun Event.Extra.Text.toMessages(contentElement: () -> List<Message.Element<*>>): Messages {
     return toMessages(
         contentElement(),
         mention, mentionRoles, isMentionAll, isMentionHere
@@ -96,16 +98,16 @@ public fun Event<Event.Extra.Text>.toContent(): KaiheilaReceiveMessageContent = 
 
 
 internal fun toMessages(
-    contentMessage: Message.Element<*>?,
+    contentMessage: List<Message.Element<*>>,
     mention: Collection<ID>, mentionRoles: Collection<ID>,
     isMentionAll: Boolean, isMentionHere: Boolean
 ): Messages {
     if (mention.isEmpty() && mentionRoles.isEmpty() && !isMentionAll && !isMentionHere) {
-        return contentMessage?.toMessages() ?: emptyMessages()
+        return contentMessage.toMessages()
     }
     val messages = buildList(mention.size + mentionRoles.size + 3) {
-        if (contentMessage != null) {
-            add(contentMessage)
+        if (contentMessage.isNotEmpty()) {
+            addAll(contentMessage)
         }
 
         if (isMentionAll) {
