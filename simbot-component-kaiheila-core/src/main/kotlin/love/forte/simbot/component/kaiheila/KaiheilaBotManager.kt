@@ -18,7 +18,6 @@
 
 package love.forte.simbot.component.kaiheila
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import love.forte.simbot.*
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
@@ -43,7 +42,6 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     /**
      * 通过 `.bot` 的json配置文件注册一个bot信息。
      */
-    @OptIn(ExperimentalSerializationApi::class)
     override fun register(verifyInfo: BotVerifyInfo): KaiheilaComponentBot {
         val serializer = KaiheilaBotVerifyInfo.serializer()
 
