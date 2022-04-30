@@ -58,19 +58,19 @@ public object KaiheilaMessages {
      * 构建一个 at(mention) 用户的 [At] 消息对象。
      */
     @JvmStatic
-    public fun atUser(id: ID): At = At(target = id, atType = AT_TYPE_USER)
+    public fun atUser(id: ID): At = At(target = id, atType = AT_TYPE_USER, originContent = "(met)$id(met)")
 
     /**
      * 构建一个 at(mention) 整个角色的 [At] 消息对象。
      */
     @JvmStatic
-    public fun atRole(id: ID): At = At(target = id, atType = AT_TYPE_ROLE)
+    public fun atRole(id: ID): At = At(target = id, atType = AT_TYPE_ROLE, originContent = "(rol)$id(rol)")
 
     /**
      * 构建一个 at(mention) 频道的 [At] 消息对象。
      */
     @JvmStatic
-    public fun atChannel(id: ID): At = At(target = id, atType = AT_TYPE_CHANNEL)
+    public fun atChannel(id: ID): At = At(target = id, atType = AT_TYPE_CHANNEL, originContent = "(chn)$id(chn)")
 
 
 }

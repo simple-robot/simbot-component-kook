@@ -20,11 +20,14 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
 import love.forte.simbot.kaiheila.objects.AtTarget.*
 import love.forte.simbot.kaiheila.objects.AtTarget.User
-import love.forte.simbot.kaiheila.objects.impl.*
+import love.forte.simbot.literal
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 @DslMarker
@@ -59,7 +62,7 @@ public interface KMarkdown {
     /**
      * \@特定角色 的角色ID信息，与mention_roles中数据对应 -&gt; [ 角色id ]
      */
-    public val mentionRolePart: List<Role>
+    public val mentionRolePart: List<MentionRolePart>
 
     public companion object {
         public val rawKMarkdownSerializer: KSerializer<RawValueKMarkdown> = RawValueKMarkdown.serializer()
@@ -78,7 +81,7 @@ public data class RawValueKMarkdown(
     @SerialName("mention_part")
     override val mentionPart: List<MentionPart> = emptyList(),
     @SerialName("mention_role_part")
-    override val mentionRolePart: List<RoleImpl> = emptyList(),
+    override val mentionRolePart: List<MentionRolePart> = emptyList(),
 ) : KMarkdown {
     public companion object {
         internal const val SERIAL_NAME = "RAW_V_K_MD"

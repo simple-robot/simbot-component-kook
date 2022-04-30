@@ -43,6 +43,10 @@ internal class KaiheilaUserChatImpl(
     override val id: ID
         get() = source.targetInfo.id
 
+    override fun toString(): String {
+        return "KaiheilaUserChat(source=$source, bot=$bot)"
+    }
+
     override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
         return DirectMessageCreateRequest.byChatCode(
             source.code, text, MessageType.TEXT, null, null
