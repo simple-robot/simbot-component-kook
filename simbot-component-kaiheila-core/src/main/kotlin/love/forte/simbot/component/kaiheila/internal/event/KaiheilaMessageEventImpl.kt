@@ -31,6 +31,7 @@ import love.forte.simbot.component.kaiheila.internal.KaiheilaGuildMemberImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaUserChatImpl
 import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.component.kaiheila.message.toContent
+import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
@@ -72,7 +73,7 @@ internal class KaiheilaNormalPersonMessageEventImpl(
     @OptIn(ExperimentalSimbotApi::class)
     private val userChatView = lazyValue {
         val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
-        KaiheilaUserChatImpl(bot, view)
+        KaiheilaUserChatImpl(bot, view.toModel())
     }
 
     @OptIn(ExperimentalSimbotApi::class)
@@ -117,7 +118,7 @@ internal class KaiheilaBotSelfPersonMessageEventImpl(
     @OptIn(ExperimentalSimbotApi::class)
     private val userChatView = lazyValue {
         val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
-        KaiheilaUserChatImpl(bot, view)
+        KaiheilaUserChatImpl(bot, view.toModel())
     }
 
     @OptIn(ExperimentalSimbotApi::class)

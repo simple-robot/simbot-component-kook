@@ -263,28 +263,34 @@ internal class KaiheilaGuildImpl constructor(
     
     
     private fun requestChannels(guildId: ID, type: Int? = null, batchDelay: Long = 0L): Flow<ChannelInfo> = flow {
-        var page = 0
+        var page = 1
         do {
+            if (page > 1) {
+                delay(batchDelay)
+            }
             bot.logger.debug("Sync channel data ... page {}", page)
             val result = ChannelListRequest(guildId = guildId, type = type, page = page).requestDataBy(bot)
             val channels = result.items
-            bot.logger.debug("{} channel data synced in page {}", channels.size, page - 1)
+            bot.logger.debug("{} channel data synced in page {}", channels.size, page)
             channels.forEach {
                 emit(it)
             }
             page = result.meta.page + 1
-            delay(batchDelay)
+            
         } while (channels.isNotEmpty() && result.meta.page < result.meta.pageTotal)
     }
     
     
     private fun requestGuildUsers(guildId: ID, batchDelay: Long = 0L): Flow<GuildUser> = flow {
-        var page = 0
+        var page = 1
         do {
+            if (page > 1) {
+                delay(batchDelay)
+            }
             bot.logger.debug("Sync member data ... page {}", page)
             val usersResult = GuildUserListRequest(guildId = guildId, page = page).requestDataBy(bot)
             val users = usersResult.items
-            bot.logger.debug("{} member data synced in page {}", users.size, page - 1)
+            bot.logger.debug("{} member data synced in page {}", users.size, page)
             users.forEach {
                 emit(it)
             }

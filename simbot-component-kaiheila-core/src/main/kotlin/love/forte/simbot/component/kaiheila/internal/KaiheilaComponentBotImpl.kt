@@ -88,8 +88,7 @@ internal class KaiheilaComponentBotImpl(
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
     
-    internal lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
-        private set
+    private lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
     
     
     @JvmSynthetic
@@ -134,12 +133,12 @@ internal class KaiheilaComponentBotImpl(
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
                 val guildsResult = GuildListRequest(page = page).requestDataBy(this@KaiheilaComponentBotImpl)
-                page = guildsResult.meta.page + 1
                 val guilds = guildsResult.items
-                bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page - 1)
+                bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page)
                 guilds.forEach {
                     emit(it)
                 }
+                page = guildsResult.meta.page + 1
             } while (guilds.isNotEmpty() && guildsResult.meta.page < guildsResult.meta.pageTotal)
         }
     }
@@ -163,7 +162,6 @@ internal class KaiheilaComponentBotImpl(
     @Synchronized
     private fun initSyncJob() {
         initGuildSyncJob()
-        initMemberSyncJob()
     }
     
     @Volatile
@@ -221,16 +219,6 @@ internal class KaiheilaComponentBotImpl(
                 }
             }
         }
-    }
-    
-    
-    @Volatile
-    private var memberSyncJob: Job? = null
-    
-    @Synchronized
-    private fun initMemberSyncJob() {
-        memberSyncJob?.cancel()
-        memberSyncJob = null
     }
     
     
