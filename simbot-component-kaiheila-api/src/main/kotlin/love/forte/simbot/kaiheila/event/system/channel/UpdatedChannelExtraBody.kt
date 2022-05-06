@@ -17,8 +17,10 @@
 
 package love.forte.simbot.kaiheila.event.system.channel
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
 
 /**
  * 频道信息更新
@@ -33,26 +35,32 @@ public interface UpdatedChannelExtraBody : ChannelEventExtraBody, Comparable<Upd
      * 服务器频道ID
      */
     public val id: ID
+
     /**
      * 服务器id
      */
     public val guildId: ID
+
     /**
-     * 频道创建者id
+     * 频道创建者id. 事件体中通常为 `user_id` 字段。
      */
     public val masterId: ID
+
     /**
      * 父分组频道id
      */
     public val parentId: ID
+
     /**
      * 频道名称
      */
     public val name: String
+
     /**
      * 频道简介
      */
     public val topic: String
+
     /**
      * 频道类型，1为文字频道，2为语音频道
      *
@@ -91,15 +99,22 @@ public interface UpdatedChannelExtraBody : ChannelEventExtraBody, Comparable<Upd
 @Serializable
 internal data class UpdatedChannelExtraBodyImpl(
     override val id: CharSequenceID,
+    @SerialName("guild_id")
     override val guildId: CharSequenceID,
+    @SerialName("user_id")
     override val masterId: CharSequenceID,
+    @SerialName("parent_id")
     override val parentId: CharSequenceID,
     override val name: String,
     override val topic: String,
     override val type: Int,
     override val level: Int,
+    @SerialName("slow_mode")
     override val slowMode: Int,
+    @SerialName("limit_amount")
     override val limitAmount: Int,
+    @SerialName("is_category")
     override val isCategory: Boolean,
+    @SerialName("server_url")
     override val serverUrl: String
 ) : UpdatedChannelExtraBody
