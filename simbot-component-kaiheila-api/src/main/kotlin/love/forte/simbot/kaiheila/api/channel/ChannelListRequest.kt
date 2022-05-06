@@ -26,10 +26,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.*
 import love.forte.simbot.kaiheila.objects.Channel
 import love.forte.simbot.kaiheila.objects.ChannelPermissionOverwrites
 import love.forte.simbot.kaiheila.objects.impl.ChannelPermissionOverwritesImpl
@@ -42,26 +39,42 @@ import love.forte.simbot.literal
  * request method: GET
  *
  */
-public class ChannelListRequest(private val guildId: ID) :
-    KaiheilaGetRequest<KaiheilaApiResult.ListData<ChannelInfo>>() {
+public class ChannelListRequest(
+    private val guildId: ID,
+    /**
+     * 目标页数
+     */
+    private val page: Int? = null,
+    /**
+     * 每页数据数量
+     */
+    private val pageSize: Int? = null,
+    /**
+     * 频道类型, `1`为文字，`2`为语音, 默认为`1`.
+     */
+    private val type: Int? = null,
+) : KaiheilaGetRequest<KaiheilaApiResult.ListData<ChannelInfo>>() {
     public companion object Key : BaseApiRequestKey("channel", "list") {
         private val serializer = KaiheilaApiResult.ListData.serializer(ChannelInfoImpl.serializer())
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<ChannelInfo>>
         get() = serializer
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("guild_id", guildId.literal)
+        appendIfNotnull("page", page)
+        appendIfNotnull("page_size", pageSize)
+        appendIfNotnull("type", type)
     }
-
+    
     override suspend fun requestData(
         client: HttpClient,
         authorization: String,
-        decoder: Json
+        decoder: Json,
     ): KaiheilaApiResult.ListData<ChannelInfo> {
         val data = super.requestData(client, authorization, decoder)
         data.items.forEach {
@@ -69,7 +82,7 @@ public class ChannelListRequest(private val guildId: ID) :
         }
         return data
     }
-
+    
 }
 
 /**
@@ -81,37 +94,37 @@ public interface ChannelInfo : Channel {
      * 频道id
      */
     override val id: ID
-
+    
     /**
      *	频道名称
      */
     override val name: String
-
+    
     /**
      * 是否为分组类型
      */
     override val isCategory: Boolean
-
+    
     /**
      *	频道创建者id
      */
     override val userId: ID
-
+    
     /**
      *	父分组频道id
      */
     override val parentId: ID
-
+    
     /**
      * 频道排序
      */
     override val level: Int
-
+    
     /**
      * 频道类型
      */
     override val type: Int
-
+    
     /**
      * 人数限制
      */
@@ -131,24 +144,21 @@ internal data class ChannelInfoImpl @ApiResultType constructor(
      */
     override val id: CharSequenceID,
     /**
-     *	频道名称
+     * 频道名称
      */
     override val name: String,
     /**
      * 是否为分组类型
      */
-    @SerialName("is_category")
-    override val isCategory: Boolean,
+    @SerialName("is_category") override val isCategory: Boolean,
     /**
-     *	频道创建者id
+     * 频道创建者id
      */
-    @SerialName("user_id")
-    override val userId: CharSequenceID,
+    @SerialName("user_id") override val userId: CharSequenceID,
     /**
-     *	父分组频道id
+     * 父分组频道id
      */
-    @SerialName("parent_id")
-    override val parentId: CharSequenceID,
+    @SerialName("parent_id") override val parentId: CharSequenceID,
     /**
      * 频道排序
      */
@@ -157,39 +167,35 @@ internal data class ChannelInfoImpl @ApiResultType constructor(
      * 频道类型
      */
     override val type: Int,
-
+    
     /**
      * 人数限制
      */
-    @SerialName("limit_amount")
-    override val maximumMember: Int,
-
-
+    @SerialName("limit_amount") override val maximumMember: Int,
+    
+    
     override val topic: String = "",
-    @SerialName("slow_mode")
-    override val slowMode: Int = 0,
-    @SerialName("permission_overwrites")
-    override val permissionOverwrites: List<ChannelPermissionOverwritesImpl> = emptyList(),
+    @SerialName("slow_mode") override val slowMode: Int = 0,
+    @SerialName("permission_overwrites") override val permissionOverwrites: List<ChannelPermissionOverwritesImpl> = emptyList(),
     // @SerialName("permission_users")
     // public val permissionUserEntities: List<UserImpl> = emptyList(),
-    @SerialName("permission_sync")
-    override val permissionSync: Int = 0,
+    @SerialName("permission_sync") override val permissionSync: Int = 0,
 ) : ChannelInfo {
-
+    
     override val permissionUsers: List<CharSequenceID> get() = emptyList() // permissionUserEntities.map { it.id }
-
-
+    
+    
     @Transient
     internal lateinit var guildIdLate: ID
     override val guildId: ID get() = guildIdLate
-
+    
     override val currentMember: Int
         get() = -1
-
+    
     override val icon: String
         get() = ""
-
-
+    
+    
 }
 
 

@@ -33,12 +33,19 @@ public class KaiheilaComponentBotConfiguration(public var botConfiguration: Kaih
     public data class SyncPeriods(
         /**
          * 对频道服务器进行同步的周期，单位毫秒。
+         * 服务器同步的同时会去同步此服务器下的所有频道列表与成员列表。
          */
-        public val guildSyncPeriod: Long = 60_000L,
+        public val guildSyncPeriod: Long = 180_000L,
 
         /**
-         * 对各频道服务器中的成员进行同步的周期，单位毫秒。
+         * 同步数据是分页分批次的同步。[batchDelay] 配置每一批次后进行挂起等待的时间，单位毫秒。
+         *
+         * 可以通过调大此参数来减缓api的请求速率, 默认不等待。
          */
-        public val memberSyncPeriods: Long = 60_000L
-    )
+        public val batchDelay: Long = 0L,
+        
+    ) {
+        @Deprecated("Unused.", ReplaceWith("Long.MAX_VALUE"))
+        public val memberSyncPeriods: Long get() = Long.MAX_VALUE
+    }
 }

@@ -17,8 +17,11 @@
 
 package love.forte.simbot.kaiheila.event.system.guild
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.util.BooleanToIntSerializer
 
 
 /**
@@ -107,7 +110,8 @@ internal data class UpdatedGuildExtraBodyImpl(
      * 是否为公开服务器
      */
     @SerialName("enable_open")
-   override val enableOpen: Boolean,
+    @Serializable(BooleanToIntSerializer::class)
+    override val enableOpen: Boolean,
     /**
      * 公开服务器id
      */

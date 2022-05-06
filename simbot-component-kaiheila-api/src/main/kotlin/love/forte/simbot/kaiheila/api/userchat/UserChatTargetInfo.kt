@@ -17,20 +17,29 @@
 
 package love.forte.simbot.kaiheila.api.userchat
 
-import love.forte.simbot.*
-import love.forte.simbot.definition.*
-import love.forte.simbot.kaiheila.api.*
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.definition.UserInfo
+
 
 /**
  *
  * [UserChatView] 中的 `targetInfo` 属性。
  *
  */
+public interface UserChatTargetInfo : UserInfo {
+    override val id: ID
+    override val username: String
+    override val avatar: String
+    public val online: Boolean
+}
+
+
+
 @kotlinx.serialization.Serializable
-public data class UserChatTargetInfo @ApiResultType constructor(
-    @kotlinx.serialization.Serializable(ID.AsCharSequenceIDSerializer::class)
-    override val id: ID,
+internal data class UserChatTargetInfoImpl(
+    override val id: CharSequenceID,
     override val username: String,
     override val avatar: String,
-    val online: Boolean = false,
-) : UserInfo
+    override val online: Boolean = false,
+) : UserChatTargetInfo
