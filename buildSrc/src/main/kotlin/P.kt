@@ -60,7 +60,7 @@ object P {
             major = "${Simbot.version.major}.${Simbot.version.minor}",
             minor = 0,
             patch = 0,
-            status = preview(3, 2),
+            status = preview(3, 3),
             isSnapshot = isSnapshot
         )
 
