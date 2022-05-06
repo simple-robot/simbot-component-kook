@@ -32,11 +32,11 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaChannelMessageDetail
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.component.kaiheila.message.toRequest
+import love.forte.simbot.component.kaiheila.model.ChannelModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.Role
 import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreated
-import love.forte.simbot.kaiheila.objects.Channel
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.MessageReceipt
@@ -51,51 +51,51 @@ import kotlin.coroutines.CoroutineContext
 internal class KaiheilaChannelImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val guild: KaiheilaGuildImpl,
-    override val source: Channel
+    @Volatile override var source: ChannelModel,
 ) : KaiheilaChannel, CoroutineScope {
     private val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
-
+    
     override val guildId: ID
         get() = guild.id
-
+    
     override val currentMember: Int
         get() = guild.currentMember
-
+    
     override val maximumMember: Int
         get() = guild.maximumMember
-
+    
     override val ownerId: ID
         get() = guild.ownerId
-
+    
     override val owner: KaiheilaGuildMember
         get() = guild.owner
-
+    
     override fun getMember(id: ID): KaiheilaGuildMember? = guild.getMember(id)
     override suspend fun member(id: ID): KaiheilaGuildMember? = guild.member(id)
     override fun getMembers(): Stream<out KaiheilaGuildMember> = guild.getMembers()
     override fun getMembers(groupingId: ID?): Stream<out KaiheilaGuildMember> = guild.getMembers(groupingId)
     override fun getMembers(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaGuildMember> =
         guild.getMembers(groupingId, limiter)
-
+    
     override fun getMembers(limiter: Limiter): Stream<out KaiheilaGuildMember> = guild.getMembers(limiter)
     override suspend fun members(groupingId: ID?, limiter: Limiter): Flow<KaiheilaGuildMember> =
         guild.members(groupingId, limiter)
-
-
+    
+    
     override suspend fun send(message: Message, tempTargetId: ID?): MessageReceipt {
         val request = message.toRequest(targetId = source.id, tempTargetId = tempTargetId)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-
+        
         val result = request.requestDataBy(bot)
-
+        
         return if (result is MessageCreated) {
             result.asReceipt(false, bot)
         } else {
             KaiheilaApiRequestedReceipt(result, false)
         }
     }
-
+    
     override suspend fun send(message: MessageContent, tempTargetId: ID?): MessageReceipt {
         return when (message) {
             is KaiheilaReceiveMessageContent -> {
@@ -125,20 +125,20 @@ internal class KaiheilaChannelImpl(
             }
         }
     }
-
+    
     @Api4J
     override fun getRoles(groupingId: ID?, limiter: Limiter): Stream<out Role> {
         return Stream.empty()
         // TODO("Not yet implemented")
     }
-
+    
     override suspend fun roles(groupingId: ID?, limiter: Limiter): Flow<Role> {
         return emptyFlow()
         // TODO("Not yet implemented")
     }
-
+    
     override fun toString(): String {
         return "KaiheilaChannel(source=$source)"
     }
-
+    
 }

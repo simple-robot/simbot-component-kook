@@ -17,9 +17,12 @@
 
 package love.forte.simbot.kaiheila.api.userchat
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
 
 
 /**
@@ -30,7 +33,7 @@ import love.forte.simbot.kaiheila.api.*
 public class UserChatCreateRequest(private val targetId: ID) : KaiheilaPostRequest<UserChatView>() {
     public companion object Key : BaseApiRequestKey("user-chat", "create")
 
-    override val resultDeserializer: DeserializationStrategy<out UserChatView> get() = UserChatView.serializer()
+    override val resultDeserializer: DeserializationStrategy<out UserChatView> get() = UserChatViewImpl.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(targetId)
 

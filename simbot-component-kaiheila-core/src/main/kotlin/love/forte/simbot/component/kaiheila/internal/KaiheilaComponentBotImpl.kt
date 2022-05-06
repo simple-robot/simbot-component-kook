@@ -33,6 +33,7 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage.Key.asImage
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage.Key.asMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
+import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.event.EventProcessor
@@ -80,31 +81,30 @@ internal class KaiheilaComponentBotImpl(
     override val manager: KaiheilaBotManager,
     override val eventProcessor: EventProcessor,
     override val component: KaiheilaComponent,
-    private val configuration: KaiheilaComponentBotConfiguration
+    private val configuration: KaiheilaComponentBotConfiguration,
 ) : KaiheilaComponentBot() {
     internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
-
-    internal lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
-    private set
-
-
+    
+    private lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
+    
+    
     @JvmSynthetic
     internal fun internalGuild(id: ID): KaiheilaGuildImpl? = internalGuild(id.literal)
-
+    
     @JvmSynthetic
     internal fun internalGuild(id: String): KaiheilaGuildImpl? = guilds[id]
-
-
+    
+    
     init {
         sourceBot.preProcessor { _, decoded ->
             val decodedEvent = decoded()
-
+            
             // register some event processors
             decodedEvent.internalPreProcessor()
-
+            
             // register standard event processors
             /*
                 事件的验证、准备是(协程下)同步的（借preProcessor的特性），
@@ -112,10 +112,10 @@ internal class KaiheilaComponentBotImpl(
              */
             decodedEvent.internalProcessor()
         }
-
+        
     }
-
-
+    
+    
     // invoke with initLock
     private suspend fun init() {
         updateMe(sourceBot.me())
@@ -123,7 +123,7 @@ internal class KaiheilaComponentBotImpl(
         initSyncJob()
         // clearFriendCache()
     }
-
+    
     /**
      * 以 flow 的方式查询guild列表
      */
@@ -133,130 +133,142 @@ internal class KaiheilaComponentBotImpl(
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
                 val guildsResult = GuildListRequest(page = page).requestDataBy(this@KaiheilaComponentBotImpl)
-                page = guildsResult.meta.page + 1
                 val guilds = guildsResult.items
-                bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page - 1)
+                bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page)
                 guilds.forEach {
                     emit(it)
                 }
+                page = guildsResult.meta.page + 1
             } while (guilds.isNotEmpty() && guildsResult.meta.page < guildsResult.meta.pageTotal)
         }
     }
-
+    
     private suspend fun initGuilds() {
         val guildsMap = ConcurrentHashMap<String, KaiheilaGuildImpl>()
         requestGuilds()
             .buffer(100)
+            .map { guild -> guild.toModel() }
             .map { guild ->
                 KaiheilaGuildImpl(this, guild)
             }.collect {
                 guildsMap[it.id.literal] = it.also { it.init() }
             }
-
+        
         bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
-
+        
         this.guilds = guildsMap
     }
-
-
+    
+    @Synchronized
     private fun initSyncJob() {
         initGuildSyncJob()
-        initMemberSyncJob()
     }
-
+    
     @Volatile
     private var guildSyncJob: Job? = null
-
+    
+    @Synchronized
     private fun initGuildSyncJob() {
         guildSyncJob?.cancel()
         guildSyncJob = null
-
+        
         val guildSyncPeriod = configuration.syncPeriods.guildSyncPeriod
+        val batchDelay = configuration.syncPeriods.batchDelay
         if (guildSyncPeriod > 0) {
-            // 同步guild信息。
+            // 同步guild信息。目前只同步 model 信息
             suspend fun syncGuild() {
                 requestGuilds().collect { guild ->
-                    if (!guilds.containsKey(guild.id.literal)) {
-                        val guildImpl = KaiheilaGuildImpl(this, guild).also { it.init() }
-                        guilds.computeIfPresent(guild.id.literal) { _, cur ->
-                            if (cur.initTimestamp >= guildImpl.initTimestamp) {
-                                guildImpl.cancel()
-                                cur
-                            } else {
-                                cur.cancel()
+                    val guildId = guild.id.literal
+                    val guildModel = guild.toModel()
+                    
+                    val curr = guild(guild.id)
+                    val syncNeedGuild = if (curr == null) {
+                        // compute it.
+                        val guildImpl = KaiheilaGuildImpl(this, guildModel).also { it.init() }
+                        guilds.compute(guildId) { _, cur ->
+                            if (cur == null) {
+                                // 不存在旧的，直接添加
                                 guildImpl
+                            } else {
+                                // 存在旧的，尝试替换model
+                                // 但是无论如何, 新的guildImpl都是没有必要的了
+                                guildImpl.cancel()
+                                // 如果当前旧的完成初始化的事件比自己晚，抛弃自己
+                                // // 否则，自己为最新数据，替换。
+                                if (cur.initTimestamp < guildImpl.initTimestamp) {
+                                    cur.source = guildModel
+                                }
+                                cur
                             }
-                        }
+                        }!!
+                    } else {
+                        // update source data
+                        curr.source = guildModel
+                        curr
                     }
+                    
+                    syncNeedGuild.sync(batchDelay)
+                    
                 }
             }
-
+            
             guildSyncJob = launch {
-                while (isActive) {
+                while (job.isActive) {
                     delay(guildSyncPeriod)
                     syncGuild()
                 }
             }
         }
     }
-
-
-    @Volatile
-    private var memberSyncJob: Job? = null
-
-    private fun initMemberSyncJob() {
-        memberSyncJob?.cancel()
-        memberSyncJob = null
-    }
-
-
+    
+    
     override val isActive: Boolean
         get() = job.isActive
-
+    
     override val isCancelled: Boolean
         get() = job.isCancelled
-
+    
     override val isStarted: Boolean
         get() = sourceBot.isStarted
-
+    
     override val status: UserStatus
         get() = botStatus
-
+    
     override suspend fun join() {
         sourceBot.join()
     }
-
+    
     override suspend fun cancel(reason: Throwable?): Boolean {
         if (job.isCancelled) return false
         sourceBot.cancel(reason)
         return true
     }
-
-    //region me and isMe
+    
+    // region me and isMe
     @Volatile
     private lateinit var me: Me
-
+    
     private val meLock = Mutex()
-
+    
     private suspend fun updateMe(newMe: Me) = meLock.withLock {
         me = newMe
     }
-
+    
     override fun isMe(id: ID): Boolean {
         if (id == this.id) return true
         if (::me.isInitialized && me.id == id) return true
         return false
     }
-    //endregion
-
+    // endregion
+    
     override val avatar: String
         get() = me.avatar
-
+    
     override val username: String
         get() = me.username
-
+    
     private val initLock = Mutex()
-
+    
     /**
      * 启动bot。
      */
@@ -272,46 +284,46 @@ internal class KaiheilaComponentBotImpl(
             }
         }
     }
-
-
-    //region guild api
+    
+    
+    // region guild api
     override suspend fun guild(id: ID): KaiheilaGuildImpl? = guilds[id.literal]
-
+    
     override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuildImpl> =
         guilds.values.asFlow().withLimiter(limiter)
-
+    
     override fun getGuild(id: ID): KaiheilaGuildImpl? = guilds[id.literal]
-
+    
     override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuildImpl> =
         guilds.values.stream().withLimiter(limiter)
-    //endregion
-
-
-    //region friend api
+    // endregion
+    
+    
+    // region friend api
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun friend(id: ID): KaiheilaUserChatImpl {
         val chat = UserChatCreateRequest(id).requestDataBy(bot)
-        return KaiheilaUserChatImpl(this, chat)
+        return KaiheilaUserChatImpl(this, chat.toModel())
     }
-
+    
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChatImpl> {
         return UserChatListRequest.requestDataBy(this).items.asFlow().map { chat ->
-            KaiheilaUserChatImpl(this, chat)
+            KaiheilaUserChatImpl(this, chat.toModel())
         }
     }
-
+    
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
     override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChatImpl> {
         return runInBlocking { UserChatListRequest.requestDataBy(this@KaiheilaComponentBotImpl) }
-            .items.stream().map { chat -> KaiheilaUserChatImpl(this, chat) }
+            .items.stream().map { chat -> KaiheilaUserChatImpl(this, chat.toModel()) }
     }
-    //endregion
-
-
-    //region image api / assert api
-
+    // endregion
+    
+    
+    // region image api / assert api
+    
     /**
      * 上传一个资源并得到一个 [KaiheilaAssetMessage].
      *
@@ -324,8 +336,8 @@ internal class KaiheilaComponentBotImpl(
         val asset = AssetCreateRequest(resource).requestDataBy(this)
         return asset.asMessage(type)
     }
-
-
+    
+    
     /**
      * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      */
@@ -337,23 +349,23 @@ internal class KaiheilaComponentBotImpl(
         }
         return KaiheilaAssetImage(AssetCreated(id.literal))
     }
-
+    
     override suspend fun uploadImage(resource: Resource): KaiheilaAssetImage {
         val asset = AssetCreateRequest(resource).requestDataBy(this)
         return asset.asImage()
     }
-
-    //endregion
-
-
-    //region internal event process
+    
+    // endregion
+    
+    
+    // region internal event process
     private suspend fun KhlEvent<*>.internalPreProcessor() {
         when (val ex = extra) {
             // 系统事件
             is Sys<*> -> {
                 when (val body = ex.body) {
-
-                    //region guild members
+                    
+                    // region guild members
                     // 某人退出频道服务器
                     is ExitedGuildEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
@@ -365,20 +377,25 @@ internal class KaiheilaComponentBotImpl(
                         val guild = internalGuild(this.targetId) ?: return
                         val userInfo =
                             UserViewRequest(guild.id, body.userId).requestDataBy(this@KaiheilaComponentBotImpl)
-                        val member = KaiheilaGuildMemberImpl(this@KaiheilaComponentBotImpl, guild, userInfo)
-                        guild.members.merge(body.userId.literal, member) { old, now ->
-                            old.cancel()
-                            now
+                        val userModel = userInfo.toModel()
+                        
+                        guild.members.compute(body.userId.literal) { _, old ->
+                            if (old == null) {
+                                KaiheilaGuildMemberImpl(this@KaiheilaComponentBotImpl, guild, userModel)
+                            } else {
+                                old.source = userModel
+                                old
+                            }
                         }
                     }
                     // 信息变更 （昵称变更）
                     is UpdatedGuildMemberEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
                         val member = guild.members[body.userId.literal] ?: return
-                        member.nickname = body.nickname
+                        member.source.nickname = body.nickname
                     }
-                    //endregion
-                    //region guilds
+                    // endregion
+                    // region guilds
                     // 服务器被删除
                     is DeletedGuildExtraBody -> {
                         guilds.remove(body.id.literal)?.also { it.cancel() }
@@ -386,57 +403,69 @@ internal class KaiheilaComponentBotImpl(
                     // 服务器更新
                     is UpdatedGuildExtraBody -> {
                         val guild = internalGuild(body.id) ?: return
-                        guild.name = body.name
-                        guild.icon = body.icon
-                        guild.ownerId = body.openId
+                        guild.source = guild.source.copy(
+                            name = body.name,
+                            icon = body.icon,
+                            masterId = body.userId,
+                            notifyType = body.notifyType,
+                            region = body.region,
+                            enableOpen = body.enableOpen,
+                            openId = body.openId,
+                            defaultChannelId = body.defaultChannelId,
+                            welcomeChannelId = body.welcomeChannelId,
+                        )
                     }
-                    //endregion
-    
-                    //region channels
+                    // endregion
+                    // region channels
                     // 某服务器新增频道
                     is AddedChannelExtraBody -> {
                         val channelId = body.id
                         val guildId = body.guildId.literal
+                        
                         guilds[guildId]?.also { guild ->
                             // query channel info.
                             val channelView = ChannelViewRequest(channelId).requestDataBy(this@KaiheilaComponentBotImpl)
-                            guild.channels.put(channelId.literal, KaiheilaChannelImpl(this@KaiheilaComponentBotImpl, guild, channelView))?.also { oldChannel ->
-                                // cancel old.
-                                oldChannel.cancel()
+                            val channelModel = channelView.toModel()
+                            
+                            // 如果已经存在，覆盖source
+                            guild.channels.compute(channelId.literal) { _, old ->
+                                if (old == null) {
+                                    KaiheilaChannelImpl(this@KaiheilaComponentBotImpl, guild, channelModel)
+                                } else {
+                                    old.source = channelModel
+                                    old
+                                }
                             }
                         }
                     }
                     // 某服务器更新频道信息
                     is UpdatedChannelExtraBody -> {
-                        val channelId = body.id
-                        val guildId = body.guildId.literal
-                        guilds[guildId]?.also { guild ->
-                            val channel = guild.internalChannel(channelId)
-                            if (channel == null) {
-                                // query channel info.
-                                val channelView = ChannelViewRequest(channelId).requestDataBy(this@KaiheilaComponentBotImpl)
-                                guild.channels.put(channelId.literal, KaiheilaChannelImpl(this@KaiheilaComponentBotImpl, guild, channelView))?.also { oldChannel ->
-                                    // cancel old.
-                                    oldChannel.cancel()
-                                }
-                            } else {
-                                // update TODO
-                                channel.source
-                            }
-                        
+                        guild(body.guildId)?.also { guild ->
+                            val channel = guild.internalChannel(body.id) ?: return@also
+                            channel.source = channel.source.copy(
+                                userId = body.masterId,
+                                parentId = body.parentId,
+                                name = body.name,
+                                topic = body.topic,
+                                type = body.type,
+                                level = body.level,
+                                slowMode = body.slowMode,
+                                isCategory = body.isCategory,
+                            )
                         }
                     }
                     // 某服务器频道被删除
                     is DeletedChannelExtraBody -> {
-                        TODO()
+                        guild(this.targetId)?.channels?.remove(body.id.literal)?.also { it.cancel() }
                     }
-                    //endregion
+                    // endregion
                     
-                    //region bot self
+                    // region bot self
                     // 用户信息更新
                     is UserUpdatedEventBody -> {
-                        if (body.userId == me.id) {
-                            updateMe(me.copy(username = body.username, avatar = body.avatar))
+                        val curMe = me
+                        if (body.userId == curMe.id) {
+                            updateMe(curMe.copy(username = body.username, avatar = body.avatar))
                         }
                     }
                     // bot退出了某个服务器
@@ -446,30 +475,30 @@ internal class KaiheilaComponentBotImpl(
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
                         val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KaiheilaComponentBotImpl)
-                        val guild = KaiheilaGuildImpl(this@KaiheilaComponentBotImpl, guildInfo)
-                        guilds.merge(guildInfo.id.literal, guild) { old, now ->
+                        val guildModel = guildInfo.toModel()
+                        val newGuild = KaiheilaGuildImpl(this@KaiheilaComponentBotImpl, guildModel).also { it.init() }
+                        guilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
                             old.cancel()
-                            now
+                            cur
                         }
-                        guild.init()
                     }
-                    //endregion
-
+                    // endregion
+                    
                 }
             }
-
-            // Text.
+            
+            // Text..?
             is Text -> {
             }
         }
     }
-
+    
     private suspend fun KhlEvent<*>.internalProcessor() {
         register(this@KaiheilaComponentBotImpl)
     }
-
-    //endregion
-
+    
+    // endregion
+    
     companion object {
         val botStatus = UserStatus.builder().bot().fakeUser().build()
         const val ASSET_PREFIX = "https://www.kaiheila.cn"

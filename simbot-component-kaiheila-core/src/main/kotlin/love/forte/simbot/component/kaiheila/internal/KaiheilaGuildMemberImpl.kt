@@ -25,13 +25,13 @@ import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.botUserStatus
 import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.normalUserStatus
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
+import love.forte.simbot.component.kaiheila.model.UserModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.update
 import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kaiheila.api.guild.GuildMuteDeleteRequest
-import love.forte.simbot.kaiheila.objects.User
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.MessageReceipt
@@ -48,9 +48,9 @@ import kotlin.time.Duration
 internal class KaiheilaGuildMemberImpl(
     override val bot: KaiheilaComponentBotImpl,
     override val guild: KaiheilaGuildImpl,
-    override val source: User,
+    @Volatile override var source: UserModel,
 ) : KaiheilaGuildMember, CoroutineScope {
-    internal val job = SupervisorJob(guild.job)
+    private val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
 
     @Volatile
@@ -58,8 +58,8 @@ internal class KaiheilaGuildMemberImpl(
     private var _muteJob: Job? = null
 
 
-    override var nickname: String = source.nickname ?: ""
-        internal set
+    override val nickname: String get() = source.nickname ?: ""
+    
     override val username: String = source.username
     override val avatar: String = source.avatar
     override val status: UserStatus = if (source.isBot) botUserStatus else normalUserStatus
@@ -160,12 +160,9 @@ internal class KaiheilaGuildMemberImpl(
     }
 
     companion object {
-        private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaihieila.KaiheilaMember")
+        private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.KaiheilaMember")
         private val MUTE_JOB_ATOMIC =
             AtomicReferenceFieldUpdater.newUpdater(KaiheilaGuildMemberImpl::class.java, Job::class.java, "_muteJob")
     }
 
 }
-
-
-//  by KaiheilaGuildMemberImpl(bot, guild, SystemUser)

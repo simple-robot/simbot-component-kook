@@ -23,11 +23,11 @@ import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
 import love.forte.simbot.component.kaiheila.message.*
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
+import love.forte.simbot.component.kaiheila.model.UserChatViewModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreated
 import love.forte.simbot.kaiheila.api.message.MessageType
-import love.forte.simbot.kaiheila.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.MessageReceipt
@@ -38,7 +38,7 @@ import love.forte.simbot.message.MessageReceipt
  */
 @ExperimentalSimbotApi
 internal class KaiheilaUserChatImpl(
-    override val bot: KaiheilaComponentBotImpl, override val source: UserChatView
+    override val bot: KaiheilaComponentBotImpl, @Volatile override var source: UserChatViewModel
 ) : KaiheilaUserChat {
     override val id: ID
         get() = source.targetInfo.id

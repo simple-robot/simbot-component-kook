@@ -23,6 +23,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.event.*
 import love.forte.simbot.component.kaiheila.internal.event.*
+import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.event.Event.Key
@@ -311,5 +312,5 @@ private fun toMemberIfSystem(
         return null
     }
 
-    return KaiheilaGuildMemberImpl(bot, guild, SystemUser)
+    return KaiheilaGuildMemberImpl(bot, guild, SystemUser.toModel())
 }
