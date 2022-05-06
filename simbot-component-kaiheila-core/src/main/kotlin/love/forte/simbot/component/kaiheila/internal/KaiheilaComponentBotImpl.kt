@@ -41,6 +41,7 @@ import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.api.ApiResultType
 import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
 import love.forte.simbot.kaiheila.api.asset.AssetCreated
+import love.forte.simbot.kaiheila.api.channel.ChannelViewRequest
 import love.forte.simbot.kaiheila.api.guild.GuildListRequest
 import love.forte.simbot.kaiheila.api.guild.GuildViewRequest
 import love.forte.simbot.kaiheila.api.message.MessageType
@@ -50,6 +51,9 @@ import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
 import love.forte.simbot.kaiheila.api.userchat.UserChatListRequest
 import love.forte.simbot.kaiheila.event.Event.Extra.Sys
 import love.forte.simbot.kaiheila.event.Event.Extra.Text
+import love.forte.simbot.kaiheila.event.system.channel.AddedChannelExtraBody
+import love.forte.simbot.kaiheila.event.system.channel.DeletedChannelExtraBody
+import love.forte.simbot.kaiheila.event.system.channel.UpdatedChannelExtraBody
 import love.forte.simbot.kaiheila.event.system.guild.DeletedGuildExtraBody
 import love.forte.simbot.kaiheila.event.system.guild.UpdatedGuildExtraBody
 import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
@@ -387,6 +391,47 @@ internal class KaiheilaComponentBotImpl(
                         guild.ownerId = body.openId
                     }
                     //endregion
+    
+                    //region channels
+                    // 某服务器新增频道
+                    is AddedChannelExtraBody -> {
+                        val channelId = body.id
+                        val guildId = body.guildId.literal
+                        guilds[guildId]?.also { guild ->
+                            // query channel info.
+                            val channelView = ChannelViewRequest(channelId).requestDataBy(this@KaiheilaComponentBotImpl)
+                            guild.channels.put(channelId.literal, KaiheilaChannelImpl(this@KaiheilaComponentBotImpl, guild, channelView))?.also { oldChannel ->
+                                // cancel old.
+                                oldChannel.cancel()
+                            }
+                        }
+                    }
+                    // 某服务器更新频道信息
+                    is UpdatedChannelExtraBody -> {
+                        val channelId = body.id
+                        val guildId = body.guildId.literal
+                        guilds[guildId]?.also { guild ->
+                            val channel = guild.internalChannel(channelId)
+                            if (channel == null) {
+                                // query channel info.
+                                val channelView = ChannelViewRequest(channelId).requestDataBy(this@KaiheilaComponentBotImpl)
+                                guild.channels.put(channelId.literal, KaiheilaChannelImpl(this@KaiheilaComponentBotImpl, guild, channelView))?.also { oldChannel ->
+                                    // cancel old.
+                                    oldChannel.cancel()
+                                }
+                            } else {
+                                // update TODO
+                                channel.source
+                            }
+                        
+                        }
+                    }
+                    // 某服务器频道被删除
+                    is DeletedChannelExtraBody -> {
+                        TODO()
+                    }
+                    //endregion
+                    
                     //region bot self
                     // 用户信息更新
                     is UserUpdatedEventBody -> {
