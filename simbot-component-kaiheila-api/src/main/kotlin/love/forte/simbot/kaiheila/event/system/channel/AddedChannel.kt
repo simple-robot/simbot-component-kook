@@ -17,8 +17,11 @@
 
 package love.forte.simbot.kaiheila.event.system.channel
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.util.BooleanToIntSerializer
 
 
 /**
@@ -34,26 +37,32 @@ public interface AddedChannelExtraBody : ChannelEventExtraBody, Comparable<Added
      * 服务器频道ID
      */
     public val id: ID
+
     /**
      * 服务器id
      */
     public val guildId: ID
+
     /**
      * 频道创建者id
      */
     public val masterId: ID
+
     /**
      * 父分组频道id
      */
     public val parentId: ID
+
     /**
      * 频道名称
      */
     public val name: String
+
     /**
      * 频道简介
      */
     public val topic: String
+
     /**
      * 频道类型，1为文字频道，2为语音频道
      *
@@ -106,24 +115,29 @@ internal data class AddedChannelExtraBodyImpl(
      */
     @SerialName("guild_id")
     override val guildId: CharSequenceID,
+    
     /**
      * 频道创建者id
      */
-    @SerialName("master_id")
+    @SerialName("user_id")
     override val masterId: CharSequenceID,
+
     /**
      * 父分组频道id
      */
     @SerialName("parent_id")
     override val parentId: CharSequenceID,
+
     /**
      * 频道名称
      */
     override val name: String,
+
     /**
      * 频道简介
      */
     override val topic: String,
+
     /**
      * 频道类型，1为文字频道，2为语音频道
      *
@@ -133,34 +147,39 @@ internal data class AddedChannelExtraBodyImpl(
     /**
      * 频道排序
      */
-    override val level: Int,
+    @SerialName("level")
+    private val _level: Int? = null,
 
     /**
      * 慢速限制，单位秒。用户发送消息之后再次发送消息的等待时间。
      */
     @SerialName("slow_mode")
-    override val slowMode: Int,
+    override val slowMode: Int = -1,
 
     /**
      * 人数限制（如果为语音频道）
      */
     @SerialName("limit_amount")
-    override val limitAmount: Int,
+    override val limitAmount: Int = -1,
 
     /**
      * 是否为分组类型
      */
     @SerialName("is_category")
-    override val isCategory: Boolean,
+    @Serializable(BooleanToIntSerializer::class)
+    override val isCategory: Boolean = false,
 
     /**
      * 语音服务器地址，HOST:PORT的格式
      */
     @SerialName("server_url")
-    override val serverUrl: String
+    override val serverUrl: String = ""
 ) : AddedChannelExtraBody {
     init {
         check(type in 1..2) { "Parameter type must be 1 or 2, but $type" }
     }
+
+    override val level: Int
+        get() = _level ?: -1
 
 }
