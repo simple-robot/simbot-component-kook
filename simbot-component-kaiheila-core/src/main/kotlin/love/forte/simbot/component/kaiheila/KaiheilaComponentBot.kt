@@ -135,26 +135,74 @@ public abstract class KaiheilaComponentBot : Bot {
      */
     @JvmSynthetic
     abstract override suspend fun resolveImage(id: ID): KaiheilaAssetImage
-
+    
+    /**
+     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     *
+     * 但是需要验证此 [id] 是否为 `https://www.kaiheila.cn` 开头，即是否为kaiheila的资源。
+     *
+     */
     @OptIn(Api4J::class)
     override fun resolveImageBlocking(id: ID): KaiheilaAssetImage = runInBlocking { resolveImage(id) }
     //endregion
-
+    
+    /**
+     * 通过指定ID **构建** 一个目标用户的聊天会话对象。
+     *
+     * 由于开黑啦bot api中没有实际上的“好友”相关API，因此目前阶段以聊天会话代替好友概念。未来可能会对此api做出调整。
+     */
     @OptIn(ExperimentalSimbotApi::class)
-    abstract override suspend fun friend(id: ID): KaiheilaUserChat?
-
+    abstract override suspend fun friend(id: ID): KaiheilaUserChat
+    
+    /**
+     * 通过指定ID **构建** 一个目标用户的聊天会话对象。
+     *
+     * 由于开黑啦bot api中没有实际上的“好友”相关API，因此目前阶段以聊天会话代替好友概念。未来可能会对此api做出调整。
+     */
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun getFriend(id: ID): KaiheilaUserChat = runInBlocking { friend(id) }
+    
+    /**
+     * 查询当前存在的所有**聊天会话**。
+     */
     @OptIn(ExperimentalSimbotApi::class)
     abstract override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChat>
-
-    @OptIn(ExperimentalSimbotApi::class)
+    
+    /**
+     * 查询当前存在的所有**聊天会话**。
+     */
     @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
     abstract override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChat>
-
+    
+    /**
+     * 查询当前存在的所有**聊天会话**。
+     */
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun getFriends(): Stream<out KaiheilaUserChat> = getFriends(Grouping.EMPTY, Limiter)
+    
+    /**
+     * 查询当前存在的所有**聊天会话**。
+     */
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun getFriends(limiter: Limiter): Stream<out KaiheilaUserChat> = getFriends(Grouping.EMPTY, limiter)
+    
+    /**
+     * 终止当前bot。
+     */
     abstract override suspend fun cancel(reason: Throwable?): Boolean
-
+    
+    /**
+     * 挂起直到当前bot被关闭。
+     */
     abstract override suspend fun join()
-
-
+    
+    /**
+     * 启动此bot。
+     */
     abstract override suspend fun start(): Boolean
 
 

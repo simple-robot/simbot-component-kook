@@ -21,10 +21,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.botUserStatus
 import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.normalUserStatus
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
+import love.forte.simbot.component.kaiheila.KaiheilaUserChat
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.component.kaiheila.model.UserModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.update
@@ -34,7 +37,6 @@ import love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kaiheila.api.guild.GuildMuteDeleteRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
-import love.forte.simbot.message.MessageReceipt
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
 import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
@@ -52,22 +54,22 @@ internal class KaiheilaGuildMemberImpl(
 ) : KaiheilaGuildMember, CoroutineScope {
     private val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
-
+    
     @Volatile
     @Suppress("unused")
     private var _muteJob: Job? = null
-
-
+    
+    
     override val nickname: String get() = source.nickname ?: ""
     
     override val username: String = source.username
     override val avatar: String = source.avatar
     override val status: UserStatus = if (source.isBot) botUserStatus else normalUserStatus
-
+    
     override val id: ID
         get() = source.id
-
-    //region mute相关
+    
+    // region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
         val result = GuildMuteDeleteRequest(guild.id, source.id, type).requestBy(bot)
@@ -81,14 +83,14 @@ internal class KaiheilaGuildMemberImpl(
             }
         }
     }
-
+    
     override suspend fun mute(duration: Duration, type: Int): Boolean {
         // do mute
         val milliseconds = duration.inWholeMilliseconds
         if (milliseconds == 0L) {
             return unmute(type)
         }
-
+        
         val result = GuildMuteCreateRequest(guild.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (milliseconds > 0 && success) {
@@ -108,61 +110,77 @@ internal class KaiheilaGuildMemberImpl(
                 }
             }
         }
-
-
+        
+        
     }
-    //endregion
-
-
-    //region TODO send 相关
-    override suspend fun send(text: String): MessageReceipt {
-        return super.send(text)
-    }
-
-    override suspend fun send(message: Message): MessageReceipt {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun send(message: MessageContent): MessageReceipt {
-        return super.send(message)
-    }
-
+    // endregion
+    
+    
+    // region send 相关
+    // 暂时等同于向好友发送消息
+    
+    @OptIn(ExperimentalSimbotApi::class)
+    private suspend fun asFriend(): KaiheilaUserChat = bot.friend(id)
+    
     @Api4J
-    override fun sendBlocking(text: String): MessageReceipt {
-        return super.sendBlocking(text)
+    @OptIn(ExperimentalSimbotApi::class)
+    private fun asFriendBlocking(): KaiheilaUserChat = bot.getFriend(id)
+    
+    
+    @OptIn(ExperimentalSimbotApi::class)
+    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
+        return asFriend().send(text)
     }
-
+    
+    @OptIn(ExperimentalSimbotApi::class)
+    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
+        return asFriend().send(message)
+    }
+    
+    @OptIn(ExperimentalSimbotApi::class)
+    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
+        return asFriend().send(message)
+    }
+    
     @Api4J
-    override fun sendBlocking(message: Message): MessageReceipt {
-        return super.sendBlocking(message)
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt {
+        return asFriendBlocking().sendBlocking(text)
     }
-
+    
     @Api4J
-    override fun sendBlocking(message: MessageContent): MessageReceipt {
-        return super.sendBlocking(message)
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt {
+        return asFriendBlocking().sendBlocking(message)
     }
-    //endregion
-
-    //region roles相关
+    
+    @Api4J
+    @OptIn(ExperimentalSimbotApi::class)
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt {
+        return asFriendBlocking().sendBlocking(message)
+    }
+    // endregion
+    
+    // region roles相关
     @Api4J
     override val roles: Stream<out Role>
         get() = Stream.empty() // TODO("Not yet implemented")
-
+    
     override suspend fun roles(): Flow<Role> {
         return emptyFlow()
         // TODO("Not yet implemented")
     }
-    //endregion
-
-
+    // endregion
+    
+    
     override fun toString(): String {
         return "KaiheilaMember(source=$source)"
     }
-
+    
     companion object {
         private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.KaiheilaMember")
         private val MUTE_JOB_ATOMIC =
             AtomicReferenceFieldUpdater.newUpdater(KaiheilaGuildMemberImpl::class.java, Job::class.java, "_muteJob")
     }
-
+    
 }
