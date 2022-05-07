@@ -24,7 +24,7 @@ import love.forte.simbot.kaiheila.objects.Permissions
 import love.forte.simbot.kaiheila.objects.Role
 
 @Serializable
-public data class RoleImpl(
+internal data class RoleImpl(
     @SerialName("role_id")
     override val roleId: LongID,
     override val name: String,

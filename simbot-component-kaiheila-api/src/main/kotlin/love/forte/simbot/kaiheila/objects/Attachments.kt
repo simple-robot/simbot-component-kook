@@ -14,8 +14,8 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
-import love.forte.simbot.kaiheila.objects.impl.*
+import kotlinx.serialization.KSerializer
+import love.forte.simbot.kaiheila.objects.impl.AttachmentsImpl
 
 
 /**
@@ -49,14 +49,5 @@ public interface Attachments {
     public companion object {
         internal val serializer: KSerializer<out Attachments> = AttachmentsImpl.serializer()
     }
-
-    // companion object : SerializerModuleRegistrar {
-    //     override fun SerializersModuleBuilder.serializerModule() {
-    //         polymorphic(Attachments::class) {
-    //             val implSer = SimpleAttachments.serializer()
-    //             subclass(SimpleAttachments::class, implSer)
-    //             default { implSer }
-    //         }
-    //     }
-    // }
+    
 }

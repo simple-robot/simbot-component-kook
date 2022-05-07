@@ -17,7 +17,7 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 
 /**
  * ## 权限
@@ -53,7 +53,7 @@ public value class Permissions(public val perm: UInt) {
      * 判断提供的权限类型任意一个存在于当前值中。
      */
     public fun anyContains(permissionType: PermissionType): Boolean {
-        return perm and permissionType.value > 0u
+        return (perm and permissionType.value) > 0u
 
 
     }

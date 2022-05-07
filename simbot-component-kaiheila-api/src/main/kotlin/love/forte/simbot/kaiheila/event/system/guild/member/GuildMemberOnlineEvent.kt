@@ -17,8 +17,11 @@
 
 package love.forte.simbot.kaiheila.event.system.guild.member
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
 
 /**
  *
@@ -31,13 +34,11 @@ public interface GuildMemberOnlineEventBody : GuildMemberEventExtraBody {
     /**
      * userId
      */
-    @SerialName("user_id")
     public val userId: ID
 
     /**
      * 上线时间（ms）
      */
-    @SerialName("event_time")
     public val eventTime: Timestamp
 
     /**

@@ -349,7 +349,7 @@ internal class KaiheilaBotImpl(
                 )
             }.catch { cause ->
                 clientLogger.error(
-                    "Session flow on catch: ${cause.localizedMessage}",
+                    "Session flow on error: ${cause.localizedMessage}",
                     cause
                 )
             }
