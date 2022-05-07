@@ -28,7 +28,6 @@ import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
-import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.utils.runInBlocking
 
 /**
@@ -49,38 +48,38 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     override val id: ID
     override val bot: KaiheilaComponentBot
     override val source: UserChatView
-
+    
     override val avatar: String get() = source.targetInfo.avatar
     override val username: String get() = source.targetInfo.username
     override val status: UserStatus get() = normalUserStatus
-
+    
     /**
      * [KaiheilaUserChat] 不存在"好友备注"信息。
      */
     override val remark: String? get() = null
-
+    
     /**
      * [KaiheilaUserChat] 不存在分组信息。
      */
     override val grouping: Grouping
         get() = Grouping.EMPTY
-
-
+    
+    
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    override suspend fun send(message: Message): MessageReceipt
-
+    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    
     /**
      * 向当前好友（私聊会话）发送消息。
      */
     override suspend fun send(text: String): KaiheilaMessageCreatedReceipt
-
+    
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    override suspend fun send(message: MessageContent): MessageReceipt
-
+    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
+    
     /**
      * 向当前好友（私聊会话）发送消息。
      */
@@ -88,20 +87,20 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt = runInBlocking {
         send(text)
     }
-
+    
     /**
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: Message): MessageReceipt = runInBlocking {
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt = runInBlocking {
         send(message)
     }
-
+    
     /**
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): MessageReceipt = runInBlocking {
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt = runInBlocking {
         send(message)
     }
 }

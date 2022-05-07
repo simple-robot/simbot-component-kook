@@ -306,6 +306,7 @@ internal class KaiheilaComponentBotImpl(
         return KaiheilaUserChatImpl(this, chat.toModel())
     }
     
+    
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChatImpl> {
         return UserChatListRequest.requestDataBy(this).items.asFlow().map { chat ->

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
+import love.forte.simbot.action.UnsupportedActionException
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
@@ -178,32 +179,40 @@ public class KaiheilaGuildSystemMember(
     override suspend fun mute(duration: Duration, type: Int): Boolean = false
 
 
-    //region TODO send 相关
+    //region send 相关
+    // 无法向系统用户发送消息
+    private fun notSupport(): Nothing {
+        throw UnsupportedActionException("Send message to system user (bot [$bot] in guild [${guild}]) ")
+    }
+    
+    @JvmSynthetic
     override suspend fun send(text: String): MessageReceipt {
-        return super.send(text)
+        notSupport()
     }
-
+    
+    @JvmSynthetic
     override suspend fun send(message: Message): MessageReceipt {
-        TODO("Not yet implemented")
+        notSupport()
     }
 
+    @JvmSynthetic
     override suspend fun send(message: MessageContent): MessageReceipt {
-        return super.send(message)
+        notSupport()
     }
 
-    @Api4J
+    @OptIn(Api4J::class)
     override fun sendBlocking(text: String): MessageReceipt {
-        return super.sendBlocking(text)
+        notSupport()
     }
-
-    @Api4J
+    
+    @OptIn(Api4J::class)
     override fun sendBlocking(message: Message): MessageReceipt {
-        return super.sendBlocking(message)
+        notSupport()
     }
-
-    @Api4J
+    
+    @OptIn(Api4J::class)
     override fun sendBlocking(message: MessageContent): MessageReceipt {
-        return super.sendBlocking(message)
+        notSupport()
     }
     //endregion
 
