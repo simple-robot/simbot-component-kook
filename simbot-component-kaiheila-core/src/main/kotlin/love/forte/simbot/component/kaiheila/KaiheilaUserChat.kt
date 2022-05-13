@@ -21,7 +21,7 @@ import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.Grouping
 import love.forte.simbot.ID
-import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.normalUserStatus
+import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUserStatus
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.definition.Friend
 import love.forte.simbot.definition.UserStatus

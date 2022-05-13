@@ -1,7 +1,7 @@
 package forte.example.spring.app
 
 import love.forte.simboot.annotation.Listener
-import love.forte.simboot.autoconfigure.EnableSimbot
+import love.forte.simboot.spring.autoconfigure.EnableSimbot
 import love.forte.simbot.event.ContactMessageEvent
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.stereotype.Component
