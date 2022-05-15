@@ -106,6 +106,8 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      * 当前bot所使用的部分权限"票据"。
      *
      * [Ticket.equals] 默认情况下将会只基于 [clientId] 进行匹配。如果你想同时比较 [token], 使用 [exactlyEquals].
+     *
+     * @see SimpleTicket
      */
     public interface Ticket {
 
@@ -249,7 +251,7 @@ public class SimpleTicket(
     token: String,
 ) : KaiheilaBot.Ticket {
     // Bot xxx
-    private var _authToken = "Bot $token"
+    @Volatile private var _authToken = "Bot $token"
 
     override var token: String
         get() = _authToken.substring(4)
