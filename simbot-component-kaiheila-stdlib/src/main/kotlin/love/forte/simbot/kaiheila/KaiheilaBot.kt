@@ -21,6 +21,7 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
+import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.LoggerContainer
 import love.forte.simbot.kaiheila.api.user.Me
@@ -247,9 +248,11 @@ public fun interface EventProcessor4J<out EX : Event.Extra, E : Event<EX>> {
  *
  */
 public class SimpleTicket(
-    override val clientId: ID,
+    clientId: String,
     token: String,
 ) : KaiheilaBot.Ticket {
+    override val clientId: CharSequenceID = clientId.ID
+    
     // Bot xxx
     @Volatile private var _authToken = "Bot $token"
 

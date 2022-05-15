@@ -47,6 +47,18 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
     override val componentSerializersModule: SerializersModule
         get() = messageSerializersModule
     
+    override fun toString(): String = TO_STRING_VALUE
+    
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is KaiheilaComponent) return false
+        
+        return id == other.id
+    }
+    
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
     
     /**
      * 组件 [KaiheilaComponent] 的注册器。
@@ -61,6 +73,8 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
          */
         @Suppress("MemberVisibilityCanBePrivate")
         public const val ID_VALUE: String = "simbot.kaiheila"
+        
+        private const val TO_STRING_VALUE = "KaiheilaComponent(id=$ID_VALUE)"
         
         /**
          * 组件的ID实例。
@@ -97,7 +111,7 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
                 include()
             }
         }
-    
+        
         /**
          * 构建一个 [KaiheilaComponent] 实例。
          */

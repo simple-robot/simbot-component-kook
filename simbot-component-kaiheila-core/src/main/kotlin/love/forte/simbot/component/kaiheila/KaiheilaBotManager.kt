@@ -27,7 +27,6 @@ import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.KaiheilaBotConfiguration
 import love.forte.simbot.kaiheila.SimpleTicket
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -52,7 +51,7 @@ public interface KaiheilaBotRegistrar {
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
     public fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot
@@ -70,7 +69,7 @@ public interface KaiheilaBotRegistrar {
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
     public fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         block: KaiheilaComponentBotConfiguration.() -> Unit = {},
     ): KaiheilaComponentBot
@@ -129,7 +128,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
     override fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot {
@@ -151,7 +150,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
     override fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         block: KaiheilaComponentBotConfiguration.() -> Unit,
     ): KaiheilaComponentBot {
@@ -256,7 +255,7 @@ public interface KaiheilaBotManagerConfiguration {
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
     public fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         configuration: KaiheilaComponentBotConfiguration,
         onBot: suspend (KaiheilaComponentBot) -> Unit,
@@ -275,7 +274,7 @@ public interface KaiheilaBotManagerConfiguration {
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
     public fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         block: KaiheilaComponentBotConfiguration.() -> Unit = {},
         onBot: suspend (KaiheilaComponentBot) -> Unit,
@@ -285,10 +284,15 @@ public interface KaiheilaBotManagerConfiguration {
 
 private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfiguration {
     override var parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
-    private var managerConfigurations = ConcurrentLinkedQueue<suspend (KaiheilaBotManager) -> Unit>()
+    private var managerConfig: (suspend (KaiheilaBotManager) -> Unit) = {}
     
-    private fun addConfig(block: suspend (KaiheilaBotManager) -> Unit) {
-        managerConfigurations.add(block)
+    private fun addConfig(newConfig: suspend (KaiheilaBotManager) -> Unit) {
+        managerConfig.also { old ->
+            managerConfig = {
+                old(it)
+                newConfig(it)
+            }
+        }
     }
     
     /**
@@ -308,7 +312,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
     override fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         configuration: KaiheilaComponentBotConfiguration,
         onBot: suspend (KaiheilaComponentBot) -> Unit,
@@ -335,7 +339,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
     override fun register(
-        clientId: ID,
+        clientId: String,
         token: String,
         block: KaiheilaComponentBotConfiguration.() -> Unit,
         onBot: suspend (KaiheilaComponentBot) -> Unit,
@@ -346,9 +350,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
     }
     
     suspend fun useBotManager(botManager: KaiheilaBotManager) {
-        managerConfigurations.forEach { config ->
-            config(botManager)
-        }
+        managerConfig(botManager)
     }
 }
 
@@ -410,7 +412,7 @@ public data class KaiheilaBotVerifyInfoConfiguration(
     /**
      * client id
      */
-    val clientId: CharSequenceID,
+    val clientId: String,
     
     /**
      * token
