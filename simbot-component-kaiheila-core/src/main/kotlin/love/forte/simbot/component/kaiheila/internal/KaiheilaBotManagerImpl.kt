@@ -19,11 +19,11 @@ package love.forte.simbot.component.kaiheila.internal
 
 import kotlinx.coroutines.*
 import love.forte.simbot.BotAlreadyRegisteredException
+import love.forte.simbot.ComponentMismatchException
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.*
 import love.forte.simbot.component.kaiheila.event.KaiheilaBotRegisteredEvent
 import love.forte.simbot.component.kaiheila.internal.event.KaiheilaBotRegisteredEventImpl
-import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.kaiheilaBot
@@ -37,29 +37,27 @@ import kotlin.coroutines.CoroutineContext
  * @author ForteScarlet
  */
 internal class KaiheilaBotManagerImpl(
-    private val eventProcessor: EventProcessor,
-    override val configuration: KaiheilaBotManagerConfiguration,
-    override val component: KaiheilaComponent,
+    override val configuration: KaiheilaBotManagerConfiguration
 ) : KaiheilaBotManager() {
+    private val eventProcessor = configuration.eventProcessor
     private val job: CompletableJob
     override val coroutineContext: CoroutineContext
-    
-    // override val component: KaiheilaComponent =
-    //     eventProcessor.getComponent(KaiheilaComponent.ID_VALUE) as? KaiheilaComponent
-    //         ?: throw ComponentMismatchException("The component['${KaiheilaComponent.ID_VALUE}'] cannot cast to [love.forte.simbot.component.kaiheila.KaiheilaComponent]")
-    
+    override val component: KaiheilaComponent =
+        eventProcessor.getComponent(KaiheilaComponent.ID_VALUE) as? KaiheilaComponent
+            ?: throw ComponentMismatchException("The component['${KaiheilaComponent.ID_VALUE}'] cannot cast to [love.forte.simbot.component.kaiheila.KaiheilaComponent]")
+
     private val bots = ConcurrentHashMap<String, KaiheilaComponentBotImpl>()
-    
+
     init {
         val parentContext = configuration.parentCoroutineContext
         val parentJob = parentContext[Job]
         job = SupervisorJob(parentJob)
         coroutineContext = parentContext.minusKey(Job) + job
     }
-    
+
     override fun register(
         ticket: KaiheilaBot.Ticket,
-        configuration: KaiheilaComponentBotConfiguration,
+        configuration: KaiheilaComponentBotConfiguration
     ): KaiheilaComponentBot {
         return bots.compute(ticket.clientId.literal) { key, old ->
             if (old != null) throw BotAlreadyRegisteredException(key)
@@ -72,13 +70,13 @@ internal class KaiheilaBotManagerImpl(
                     KaiheilaBotRegisteredEventImpl(bot)
                 }
             }
-            
+
         }
     }
-    
-    
+
+
     override fun all(): List<KaiheilaComponentBot> = bots.values.toList()
-    
+
     override suspend fun doCancel(reason: Throwable?): Boolean {
         if (job.isCancelled) return false
         if (reason == null) {
@@ -89,21 +87,21 @@ internal class KaiheilaBotManagerImpl(
         job.join()
         return true
     }
-    
+
     override fun get(id: ID): KaiheilaComponentBot? = bots[id.literal]
-    
+
     override fun invokeOnCompletion(handler: CompletionHandler) {
         job.invokeOnCompletion(handler)
     }
-    
+
     override suspend fun join() {
         job.join()
     }
-    
+
     override suspend fun start(): Boolean = true
-    
+
     override val isActive: Boolean get() = job.isActive
     override val isCancelled: Boolean get() = job.isCancelled
     override val isStarted: Boolean get() = true
-    
+
 }

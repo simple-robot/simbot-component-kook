@@ -28,17 +28,6 @@ import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
 import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.randomID
 
-// TODO
-/**
- *
- */
-public sealed interface KaiheilaMessageReceipt : MessageReceipt, DeleteSupport {
-    public val result: Any?
-    public val isDirect: Boolean
-    
-}
-
-
 
 /**
  * 消息创建后的回执实例。

@@ -21,7 +21,6 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
-import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.LoggerContainer
 import love.forte.simbot.kaiheila.api.user.Me
@@ -107,8 +106,6 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      * 当前bot所使用的部分权限"票据"。
      *
      * [Ticket.equals] 默认情况下将会只基于 [clientId] 进行匹配。如果你想同时比较 [token], 使用 [exactlyEquals].
-     *
-     * @see SimpleTicket
      */
     public interface Ticket {
 
@@ -248,13 +245,11 @@ public fun interface EventProcessor4J<out EX : Event.Extra, E : Event<EX>> {
  *
  */
 public class SimpleTicket(
-    clientId: String,
+    override val clientId: ID,
     token: String,
 ) : KaiheilaBot.Ticket {
-    override val clientId: CharSequenceID = clientId.ID
-    
     // Bot xxx
-    @Volatile private var _authToken = "Bot $token"
+    private var _authToken = "Bot $token"
 
     override var token: String
         get() = _authToken.substring(4)

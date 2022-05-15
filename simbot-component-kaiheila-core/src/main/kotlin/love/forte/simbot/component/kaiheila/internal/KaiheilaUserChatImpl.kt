@@ -30,6 +30,7 @@ import love.forte.simbot.kaiheila.api.message.MessageCreated
 import love.forte.simbot.kaiheila.api.message.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.MessageReceipt
 
 /**
  *
@@ -52,7 +53,7 @@ internal class KaiheilaUserChatImpl(
         ).requestDataBy(bot).asReceipt(true, bot)
     }
 
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: Message): MessageReceipt {
         val request = message.toRequest(source.code, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
 
@@ -61,11 +62,10 @@ internal class KaiheilaUserChatImpl(
             result.asReceipt(true, bot)
         } else {
             KaiheilaApiRequestedReceipt(result, true)
-            TODO()
         }
     }
 
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: MessageContent): MessageReceipt {
         return when (message) {
             is KaiheilaReceiveMessageContent -> {
                 val source = message.source
