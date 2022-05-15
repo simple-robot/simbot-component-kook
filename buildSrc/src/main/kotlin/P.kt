@@ -40,7 +40,7 @@ object P {
 
         val version = Version(
             major = "3", minor = 0, patch = 0,
-            status = preview(8, 1),
+            status = preview(9, 0),
             isSnapshot = System.getProperty("isSnapshot")?.equals("true", true) ?: false
         )
 

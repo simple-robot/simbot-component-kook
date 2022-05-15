@@ -2,8 +2,9 @@
 
 package love.forte.simbot.kaiheila
 
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.internal.*
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.internal.KaiheilaBotImpl
+import love.forte.simbot.literal
 
 /**
  * 最基础的用于构建 [KaiheilaBot] 的函数，提供票据信息 和 配置信息。
@@ -31,7 +32,7 @@ public fun kaiheilaBot(
     clientId: ID,
     token: String,
     configuration: KaiheilaBotConfiguration = KaiheilaBotConfiguration()
-): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId, token), configuration)
+): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId.literal, token), configuration)
 
 
 /**
@@ -41,7 +42,7 @@ public fun kaiheilaBot(
     clientId: String,
     token: String,
     configuration: KaiheilaBotConfiguration = KaiheilaBotConfiguration()
-): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId.ID, token), configuration)
+): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId, token), configuration)
 
 
 /**
@@ -51,7 +52,7 @@ public fun kaiheilaBot(
     clientId: ID,
     token: String,
     block: KaiheilaBotConfiguration.() -> Unit
-): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId, token), block)
+): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId.literal, token), block)
 
 
 /**
@@ -61,7 +62,7 @@ public fun kaiheilaBot(
     clientId: String,
     token: String,
     block: KaiheilaBotConfiguration.() -> Unit
-): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId.ID, token), block)
+): KaiheilaBot = kaiheilaBot(SimpleTicket(clientId, token), block)
 
 
 

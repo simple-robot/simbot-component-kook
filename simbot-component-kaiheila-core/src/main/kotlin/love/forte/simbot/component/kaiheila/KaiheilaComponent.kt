@@ -33,38 +33,59 @@ import love.forte.simbot.message.Message
  *
  * @author ForteScarlet
  */
-public class KaiheilaComponent : Component {
+public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
+    /**
+     * 组件的唯一标识ID。
+     */
     override val id: ID
         get() = componentID
-
+    
+    /**
+     * 开黑啦组件中所涉及到的序列化模块。
+     *
+     */
     override val componentSerializersModule: SerializersModule
         get() = messageSerializersModule
-
-
+    
+    override fun toString(): String = TO_STRING_VALUE
+    
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is KaiheilaComponent) return false
+        
+        return id == other.id
+    }
+    
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+    
     /**
      * 组件 [KaiheilaComponent] 的注册器。
      *
      */
-    public companion object Registrar : ComponentRegistrar<KaiheilaComponent, KaiheilaComponentConfiguration> {
+    public companion object Factory : ComponentFactory<KaiheilaComponent, KaiheilaComponentConfiguration> {
         internal val botUserStatus = UserStatus.builder().bot().fakeUser().build()
         internal val normalUserStatus = UserStatus.builder().normal().build()
-
+        
         /**
          * 组件 [KaiheilaComponent] 的ID
          */
         @Suppress("MemberVisibilityCanBePrivate")
         public const val ID_VALUE: String = "simbot.kaiheila"
-
+        
+        private const val TO_STRING_VALUE = "KaiheilaComponent(id=$ID_VALUE)"
+        
         /**
          * 组件的ID实例。
          */
         public val componentID: CharSequenceID = ID_VALUE.ID
-
+        
         /**
          * 注册器的唯一标识。
          */
         override val key: Attribute<KaiheilaComponent> = attribute(ID_VALUE)
-
+        
         /**
          * [KaiheilaComponent] 组件所使用的消息序列化信息。
          */
@@ -81,39 +102,44 @@ public class KaiheilaComponent : Component {
             polymorphic(KMarkdown::class) {
                 subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer())
             }
-
+            
             polymorphic(KaiheilaMessageElement::class) {
                 include()
             }
-
+            
             polymorphic(Message.Element::class) {
                 include()
             }
         }
-
-        override fun register(block: KaiheilaComponentConfiguration.() -> Unit): KaiheilaComponent {
-            // nothing config now
-
+        
+        /**
+         * 构建一个 [KaiheilaComponent] 实例。
+         */
+        @OptIn(InternalSimbotApi::class)
+        override suspend fun create(configurator: KaiheilaComponentConfiguration.() -> Unit): KaiheilaComponent {
+            KaiheilaComponentConfiguration.configurator()
             return KaiheilaComponent()
         }
     }
-
+    
 }
 
 /**
  *
  * [KaiheilaComponent] 注册时所使用的配置类。
  *
+ * 目前对于开黑啦组件来讲没有需要配置的内容，因此 [KaiheilaComponentConfiguration] 中暂无可配置属性。
+ *
  */
-public class KaiheilaComponentConfiguration
+public object KaiheilaComponentConfiguration
 
 
 /**
  * [KaiheilaComponent] 的注册器工厂，用于支持组件的自动加载。
  *
  */
-public class KaiheilaComponentRegistrarFactory :
-    ComponentRegistrarFactory<KaiheilaComponent, KaiheilaComponentConfiguration> {
-    override val registrar: ComponentRegistrar<KaiheilaComponent, KaiheilaComponentConfiguration>
+public class KaiheilaComponentAutoRegistrarFactory :
+    ComponentAutoRegistrarFactory<KaiheilaComponent, KaiheilaComponentConfiguration> {
+    override val registrar: KaiheilaComponent.Factory
         get() = KaiheilaComponent
 }

@@ -23,8 +23,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.botUserStatus
-import love.forte.simbot.component.kaiheila.KaiheilaComponent.Registrar.normalUserStatus
+import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.botUserStatus
+import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUserStatus
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
