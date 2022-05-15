@@ -19,8 +19,9 @@ package love.forte.simbot.kaiheila
 
 import io.ktor.client.*
 import io.ktor.client.engine.*
-import kotlinx.serialization.json.*
-import kotlin.coroutines.*
+import kotlinx.serialization.json.Json
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 
 @Retention(AnnotationRetention.BINARY)
@@ -37,12 +38,11 @@ public annotation class KaiheilaBotConfigurationDSL
  */
 public class KaiheilaBotConfiguration {
 
-
     /**
      * 设置bot进行连接的时候使用要使用压缩数据。
      */
     @KaiheilaBotConfigurationDSL
-    public val isCompress: Boolean = true
+    public var isCompress: Boolean = true
 
     /**
      * Bot用于解析api请求或其他用途的解析器。
@@ -73,8 +73,12 @@ public class KaiheilaBotConfiguration {
 
     /**
      * 配置bot内部要使用的httpclient。
-     * 默认情况下的client中已经install了[io.ktor.client.features.json.JsonFeature]和[io.ktor.client.features.websocket.WebSockets],
-     * 如果有必要可重新加载以覆盖。
+     *
+     * 默认情况下的client中已经install了
+     * [ContentNegotiation][io.ktor.client.plugins.contentnegotiation.ContentNegotiation.Plugin] 中的 `json`
+     * 和
+     * [WebSockets][io.ktor.client.plugins.websocket.WebSockets.Plugin].
+     *
      */
     @KaiheilaBotConfigurationDSL
     public var httpClientConfig: HttpClientConfig<*>.() -> Unit = {}
@@ -82,8 +86,11 @@ public class KaiheilaBotConfiguration {
 
     /**
      * 配置bot内部要使用的httpclient。
-     * 默认情况下的client中已经install了[io.ktor.client.features.json.JsonFeature]和[io.ktor.client.features.websocket.WebSockets],
-     * 如果有必要可重新加载以覆盖。
+     *
+     * 默认情况下的client中已经install了
+     * [ContentNegotiation][io.ktor.client.plugins.contentnegotiation.ContentNegotiation.Plugin] 中的 `json`
+     * 和
+     * [WebSockets][io.ktor.client.plugins.websocket.WebSockets.Plugin].
      */
     @KaiheilaBotConfigurationDSL
     public fun httpClientConfig(block: HttpClientConfig<*>.() -> Unit) {

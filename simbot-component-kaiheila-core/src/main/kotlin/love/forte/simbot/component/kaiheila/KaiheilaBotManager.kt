@@ -30,6 +30,52 @@ import love.forte.simbot.kaiheila.SimpleTicket
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+
+/**
+ * 在开黑啦组件中对于 [Bot][KaiheilaBot] 的注册函数的常见形式。
+ *
+ * @see KaiheilaBotManager
+ */
+public interface KaiheilaBotRegistrar {
+    
+    /**
+     * 通过 [ticket] 和 [configuration] 注册bot。
+     */
+    public fun register(
+        ticket: KaiheilaBot.Ticket,
+        configuration: KaiheilaComponentBotConfiguration,
+    ): KaiheilaComponentBot
+    
+    
+    /**
+     * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
+     */
+    public fun register(
+        clientId: String,
+        token: String,
+        configuration: KaiheilaComponentBotConfiguration,
+    ): KaiheilaComponentBot
+    
+    /**
+     * 通过 [ticket] 和 [block] 注册bot。
+     */
+    public fun register(
+        ticket: KaiheilaBot.Ticket,
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
+    ): KaiheilaComponentBot
+    
+    
+    /**
+     * 通过 [clientId]、 [token] 和 [block] 注册bot。
+     */
+    public fun register(
+        clientId: String,
+        token: String,
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
+    ): KaiheilaComponentBot
+}
+
+
 /**
  *
  * [KaiheilaComponentBot] 的管理器实现。
@@ -37,7 +83,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @author ForteScarlet
  */
 @Suppress("MemberVisibilityCanBePrivate")
-public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
+public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), KaiheilaBotRegistrar {
     abstract override val component: KaiheilaComponent
     public abstract val configuration: KaiheilaBotManagerConfiguration
     
@@ -72,7 +118,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     /**
      * 通过 [ticket] 和 [configuration] 注册bot。
      */
-    public abstract fun register(
+    abstract override fun register(
         ticket: KaiheilaBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot
@@ -81,8 +127,8 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     /**
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
-    public fun register(
-        clientId: ID,
+    override fun register(
+        clientId: String,
         token: String,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot {
@@ -92,9 +138,9 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     /**
      * 通过 [ticket] 和 [block] 注册bot。
      */
-    public fun register(
+    override fun register(
         ticket: KaiheilaBot.Ticket,
-        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
+        block: KaiheilaComponentBotConfiguration.() -> Unit,
     ): KaiheilaComponentBot {
         return register(ticket, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
     }
@@ -103,10 +149,10 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     /**
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
-    public fun register(
-        clientId: ID,
+    override fun register(
+        clientId: String,
         token: String,
-        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
+        block: KaiheilaComponentBotConfiguration.() -> Unit,
     ): KaiheilaComponentBot {
         return register(clientId, token, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
     }
@@ -168,16 +214,19 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
     
 }
 
+// TODO DELETE
 /**
  * 配置并构建一个 [KaiheilaBotManager] 实例。
  *
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Use Factory in application")
 public fun kaiheilaBotManager(
     eventProcessor: EventProcessor,
     block: KaiheilaBotManagerConfiguration.() -> Unit = {},
 ): KaiheilaBotManager {
     
+    @Suppress("DEPRECATION")
     return KaiheilaBotManager.newInstance(eventProcessor, KaiheilaBotManagerConfigurationImpl().also(block))
 }
 
@@ -193,17 +242,115 @@ public interface KaiheilaBotManagerConfiguration {
      */
     public var parentCoroutineContext: CoroutineContext
     
-    // TODO register bot
+    /**
+     * 通过 [ticket] 和 [configuration] 注册bot。
+     */
+    public fun register(
+        ticket: KaiheilaBot.Ticket,
+        configuration: KaiheilaComponentBotConfiguration,
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    )
     
+    /**
+     * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
+     */
+    public fun register(
+        clientId: String,
+        token: String,
+        configuration: KaiheilaComponentBotConfiguration,
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    )
+    
+    /**
+     * 通过 [ticket] 和 [block] 注册bot。
+     */
+    public fun register(
+        ticket: KaiheilaBot.Ticket,
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    )
+    
+    /**
+     * 通过 [clientId]、 [token] 和 [block] 注册bot。
+     */
+    public fun register(
+        clientId: String,
+        token: String,
+        block: KaiheilaComponentBotConfiguration.() -> Unit = {},
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    )
 }
 
 
 private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfiguration {
     override var parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
+    private var managerConfig: (suspend (KaiheilaBotManager) -> Unit) = {}
     
+    private fun addConfig(newConfig: suspend (KaiheilaBotManager) -> Unit) {
+        managerConfig.also { old ->
+            managerConfig = {
+                old(it)
+                newConfig(it)
+            }
+        }
+    }
     
-    fun useBotManager(botManager: KaiheilaBotManager) {
-        // TODO
+    /**
+     * 通过 [ticket] 和 [configuration] 注册bot。
+     */
+    override fun register(
+        ticket: KaiheilaBot.Ticket,
+        configuration: KaiheilaComponentBotConfiguration,
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    ) {
+        addConfig { m ->
+            onBot(m.register(ticket, configuration))
+        }
+    }
+    
+    /**
+     * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
+     */
+    override fun register(
+        clientId: String,
+        token: String,
+        configuration: KaiheilaComponentBotConfiguration,
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    ) {
+        addConfig { m ->
+            onBot(m.register(clientId, token, configuration))
+        }
+    }
+    
+    /**
+     * 通过 [ticket] 和 [block] 注册bot。
+     */
+    override fun register(
+        ticket: KaiheilaBot.Ticket,
+        block: KaiheilaComponentBotConfiguration.() -> Unit,
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    ) {
+        addConfig { m ->
+            onBot(m.register(ticket, block))
+        }
+    }
+    
+    /**
+     * 通过 [clientId]、 [token] 和 [block] 注册bot。
+     */
+    override fun register(
+        clientId: String,
+        token: String,
+        block: KaiheilaComponentBotConfiguration.() -> Unit,
+        onBot: suspend (KaiheilaComponentBot) -> Unit,
+    ) {
+        addConfig { m ->
+            onBot(m.register(clientId, token, block))
+        }
+    }
+    
+    suspend fun useBotManager(botManager: KaiheilaBotManager) {
+        managerConfig(botManager)
     }
 }
 
@@ -265,13 +412,13 @@ public data class KaiheilaBotVerifyInfoConfiguration(
     /**
      * client id
      */
-    val clientId: CharSequenceID,
+    val clientId: String,
     
     /**
      * token
      */
     val token: String,
-
+    
     /**
      * 额外的部分可选配置属性。
      */
@@ -309,9 +456,10 @@ public data class KaiheilaBotVerifyInfoConfiguration(
     
     
     internal fun includeConfig(configuration: KaiheilaComponentBotConfiguration) {
+        configuration.botConfiguration.isCompress = config.isCompress
         configuration.syncPeriods = config.syncPeriods
     }
-
+    
 }
 
 
