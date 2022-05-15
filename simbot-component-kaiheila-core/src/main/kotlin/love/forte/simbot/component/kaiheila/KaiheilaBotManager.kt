@@ -45,7 +45,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>() {
      * 通过 `.bot` 的json配置文件注册一个bot信息。
      */
     override fun register(verifyInfo: BotVerifyInfo): KaiheilaComponentBot {
-        val serializer = KaiheilaBotVerifyInfo.serializer()
+        val serializer = KaiheilaBotVerifyInfoConfiguration.serializer()
         
         val component = verifyInfo.componentId
         val currentComponent = this.component.id.literal
@@ -208,7 +208,8 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
 }
 
 
-/**
+/*
+ * 暂且备份
  * `.bot` 配置文件读取的配置信息实体。
  *
  * ```json
@@ -225,10 +226,42 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
  * ```
  *
  */
+
+/**
+ * `.bot` 配置文件读取的配置信息实体, 用于接收从 [BotVerifyInfo] 中的序列化信息。
+ *
+ * 在 [KaiheilaBotVerifyInfoConfiguration] 中，[clientId] 和 [token] 为必选项，
+ * 存在于当前配置属性的最外层。除了必选项以外还存在部分可选项存在于 [KaiheilaBotVerifyInfoConfiguration.Config] 类型中，
+ * 作为 [config][KaiheilaBotVerifyInfoConfiguration.config] 属性使用。
+ *
+ * 简化json e.g.
+ * ```json
+ * {
+ *   "component": "simbot.kaiheila",
+ *   "clientId": "Your client ID",
+ *   "token": "Your ws token"
+ * }
+ * ```
+ *
+ * 完整json e.g.
+ * ```json
+ * {
+ *  "component": "simbot.kaiheila",
+ *  "clientId": "Your client ID",
+ *  "token": "Your ws token",
+ *  "config": {
+ *      "isCompress": true,
+ *      "syncPeriods": {
+ *          "guildSyncPeriod": 60000,
+ *          "memberSyncPeriods": 60000
+ *          }
+ *      }
+ * }
+ * ```
+ *
+ */
 @Serializable
-private data class KaiheilaBotVerifyInfo(
-    val component: String? = null,
-    
+public data class KaiheilaBotVerifyInfoConfiguration(
     /**
      * client id
      */
@@ -238,21 +271,47 @@ private data class KaiheilaBotVerifyInfo(
      * token
      */
     val token: String,
+
+    /**
+     * 额外的部分可选配置属性。
+     */
+    val config: Config = Config.DEFAULT,
+) {
     
     /**
-     * 是否压缩数据
+     * 在 [KaiheilaBotVerifyInfoConfiguration] 中除了必须的bot信息以外的可选配置信息。
+     *
      */
-    val isCompress: Boolean = true,
-    
-    /**
-     * 缓存对象信息的同步周期
-     */
-    val syncPeriods: KaiheilaComponentBotConfiguration.SyncPeriods = KaiheilaComponentBotConfiguration.SyncPeriods(),
-    
-    ) {
-    fun includeConfig(configuration: KaiheilaComponentBotConfiguration) {
-        configuration.syncPeriods = syncPeriods
+    @Serializable
+    public data class Config(
+        /**
+         * 是否压缩数据。
+         *
+         * _Note: 尚未使用的属性。_
+         */
+        val isCompress: Boolean = true,
+        
+        /**
+         * 缓存对象信息的同步周期
+         */
+        val syncPeriods: KaiheilaComponentBotConfiguration.SyncPeriods = KaiheilaComponentBotConfiguration.SyncPeriods(),
+        
+        ) {
+        public companion object {
+            /**
+             * [Config] 全默认属性实例。
+             *
+             */
+            @JvmField
+            public val DEFAULT: Config = Config()
+        }
     }
+    
+    
+    internal fun includeConfig(configuration: KaiheilaComponentBotConfiguration) {
+        configuration.syncPeriods = config.syncPeriods
+    }
+
 }
 
 
