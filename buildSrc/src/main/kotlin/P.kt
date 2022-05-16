@@ -169,8 +169,8 @@ private fun isSnapshot(): Boolean {
     println("property: ${System.getProperty("simbot.snapshot")}")
     println("env: ${System.getenv("simbot.snapshot")}")
     
-    return System.getProperty("simbot.snapshot")?.equals("true", ignoreCase = true)
-        ?: System.getenv("simbot.snapshot")?.equals("true", ignoreCase = true)
+    return System.getProperty("simbot.snapshot")?.toBoolean()
+        ?: System.getenv("simbot.snapshot")?.toBoolean()
         ?: false
     
 }
