@@ -21,6 +21,7 @@ package love.forte.simbot.component.kaiheila
 import kotlinx.serialization.Serializable
 import love.forte.simbot.*
 import love.forte.simbot.application.ApplicationConfiguration
+import love.forte.simbot.application.EventProviderAutoRegistrarFactory
 import love.forte.simbot.application.EventProviderFactory
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
 import love.forte.simbot.event.EventProcessor
@@ -98,10 +99,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
         
         if (component != currentComponent) {
             logger.debug(
-                "[{}] mismatch: [{}] != [{}]",
-                verifyInfo.name,
-                component,
-                currentComponent
+                "[{}] mismatch: [{}] != [{}]", verifyInfo.name, component, currentComponent
             )
             throw ComponentMismatchException("[$component] != [$currentComponent]")
         }
@@ -176,31 +174,34 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
             val component = components.find { it.id.literal == KaiheilaComponent.ID_VALUE } as? KaiheilaComponent
                 ?: throw NoSuchComponentException("${KaiheilaComponent.ID_VALUE} type of KaiheilaComponent")
             
-            val config = KaiheilaBotManagerConfigurationImpl().also(configurator)
+            val config = KaiheilaBotManagerConfigurationImpl().also {
+                val currentContext = applicationConfiguration.coroutineContext
+                it.parentCoroutineContext = currentContext
+                configurator(it)
+            }
+            
             
             return KaiheilaBotManagerImpl(eventProcessor, config, component).also {
                 config.useBotManager(it)
             }
         }
         
-        /**
-         * 通过 [EventProcessor] 构建bot管理器并使用默认配置。
-         */
         @Suppress("DeprecatedCallableAddReplaceWith")
         @OptIn(InternalSimbotApi::class)
         @JvmStatic
-        @Deprecated("Use Factory.")
+        @Deprecated("Use Factory in Application.")
         public fun newInstance(eventProcessor: EventProcessor): KaiheilaBotManager {
-            return KaiheilaBotManagerImpl(eventProcessor, KaiheilaBotManagerConfigurationImpl(), KaiheilaComponent())
+            return KaiheilaBotManagerImpl(
+                eventProcessor,
+                KaiheilaBotManagerConfigurationImpl(),
+                KaiheilaComponent()
+            )
         }
         
-        /**
-         * 提供配置类并构建bot管理器实例。
-         */
         @Suppress("DeprecatedCallableAddReplaceWith")
         @OptIn(InternalSimbotApi::class)
         @JvmStatic
-        @Deprecated("Use Factory.")
+        @Deprecated("Use Factory in Application.")
         public fun newInstance(
             eventProcessor: EventProcessor,
             configuration: KaiheilaBotManagerConfiguration,
@@ -214,6 +215,18 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
     
 }
 
+
+/**
+ * 实现 [EventProviderAutoRegistrarFactory] 并通过 `Java SPI`
+ * 支持 [KaiheilaBotManager] 的自动安装。
+ */
+public class KaiheilaBotManagerAutoRegistrarFactory :
+    EventProviderAutoRegistrarFactory<KaiheilaBotManager, KaiheilaBotManagerConfiguration> {
+    override val registrar: KaiheilaBotManager.Factory
+        get() = KaiheilaBotManager
+}
+
+
 // TODO DELETE
 /**
  * 配置并构建一个 [KaiheilaBotManager] 实例。
@@ -226,8 +239,10 @@ public fun kaiheilaBotManager(
     block: KaiheilaBotManagerConfiguration.() -> Unit = {},
 ): KaiheilaBotManager {
     
-    @Suppress("DEPRECATION")
-    return KaiheilaBotManager.newInstance(eventProcessor, KaiheilaBotManagerConfigurationImpl().also(block))
+    @Suppress("DEPRECATION") return KaiheilaBotManager.newInstance(
+        eventProcessor,
+        KaiheilaBotManagerConfigurationImpl().also(block)
+    )
 }
 
 
@@ -235,12 +250,15 @@ public fun kaiheilaBotManager(
  * [KaiheilaBotManager] 使用的配置类。
  */
 public interface KaiheilaBotManagerConfiguration {
+    
     /**
      * bot管理器中为所有bot分配的父级协程上下文。
      *
-     * 如果其中存在 [kotlinx.coroutines.Job], 则会被作为parentJob使用。
+     * 此属性的初始值为 [ApplicationConfiguration] 中的值。
+     *
      */
     public var parentCoroutineContext: CoroutineContext
+    
     
     /**
      * 通过 [ticket] 和 [configuration] 注册bot。
