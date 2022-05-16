@@ -28,7 +28,7 @@ val springBootVersion = "2.6.7"
 
 dependencies {
     api(project(":simbot-component-kaiheila-core")) {
-        exclude("love.forte.simbot")
+        exclude("love.forte.simbot", "simbot-logger")
     }
     api(V.Simbot.BootApi.NOTATION) {
         exclude("love.forte.simbot", "simbot-logger")
