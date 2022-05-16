@@ -220,7 +220,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
  * 实现 [EventProviderAutoRegistrarFactory] 并通过 `Java SPI`
  * 支持 [KaiheilaBotManager] 的自动安装。
  */
-public object KaiheilaBotManagerAutoRegistrarFactory :
+public class KaiheilaBotManagerAutoRegistrarFactory :
     EventProviderAutoRegistrarFactory<KaiheilaBotManager, KaiheilaBotManagerConfiguration> {
     override val registrar: KaiheilaBotManager.Factory
         get() = KaiheilaBotManager
