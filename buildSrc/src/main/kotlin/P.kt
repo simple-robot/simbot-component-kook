@@ -16,6 +16,9 @@
  */
 
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
+
+import org.gradle.api.Project
+
 /*
 *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
 *
@@ -37,25 +40,28 @@
 object P {
     object Simbot {
         const val GROUP = "love.forte.simbot"
-
+        
         val version = Version(
             major = "3", minor = 0, patch = 0,
             status = preview(9, 0),
-            isSnapshot = System.getProperty("isSnapshot")?.equals("true", true) ?: false
+            isSnapshot = isSnapshot().also {
+                println("isSnapshot: $it")
+            }
         )
-
-
+        
+        
         val isSnapshot: Boolean get() = version.isSnapshot
+        
         // val REAL_VERSION = version.fullVersion(false)
-            // "3.0.0.preview.6.0"
+        // "3.0.0.preview.6.0"
         val VERSION = version.fullVersion(true)
         // = if (isSnapshot) "$REAL_VERSION-SNAPSHOT" else REAL_VERSION
     }
-
+    
     object ComponentKaiheila {
         val isSnapshot: Boolean get() = Simbot.isSnapshot
         const val GROUP = "${Simbot.GROUP}.component"
-
+        
         val version = Version(
             major = "${Simbot.version.major}.${Simbot.version.minor}",
             minor = 0,
@@ -63,10 +69,10 @@ object P {
             status = preview(5, 0),
             isSnapshot = isSnapshot
         )
-
+        
         // 0: v3 api
         // const val REAL_VERSION = "3.0.1.0"
-
+        
         val VERSION = version.fullVersion(true)
     }
 }
@@ -89,7 +95,7 @@ data class Version(
      * 修订号
      */
     val patch: Int,
-
+    
     /**
      * 状态号。状态号会追加在 [major].[minor].[patch] 之后，由 `.` 拼接，
      * 变为 [major].[minor].[patch].[PVS.status].[PVS.minor].[PVS.patch].
@@ -101,22 +107,22 @@ data class Version(
      *
      */
     val status: PVS? = null,
-
+    
     /**
      * 是否快照。如果是，将会在版本号结尾处拼接 `-SNAPSHOT`。
      */
-    val isSnapshot: Boolean = false
+    val isSnapshot: Boolean = false,
 ) {
     companion object {
         const val SNAPSHOT_SUFFIX = "-SNAPSHOT"
     }
-
+    
     /**
      * 没有任何后缀的版本号。
      */
     val standardVersion: String = "$major.$minor.$patch"
-
-
+    
+    
     /**
      * 完整的版本号。
      */
@@ -131,7 +137,7 @@ data class Version(
             }
         }
     }
-
+    
 }
 
 /**
@@ -159,3 +165,12 @@ data class PVS(
 internal fun preview(minor: Int, patch: Int) = PVS(PVS.PREVIEW_STATUS, minor, patch)
 
 
+private fun isSnapshot(): Boolean {
+    println("property: ${System.getProperty("simbot.snapshot")}")
+    println("env: ${System.getenv("simbot.snapshot")}")
+    
+    return System.getProperty("simbot.snapshot")?.equals("true", ignoreCase = true)
+        ?: System.getenv("simbot.snapshot")?.equals("true", ignoreCase = true)
+        ?: false
+    
+}

@@ -32,12 +32,7 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation(V.Simbot.Core.NOTATION)
 }
-repositories {
-    maven {
-        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
-        name = "ktor-eap"
-    }
-}
+
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
