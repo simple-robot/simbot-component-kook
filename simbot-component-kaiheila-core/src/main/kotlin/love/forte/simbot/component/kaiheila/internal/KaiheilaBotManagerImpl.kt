@@ -34,6 +34,8 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  *
+ * 【
+ *
  * @author ForteScarlet
  */
 internal class KaiheilaBotManagerImpl(
@@ -41,20 +43,15 @@ internal class KaiheilaBotManagerImpl(
     override val configuration: KaiheilaBotManagerConfiguration,
     override val component: KaiheilaComponent,
 ) : KaiheilaBotManager() {
-    private val job: CompletableJob
     override val coroutineContext: CoroutineContext
-    
-    // override val component: KaiheilaComponent =
-    //     eventProcessor.getComponent(KaiheilaComponent.ID_VALUE) as? KaiheilaComponent
-    //         ?: throw ComponentMismatchException("The component['${KaiheilaComponent.ID_VALUE}'] cannot cast to [love.forte.simbot.component.kaiheila.KaiheilaComponent]")
+    private val job: CompletableJob
     
     private val bots = ConcurrentHashMap<String, KaiheilaComponentBotImpl>()
     
     init {
         val parentContext = configuration.parentCoroutineContext
-        val parentJob = parentContext[Job]
-        job = SupervisorJob(parentJob)
-        coroutineContext = parentContext.minusKey(Job) + job
+        job = SupervisorJob(parentContext[Job])
+        coroutineContext = parentContext + job
     }
     
     override fun register(

@@ -18,12 +18,10 @@
 
 package love.forte.simbot.component.kaiheila
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.Serializable
 import love.forte.simbot.*
-import love.forte.simbot.application.Application
 import love.forte.simbot.application.ApplicationConfiguration
+import love.forte.simbot.application.EventProviderAutoRegistrarFactory
 import love.forte.simbot.application.EventProviderFactory
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
 import love.forte.simbot.event.EventProcessor
@@ -176,11 +174,11 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
             val component = components.find { it.id.literal == KaiheilaComponent.ID_VALUE } as? KaiheilaComponent
                 ?: throw NoSuchComponentException("${KaiheilaComponent.ID_VALUE} type of KaiheilaComponent")
             
-            val config = KaiheilaBotManagerConfigurationImpl().also(configurator)
-            
-            val concurrentContext = applicationConfiguration.coroutineContext
-            val job = SupervisorJob(concurrentContext[Job])
-            config.parentCoroutineContext += job
+            val config = KaiheilaBotManagerConfigurationImpl().also {
+                val currentContext = applicationConfiguration.coroutineContext
+                it.parentCoroutineContext = currentContext
+                configurator(it)
+            }
             
             
             return KaiheilaBotManagerImpl(eventProcessor, config, component).also {
@@ -193,7 +191,11 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
         @JvmStatic
         @Deprecated("Use Factory in Application.")
         public fun newInstance(eventProcessor: EventProcessor): KaiheilaBotManager {
-            return KaiheilaBotManagerImpl(eventProcessor, KaiheilaBotManagerConfigurationImpl(), KaiheilaComponent())
+            return KaiheilaBotManagerImpl(
+                eventProcessor,
+                KaiheilaBotManagerConfigurationImpl(),
+                KaiheilaComponent()
+            )
         }
         
         @Suppress("DeprecatedCallableAddReplaceWith")
@@ -212,6 +214,18 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
     
     
 }
+
+
+/**
+ * 实现 [EventProviderAutoRegistrarFactory] 并通过 `Java SPI`
+ * 支持 [KaiheilaBotManager] 的自动安装。
+ */
+public object KaiheilaBotManagerAutoRegistrarFactory :
+    EventProviderAutoRegistrarFactory<KaiheilaBotManager, KaiheilaBotManagerConfiguration> {
+    override val registrar: KaiheilaBotManager.Factory
+        get() = KaiheilaBotManager
+}
+
 
 // TODO DELETE
 /**
@@ -240,7 +254,8 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * bot管理器中为所有bot分配的父级协程上下文。
      *
-     * _[parentCoroutineContext] 中的 [Job] 最终将会被覆盖。botManager中只会使用来自于 [Application] 的 [Job]。_
+     * 此属性的初始值为 [ApplicationConfiguration] 中的值。
+     *
      */
     public var parentCoroutineContext: CoroutineContext
     
