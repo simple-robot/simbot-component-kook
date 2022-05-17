@@ -62,36 +62,36 @@ import kotlin.math.max
  */
 internal class KaiheilaBotImpl(
     override val ticket: KaiheilaBot.Ticket,
-    override val configuration: KaiheilaBotConfiguration
+    override val configuration: KaiheilaBotConfiguration,
 ) : KaiheilaBot {
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.bot.client.${ticket.clientId}")
     private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
-
+    
     private val preProcessorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
-
-
+    
+    
     private val decoder = configuration.decoder
-
+    
     private val job: Job
     override val coroutineContext: CoroutineContext
-
+    
     override val httpClient: HttpClient
-
+    
     private val isCompress = configuration.isCompress
     private val gatewayRequest: GatewayRequest = if (isCompress) GatewayRequest.Compress else GatewayRequest.NotCompress
-
-
+    
+    
     init {
         val parentJob = configuration.coroutineContext[Job]
         this.job = SupervisorJob(parentJob)
         this.coroutineContext = configuration.coroutineContext + job + CoroutineName("KaiheilaBot.${ticket.clientId}")
-
+        
         val engine = configuration.clientEngine
         val engineFactory = configuration.clientEngineFactory
-
+        
         fun HttpClientConfig<*>.configClient() {
             install(ContentNegotiation) {
                 json(decoder)
@@ -101,12 +101,12 @@ internal class KaiheilaBotImpl(
             // }
             // install ws
             install(WebSockets)
-
-
+            
+            
             // config it.
             configuration.httpClientConfig(this)
         }
-
+        
         val client = when {
             engine != null -> HttpClient(engine) {
                 configClient()
@@ -118,38 +118,38 @@ internal class KaiheilaBotImpl(
                 configClient()
             }
         }
-
+        
         httpClient = client
-
-
+        
+        
     }
-
+    
     override fun preProcessor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
         preProcessorQueue.add(processor)
     }
-
+    
     override fun processor(processor: suspend Signal_0.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
         processorQueue.add(processor)
     }
-
+    
     private val lifeLock = Mutex()
-
+    
     @Volatile
     private var client: ClientImpl? = null
-
+    
     private val _isStarted: AtomicBoolean = AtomicBoolean(false)
-
+    
     override val isStarted: Boolean
         get() = _isStarted.get()
-
+    
     override suspend fun start(): Boolean = start { null }
-
-
-    private suspend inline fun start(reason: () -> Throwable? = { null }): Boolean = lifeLock.withLock {
+    
+    
+    private suspend inline fun start(reason: () -> Throwable? = { null }): Boolean {
         if (job.isCancelled) {
             throw kotlinx.coroutines.CancellationException("Bot has been cancelled.")
         }
-
+        
         val c = client
         if (c != null) {
             clientLogger.debug("Closing the current client: {}", c)
@@ -157,20 +157,20 @@ internal class KaiheilaBotImpl(
             clientLogger.debug("Current client closed.")
             client = null
         }
-
+        
         clientLogger.debug("Requesting for gateway info...")
         val gateway = gatewayRequest.requestDataBy(this)
-
+        
         clientLogger.debug("Creating client by gateway {}", gateway)
         client = createClient(gateway, DEFAULT_CONNECT_TIMEOUT)
         clientLogger.debug("Client created. client: {}", client)
-
+        
         _isStarted.compareAndSet(false, true)
-
-        true
+        
+        return true
     }
-
-
+    
+    
     /**
      * 创建并启动一个连接。
      */
@@ -179,53 +179,53 @@ internal class KaiheilaBotImpl(
         val sessionInfo: SessionInfo = createSession(gateway, connectTimeout)
         clientLogger.debug("Session created: {}", sessionInfo)
         val (session, sn, _, sessionData) = sessionInfo
-
+        
         // pre process
         val preProcessor = configuration.preEventProcessor
         preProcessor(this, sessionData.data.sessionId)
-
+        
         processEvent(sessionInfo)
-
+        
         return ClientImpl(gateway.url, sessionData, sn, session)
     }
-
-
+    
+    
     /**
      * 创建一个会话。
      */
     private suspend fun createSession(gateway: Gateway, connectTimeout: Long): SessionInfo {
         val sn = AtomicLong(0)
-
+        
         val session = httpClient.ws(gateway)
-
+        
         kotlin.runCatching {
             val timeoutJob = launch {
                 delay(connectTimeout)
                 val message = "Hello receive timeout: $connectTimeout ms"
                 session.cancel(message, TimeoutException(message))
             }
-
+            
             val hello: Signal.Hello = session.waitHello().check()
             timeoutJob.cancel()
-
+            
             clientLogger.debug("Received Hello: {}", hello)
             // receive events
-
+            
             val heartbeatJob = session.heartbeatJob(sn)
-
-
+            
+            
             return SessionInfo(session, sn, heartbeatJob, hello)
         }.getOrElse {
             session.closeReason.await().err(it)
         }
-
+        
     }
-
-
+    
+    
     private suspend fun processEvent(sessionInfo: SessionInfo): Job {
         val eventSerializer = Signal.Event.serializer()
         val sn = sessionInfo.sn
-
+        
         fun processEventString(eventString: String): Signal.Event? {
             val jsonElement = decoder.parseToJsonElement(eventString)
             // maybe op 11: heartbeat ack
@@ -235,7 +235,7 @@ internal class KaiheilaBotImpl(
                 Signal.Pong.S_CODE -> {
                     // TODO 6s timeout?
                     this.clientLogger.debug("Pong signal received.")
-
+                    
                     null
                 }
                 Signal.Reconnect.S_CODE -> {
@@ -255,15 +255,15 @@ internal class KaiheilaBotImpl(
                 else -> null
             }
         }
-
+        
         val processJob = SupervisorJob(sessionInfo.session.coroutineContext[Job])
-
+        
         return sessionInfo.session.incoming.receiveAsFlow().mapNotNull {
             when (it) {
                 is Frame.Text -> {
                     val eventString = it.readToText()
                     processEventString(eventString)
-
+                    
                 }
                 is Frame.Binary -> {
                     val eventString = it.readToText()
@@ -282,12 +282,12 @@ internal class KaiheilaBotImpl(
                 clientLogger.debug("On event: $event")
                 val eventType = event.type
                 val eventExtraType = event.extraType
-
+                
                 // Event(s=0,
                 // d={"channel_type":"GROUP","type":9,"target_id":"4587833303764121","author_id":"2371258185","content":"我是RBQ",
                 // "extra":{"type":1,
                 // "code":"","guild_id":"8582739890554982","channel_name":"查价bot (机器人)","author":{"id":"2371258185","username":"芦苇测试机","identify_num":"5173","online":true,"os":"Websocket","status":0,"avatar":"https://img.kaiheila.cn/assets/bot.png/icon","vip_avatar":"https://img.kaiheila.cn/assets/bot.png/icon","banner":"","nickname":"芦苇测试机","roles":[2842315],"is_vip":false,"is_ai_reduce_noise":false,"bot":true,"tag_info":{"color":"#34A853","text":"机器人"},"client_id":"OPYfwS3t0hPuVZZx"},"mention":[],"mention_all":false,"mention_roles":[],"mention_here":false,"nav_channels":[],"kmarkdown":{"raw_content":"我是RBQ","mention_part":[],"mention_role_part":[]},"last_msg_content":"芦苇测试机：我是RBQ"},"msg_id":"ee8b14c1-22eb-44d3-bb65-a1274ade96db","msg_timestamp":1650354611204,"nonce":"","from_type":1}, sn=2)
-
+                
                 val parser = EventSignals[eventType, eventExtraType] ?: run {
                     val e =
                         SimbotIllegalStateException("Unknown event type: $eventType, subType: $eventExtraType. data: $event")
@@ -295,14 +295,14 @@ internal class KaiheilaBotImpl(
                     // e.process(logger) { "Event receiving" } // TODO process exception?
                     return@onEach
                 }
-
+                
                 val lazy = lazy(LazyThreadSafetyMode.PUBLICATION) {
                     parser.deserialize(decoder, event.d)
                 }
-
-
+                
+                
                 val lazyDecoded = lazy::value
-
+                
                 // pre process
                 currPreProcessorQueue.forEach { pre ->
                     try {
@@ -318,7 +318,7 @@ internal class KaiheilaBotImpl(
                         clientLogger.error("Event pre precess failure.", e)
                     }
                 }
-
+                
                 if (currProcessorQueue.isNotEmpty()) {
                     launch {
                         currProcessorQueue.forEach { p ->
@@ -338,7 +338,7 @@ internal class KaiheilaBotImpl(
                     }
                 }
             }
-
+            
             // 留下最大的值。
             sn.updateAndGet { prev -> max(prev, nowSn) }
         }
@@ -355,8 +355,8 @@ internal class KaiheilaBotImpl(
             }
             .launchIn(this + processJob)
     }
-
-
+    
+    
     /**
      * 通过 [Gateway] 连接bot信息。
      */
@@ -365,8 +365,8 @@ internal class KaiheilaBotImpl(
             url(gateway.url)
         }
     }
-
-
+    
+    
     private suspend inline fun DefaultClientWebSocketSession.waitHello(): Signal.Hello {
         // receive Hello
         var hello: Signal.Hello? = null
@@ -382,15 +382,15 @@ internal class KaiheilaBotImpl(
         }
         return hello
     }
-
-
+    
+    
     private suspend inline fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLong): Job {
         val heartbeatInterval = 30
         val helloIntervalFactory: () -> Long = {
             val r = kotlin.random.Random.nextLong(5000)
             if (kotlin.random.Random.nextBoolean()) heartbeatInterval + r else heartbeatInterval - r
         }
-
+        
         // heartbeat Job
         val heartbeatJob = launch {
             val serializer = Signal.Ping.serializer()
@@ -400,19 +400,19 @@ internal class KaiheilaBotImpl(
                 send(decoder.encodeToString(serializer, hb))
             }
         }
-
+        
         return heartbeatJob
     }
-
+    
     override suspend fun join() {
         job.join()
     }
-
+    
     override suspend fun cancel(reason: Throwable?) = lifeLock.withLock {
         if (job.isCancelled) {
             return@withLock
         }
-
+        
         if (reason == null) {
             job.cancel()
         } else {
@@ -420,54 +420,54 @@ internal class KaiheilaBotImpl(
         }
         job.join()
     }
-
+    
     private inner class ClientImpl(
-        //private val job: Job,
+        // private val job: Job,
         override val url: String,
         private val sessionData: Signal.Hello,
         private val _sn: AtomicLong,
         private var session: DefaultClientWebSocketSession,
     ) : KaiheilaBot.Client {
         override val sn: Long get() = _sn.get()
-
+        
         override val isActive: Boolean get() = session.isActive
         // override val isResuming: Boolean get() = _resuming.get()
-
+        
         override val bot: KaiheilaBot
             get() = this@KaiheilaBotImpl
-
+        
         override val isCompress: Boolean
             get() = this@KaiheilaBotImpl.isCompress
-
-
-        suspend fun cancel(reason: Throwable? = null) = lifeLock.withLock {
+        
+        
+        suspend fun cancel(reason: Throwable? = null) {
             val cancel = reason?.let { CancellationException(it.localizedMessage, it) }
-
+            
             val sessionJob = session.coroutineContext[Job]!!
             sessionJob.cancel(cancel)
             sessionJob.join()
         }
-
+        
         override fun toString(): String {
             return "Client(url=$url, sn=$sn, sessionId=${sessionData.d.sessionId})"
         }
-
+        
     }
-
-
+    
+    
     override suspend fun me(): Me {
         return MeRequest.requestDataBy(this)
     }
-
+    
     override suspend fun offline() {
         return OfflineRequest.requestDataBy(this)
     }
-
-
+    
+    
     companion object {
         private const val DEFAULT_CONNECT_TIMEOUT: Long = 6000L
     }
-
+    
 }
 
 
@@ -475,7 +475,7 @@ private data class SessionInfo(
     val session: DefaultClientWebSocketSession,
     val sn: AtomicLong,
     val heartbeatJob: Job,
-    val sessionData: Signal.Hello
+    val sessionData: Signal.Hello,
 )
 
 /**
@@ -504,14 +504,14 @@ private fun Frame.readToText(): String {
 private fun waitForHello(decoder: Json, frame: Frame): Signal.Hello? {
     var hello: Signal.Hello? = null
     // for hello
-
+    
     if (frame is Frame.Text || frame is Frame.Binary) {
         val json = decoder.parseToJsonElement(frame.readToText())
         if (json.jsonObject["s"]?.jsonPrimitive?.intOrNull == Signal.Hello.S_CODE) {
             hello = decoder.decodeFromJsonElement(Signal.Hello.serializer(), json)
         }
     }
-
+    
     return hello
 }
 
@@ -524,7 +524,7 @@ private fun Signal.Hello.check(): Signal.Hello {
         val info = Signal.Hello.getErrorInfo(d.code)
         throw KaiheilaApiException(d.code.toInt(), info)
     }
-
+    
     return this
 }
 
