@@ -43,7 +43,7 @@ object P {
         
         val version = Version(
             major = "3", minor = 0, patch = 0,
-            status = preview(9, 0),
+            status = preview(10, 0),
             isSnapshot = isSnapshot().also {
                 println("isSnapshot: $it")
             }
