@@ -26,7 +26,11 @@ plugins {
 
 
 dependencies {
-    api(project(":simbot-component-kaiheila-stdlib"))
+    api(project(":simbot-component-kaiheila-stdlib")) {
+        exclude("love.forte.simbot")
+    }
+    implementation(V.Simbot.Core.NOTATION)
+    
     compileOnly(V.Jetbrains.Annotations.NOTATION)
 
     testImplementation(kotlin("test-junit5"))
