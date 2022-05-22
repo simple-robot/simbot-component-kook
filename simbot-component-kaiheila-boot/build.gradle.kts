@@ -31,7 +31,6 @@ dependencies {
         exclude("love.forte.simbot")
     }
     
-    implementation(V.Simbot.Core.NOTATION)
     implementation(V.Simbot.BootApi.NOTATION)
 
     testImplementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
