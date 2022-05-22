@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
+      - dev-snapshot**
     paths:
       - '**src/main/kotlin/**.kt'
+      - '**.kts'
       - '**src/main/java/**.java'
 
 jobs:
