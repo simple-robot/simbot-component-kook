@@ -28,11 +28,10 @@ val springBootVersion = "2.6.7"
 
 dependencies {
     api(project(":simbot-component-kaiheila-core")) {
-        exclude("love.forte.simbot", "simbot-logger")
+        exclude("love.forte.simbot")
     }
-    api(V.Simbot.BootApi.NOTATION) {
-        exclude("love.forte.simbot", "simbot-logger")
-    }
+    
+    implementation(V.Simbot.BootApi.NOTATION)
 
     testImplementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
     // testImplementation(V.Simbot.BootCore.NOTATION)
