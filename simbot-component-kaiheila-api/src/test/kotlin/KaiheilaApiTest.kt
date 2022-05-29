@@ -1,6 +1,6 @@
 import io.ktor.http.*
-import love.forte.simbot.kaiheila.*
-import kotlin.test.*
+import love.forte.simbot.kaiheila.KaiheilaApi
+import kotlin.test.Test
 
 /**
  *

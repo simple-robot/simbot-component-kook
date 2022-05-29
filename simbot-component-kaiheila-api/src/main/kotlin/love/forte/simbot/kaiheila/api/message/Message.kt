@@ -16,7 +16,7 @@
  */
 package love.forte.simbot.kaiheila.api.message
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 
 /**
  * 消息体内容。

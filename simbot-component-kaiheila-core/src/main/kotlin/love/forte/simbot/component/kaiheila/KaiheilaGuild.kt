@@ -40,7 +40,7 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
      */
     override val source: KhlGuild
 
-    override val bot: KaiheilaComponentBot
+    override val bot: KaiheilaComponentGuildMemberBot
 
     override val currentMember: Int
     override val maximumMember: Int
@@ -58,7 +58,8 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
 
     @OptIn(Api4J::class)
     override val owner: KaiheilaGuildMember
-
+    
+    @JvmSynthetic
     override suspend fun owner(): KaiheilaGuildMember
     //endregion
 
@@ -67,6 +68,7 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
     /**
      * 根据指定ID查询对应用户信息，或得到null。
      */
+    @JvmSynthetic
     override suspend fun member(id: ID): KaiheilaGuildMember?
 
     /**
@@ -78,6 +80,7 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
     /**
      * 查询用户列表。
      */
+    @JvmSynthetic
     override suspend fun members(groupingId: ID?, limiter: Limiter): Flow<KaiheilaGuildMember>
 
     /**
@@ -107,12 +110,14 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
 
 
     //region children api
-
+    
+    @JvmSynthetic
     override suspend fun children(groupingId: ID?, limiter: Limiter): Flow<KaiheilaChannel>
     @OptIn(Api4J::class)
     override fun getChildren(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaChannel>
-
-
+    
+    
+    @JvmSynthetic
     override suspend fun children(groupingId: ID?): Flow<KaiheilaChannel> = children(groupingId, Limiter)
     @OptIn(Api4J::class)
     override fun getChildren(): Stream<out KaiheilaChannel> = getChildren(null, Limiter)
@@ -124,6 +129,7 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
 
     //region role api
     // TODO
+    @JvmSynthetic
     override suspend fun roles(groupingId: ID?, limiter: Limiter): Flow<Role>
 
     @Api4J
@@ -133,18 +139,18 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
 
     //region mute api
 
-    @Deprecated("不支持全局静音", ReplaceWith("false"))
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun mute(duration: Duration): Boolean = false
 
     @OptIn(Api4J::class)
-    @Deprecated("不支持全局静音", ReplaceWith("false"))
-    override fun muteBlocking(time: Long, unit: TimeUnit): Boolean = false
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean = false
 
-    @Deprecated("不支持全局静音", ReplaceWith("false"))
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
 
     @OptIn(Api4J::class)
-    @Deprecated("不支持全局静音", ReplaceWith("false"))
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
 
     //endregion
@@ -153,6 +159,7 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
     /**
      * 频道服务器没有上层。
      */
+    @JvmSynthetic
     override suspend fun previous(): Organization? = null
 
     /**

@@ -17,7 +17,7 @@
 
 package love.forte.simbot.kaiheila.api
 
-import love.forte.simbot.kaiheila.util.*
+import love.forte.simbot.kaiheila.util.unmodifiable
 
 /**
  *

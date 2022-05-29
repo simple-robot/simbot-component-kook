@@ -18,10 +18,13 @@
 package love.forte.simbot.kaiheila.api.user
 
 import io.ktor.http.*
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.DeserializationStrategy
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.kaiheila.objects.UserImpl
+import love.forte.simbot.literal
 
 /**
  * 查询用户信息

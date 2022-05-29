@@ -71,6 +71,7 @@ public class ChannelListRequest(
         appendIfNotnull("type", type)
     }
     
+    @JvmSynthetic
     override suspend fun requestData(
         client: HttpClient,
         authorization: String,

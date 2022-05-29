@@ -18,11 +18,14 @@
 package love.forte.simbot.kaiheila.api.guild.role
 
 import io.ktor.http.*
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
-import love.forte.simbot.kaiheila.objects.impl.*
+import kotlinx.serialization.DeserializationStrategy
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaApiResult
+import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.objects.Role
+import love.forte.simbot.kaiheila.objects.impl.RoleImpl
+import love.forte.simbot.literal
 
 
 /**

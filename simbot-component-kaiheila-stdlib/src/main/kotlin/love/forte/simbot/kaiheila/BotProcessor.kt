@@ -17,7 +17,7 @@
 
 package love.forte.simbot.kaiheila
 
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
 import love.forte.simbot.kaiheila.event.*
 
 /**

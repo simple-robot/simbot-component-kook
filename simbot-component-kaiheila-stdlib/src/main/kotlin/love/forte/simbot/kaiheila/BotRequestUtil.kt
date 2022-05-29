@@ -19,9 +19,10 @@
 
 package love.forte.simbot.kaiheila
 
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.utils.*
+import love.forte.simbot.Api4J
+import love.forte.simbot.kaiheila.api.ApiResult
+import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.utils.runInBlocking
 
 
 /**

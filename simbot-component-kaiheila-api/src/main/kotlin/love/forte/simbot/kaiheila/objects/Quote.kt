@@ -17,9 +17,10 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.impl.*
+import kotlinx.serialization.KSerializer
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.kaiheila.objects.impl.QuoteImpl
 
 
 /**

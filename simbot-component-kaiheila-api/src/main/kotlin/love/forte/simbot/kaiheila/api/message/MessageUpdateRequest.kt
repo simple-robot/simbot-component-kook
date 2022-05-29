@@ -16,10 +16,14 @@
  */
 package love.forte.simbot.kaiheila.api.message
 
-import kotlinx.serialization.*
-import kotlinx.serialization.builtins.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
 
 /**
  * [更新频道聊天消息](https://developer.kaiheila.cn/doc/http/message#%E6%9B%B4%E6%96%B0%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)

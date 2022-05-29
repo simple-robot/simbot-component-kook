@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.*
+import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuild
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.model.GuildModel
@@ -46,11 +47,13 @@ import kotlin.coroutines.CoroutineContext
  * @author ForteScarlet
  */
 internal class KaiheilaGuildImpl constructor(
-    override val bot: KaiheilaComponentBotImpl,
+    private val baseBot: KaiheilaComponentBotImpl,
     @Volatile override var source: GuildModel,
 ) : KaiheilaGuild, CoroutineScope {
-    internal val job = SupervisorJob(bot.job)
-    override val coroutineContext: CoroutineContext = bot.coroutineContext + job
+    
+    
+    internal val job = SupervisorJob(baseBot.job)
+    override val coroutineContext: CoroutineContext = baseBot.coroutineContext + job
     
     override val createTime: Timestamp get() = Timestamp.notSupport()
     
@@ -81,6 +84,20 @@ internal class KaiheilaGuildImpl constructor(
     @JvmSynthetic
     internal fun internalMember(id: String): KaiheilaGuildMemberImpl? = members[id]
     
+    private lateinit var botMember: KaiheilaComponentGuildMemberBot
+    
+    override val bot: KaiheilaComponentGuildMemberBot
+        get() {
+            // 不关心实例唯一性
+            if (::botMember.isInitialized) {
+                return botMember
+            }
+            
+            return baseBot.toMemberBot(internalMember(baseBot.id)!!).also {
+                botMember = it
+            }
+        }
+    
     @JvmSynthetic
     @Volatile
     private lateinit var lastOwnerMember: KaiheilaGuildMemberImpl
@@ -99,7 +116,7 @@ internal class KaiheilaGuildImpl constructor(
         requestChannels(guildId)
             .buffer(100)
             .map { it.toModel() }
-            .map { channel -> KaiheilaChannelImpl(bot, this, channel) }
+            .map { channel -> KaiheilaChannelImpl(baseBot, this, channel) }
             .collect {
                 channelsMap.merge(it.id.literal, it) { old, cur ->
                     old.cancel()
@@ -107,14 +124,14 @@ internal class KaiheilaGuildImpl constructor(
                 }
             }
         
-        bot.logger.info("Sync channel data finished. {} channels of data have been synchronized.", channelsMap.size)
+        baseBot.logger.info("Sync channel data finished. {} channels of data have been synchronized.", channelsMap.size)
         
         
         // sync members
         requestGuildUsers(guildId)
             .buffer(100)
             .map { it.toModel() }
-            .map { user -> KaiheilaGuildMemberImpl(bot, this, user) }
+            .map { user -> KaiheilaGuildMemberImpl(baseBot, this, user) }
             .collect {
                 val member = membersMap.merge(it.id.literal, it) { old, cur ->
                     old.cancel()
@@ -126,14 +143,16 @@ internal class KaiheilaGuildImpl constructor(
                 }
             }
         
-        bot.logger.info("Sync member data finished, {} members of data have been synchronized.", membersMap.size)
+        baseBot.logger.info("Sync member data finished, {} members of data have been synchronized.", membersMap.size)
         
         
         this.channels = channelsMap
         this.members = membersMap
-        this.lastOwnerMember = owner ?: KaiheilaGuildMemberImpl(bot,
+        this.lastOwnerMember = owner ?: KaiheilaGuildMemberImpl(
+            baseBot,
             this,
-            UserViewRequest(ownerId, guildId).requestDataBy(bot).toModel())
+            UserViewRequest(ownerId, guildId).requestDataBy(baseBot).toModel()
+        )
         initTimestamp = System.currentTimeMillis()
     }
     
@@ -148,9 +167,11 @@ internal class KaiheilaGuildImpl constructor(
     private suspend fun syncLastOwnerMember(id: String): KaiheilaGuildMemberImpl {
         return members[id] ?: ownerSyncLock.withLock {
             members[id] ?: run {
-                val member = KaiheilaGuildMemberImpl(bot,
+                val member = KaiheilaGuildMemberImpl(
+                    baseBot,
                     this@KaiheilaGuildImpl,
-                    UserViewRequest(ownerId, source.id).requestDataBy(bot).toModel())
+                    UserViewRequest(ownerId, source.id).requestDataBy(baseBot).toModel()
+                )
                 members.merge(id, member) { _, cur -> cur }!!
             }
         }.also {
@@ -234,7 +255,7 @@ internal class KaiheilaGuildImpl constructor(
             .collect { model ->
                 channels.compute(model.id.literal) { _, old ->
                     if (old == null) {
-                        KaiheilaChannelImpl(bot, this, model)
+                        KaiheilaChannelImpl(baseBot, this, model)
                     } else {
                         // update source.
                         old.source = model
@@ -252,7 +273,7 @@ internal class KaiheilaGuildImpl constructor(
             .collect { model ->
                 members.compute(model.id.literal) { _, old ->
                     if (old == null) {
-                        KaiheilaGuildMemberImpl(bot, this, model)
+                        KaiheilaGuildMemberImpl(baseBot, this, model)
                     } else {
                         old.source = model
                         old
@@ -268,10 +289,10 @@ internal class KaiheilaGuildImpl constructor(
             if (page > 1) {
                 delay(batchDelay)
             }
-            bot.logger.debug("Sync channel data ... page {}", page)
-            val result = ChannelListRequest(guildId = guildId, type = type, page = page).requestDataBy(bot)
+            baseBot.logger.debug("Sync channel data ... page {}", page)
+            val result = ChannelListRequest(guildId = guildId, type = type, page = page).requestDataBy(baseBot)
             val channels = result.items
-            bot.logger.debug("{} channel data synced in page {}", channels.size, page)
+            baseBot.logger.debug("{} channel data synced in page {}", channels.size, page)
             channels.forEach {
                 emit(it)
             }
@@ -287,10 +308,10 @@ internal class KaiheilaGuildImpl constructor(
             if (page > 1) {
                 delay(batchDelay)
             }
-            bot.logger.debug("Sync member data ... page {}", page)
-            val usersResult = GuildUserListRequest(guildId = guildId, page = page).requestDataBy(bot)
+            baseBot.logger.debug("Sync member data ... page {}", page)
+            val usersResult = GuildUserListRequest(guildId = guildId, page = page).requestDataBy(baseBot)
             val users = usersResult.items
-            bot.logger.debug("{} member data synced in page {}", users.size, page)
+            baseBot.logger.debug("{} member data synced in page {}", users.size, page)
             users.forEach {
                 emit(it)
             }

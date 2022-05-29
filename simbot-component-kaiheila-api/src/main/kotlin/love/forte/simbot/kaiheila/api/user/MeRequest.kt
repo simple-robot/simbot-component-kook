@@ -17,11 +17,15 @@
 
 package love.forte.simbot.kaiheila.api.user
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
-import love.forte.simbot.kaiheila.util.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.LongID
+import love.forte.simbot.kaiheila.api.ApiResultType
+import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.kaiheila.util.unmodifiableListOf
 
 /**
  * [获取当前用户信息](https://developer.kaiheila.cn/doc/http/user#%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)

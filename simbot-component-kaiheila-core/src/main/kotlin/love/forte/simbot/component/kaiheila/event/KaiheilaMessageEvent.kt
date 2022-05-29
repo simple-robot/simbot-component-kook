@@ -23,9 +23,12 @@ import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kaiheila.KaiheilaChannel
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.event.*
 import love.forte.simbot.kaiheila.event.message.MessageEventExtra
+import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.utils.runInBlocking
 import love.forte.simbot.kaiheila.event.Event as KhlEvent
@@ -63,8 +66,56 @@ public sealed class KaiheilaMessageEvent :
      * 接收到的消息体。
      */
     abstract override val messageContent: KaiheilaReceiveMessageContent
-
-
+    
+    /**
+     * 回复此事件。
+     *
+     * 即向此消息事件的发送者进行**针对性的**消息回复。
+     */
+    @JvmSynthetic
+    abstract override suspend fun reply(message: Message): KaiheilaMessageReceipt
+    
+    /**
+     * 回复此事件。
+     *
+     * 即向此消息事件的发送者进行**针对性的**消息回复。
+     */
+    @JvmSynthetic
+    abstract override suspend fun reply(text: String): KaiheilaMessageReceipt
+    
+    /**
+     * 回复此事件。
+     *
+     * 即向此消息事件的发送者进行**针对性的**消息回复。
+     */
+    @JvmSynthetic
+    abstract override suspend fun reply(message: MessageContent): KaiheilaMessageReceipt
+    
+    /**
+     * 回复此事件。
+     *
+     * 即向此消息事件的发送者进行**针对性的**消息回复。
+     */
+    @Api4J
+    override fun replyBlocking(text: String): KaiheilaMessageReceipt = runInBlocking { reply(text) }
+    
+    /**
+     * 回复此事件。
+     *
+     * 即向此消息事件的发送者进行**针对性的**消息回复。
+     */
+    @Api4J
+    override fun replyBlocking(message: Message): KaiheilaMessageReceipt = runInBlocking { reply(message) }
+    
+    /**
+     * 回复此事件。
+     *
+     * 即向此消息事件的发送者进行**针对性的**消息回复。
+     */
+    @Api4J
+    override fun replyBlocking(message: MessageContent): KaiheilaMessageReceipt = runInBlocking { reply(message) }
+    
+    
     /**
      * 频道消息事件。
      *

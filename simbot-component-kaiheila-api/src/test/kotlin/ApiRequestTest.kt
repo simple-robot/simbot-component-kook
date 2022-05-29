@@ -1,6 +1,7 @@
-import kotlinx.serialization.json.*
-import love.forte.simbot.kaiheila.api.*
-import kotlin.test.*
+import kotlinx.serialization.json.Json
+import love.forte.simbot.kaiheila.api.ApiResult
+import love.forte.simbot.kaiheila.api.KaiheilaApiResult
+import kotlin.test.Test
 
 /**
  *

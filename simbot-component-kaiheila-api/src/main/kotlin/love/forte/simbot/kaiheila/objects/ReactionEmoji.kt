@@ -14,7 +14,7 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 
 /**
  * 用于标识用户 `reaction` 时候的Emoji信息。

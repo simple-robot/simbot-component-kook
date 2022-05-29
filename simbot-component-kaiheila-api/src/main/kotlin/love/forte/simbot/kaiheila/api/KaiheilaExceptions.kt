@@ -17,7 +17,7 @@
 
 package love.forte.simbot.kaiheila.api
 
-import love.forte.simbot.*
+import love.forte.simbot.SimbotRuntimeException
 
 /*
     占位文件

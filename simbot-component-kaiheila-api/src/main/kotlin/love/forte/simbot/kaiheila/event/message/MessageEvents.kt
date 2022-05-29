@@ -17,10 +17,14 @@
 
 package love.forte.simbot.kaiheila.event.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.event.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kaiheila.objects.Attachments
+import love.forte.simbot.kaiheila.objects.Channel
 
 
 /**

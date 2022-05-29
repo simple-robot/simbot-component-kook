@@ -60,7 +60,7 @@ internal class KaiheilaUserChatImpl(
         return if (result is MessageCreated) {
             result.asReceipt(true, bot)
         } else {
-            KaiheilaApiRequestedReceipt(result, true)
+            KaiheilaApiRequestedReceipt(result, true, bot)
             TODO()
         }
     }
