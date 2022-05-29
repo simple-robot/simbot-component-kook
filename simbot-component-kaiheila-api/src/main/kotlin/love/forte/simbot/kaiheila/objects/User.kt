@@ -17,12 +17,15 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
 import love.forte.simbot.LoggerFactory
-import love.forte.simbot.definition.*
-import love.forte.simbot.kaiheila.api.*
-import org.slf4j.*
+import love.forte.simbot.LongID
+import love.forte.simbot.definition.UserInfo
+import love.forte.simbot.kaiheila.api.ApiResultType
+import org.slf4j.Logger
 
 
 /**

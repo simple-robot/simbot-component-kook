@@ -17,7 +17,8 @@
 
 package love.forte.simbot.kaiheila.event.system.message
 
-import kotlinx.serialization.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 /**

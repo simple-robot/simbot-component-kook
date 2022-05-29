@@ -60,6 +60,7 @@ public interface KaiheilaContact : Contact {
     /**
      * 发送消息。
      */
+    @JvmSynthetic
     override suspend fun send(message: Message): MessageReceipt
 
 

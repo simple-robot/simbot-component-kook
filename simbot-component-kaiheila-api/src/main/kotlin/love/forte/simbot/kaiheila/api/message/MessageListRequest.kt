@@ -18,9 +18,12 @@
 package love.forte.simbot.kaiheila.api.message
 
 import io.ktor.http.*
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.DeserializationStrategy
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaApiResult
+import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.appendIfNotnull
 
 /**
  * [获取频道聊天消息列表](https://developer.kaiheila.cn/doc/http/message#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF%E5%88%97%E8%A1%A8)

@@ -17,7 +17,10 @@
 
 package love.forte.simbot.kaiheila.event.message
 
-import love.forte.simbot.kaiheila.event.*
+import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kaiheila.event.EventParser
+import love.forte.simbot.kaiheila.event.KaiheilaEventParserDefinition
+import love.forte.simbot.kaiheila.event.MessageEventParser
 
 
 /**

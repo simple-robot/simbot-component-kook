@@ -16,16 +16,20 @@
 
 package love.forte.simbot.kaiheila.api.message
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.CARD
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.FILE
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.IMAGE
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.KMARKDOWN
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.TEXT
 import love.forte.simbot.kaiheila.api.message.MessageType.Companion.VIDEO
-import love.forte.simbot.kaiheila.event.*
+import love.forte.simbot.kaiheila.event.Event
 
 
 /**

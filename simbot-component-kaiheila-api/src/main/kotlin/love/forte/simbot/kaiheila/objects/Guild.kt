@@ -17,10 +17,15 @@
 
 package love.forte.simbot.kaiheila.objects
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.definition.*
-import love.forte.simbot.kaiheila.objects.impl.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.definition.GuildInfo
+import love.forte.simbot.kaiheila.objects.impl.ChannelImpl
+import love.forte.simbot.kaiheila.objects.impl.RoleImpl
 
 
 /**

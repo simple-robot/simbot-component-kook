@@ -17,9 +17,10 @@
 
 package love.forte.simbot.kaiheila.api.invite
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.kaiheila.objects.UserImpl
 
 @Serializable
 internal data class InviteInfoImpl(

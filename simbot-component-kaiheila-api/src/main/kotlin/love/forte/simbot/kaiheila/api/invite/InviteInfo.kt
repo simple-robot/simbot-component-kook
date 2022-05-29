@@ -17,8 +17,8 @@
 
 package love.forte.simbot.kaiheila.api.invite
 
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.objects.User
 
 /**
  * 邀请信息.

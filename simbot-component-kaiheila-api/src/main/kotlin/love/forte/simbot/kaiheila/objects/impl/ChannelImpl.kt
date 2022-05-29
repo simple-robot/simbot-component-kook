@@ -17,9 +17,10 @@
 
 package love.forte.simbot.kaiheila.objects.impl
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.kaiheila.objects.Channel
 
 @Serializable
 internal data class ChannelImpl(
@@ -49,7 +50,5 @@ internal data class ChannelImpl(
     override val currentMember: Int = -1,
     override val icon: String = "",
     override val maximumMember: Int = -1
-) : Channel {
-
-}
+) : Channel
 

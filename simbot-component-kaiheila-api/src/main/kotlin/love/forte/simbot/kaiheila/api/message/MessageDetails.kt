@@ -17,10 +17,16 @@
 
 package love.forte.simbot.kaiheila.api.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ID
+import love.forte.simbot.LongID
+import love.forte.simbot.kaiheila.api.ApiResultType
+import love.forte.simbot.kaiheila.objects.MentionPart
+import love.forte.simbot.kaiheila.objects.Quote
+import love.forte.simbot.kaiheila.objects.Role
+import love.forte.simbot.kaiheila.objects.User
 
 
 /**

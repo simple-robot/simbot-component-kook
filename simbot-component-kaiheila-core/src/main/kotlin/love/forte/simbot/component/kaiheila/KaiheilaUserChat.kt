@@ -68,16 +68,19 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     /**
      * 向当前好友（私聊会话）发送消息。
      */
+    @JvmSynthetic
     override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
     
     /**
      * 向当前好友（私聊会话）发送消息。
      */
+    @JvmSynthetic
     override suspend fun send(text: String): KaiheilaMessageCreatedReceipt
     
     /**
      * 向当前好友（私聊会话）发送消息。
      */
+    @JvmSynthetic
     override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
     
     /**

@@ -18,10 +18,14 @@
 package love.forte.simbot.kaiheila.api.guild
 
 import io.ktor.http.*
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ID
+import love.forte.simbot.LongID
 import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.literal
 
 
 /**
@@ -118,9 +122,7 @@ public data class GuildUserList @ApiResultType constructor(
     override val items: List<GuildUser>,
     override val meta: KaiheilaApiResult.ListMeta,
     override val sort: Map<String, Int> = emptyMap()
-) : KaiheilaApiResult.ListDataResponse<GuildUser, Map<String, Int>>() {
-
-}
+) : KaiheilaApiResult.ListDataResponse<GuildUser, Map<String, Int>>()
 
 /**
  * Guild User from [GuildUserListRequest]

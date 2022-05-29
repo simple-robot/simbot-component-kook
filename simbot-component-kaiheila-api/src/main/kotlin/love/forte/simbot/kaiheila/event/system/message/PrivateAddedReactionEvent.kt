@@ -17,9 +17,11 @@
 
 package love.forte.simbot.kaiheila.event.system.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.objects.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.objects.ReactionEmoji
 
 /**
  * 私聊内用户添加reaction

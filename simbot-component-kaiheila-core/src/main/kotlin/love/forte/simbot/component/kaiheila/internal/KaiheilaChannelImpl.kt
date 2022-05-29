@@ -26,12 +26,10 @@ import love.forte.simbot.ID
 import love.forte.simbot.Limiter
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kaiheila.KaiheilaChannel
+import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
-import love.forte.simbot.component.kaiheila.message.KaiheilaApiRequestedReceipt
-import love.forte.simbot.component.kaiheila.message.KaiheilaChannelMessageDetailsContent
+import love.forte.simbot.component.kaiheila.message.*
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
-import love.forte.simbot.component.kaiheila.message.toRequest
 import love.forte.simbot.component.kaiheila.model.ChannelModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.Role
@@ -39,7 +37,6 @@ import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreated
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
-import love.forte.simbot.message.MessageReceipt
 import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
 
@@ -49,10 +46,15 @@ import kotlin.coroutines.CoroutineContext
  * @author ForteScarlet
  */
 internal class KaiheilaChannelImpl(
-    override val bot: KaiheilaComponentBotImpl,
+    private val baseBot: KaiheilaComponentBotImpl,
     override val guild: KaiheilaGuildImpl,
     @Volatile override var source: ChannelModel,
 ) : KaiheilaChannel, CoroutineScope {
+    
+    
+    override val bot: KaiheilaComponentGuildMemberBot
+        get() = guild.bot
+    
     private val job = SupervisorJob(guild.job)
     override val coroutineContext: CoroutineContext = guild.coroutineContext + job
     
@@ -83,20 +85,20 @@ internal class KaiheilaChannelImpl(
         guild.members(groupingId, limiter)
     
     
-    override suspend fun send(message: Message, tempTargetId: ID?): MessageReceipt {
-        val request = message.toRequest(targetId = source.id, tempTargetId = tempTargetId)
+    override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KaiheilaMessageReceipt {
+        val request = message.toRequest(targetId = source.id, quote = quote, tempTargetId = tempTargetId)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
         
-        val result = request.requestDataBy(bot)
+        val result = request.requestDataBy(baseBot)
         
         return if (result is MessageCreated) {
-            result.asReceipt(false, bot)
+            result.asReceipt(false, baseBot)
         } else {
-            KaiheilaApiRequestedReceipt(result, false)
+            KaiheilaApiRequestedReceipt(result, false, baseBot)
         }
     }
     
-    override suspend fun send(message: MessageContent, tempTargetId: ID?): MessageReceipt {
+    override suspend fun send(message: MessageContent, quote: ID?, tempTargetId: ID?): KaiheilaMessageReceipt {
         return when (message) {
             is KaiheilaReceiveMessageContent -> {
                 val source = message.source
@@ -104,10 +106,10 @@ internal class KaiheilaChannelImpl(
                     type = source.type.type,
                     targetId = this.id,
                     content = source.content,
-                    quote = null,
+                    quote = quote,
                     nonce = null,
                     tempTargetId = tempTargetId,
-                ).requestDataBy(bot).asReceipt(false, bot)
+                ).requestDataBy(baseBot).asReceipt(false, baseBot)
             }
             is KaiheilaChannelMessageDetailsContent -> {
                 val details = message.details
@@ -115,10 +117,10 @@ internal class KaiheilaChannelImpl(
                     type = details.type,
                     targetId = this.id,
                     content = details.content,
-                    quote = details.quote?.id,
+                    quote = quote ?: details.quote?.id,
                     nonce = null,
                     tempTargetId = tempTargetId,
-                ).requestDataBy(bot).asReceipt(false, bot)
+                ).requestDataBy(baseBot).asReceipt(false, baseBot)
             }
             else -> {
                 send(message.messages)

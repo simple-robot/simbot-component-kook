@@ -17,12 +17,17 @@
 
 package love.forte.simbot.kaiheila.api.guild.role
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
-import love.forte.simbot.kaiheila.objects.*
-import love.forte.simbot.kaiheila.objects.impl.*
-import love.forte.simbot.kaiheila.util.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.objects.PermissionType
+import love.forte.simbot.kaiheila.objects.Permissions
+import love.forte.simbot.kaiheila.objects.Role
+import love.forte.simbot.kaiheila.objects.impl.RoleImpl
+import love.forte.simbot.kaiheila.util.BooleanToIntSerializer
 
 
 /**

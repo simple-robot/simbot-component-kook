@@ -194,6 +194,7 @@ public abstract class KaiheilaMemberChannelChangedEvent<out Body> : KaiheilaMemb
     /**
      * 事件涉及的频道信息。同 [organization].
      */
+    @JvmSynthetic
     override suspend fun source(): KaiheilaChannel = source
 
 
@@ -205,6 +206,7 @@ public abstract class KaiheilaMemberChannelChangedEvent<out Body> : KaiheilaMemb
     /**
      * 事件涉及的频道信息。同 [source].
      */
+    @JvmSynthetic
     override suspend fun organization(): KaiheilaChannel = organization
 
 

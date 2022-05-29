@@ -1,8 +1,10 @@
 package love.forte.simbot.kaiheila.api.message
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.kaiheila.api.ApiResultType
 
 /**
  * [发送频道消息][MessageCreateRequest] 和 [发送私聊消息][DirectMessageCreateRequest]的响应值。

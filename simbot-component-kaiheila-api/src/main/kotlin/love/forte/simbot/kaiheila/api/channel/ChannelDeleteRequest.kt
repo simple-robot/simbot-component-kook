@@ -19,10 +19,13 @@
 
 package love.forte.simbot.kaiheila.api.channel
 
-import kotlinx.serialization.*
-import kotlinx.serialization.builtins.*
-import love.forte.simbot.*
-import love.forte.simbot.kaiheila.api.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import love.forte.simbot.ID
+import love.forte.simbot.kaiheila.api.BaseApiRequestKey
+import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
 
 
 /**

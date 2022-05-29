@@ -17,8 +17,10 @@
 
 package love.forte.simbot.kaiheila.event.system.user
 
-import kotlinx.serialization.*
-import love.forte.simbot.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ID
 
 /**
  * [自己新加入服务器](https://developer.kaiheila.cn/doc/event/user#%E8%87%AA%E5%B7%B1%E6%96%B0%E5%8A%A0%E5%85%A5%E6%9C%8D%E5%8A%A1%E5%99%A8)

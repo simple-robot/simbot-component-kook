@@ -82,7 +82,7 @@ internal class KaiheilaComponentBotImpl(
     override val eventProcessor: EventProcessor,
     override val component: KaiheilaComponent,
     private val configuration: KaiheilaComponentBotConfiguration,
-) : KaiheilaComponentBot() {
+) : KaiheilaComponentBot {
     internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
     override val logger: Logger =

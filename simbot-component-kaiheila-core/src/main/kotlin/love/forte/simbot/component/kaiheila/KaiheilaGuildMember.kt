@@ -23,6 +23,7 @@ import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.UnsupportedActionException
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
@@ -30,7 +31,6 @@ import love.forte.simbot.kaiheila.api.guild.GuildMuteType
 import love.forte.simbot.kaiheila.objects.SystemUser
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
-import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
@@ -63,6 +63,7 @@ public interface KaiheilaGuildMember :
      *
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
+    @JvmSynthetic
     override suspend fun unmute(): Boolean = unmute(GuildMuteType.TYPE_MICROPHONE)
 
     /**
@@ -70,6 +71,7 @@ public interface KaiheilaGuildMember :
      *
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
+    @JvmSynthetic
     public suspend fun unmute(type: Int): Boolean
 
 
@@ -79,6 +81,7 @@ public interface KaiheilaGuildMember :
      *
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
+    @JvmSynthetic
     override suspend fun mute(duration: Duration): Boolean = mute(duration, GuildMuteType.TYPE_MICROPHONE)
 
     /**
@@ -86,6 +89,7 @@ public interface KaiheilaGuildMember :
      *
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
+    @JvmSynthetic
     public suspend fun mute(duration: Duration, type: Int): Boolean
 
 
@@ -96,8 +100,8 @@ public interface KaiheilaGuildMember :
      * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
      */
     @Api4J
-    override fun muteBlocking(time: Long, unit: TimeUnit): Boolean =
-        runInBlocking { mute(unit.toMillis(time).milliseconds) }
+    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean =
+        runInBlocking { mute(unit.toMillis(duration).milliseconds) }
 
     /**
      * 对此用户进行静音操作。
@@ -126,20 +130,95 @@ public interface KaiheilaGuildMember :
     public fun unmuteBlocking(type: Int): Boolean = runInBlocking { unmute(type) }
 
     //endregion
-
-
+    
+    /**
+     * 向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
+     * 则会抛出 [UnsupportedActionException] 异常。
+     *
+     * @throws UnsupportedActionException 如果目标不支持
+     *
+     */
+    @JvmSynthetic
+    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt
+    
+    /**
+     * 向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
+     * 则会抛出 [UnsupportedActionException] 异常。
+     *
+     * @throws UnsupportedActionException 如果目标不支持
+     *
+     */
+    @JvmSynthetic
+    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    
+    /**
+     * 向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
+     * 则会抛出 [UnsupportedActionException] 异常。
+     *
+     * @throws UnsupportedActionException 如果目标不支持
+     *
+     */
+    @JvmSynthetic
+    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
+    
+    /**
+     * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
+     * 则会抛出 [UnsupportedActionException] 异常。
+     *
+     * @throws UnsupportedActionException 如果目标不支持
+     *
+     */
+    @Api4J
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt
+    
+    /**
+     * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
+     * 则会抛出 [UnsupportedActionException] 异常。
+     *
+     * @throws UnsupportedActionException 如果目标不支持
+     *
+     */
+    @Api4J
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt
+    
+    /**
+     * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
+     * 则会抛出 [UnsupportedActionException] 异常。
+     *
+     * @throws UnsupportedActionException 如果目标不支持
+     *
+     */
+    @Api4J
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt
+    
     @OptIn(Api4J::class)
     override val guild: KaiheilaGuild
 
     @OptIn(Api4J::class)
     override val organization: KaiheilaGuild
         get() = guild
-
+    
+    /**
+     * 得到当前成员所在频道服务器。同 [guild].
+     */
+    @JvmSynthetic
     override suspend fun organization(): KaiheilaGuild = guild
+    
+    /**
+     * 得到当前成员所在频道服务器。同 [guild].
+     */
+    @JvmSynthetic
     override suspend fun guild(): KaiheilaGuild = guild
 
     @Api4J
     override val roles: Stream<out Role>
+    
+    /**
+     * 得到当前成员所在频道服务器中的角色。
+     *
+     * _TODO: 尚未实现_
+     */
+    @JvmSynthetic
     override suspend fun roles(): Flow<Role>
 
     override val joinTime: Timestamp get() = Timestamp.notSupport()
@@ -171,11 +250,13 @@ public class KaiheilaGuildSystemMember(
     /**
      * 系统用户不支持禁言相关操作，永远得到 `false`.
      */
+    @JvmSynthetic
     override suspend fun unmute(type: Int): Boolean = false
 
     /**
      * 系统用户不支持禁言相关操作，永远得到 `false`.
      */
+    @JvmSynthetic
     override suspend fun mute(duration: Duration, type: Int): Boolean = false
 
 
@@ -186,32 +267,32 @@ public class KaiheilaGuildSystemMember(
     }
     
     @JvmSynthetic
-    override suspend fun send(text: String): MessageReceipt {
+    override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
         notSupport()
     }
     
     @JvmSynthetic
-    override suspend fun send(message: Message): MessageReceipt {
+    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
         notSupport()
     }
 
     @JvmSynthetic
-    override suspend fun send(message: MessageContent): MessageReceipt {
+    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
         notSupport()
     }
 
     @OptIn(Api4J::class)
-    override fun sendBlocking(text: String): MessageReceipt {
+    override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt {
         notSupport()
     }
     
     @OptIn(Api4J::class)
-    override fun sendBlocking(message: Message): MessageReceipt {
+    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt {
         notSupport()
     }
     
     @OptIn(Api4J::class)
-    override fun sendBlocking(message: MessageContent): MessageReceipt {
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt {
         notSupport()
     }
     //endregion
@@ -219,7 +300,8 @@ public class KaiheilaGuildSystemMember(
     @OptIn(Api4J::class)
     override val roles: Stream<out Role>
         get() = Stream.empty()
-
+    
+    @JvmSynthetic
     override suspend fun roles(): Flow<Role> = emptyFlow()
 
     override val username: String

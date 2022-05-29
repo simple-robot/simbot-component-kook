@@ -16,7 +16,7 @@
  */
 package love.forte.simbot.kaiheila.event
 
-import love.forte.simbot.kaiheila.api.*
+import love.forte.simbot.kaiheila.api.KhlRuntimeException
 
 /**
  * khl事件解析相关错误。

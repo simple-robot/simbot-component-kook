@@ -22,20 +22,35 @@ import love.forte.simbot.Timestamp
 import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.util.requestBy
+import love.forte.simbot.definition.BotContainer
 import love.forte.simbot.kaiheila.api.message.DirectMessageDeleteRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreated
 import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
 import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.randomID
 
-// TODO
 /**
+ * 开黑啦进行消息回复、发送后得到的回执。
  *
+ * @see KaiheilaMessageCreatedReceipt
+ * @see KaiheilaApiRequestedReceipt
  */
-public sealed interface KaiheilaMessageReceipt : MessageReceipt, DeleteSupport {
+public sealed interface KaiheilaMessageReceipt : MessageReceipt, BotContainer {
+    /**
+     * 此次消息发送的回执内容。
+     *
+     */
     public val result: Any?
+    
+    /**
+     * 是否为私聊消息。
+     */
     public val isDirect: Boolean
     
+    /**
+     * 相关的bot。
+     */
+    override val bot: KaiheilaComponentBot
 }
 
 
@@ -46,26 +61,28 @@ public sealed interface KaiheilaMessageReceipt : MessageReceipt, DeleteSupport {
  */
 @Suppress("MemberVisibilityCanBePrivate")
 public class KaiheilaMessageCreatedReceipt(
-    public val created: MessageCreated,
-    public val isDirect: Boolean,
-    private val bot: KaiheilaComponentBot
-) : MessageReceipt, DeleteSupport {
+    override val result: MessageCreated,
+    override val isDirect: Boolean,
+    override val bot: KaiheilaComponentBot
+) : KaiheilaMessageReceipt, DeleteSupport {
     override val id: ID
-        get() = created.msgId
+        get() = result.msgId
+    
 
     override val isSuccess: Boolean
         get() = true
 
-    public val nonce: String? get() = created.nonce
+    public val nonce: String? get() = result.nonce
 
     /**
      * 消息发送时间(服务器时间戳)
      */
-    public val timestamp: Timestamp get() = created.msgTimestamp
+    public val timestamp: Timestamp get() = result.msgTimestamp
 
     /**
      * 尝试删除（撤回）发送的这条消息。
      */
+    @JvmSynthetic
     override suspend fun delete(): Boolean {
         val request = if (isDirect) DirectMessageDeleteRequest(id) else MessageDeleteRequest(id)
         return request.requestBy(bot).isSuccess
@@ -91,10 +108,10 @@ public class KaiheilaMessageCreatedReceipt(
  *
  */
 public class KaiheilaApiRequestedReceipt(
-    public val result: Any?,
-    public val isDirect: Boolean,
-    // private val bot: KaiheilaComponentBot
-) : MessageReceipt {
+    override val result: Any?,
+    override val isDirect: Boolean,
+    override val bot: KaiheilaComponentBot
+) : KaiheilaMessageReceipt {
     override val id: ID = randomID()
     override val isSuccess: Boolean get() = true
 }

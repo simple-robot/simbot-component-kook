@@ -18,7 +18,8 @@
 package love.forte.simbot.kaiheila.api
 
 import io.ktor.http.*
-import kotlinx.serialization.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import love.forte.simbot.kaiheila.api.GatewayRequest.*
 
 
