@@ -18,14 +18,16 @@
 package love.forte.simbot.component.kaiheila.internal
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.forte.simbot.*
-import love.forte.simbot.component.kaiheila.KaiheilaBotManager
-import love.forte.simbot.component.kaiheila.KaiheilaComponent
-import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
-import love.forte.simbot.component.kaiheila.KaiheilaComponentBotConfiguration
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
+import love.forte.simbot.Simbot
+import love.forte.simbot.component.kaiheila.*
 import love.forte.simbot.component.kaiheila.event.KaiheilaBotStartedEvent
 import love.forte.simbot.component.kaiheila.internal.event.KaiheilaBotStartedEventImpl
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
@@ -63,12 +65,16 @@ import love.forte.simbot.kaiheila.event.system.guild.member.UpdatedGuildMemberEv
 import love.forte.simbot.kaiheila.event.system.user.SelfExitedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
 import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEventBody
+import love.forte.simbot.literal
 import love.forte.simbot.resources.Resource
-import love.forte.simbot.utils.runInBlocking
+import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.Items.Companion.asItems
+import love.forte.simbot.utils.item.effectOn
+import love.forte.simbot.utils.item.items
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Stream
+import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kaiheila.event.Event as KhlEvent
 
@@ -88,14 +94,13 @@ internal class KaiheilaComponentBotImpl(
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
     
-    private lateinit var guilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
-    
+    private lateinit var internalGuilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
     
     @JvmSynthetic
     internal fun internalGuild(id: ID): KaiheilaGuildImpl? = internalGuild(id.literal)
     
     @JvmSynthetic
-    internal fun internalGuild(id: String): KaiheilaGuildImpl? = guilds[id]
+    internal fun internalGuild(id: String): KaiheilaGuildImpl? = internalGuilds[id]
     
     
     init {
@@ -156,7 +161,7 @@ internal class KaiheilaComponentBotImpl(
         
         bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
         
-        this.guilds = guildsMap
+        this.internalGuilds = guildsMap
     }
     
     @Synchronized
@@ -185,7 +190,7 @@ internal class KaiheilaComponentBotImpl(
                     val syncNeedGuild = if (curr == null) {
                         // compute it.
                         val guildImpl = KaiheilaGuildImpl(this, guildModel).also { it.init() }
-                        guilds.compute(guildId) { _, cur ->
+                        internalGuilds.compute(guildId) { _, cur ->
                             if (cur == null) {
                                 // 不存在旧的，直接添加
                                 guildImpl
@@ -286,17 +291,12 @@ internal class KaiheilaComponentBotImpl(
     }
     
     
-    // region guild api
-    override suspend fun guild(id: ID): KaiheilaGuildImpl? = guilds[id.literal]
+    override suspend fun guild(id: ID): KaiheilaGuildImpl? = internalGuilds[id.literal]
     
-    override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuildImpl> =
-        guilds.values.asFlow().withLimiter(limiter)
+    override fun getGuild(id: ID): KaiheilaGuildImpl? = internalGuilds[id.literal]
     
-    override fun getGuild(id: ID): KaiheilaGuildImpl? = guilds[id.literal]
-    
-    override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuildImpl> =
-        guilds.values.stream().withLimiter(limiter)
-    // endregion
+    override val guilds: Items<KaiheilaGuild>
+        get() = internalGuilds.values.asItems()
     
     
     // region friend api
@@ -306,20 +306,19 @@ internal class KaiheilaComponentBotImpl(
         return KaiheilaUserChatImpl(this, chat.toModel())
     }
     
-    
     @OptIn(ExperimentalSimbotApi::class)
-    override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChatImpl> {
-        return UserChatListRequest.requestDataBy(this).items.asFlow().map { chat ->
-            KaiheilaUserChatImpl(this, chat.toModel())
+    override val friends: Items<KaiheilaUserChatImpl>
+        get() {
+            return items(flowFactory = { prop ->
+                val flow = flow {
+                    val items = UserChatListRequest.requestDataBy(this@KaiheilaComponentBotImpl).items
+                    items.forEach { emit(KaiheilaUserChatImpl(this@KaiheilaComponentBotImpl, it.toModel())) }
+                }
+                
+                prop.effectOn(flow)
+            })
         }
-    }
     
-    @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
-    override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChatImpl> {
-        return runInBlocking { UserChatListRequest.requestDataBy(this@KaiheilaComponentBotImpl) }
-            .items.stream().map { chat -> KaiheilaUserChatImpl(this, chat.toModel()) }
-    }
     // endregion
     
     
@@ -370,7 +369,7 @@ internal class KaiheilaComponentBotImpl(
                     // 某人退出频道服务器
                     is ExitedGuildEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
-                        guild.members.remove(body.userId.literal)?.also { it.cancel() }
+                        guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
                     }
                     // 某人加入频道服务器
                     is JoinedGuildEventBody -> {
@@ -380,7 +379,7 @@ internal class KaiheilaComponentBotImpl(
                             UserViewRequest(guild.id, body.userId).requestDataBy(this@KaiheilaComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
-                        guild.members.compute(body.userId.literal) { _, old ->
+                        guild.internalMembers.compute(body.userId.literal) { _, old ->
                             if (old == null) {
                                 KaiheilaGuildMemberImpl(this@KaiheilaComponentBotImpl, guild, userModel)
                             } else {
@@ -392,14 +391,14 @@ internal class KaiheilaComponentBotImpl(
                     // 信息变更 （昵称变更）
                     is UpdatedGuildMemberEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
-                        val member = guild.members[body.userId.literal] ?: return
+                        val member = guild.internalMembers[body.userId.literal] ?: return
                         member.source.nickname = body.nickname
                     }
                     // endregion
                     // region guilds
                     // 服务器被删除
                     is DeletedGuildExtraBody -> {
-                        guilds.remove(body.id.literal)?.also { it.cancel() }
+                        internalGuilds.remove(body.id.literal)?.also { it.cancel() }
                     }
                     // 服务器更新
                     is UpdatedGuildExtraBody -> {
@@ -423,13 +422,13 @@ internal class KaiheilaComponentBotImpl(
                         val channelId = body.id
                         val guildId = body.guildId.literal
                         
-                        guilds[guildId]?.also { guild ->
+                        internalGuilds[guildId]?.also { guild ->
                             // query channel info.
                             val channelView = ChannelViewRequest(channelId).requestDataBy(this@KaiheilaComponentBotImpl)
                             val channelModel = channelView.toModel()
                             
                             // 如果已经存在，覆盖source
-                            guild.channels.compute(channelId.literal) { _, old ->
+                            guild.internalChannels.compute(channelId.literal) { _, old ->
                                 if (old == null) {
                                     KaiheilaChannelImpl(this@KaiheilaComponentBotImpl, guild, channelModel)
                                 } else {
@@ -457,7 +456,7 @@ internal class KaiheilaComponentBotImpl(
                     }
                     // 某服务器频道被删除
                     is DeletedChannelExtraBody -> {
-                        guild(this.targetId)?.channels?.remove(body.id.literal)?.also { it.cancel() }
+                        guild(this.targetId)?.internalChannels?.remove(body.id.literal)?.also { it.cancel() }
                     }
                     // endregion
                     
@@ -471,14 +470,14 @@ internal class KaiheilaComponentBotImpl(
                     }
                     // bot退出了某个服务器
                     is SelfExitedGuildEventBody -> {
-                        guilds.remove(body.guildId.literal)?.also { it.cancel() }
+                        internalGuilds.remove(body.guildId.literal)?.also { it.cancel() }
                     }
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
                         val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KaiheilaComponentBotImpl)
                         val guildModel = guildInfo.toModel()
                         val newGuild = KaiheilaGuildImpl(this@KaiheilaComponentBotImpl, guildModel).also { it.init() }
-                        guilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
+                        internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
                             old.cancel()
                             cur
                         }

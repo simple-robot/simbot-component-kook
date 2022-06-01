@@ -17,9 +17,10 @@
 
 package love.forte.simbot.component.kaiheila
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import love.forte.simbot.*
+import love.forte.simbot.Api4J
+import love.forte.simbot.Bot
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
@@ -30,9 +31,10 @@ import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.api.message.MessageType
 import love.forte.simbot.resources.Resource
+import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import love.forte.simbot.utils.runInBlocking
 import org.slf4j.Logger
-import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
 
 
@@ -47,7 +49,12 @@ public interface KaiheilaComponentBot : Bot {
      * botID。此id通常代表 client id, 即 [KaiheilaBot.Ticket.clientId].
      */
     override val id: ID get() = sourceBot.ticket.clientId
-
+    
+    /**
+     * bot自身。
+     */
+    override val bot: KaiheilaComponentBot get() = this
+    
     /**
      * 判断此ID是否代表当前bot。可能代表bot的id有可能是 [clientId][KaiheilaBot.Ticket.clientId],
      * 也有可能是此bot在系统中作为User时候的 user id.
@@ -56,16 +63,17 @@ public interface KaiheilaComponentBot : Bot {
      *
      */
     override fun isMe(id: ID): Boolean
-
+    
     /**
      * 得到在stdlib标准库模块下所提供的开黑啦bot实例。
      */
     public val sourceBot: KaiheilaBot
-
+    
     /**
      * 得到对应的组件实例。
      */
     public override val component: KaiheilaComponent
+    
     public override val avatar: String
     public override val coroutineContext: CoroutineContext
     public override val eventProcessor: EventProcessor
@@ -76,30 +84,27 @@ public interface KaiheilaComponentBot : Bot {
     public override val manager: KaiheilaBotManager
     public override val status: UserStatus
     public override val username: String
-
-
-    //region guild api
+    
+    /**
+     * 获取当前bot存在的频道服务器序列。
+     */
+    override val guilds: Items<KaiheilaGuild>
+    
+    /**
+     * 根据指定ID寻找频道服务器。
+     */
     @JvmSynthetic
     public override suspend fun guild(id: ID): KaiheilaGuild?
     
-    @JvmSynthetic
-    public override suspend fun guilds(grouping: Grouping, limiter: Limiter): Flow<KaiheilaGuild>
-
+    
+    /**
+     * 根据指定ID寻找频道服务器。
+     */
     @OptIn(Api4J::class)
     public override fun getGuild(id: ID): KaiheilaGuild?
-
-    @OptIn(Api4J::class)
-    public override fun getGuilds(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaGuild>
-
-    @OptIn(Api4J::class)
-    override fun getGuilds(limiter: Limiter): Stream<out KaiheilaGuild> = getGuilds(Grouping.EMPTY, limiter)
-
-    @OptIn(Api4J::class)
-    override fun getGuilds(): Stream<out KaiheilaGuild> = getGuilds(Grouping.EMPTY, Limiter)
-    //endregion
-
-
-    //region image api
+    
+    
+    // region image api
     /**
      * 上传一个资源并得到一个 [KaiheilaAssetMessage].
      *
@@ -108,28 +113,29 @@ public interface KaiheilaComponentBot : Bot {
      */
     @JvmSynthetic
     public suspend fun uploadAsset(resource: Resource, type: Int): KaiheilaSimpleAssetMessage
-
+    
     /**
      * 上传一个资源并得到一个 [KaiheilaAssetMessage].
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值.
      */
     @JvmSynthetic
-    public suspend fun uploadAsset(resource: Resource, type: MessageType): KaiheilaSimpleAssetMessage = uploadAsset(resource, type.type)
-
-
+    public suspend fun uploadAsset(resource: Resource, type: MessageType): KaiheilaSimpleAssetMessage =
+        uploadAsset(resource, type.type)
+    
+    
     /**
      * 提供一个资源类型并将其上传后作为 [KaiheilaAssetImage] 使用。
      */
     @JvmSynthetic
     public override suspend fun uploadImage(resource: Resource): KaiheilaAssetImage
-
+    
     /**
      * 提供一个资源类型并将其上传后作为 [KaiheilaAssetImage] 使用。
      */
     @Api4J
     override fun uploadImageBlocking(resource: Resource): KaiheilaAssetImage = runInBlocking { uploadImage(resource) }
-
+    
     /**
      * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      *
@@ -147,7 +153,7 @@ public interface KaiheilaComponentBot : Bot {
      */
     @OptIn(Api4J::class)
     override fun resolveImageBlocking(id: ID): KaiheilaAssetImage = runInBlocking { resolveImage(id) }
-    //endregion
+    // endregion
     
     /**
      * 通过指定ID **构建** 一个目标用户的聊天会话对象。
@@ -167,33 +173,13 @@ public interface KaiheilaComponentBot : Bot {
     @OptIn(ExperimentalSimbotApi::class)
     override fun getFriend(id: ID): KaiheilaUserChat = runInBlocking { friend(id) }
     
-    /**
-     * 查询当前存在的所有**聊天会话**。
-     */
-    @OptIn(ExperimentalSimbotApi::class)
-    @JvmSynthetic
-    public override suspend fun friends(grouping: Grouping, limiter: Limiter): Flow<KaiheilaUserChat>
     
     /**
-     * 查询当前存在的所有**聊天会话**。
+     * 查询当前存在的所有 [聊天会话][KaiheilaUserChat]。
      */
-    @Api4J
     @OptIn(ExperimentalSimbotApi::class)
-    public override fun getFriends(grouping: Grouping, limiter: Limiter): Stream<out KaiheilaUserChat>
+    override val friends: Items<KaiheilaUserChat>
     
-    /**
-     * 查询当前存在的所有**聊天会话**。
-     */
-    @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
-    override fun getFriends(): Stream<out KaiheilaUserChat> = getFriends(Grouping.EMPTY, Limiter)
-    
-    /**
-     * 查询当前存在的所有**聊天会话**。
-     */
-    @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
-    override fun getFriends(limiter: Limiter): Stream<out KaiheilaUserChat> = getFriends(Grouping.EMPTY, limiter)
     
     /**
      * 终止当前bot。
@@ -212,43 +198,31 @@ public interface KaiheilaComponentBot : Bot {
      */
     @JvmSynthetic
     public override suspend fun start(): Boolean
-
-
-    //// impl
-
-    override val bot: KaiheilaComponentBot get() = this
-
-    //region group apis
+    
+    
     @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override suspend fun group(id: ID): Group? = null
-
-    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
-    override suspend fun groups(grouping: Grouping, limiter: Limiter): Flow<Group> = emptyFlow()
-
-    @OptIn(Api4J::class)
-    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
-    override fun getGroups(grouping: Grouping, limiter: Limiter): Stream<out Group> = Stream.empty()
-
+    
+    @Deprecated(
+        "Does not support the 'group'",
+        ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
+    )
+    override val groups: Items<Group>
+        get() = emptyItems()
+    
     @OptIn(Api4J::class)
     @Deprecated("Does not support the 'group'", ReplaceWith("null"))
     override fun getGroup(id: ID): Group? = null
-
-    @OptIn(Api4J::class)
-    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
-    override fun getGroups(): Stream<out Group> = Stream.empty()
-
-    @OptIn(Api4J::class)
-    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
-    override fun getGroups(limiter: Limiter): Stream<out Group> = Stream.empty()
-    //endregion
-// todo ..
+    
+    
+    // todo ..
 }
 
 
 /**
  * 开黑啦组件中针对于 [GuildMemberBot] 的实现类型。继承自 [KaiheilaComponentBot] 并实现 [GuildMemberBot],
  * 代表一个bot在某个频道服务器中所扮演的成员。
- * 
+ *
  * @see KaiheilaComponentBot
  * @see GuildMemberBot
  */
@@ -262,6 +236,6 @@ public abstract class KaiheilaComponentGuildMemberBot : KaiheilaComponentBot, Gu
      * 得到当前 [KaiheilaComponentGuildMemberBot] 中真正的 [KaiheilaComponentBot] 对象实例。
      */
     abstract override val bot: KaiheilaComponentBot
-
+    
     
 }

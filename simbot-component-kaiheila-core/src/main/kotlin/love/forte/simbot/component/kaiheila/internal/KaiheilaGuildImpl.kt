@@ -21,25 +21,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.forte.simbot.*
+import love.forte.simbot.ID
+import love.forte.simbot.Timestamp
+import love.forte.simbot.component.kaiheila.KaiheilaChannel
 import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuild
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.model.GuildModel
 import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.definition.Role
 import love.forte.simbot.kaiheila.api.channel.ChannelInfo
 import love.forte.simbot.kaiheila.api.channel.ChannelListRequest
 import love.forte.simbot.kaiheila.api.guild.GuildUser
 import love.forte.simbot.kaiheila.api.guild.GuildUserListRequest
 import love.forte.simbot.kaiheila.api.user.UserViewRequest
+import love.forte.simbot.literal
+import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.Items.Companion.asItems
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -67,22 +73,22 @@ internal class KaiheilaGuildImpl constructor(
     override val icon: String get() = source.icon
     
     @JvmSynthetic
-    internal lateinit var channels: ConcurrentHashMap<String, KaiheilaChannelImpl>
+    internal lateinit var internalChannels: ConcurrentHashMap<String, KaiheilaChannelImpl>
     
     @JvmSynthetic
-    internal lateinit var members: ConcurrentHashMap<String, KaiheilaGuildMemberImpl>
+    internal lateinit var internalMembers: ConcurrentHashMap<String, KaiheilaGuildMemberImpl>
     
     @JvmSynthetic
     internal fun internalChannel(id: ID): KaiheilaChannelImpl? = internalChannel(id.literal)
     
     @JvmSynthetic
-    internal fun internalChannel(id: String): KaiheilaChannelImpl? = channels[id]
+    internal fun internalChannel(id: String): KaiheilaChannelImpl? = internalChannels[id]
     
     @JvmSynthetic
     internal fun internalMember(id: ID): KaiheilaGuildMemberImpl? = internalMember(id.literal)
     
     @JvmSynthetic
-    internal fun internalMember(id: String): KaiheilaGuildMemberImpl? = members[id]
+    internal fun internalMember(id: String): KaiheilaGuildMemberImpl? = internalMembers[id]
     
     private lateinit var botMember: KaiheilaComponentGuildMemberBot
     
@@ -146,8 +152,8 @@ internal class KaiheilaGuildImpl constructor(
         baseBot.logger.info("Sync member data finished, {} members of data have been synchronized.", membersMap.size)
         
         
-        this.channels = channelsMap
-        this.members = membersMap
+        this.internalChannels = channelsMap
+        this.internalMembers = membersMap
         this.lastOwnerMember = owner ?: KaiheilaGuildMemberImpl(
             baseBot,
             this,
@@ -157,22 +163,22 @@ internal class KaiheilaGuildImpl constructor(
     }
     
     override val currentMember: Int
-        get() = channels.values.sumOf { c -> c.currentMember }
+        get() = internalChannels.values.sumOf { c -> c.currentMember }
     
     override val currentChannel: Int
-        get() = channels.size
+        get() = internalChannels.size
     
     private val ownerSyncLock = Mutex()
     
     private suspend fun syncLastOwnerMember(id: String): KaiheilaGuildMemberImpl {
-        return members[id] ?: ownerSyncLock.withLock {
-            members[id] ?: run {
+        return internalMembers[id] ?: ownerSyncLock.withLock {
+            internalMembers[id] ?: run {
                 val member = KaiheilaGuildMemberImpl(
                     baseBot,
                     this@KaiheilaGuildImpl,
                     UserViewRequest(ownerId, source.id).requestDataBy(baseBot).toModel()
                 )
-                members.merge(id, member) { _, cur -> cur }!!
+                internalMembers.merge(id, member) { _, cur -> cur }!!
             }
         }.also {
             lastOwnerMember = it
@@ -196,43 +202,19 @@ internal class KaiheilaGuildImpl constructor(
             return runInBlocking { syncLastOwnerMember(ownerId.literal) }
         }
     
+    override val members: Items<KaiheilaGuildMember>
+        get() = internalMembers.values.asItems()
     
     override suspend fun member(id: ID): KaiheilaGuildMember? {
-        return members[id.literal]
+        return internalMembers[id.literal]
     }
     
-    override fun getMember(id: ID): KaiheilaGuildMember? = members[id.literal]
+    override fun getMember(id: ID): KaiheilaGuildMember? = internalMembers[id.literal]
     
     
-    override suspend fun members(groupingId: ID?, limiter: Limiter): Flow<KaiheilaGuildMember> {
-        return members.values.asFlow().withLimiter(limiter)
-    }
+    override val children: Items<KaiheilaChannel>
+        get() = internalChannels.values.asItems()
     
-    override fun getMembers(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaGuildMember> {
-        return members.values.stream().withLimiter(limiter)
-    }
-    
-    
-    // region channels
-    override suspend fun children(groupingId: ID?): Flow<KaiheilaChannelImpl> = channels.values.asFlow()
-    
-    override suspend fun children(groupingId: ID?, limiter: Limiter): Flow<KaiheilaChannelImpl> =
-        channels.values.asFlow().withLimiter(limiter)
-    
-    override fun getChildren(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaChannelImpl> =
-        channels.values.stream().withLimiter(limiter)
-    // endregion
-    
-    override suspend fun roles(groupingId: ID?, limiter: Limiter): Flow<Role> {
-        // TODO
-        return emptyFlow()
-    }
-    
-    @Api4J
-    override fun getRoles(groupingId: ID?, limiter: Limiter): Stream<out Role> {
-        // TODO
-        return Stream.empty()
-    }
     
     override fun toString(): String {
         return "KaiheilaGuild(source=$source)"
@@ -253,7 +235,7 @@ internal class KaiheilaGuildImpl constructor(
             .buffer(100)
             .map { it.toModel() }
             .collect { model ->
-                channels.compute(model.id.literal) { _, old ->
+                internalChannels.compute(model.id.literal) { _, old ->
                     if (old == null) {
                         KaiheilaChannelImpl(baseBot, this, model)
                     } else {
@@ -271,7 +253,7 @@ internal class KaiheilaGuildImpl constructor(
             .buffer(100)
             .map { it.toModel() }
             .collect { model ->
-                members.compute(model.id.literal) { _, old ->
+                internalMembers.compute(model.id.literal) { _, old ->
                     if (old == null) {
                         KaiheilaGuildMemberImpl(baseBot, this, model)
                     } else {
