@@ -17,11 +17,8 @@
 
 package love.forte.simbot.component.kaiheila
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
-import love.forte.simbot.Limiter
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
@@ -31,9 +28,10 @@ import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
+import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
-import java.util.stream.Stream
 import kotlin.time.Duration
 import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
 
@@ -70,28 +68,22 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
     override suspend fun owner(): Member = owner
     override val ownerId: ID
     
-    // region members api
+    /**
+     * 获取当前频道中的成员列表。相当于获取 guild 的成员列表。
+     */
+    override val members: Items<KaiheilaGuildMember>
+    
+    /**
+     * 寻找当前频道中指定ID的成员。相当于在 guild 中寻找。
+     */
+    @OptIn(Api4J::class)
     override fun getMember(id: ID): KaiheilaGuildMember?
     
+    /**
+     * 寻找当前频道中指定ID的成员。相当于在 guild 中寻找。
+     */
     @JvmSynthetic
     override suspend fun member(id: ID): KaiheilaGuildMember?
-    
-    @OptIn(Api4J::class)
-    override fun getMembers(): Stream<out KaiheilaGuildMember>
-    
-    @OptIn(Api4J::class)
-    override fun getMembers(groupingId: ID?): Stream<out KaiheilaGuildMember>
-    
-    @OptIn(Api4J::class)
-    override fun getMembers(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaGuildMember>
-    
-    @OptIn(Api4J::class)
-    override fun getMembers(limiter: Limiter): Stream<out KaiheilaGuildMember>
-    
-    
-    @JvmSynthetic
-    override suspend fun members(groupingId: ID?, limiter: Limiter): Flow<KaiheilaGuildMember>
-    // endregion
     
     
     // region guild api
@@ -111,11 +103,18 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
     
     
     // region roles api
-    @Api4J
-    override fun getRoles(groupingId: ID?, limiter: Limiter): Stream<out Role>
     
-    @JvmSynthetic
-    override suspend fun roles(groupingId: ID?, limiter: Limiter): Flow<Role>
+    /**
+     * 获取当前子频道中的所有角色信息。
+     *
+     * Deprecated: 尚未支持
+     */
+    @Deprecated(
+        "Not support yet.",
+        ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
+    )
+    override val roles: Items<Role> get() = emptyItems()
+    
     // endregion
     
     
@@ -299,23 +298,5 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
     @OptIn(Api4J::class)
     @Deprecated("Channel mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
-    
-    @Deprecated("Kaiheila channel has no children", ReplaceWith("emptyFlow()", "kotlinx.coroutines.flow.emptyFlow"))
-    override suspend fun children(groupingId: ID?): Flow<Organization> = emptyFlow()
-    
-    @Deprecated("Kaiheila channel has no children", ReplaceWith("emptyFlow()", "kotlinx.coroutines.flow.emptyFlow"))
-    override suspend fun children(groupingId: ID?, limiter: Limiter): Flow<Organization> = emptyFlow()
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Kaiheila channel has no children", ReplaceWith("Stream.empty()", "java.util.stream.Stream"))
-    override fun getChildren(groupingId: ID?, limiter: Limiter): Stream<Organization> = Stream.empty()
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Kaiheila channel has no children", ReplaceWith("Stream.empty()", "java.util.stream.Stream"))
-    override fun getChildren(): Stream<out Organization> = Stream.empty()
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Kaiheila channel has no children", ReplaceWith("Stream.empty()", "java.util.stream.Stream"))
-    override fun getChildren(groupingId: ID?): Stream<out Organization> = Stream.empty()
     // endregion
 }

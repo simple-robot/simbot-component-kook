@@ -18,8 +18,6 @@
 package love.forte.simbot.component.kaiheila.internal
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
@@ -31,14 +29,12 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceip
 import love.forte.simbot.component.kaiheila.model.UserModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.update
-import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kaiheila.api.guild.GuildMuteDeleteRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
-import java.util.stream.Stream
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
@@ -161,16 +157,6 @@ internal class KaiheilaGuildMemberImpl(
     }
     // endregion
     
-    // region roles相关
-    @Api4J
-    override val roles: Stream<out Role>
-        get() = Stream.empty() // TODO("Not yet implemented")
-    
-    override suspend fun roles(): Flow<Role> {
-        return emptyFlow()
-        // TODO("Not yet implemented")
-    }
-    // endregion
     
     
     override fun toString(): String {

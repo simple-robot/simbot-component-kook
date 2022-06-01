@@ -17,13 +17,12 @@
 
 package love.forte.simbot.component.kaiheila
 
-import kotlinx.coroutines.flow.Flow
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
-import love.forte.simbot.Limiter
 import love.forte.simbot.definition.*
+import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import java.util.concurrent.TimeUnit
-import java.util.stream.Stream
 import kotlin.time.Duration
 import love.forte.simbot.kaiheila.objects.Guild as KhlGuild
 
@@ -34,134 +33,100 @@ import love.forte.simbot.kaiheila.objects.Guild as KhlGuild
  * @author ForteScarlet
  */
 public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
-
+    
     /**
      * 得到当前频道服务器所对应的api模块下的服务器对象。
      */
     override val source: KhlGuild
-
+    
     override val bot: KaiheilaComponentGuildMemberBot
-
+    
     override val currentMember: Int
     override val maximumMember: Int
-
+    
     override val description: String
     override val icon: String
     override val id: ID
     override val name: String
-
+    
     override val currentChannel: Int
     override val maximumChannel: Int
-
-    //region owner api
+    
+    // region owner api
     override val ownerId: ID
-
+    
     @OptIn(Api4J::class)
     override val owner: KaiheilaGuildMember
     
     @JvmSynthetic
     override suspend fun owner(): KaiheilaGuildMember
-    //endregion
-
-
-    //region member api
+    // endregion
+    
+    
     /**
      * 根据指定ID查询对应用户信息，或得到null。
      */
     @JvmSynthetic
     override suspend fun member(id: ID): KaiheilaGuildMember?
-
+    
     /**
      * 根据指定ID查询对应用户信息，或得到null。
      */
+    @OptIn(Api4J::class)
     override fun getMember(id: ID): KaiheilaGuildMember?
-
-
-    /**
-     * 查询用户列表。
-     */
-    @JvmSynthetic
-    override suspend fun members(groupingId: ID?, limiter: Limiter): Flow<KaiheilaGuildMember>
-
-    /**
-     * 查询用户列表。
-     */
-    @OptIn(Api4J::class)
-    override fun getMembers(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaGuildMember>
-
-    /**
-     * 查询用户列表。
-     */
-    @OptIn(Api4J::class)
-    override fun getMembers(): Stream<out KaiheilaGuildMember> = getMembers(null, Limiter)
-
-    /**
-     * 查询用户列表。
-     */
-    @OptIn(Api4J::class)
-    override fun getMembers(groupingId: ID?): Stream<out KaiheilaGuildMember> = getMembers(groupingId, Limiter)
-
-    /**
-     * 查询用户列表。
-     */
-    @OptIn(Api4J::class)
-    override fun getMembers(limiter: Limiter): Stream<out KaiheilaGuildMember> = getMembers(null, limiter)
-    //endregion
-
-
-    //region children api
     
-    @JvmSynthetic
-    override suspend fun children(groupingId: ID?, limiter: Limiter): Flow<KaiheilaChannel>
-    @OptIn(Api4J::class)
-    override fun getChildren(groupingId: ID?, limiter: Limiter): Stream<out KaiheilaChannel>
+    /**
+     * 查询用户列表。
+     */
+    override val members: Items<KaiheilaGuildMember>
     
     
-    @JvmSynthetic
-    override suspend fun children(groupingId: ID?): Flow<KaiheilaChannel> = children(groupingId, Limiter)
-    @OptIn(Api4J::class)
-    override fun getChildren(): Stream<out KaiheilaChannel> = getChildren(null, Limiter)
-
-    @OptIn(Api4J::class)
-    override fun getChildren(groupingId: ID?): Stream<out KaiheilaChannel> = getChildren(groupingId, Limiter)
-
-    //endregion
-
-    //region role api
-    // TODO
-    @JvmSynthetic
-    override suspend fun roles(groupingId: ID?, limiter: Limiter): Flow<Role>
-
-    @Api4J
-    override fun getRoles(groupingId: ID?, limiter: Limiter): Stream<out Role>
-
-    //endregion
-
-    //region mute api
-
+    /**
+     * 获取当前频道服务器下的子频道序列。
+     */
+    override val children: Items<KaiheilaChannel>
+    
+    
+    // region role api
+    /**
+     * 获取当前频道服务器中配置的所有角色信息。
+     *
+     * Deprecated: 尚未支持
+     */
+    @Deprecated(
+        "Not support yet.",
+        ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
+    )
+    override val roles: Items<Role>
+        get() = emptyItems()
+    
+    // endregion
+    
+    // region mute api
+    
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun mute(duration: Duration): Boolean = false
-
+    
     @OptIn(Api4J::class)
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean = false
-
+    
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
-
+    
     @OptIn(Api4J::class)
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
-
-    //endregion
-
-
+    
+    // endregion
+    
+    
     /**
      * 频道服务器没有上层。
      */
     @JvmSynthetic
     override suspend fun previous(): Organization? = null
-
+    
     /**
      * 频道服务器没有上层。
      */
