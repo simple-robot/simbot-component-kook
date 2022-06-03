@@ -70,7 +70,7 @@ import love.forte.simbot.resources.Resource
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
 import love.forte.simbot.utils.item.effectOn
-import love.forte.simbot.utils.item.items
+import love.forte.simbot.utils.item.itemsByFlow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -309,14 +309,14 @@ internal class KaiheilaComponentBotImpl(
     @OptIn(ExperimentalSimbotApi::class)
     override val friends: Items<KaiheilaUserChatImpl>
         get() {
-            return items(flowFactory = { prop ->
+            return itemsByFlow { prop ->
                 val flow = flow {
                     val items = UserChatListRequest.requestDataBy(this@KaiheilaComponentBotImpl).items
                     items.forEach { emit(KaiheilaUserChatImpl(this@KaiheilaComponentBotImpl, it.toModel())) }
                 }
-                
+    
                 prop.effectOn(flow)
-            })
+            }
         }
     
     // endregion

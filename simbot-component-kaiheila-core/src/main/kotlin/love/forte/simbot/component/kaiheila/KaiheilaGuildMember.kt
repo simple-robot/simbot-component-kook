@@ -38,8 +38,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import love.forte.simbot.kaiheila.objects.User as KhlUser
 
 
-// TODO sendSupport
-
 /**
  *
  * 开黑啦组件下，[频道服务器][KaiheilaGuild] 的成员信息.

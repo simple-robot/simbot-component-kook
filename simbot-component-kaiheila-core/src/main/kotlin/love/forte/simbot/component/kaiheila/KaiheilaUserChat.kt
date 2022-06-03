@@ -23,6 +23,7 @@ import love.forte.simbot.Grouping
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUserStatus
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.Friend
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.userchat.UserChatView
@@ -69,7 +70,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @JvmSynthetic
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: Message): KaiheilaMessageReceipt
     
     /**
      * 向当前好友（私聊会话）发送消息。
@@ -81,7 +82,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @JvmSynthetic
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: MessageContent): KaiheilaMessageReceipt
     
     /**
      * 向当前好友（私聊会话）发送消息。
@@ -95,7 +96,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt = runInBlocking {
+    override fun sendBlocking(message: Message): KaiheilaMessageReceipt = runInBlocking {
         send(message)
     }
     
@@ -103,7 +104,7 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
      * 向当前好友（私聊会话）发送消息。
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt = runInBlocking {
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageReceipt = runInBlocking {
         send(message)
     }
 }

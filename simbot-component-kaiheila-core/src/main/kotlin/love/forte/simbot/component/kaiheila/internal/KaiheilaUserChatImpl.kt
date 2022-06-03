@@ -52,7 +52,7 @@ internal class KaiheilaUserChatImpl(
         ).requestDataBy(bot).asReceipt(true, bot)
     }
 
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: Message): KaiheilaMessageReceipt {
         val request = message.toRequest(source.code, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
 
@@ -61,11 +61,10 @@ internal class KaiheilaUserChatImpl(
             result.asReceipt(true, bot)
         } else {
             KaiheilaApiRequestedReceipt(result, true, bot)
-            TODO()
         }
     }
 
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: MessageContent): KaiheilaMessageReceipt {
         return when (message) {
             is KaiheilaReceiveMessageContent -> {
                 val source = message.source
