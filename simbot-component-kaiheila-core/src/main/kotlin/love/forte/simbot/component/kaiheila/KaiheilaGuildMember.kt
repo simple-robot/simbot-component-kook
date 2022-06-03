@@ -22,6 +22,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.UnsupportedActionException
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.definition.Role
 import love.forte.simbot.definition.UserStatus
@@ -146,7 +147,7 @@ public interface KaiheilaGuildMember :
      *
      */
     @JvmSynthetic
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: Message): KaiheilaMessageReceipt
     
     /**
      * 向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
@@ -156,7 +157,7 @@ public interface KaiheilaGuildMember :
      *
      */
     @JvmSynthetic
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override suspend fun send(message: MessageContent): KaiheilaMessageReceipt
     
     /**
      * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
@@ -176,7 +177,7 @@ public interface KaiheilaGuildMember :
      *
      */
     @Api4J
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(message: Message): KaiheilaMessageReceipt
     
     /**
      * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KaiheilaGuildSystemMember],
@@ -186,7 +187,7 @@ public interface KaiheilaGuildMember :
      *
      */
     @Api4J
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageReceipt
     
     @OptIn(Api4J::class)
     override val guild: KaiheilaGuild

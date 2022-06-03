@@ -26,6 +26,7 @@ import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUser
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.model.UserModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.update
@@ -129,12 +130,12 @@ internal class KaiheilaGuildMemberImpl(
     }
     
     @OptIn(ExperimentalSimbotApi::class)
-    override suspend fun send(message: Message): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: Message): KaiheilaMessageReceipt {
         return asFriend().send(message)
     }
     
     @OptIn(ExperimentalSimbotApi::class)
-    override suspend fun send(message: MessageContent): KaiheilaMessageCreatedReceipt {
+    override suspend fun send(message: MessageContent): KaiheilaMessageReceipt {
         return asFriend().send(message)
     }
     
@@ -146,13 +147,13 @@ internal class KaiheilaGuildMemberImpl(
     
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
-    override fun sendBlocking(message: Message): KaiheilaMessageCreatedReceipt {
+    override fun sendBlocking(message: Message): KaiheilaMessageReceipt {
         return asFriendBlocking().sendBlocking(message)
     }
     
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
-    override fun sendBlocking(message: MessageContent): KaiheilaMessageCreatedReceipt {
+    override fun sendBlocking(message: MessageContent): KaiheilaMessageReceipt {
         return asFriendBlocking().sendBlocking(message)
     }
     // endregion

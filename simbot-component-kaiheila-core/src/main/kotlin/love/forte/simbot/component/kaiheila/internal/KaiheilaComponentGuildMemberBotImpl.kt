@@ -5,7 +5,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
-import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
+import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.message.Message
 import love.forte.simbot.utils.runInBlocking
@@ -31,7 +31,7 @@ internal class KaiheilaComponentGuildMemberBotImpl(
         get() = member.username
     
     @Api4J
-    override fun sendIfSupportBlocking(message: Message): KaiheilaMessageCreatedReceipt {
+    override fun sendIfSupportBlocking(message: Message): KaiheilaMessageReceipt {
         return runInBlocking { member.send(message) }
     }
     
