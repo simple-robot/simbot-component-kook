@@ -7,6 +7,7 @@ import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.UserStatus
+import love.forte.simbot.definition.UserStatus.Companion.refactor
 import love.forte.simbot.message.Message
 import love.forte.simbot.utils.runInBlocking
 
@@ -40,19 +41,5 @@ internal class KaiheilaComponentGuildMemberBotImpl(
 internal fun KaiheilaComponentBot.toMemberBot(member: KaiheilaGuildMember): KaiheilaComponentGuildMemberBotImpl = KaiheilaComponentGuildMemberBotImpl(this, member)
 
 private fun UserStatus.copyAndAsBot(): UserStatus {
-    return UserStatus.builder().also {
-        it.bot()
-        if (isAnonymous) {
-            it.anonymous()
-        }
-        if (isFake) {
-            it.fakeUser()
-        }
-        if (isNormal) {
-            it.normal()
-        }
-        if (isOfficial) {
-            it.official()
-        }
-    }.build()
+    return refactor().bot().build()
 }
