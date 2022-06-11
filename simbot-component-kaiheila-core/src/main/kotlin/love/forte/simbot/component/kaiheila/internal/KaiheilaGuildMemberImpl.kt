@@ -61,6 +61,8 @@ internal class KaiheilaGuildMemberImpl(
     
     override val username: String = source.username
     override val avatar: String = source.avatar
+    
+    @ExperimentalSimbotApi
     override val status: UserStatus = if (source.isBot) botUserStatus else normalUserStatus
     
     override val id: ID
@@ -117,44 +119,44 @@ internal class KaiheilaGuildMemberImpl(
     // 暂时等同于向好友发送消息
     
     @OptIn(ExperimentalSimbotApi::class)
-    private suspend fun asFriend(): KaiheilaUserChat = bot.friend(id)
+    private suspend fun asContact(): KaiheilaUserChat = bot.contact(id)
     
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
-    private fun asFriendBlocking(): KaiheilaUserChat = bot.getFriend(id)
+    private fun asContactBlocking(): KaiheilaUserChat = bot.getContact(id)
     
     
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun send(text: String): KaiheilaMessageCreatedReceipt {
-        return asFriend().send(text)
+        return asContact().send(text)
     }
     
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun send(message: Message): KaiheilaMessageReceipt {
-        return asFriend().send(message)
+        return asContact().send(message)
     }
     
     @OptIn(ExperimentalSimbotApi::class)
     override suspend fun send(message: MessageContent): KaiheilaMessageReceipt {
-        return asFriend().send(message)
+        return asContact().send(message)
     }
     
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
     override fun sendBlocking(text: String): KaiheilaMessageCreatedReceipt {
-        return asFriendBlocking().sendBlocking(text)
+        return asContactBlocking().sendBlocking(text)
     }
     
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
     override fun sendBlocking(message: Message): KaiheilaMessageReceipt {
-        return asFriendBlocking().sendBlocking(message)
+        return asContactBlocking().sendBlocking(message)
     }
     
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
     override fun sendBlocking(message: MessageContent): KaiheilaMessageReceipt {
-        return asFriendBlocking().sendBlocking(message)
+        return asContactBlocking().sendBlocking(message)
     }
     // endregion
     

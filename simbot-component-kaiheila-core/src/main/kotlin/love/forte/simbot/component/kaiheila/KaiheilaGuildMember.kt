@@ -18,6 +18,7 @@
 package love.forte.simbot.component.kaiheila
 
 import love.forte.simbot.Api4J
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.UnsupportedActionException
@@ -225,6 +226,7 @@ public interface KaiheilaGuildMember :
     override val joinTime: Timestamp get() = Timestamp.notSupport()
     override val nickname: String
     override val avatar: String
+    @ExperimentalSimbotApi
     override val status: UserStatus
     override val username: String
     

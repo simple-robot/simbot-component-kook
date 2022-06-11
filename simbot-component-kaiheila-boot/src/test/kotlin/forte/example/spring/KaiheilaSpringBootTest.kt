@@ -1,6 +1,7 @@
 package forte.example.spring
 
 import forte.example.spring.app.TestListener
+import love.forte.simbot.FragileSimbotApi
 import love.forte.simbot.OriginBotManager
 
 
@@ -15,6 +16,7 @@ class KaiheilaSpringBootTest {
     lateinit var testListener: TestListener
 
     // @Test
+    @OptIn(FragileSimbotApi::class)
     fun test() {
         OriginBotManager.forEach {
             println(it)

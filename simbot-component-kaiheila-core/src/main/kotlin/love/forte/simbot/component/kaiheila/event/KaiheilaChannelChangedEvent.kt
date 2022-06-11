@@ -318,7 +318,7 @@ public abstract class KaiheilaMessagePinEvent<Body : ChannelEventExtraBody> :
     @JvmSynthetic
     public suspend fun queryMsg(): MessageContent {
         val messageView = MessageViewRequest(msgId).requestDataBy(bot)
-        return messageView.toContent()
+        return messageView.toContent(bot)
     }
 
     /**

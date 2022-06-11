@@ -39,7 +39,7 @@ public interface KaiheilaGuild : Guild, KaiheilaComponentDefinition<KhlGuild> {
      */
     override val source: KhlGuild
     
-    override val bot: KaiheilaComponentGuildMemberBot
+    override val bot: KaiheilaComponentGuildBot
     
     override val currentMember: Int
     override val maximumMember: Int

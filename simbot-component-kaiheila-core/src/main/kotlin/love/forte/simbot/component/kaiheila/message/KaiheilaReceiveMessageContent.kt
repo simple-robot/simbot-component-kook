@@ -19,10 +19,14 @@ package love.forte.simbot.component.kaiheila.message
 
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.message.KaiheilaAttachmentMessage.Key.asMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaKMarkdownMessage.Key.asMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessages.AT_TYPE_USER
+import love.forte.simbot.component.kaiheila.util.requestDataBy
+import love.forte.simbot.kaiheila.api.message.DirectMessageDeleteRequest
+import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
 import love.forte.simbot.kaiheila.event.Event
 import love.forte.simbot.kaiheila.event.message.*
 import love.forte.simbot.message.*
@@ -32,7 +36,7 @@ import love.forte.simbot.message.*
  *
  * @author ForteScarlet
  */
-public class KaiheilaReceiveMessageContent(internal val source: Event<Event.Extra.Text>) : ReceivedMessageContent() {
+public class KaiheilaReceiveMessageContent(private val isDirect: Boolean, internal val source: Event<Event.Extra.Text>, private val bot: KaiheilaComponentBot) : ReceivedMessageContent() {
 
     /**
      * 消息ID。
@@ -43,7 +47,20 @@ public class KaiheilaReceiveMessageContent(internal val source: Event<Event.Extr
      * 开黑啦消息事件中所收到的消息列表。
      */
     override val messages: Messages = source.toMessages()
-
+    
+    /**
+     * 通过 [MessageDeleteRequest] 删除当前消息。
+     */
+    override suspend fun delete(): Boolean {
+        val api = if (isDirect) {
+            DirectMessageDeleteRequest(messageId)
+        } else {
+            MessageDeleteRequest(messageId)
+        }
+        api.requestDataBy(bot)
+        
+        return true
+    }
 
     override fun toString(): String {
         return "KaiheilaReceiveMessageContent(sourceEvent=$source)"
@@ -94,7 +111,7 @@ private inline fun Event.Extra.Text.toMessages(contentElement: () -> List<Messag
 /**
  * 使用消息事件并将其中的消息内容转化为 [KaiheilaChannelMessageDetailsContent].
  */
-public fun Event<Event.Extra.Text>.toContent(): KaiheilaReceiveMessageContent = KaiheilaReceiveMessageContent(this)
+public fun Event<Event.Extra.Text>.toContent(isDirect: Boolean, bot: KaiheilaComponentBot): KaiheilaReceiveMessageContent = KaiheilaReceiveMessageContent(isDirect, this, bot)
 
 
 internal fun toMessages(

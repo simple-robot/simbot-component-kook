@@ -22,7 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kaiheila.KaiheilaChannel
-import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
+import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.message.*
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
@@ -47,7 +47,7 @@ internal class KaiheilaChannelImpl(
 ) : KaiheilaChannel, CoroutineScope {
     
     
-    override val bot: KaiheilaComponentGuildMemberBot
+    override val bot: KaiheilaComponentGuildBot
         get() = guild.bot
     
     private val job = SupervisorJob(guild.job)

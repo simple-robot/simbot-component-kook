@@ -236,6 +236,7 @@ internal class KaiheilaComponentBotImpl(
     override val isStarted: Boolean
         get() = sourceBot.isStarted
     
+    @ExperimentalSimbotApi
     override val status: UserStatus
         get() = botStatus
     
@@ -301,13 +302,13 @@ internal class KaiheilaComponentBotImpl(
     
     // region friend api
     @OptIn(ExperimentalSimbotApi::class)
-    override suspend fun friend(id: ID): KaiheilaUserChatImpl {
+    override suspend fun contact(id: ID): KaiheilaUserChatImpl {
         val chat = UserChatCreateRequest(id).requestDataBy(bot)
         return KaiheilaUserChatImpl(this, chat.toModel())
     }
     
     @OptIn(ExperimentalSimbotApi::class)
-    override val friends: Items<KaiheilaUserChatImpl>
+    override val contacts: Items<KaiheilaUserChatImpl>
         get() {
             return itemsByFlow { prop ->
                 val flow = flow {
@@ -344,6 +345,18 @@ internal class KaiheilaComponentBotImpl(
     @OptIn(ApiResultType::class)
     @JvmSynthetic
     override suspend fun resolveImage(id: ID): KaiheilaAssetImage {
+        Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
+            "The id must be the resource id of the kaiheila and must start with $ASSET_PREFIX"
+        }
+        return KaiheilaAssetImage(AssetCreated(id.literal))
+    }
+    
+    /**
+     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     */
+    @OptIn(ApiResultType::class)
+    @JvmSynthetic
+    override fun resolveImageBlocking(id: ID): KaiheilaAssetImage {
         Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
             "The id must be the resource id of the kaiheila and must start with $ASSET_PREFIX"
         }
@@ -500,6 +513,7 @@ internal class KaiheilaComponentBotImpl(
     // endregion
     
     companion object {
+        @ExperimentalSimbotApi
         val botStatus = UserStatus.builder().bot().fakeUser().build()
         const val ASSET_PREFIX = "https://www.kaiheila.cn"
     }
