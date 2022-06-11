@@ -19,7 +19,6 @@ package love.forte.simbot.component.kaiheila.event
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kaiheila.KaiheilaChannel
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
@@ -129,7 +128,7 @@ public sealed class KaiheilaMessageEvent :
      * @see KaiheilaBotSelfGroupMessageEvent
      *
      */
-    public abstract class Group : KaiheilaMessageEvent(), MessageEvent, DeleteSupport {
+    public abstract class Group : KaiheilaMessageEvent(), MessageEvent {
 
 
         /**

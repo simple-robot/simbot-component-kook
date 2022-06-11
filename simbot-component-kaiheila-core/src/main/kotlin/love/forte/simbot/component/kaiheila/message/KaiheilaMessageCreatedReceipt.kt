@@ -104,7 +104,7 @@ public class KaiheilaMessageCreatedReceipt(
  * [KaiheilaApiRequestedReceipt] 很可能并不是通过执行的消息api，
  * 例如通过 [KaiheilaRequestMessage] 执行了一个任意的请求。
  *
- * 也正因此，此回执不支持 [删除][DeleteSupport] 操作。
+ * 也正因此，此回执不支持 [删除][delete] 操作。当使用 [delete] 时将会恒返回 `false`.
  *
  */
 public class KaiheilaApiRequestedReceipt(
@@ -114,4 +114,10 @@ public class KaiheilaApiRequestedReceipt(
 ) : KaiheilaMessageReceipt {
     override val id: ID = randomID()
     override val isSuccess: Boolean get() = true
+    
+    /**
+     * 不支持撤回，将会始终得到 `false`。
+     *
+     */
+    override suspend fun delete(): Boolean = false
 }

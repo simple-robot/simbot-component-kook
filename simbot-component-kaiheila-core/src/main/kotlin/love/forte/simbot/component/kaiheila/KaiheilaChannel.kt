@@ -50,7 +50,7 @@ public interface KaiheilaChannel : Channel, KaiheilaComponentDefinition<KhlChann
     override val source: KhlChannel
     
     
-    override val bot: KaiheilaComponentGuildMemberBot
+    override val bot: KaiheilaComponentGuildBot
     override val id: ID get() = source.id
     override val icon: String get() = source.icon
     override val name: String get() = source.name

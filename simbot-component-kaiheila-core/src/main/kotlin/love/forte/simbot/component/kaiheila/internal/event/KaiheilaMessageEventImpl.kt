@@ -33,9 +33,7 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.component.kaiheila.message.toContent
 import love.forte.simbot.component.kaiheila.model.toModel
-import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
 import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
 import love.forte.simbot.kaiheila.event.message.MessageEvent
 import love.forte.simbot.kaiheila.event.message.MessageEventExtra
@@ -51,13 +49,6 @@ internal class KaiheilaNormalGroupMessageEventImpl(
     override val channel: KaiheilaChannelImpl,
 ) : KaiheilaNormalGroupMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
-
-    /**
-     * 删除这条消息。
-     */
-    override suspend fun delete(): Boolean {
-        return MessageDeleteRequest(id).requestBy(bot).isSuccess
-    }
     
     override suspend fun reply(message: Message): KaiheilaMessageReceipt {
         return channel.send(message, sourceEvent.msgId)
@@ -73,7 +64,7 @@ internal class KaiheilaNormalGroupMessageEventImpl(
     
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
-    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent()
+    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent(false, bot)
 
 
 }
@@ -110,7 +101,7 @@ internal class KaiheilaNormalPersonMessageEventImpl(
         return user().send(message)
     }
 
-    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent()
+    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent(true, bot)
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
 }
@@ -137,16 +128,9 @@ internal class KaiheilaBotSelfGroupMessageEventImpl(
         return channel.send(message, sourceEvent.msgId)
     }
     
-    /**
-     * 删除这条消息。
-     */
-    override suspend fun delete(): Boolean {
-        return MessageDeleteRequest(id).requestBy(bot).isSuccess
-    }
-
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
-    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent()
+    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent(false, bot)
 
 
 }
@@ -184,7 +168,7 @@ internal class KaiheilaBotSelfPersonMessageEventImpl(
         return source().send(message)
     }
     
-    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent()
+    override val messageContent: KaiheilaReceiveMessageContent = sourceEvent.toContent(true, bot)
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
 }

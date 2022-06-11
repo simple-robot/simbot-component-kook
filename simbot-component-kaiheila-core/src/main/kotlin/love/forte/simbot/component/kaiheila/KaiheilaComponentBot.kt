@@ -25,11 +25,13 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.definition.Group
-import love.forte.simbot.definition.GuildMemberBot
+import love.forte.simbot.definition.GuildBot
 import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
+import love.forte.simbot.kaiheila.api.userchat.UserChatListRequest
 import love.forte.simbot.resources.Resource
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
@@ -82,6 +84,7 @@ public interface KaiheilaComponentBot : Bot {
     public override val isStarted: Boolean
     public override val logger: Logger
     public override val manager: KaiheilaBotManager
+    @ExperimentalSimbotApi
     public override val status: UserStatus
     public override val username: String
     
@@ -152,33 +155,43 @@ public interface KaiheilaComponentBot : Bot {
      *
      */
     @OptIn(Api4J::class)
-    override fun resolveImageBlocking(id: ID): KaiheilaAssetImage = runInBlocking { resolveImage(id) }
+    override fun resolveImageBlocking(id: ID): KaiheilaAssetImage
     // endregion
     
     /**
-     * 通过指定ID **构建** 一个目标用户的聊天会话对象。
+     * 通过指定ID **构建** 一个目标用户的[聊天会话][KaiheilaUserChat]对象。
      *
-     * 由于开黑啦bot api中没有实际上的“好友”相关API，因此目前阶段以聊天会话代替好友概念。未来可能会对此api做出调整。
+     * [聊天会话][KaiheilaUserChat] 目前不会进行缓存，每次获取都会通过 [UserChatCreateRequest] 请求并构建新的实例。
+     * 由于每次都会通过api请求，因此不存在 "没找到" 的情况，[contact] 将不会返回非null值。
+     *
+     * 但是会抛出任何可能由 [UserChatCreateRequest] 抛出的或者请求过程中产生的任何异常。
+     *
      */
     @OptIn(ExperimentalSimbotApi::class)
     @JvmSynthetic
-    public override suspend fun friend(id: ID): KaiheilaUserChat
+    override suspend fun contact(id: ID): KaiheilaUserChat
     
     /**
-     * 通过指定ID **构建** 一个目标用户的聊天会话对象。
+     * 通过指定ID **构建** 一个目标用户的[聊天会话][KaiheilaUserChat]对象。
      *
-     * 由于开黑啦bot api中没有实际上的“好友”相关API，因此目前阶段以聊天会话代替好友概念。未来可能会对此api做出调整。
+     * [聊天会话][KaiheilaUserChat] 目前不会进行缓存，每次获取都会通过 [UserChatCreateRequest] 请求并构建新的实例。
+     * 由于每次都会通过api请求，因此不存在 "没找到" 的情况，[getContact] 将不会返回非null值。
+     *
+     * 但是会抛出任何可能由 [UserChatCreateRequest] 抛出的或者请求过程中产生的任何异常。
+     *
      */
     @Api4J
     @OptIn(ExperimentalSimbotApi::class)
-    override fun getFriend(id: ID): KaiheilaUserChat = runInBlocking { friend(id) }
+    override fun getContact(id: ID): KaiheilaUserChat = runInBlocking { contact(id) }
     
     
     /**
      * 查询当前存在的所有 [聊天会话][KaiheilaUserChat]。
+     *
+     * 会通过 [UserChatListRequest] 直接进行查询，不会进行缓存。
      */
     @OptIn(ExperimentalSimbotApi::class)
-    override val friends: Items<KaiheilaUserChat>
+    override val contacts: Items<KaiheilaUserChat>
     
     
     /**
@@ -215,27 +228,29 @@ public interface KaiheilaComponentBot : Bot {
     override fun getGroup(id: ID): Group? = null
     
     
-    // todo ..
+    // more ..?
 }
 
 
 /**
- * 开黑啦组件中针对于 [GuildMemberBot] 的实现类型。继承自 [KaiheilaComponentBot] 并实现 [GuildMemberBot],
+ * 开黑啦组件中针对于 [GuildBot] 的实现类型。
+ *
+ * 实现 [KaiheilaComponentBot] 和 [GuildBot],
  * 代表一个bot在某个频道服务器中所扮演的成员。
  *
  * @see KaiheilaComponentBot
- * @see GuildMemberBot
+ * @see GuildBot
  */
-public abstract class KaiheilaComponentGuildMemberBot : KaiheilaComponentBot, GuildMemberBot, KaiheilaGuildMember {
-    /**
-     * 当前bot作为成员的唯一标识。会以作为频道成员的标识为主。
-     */
-    abstract override val id: ID
+public abstract class KaiheilaComponentGuildBot : KaiheilaComponentBot, GuildBot {
     
     /**
-     * 得到当前 [KaiheilaComponentGuildMemberBot] 中真正的 [KaiheilaComponentBot] 对象实例。
+     * 得到当前组织中的开黑啦bot在当前组织中所扮演的成员对象。
      */
-    abstract override val bot: KaiheilaComponentBot
+    abstract override suspend fun asMember(): KaiheilaGuildMember
     
-    
+    /**
+     * 得到当前组织中的开黑啦bot在当前组织中所扮演的成员对象。
+     */
+    @OptIn(Api4J::class)
+    abstract override fun toMember(): KaiheilaGuildMember
 }

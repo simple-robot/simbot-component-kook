@@ -19,13 +19,16 @@ package love.forte.simbot.component.kaiheila
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.Grouping
 import love.forte.simbot.ID
+import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUserStatus
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
+import love.forte.simbot.definition.Contact
 import love.forte.simbot.definition.Friend
+import love.forte.simbot.definition.Stranger
 import love.forte.simbot.definition.UserStatus
+import love.forte.simbot.kaiheila.api.userchat.UserChatDeleteRequest
 import love.forte.simbot.kaiheila.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
@@ -34,15 +37,16 @@ import love.forte.simbot.utils.runInBlocking
 /**
  * 开黑啦的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
  *
- * 开黑啦组件会将私聊会话视为 [Friend] 处理。
+ * ~~开黑啦组件会将私聊会话视为 [Friend] 处理~~
  *
- * ### Experimental
+ * 开黑啦组件会将 [私聊会话][KaiheilaUserChat] 视为 [Stranger] 处理，但是会同时实现 [Contact] 来提供可交流的联系人能力。
  *
- * 实际上私聊会话更贴合普通的*联系人*概念而不是好友，因此未来可能会变更其在simbot中所代表的含义。
+ * ## 可删除的
+ * 开黑啦中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KaiheilaUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
  *
  */
 @ExperimentalSimbotApi
-public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChatView> {
+public interface KaiheilaUserChat : /*Friend, */ Stranger, Contact, KaiheilaComponentDefinition<UserChatView>, DeleteSupport {
     /**
      * 私聊会话对应用户ID。
      */
@@ -52,19 +56,8 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     
     override val avatar: String get() = source.targetInfo.avatar
     override val username: String get() = source.targetInfo.username
+    @ExperimentalSimbotApi
     override val status: UserStatus get() = normalUserStatus
-    
-    /**
-     * [KaiheilaUserChat] 不存在"好友备注"信息。
-     */
-    override val remark: String? get() = null
-    
-    /**
-     * [KaiheilaUserChat] 不存在分组信息。
-     */
-    override val grouping: Grouping
-        get() = Grouping.EMPTY
-    
     
     /**
      * 向当前好友（私聊会话）发送消息。
@@ -107,4 +100,25 @@ public interface KaiheilaUserChat : Friend, KaiheilaComponentDefinition<UserChat
     override fun sendBlocking(message: MessageContent): KaiheilaMessageReceipt = runInBlocking {
         send(message)
     }
+    
+    /**
+     * 删除当前 [聊天会话][KaiheilaUserChat].
+     *
+     * 通过 [UserChatDeleteRequest] 删除当前聊天会话。除非 [delete] 抛出异常，否则 [delete] 始终得到 `true`。
+     * 在删除的过程中会直接抛出请求 [UserChatDeleteRequest] 过程中可能产生的任何异常。
+     *
+     */
+    override suspend fun delete(): Boolean
+    
+    /**
+     * 阻塞地删除当前 [聊天会话][KaiheilaUserChat].
+     *
+     * 通过 [UserChatDeleteRequest] 删除当前聊天会话。
+     *
+     */
+    @Api4J
+    override fun deleteBlocking(): Boolean {
+        return runInBlocking { delete() }
+    }
+    
 }

@@ -28,6 +28,7 @@ import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreated
 import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kaiheila.api.userchat.UserChatDeleteRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 
@@ -90,5 +91,10 @@ internal class KaiheilaUserChatImpl(
                 send(message.messages)
             }
         }
+    }
+    
+    override suspend fun delete(): Boolean {
+        UserChatDeleteRequest(id).requestDataBy(bot)
+        return true
     }
 }

@@ -30,7 +30,7 @@ import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kaiheila.KaiheilaChannel
-import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildMemberBot
+import love.forte.simbot.component.kaiheila.KaiheilaComponentGuildBot
 import love.forte.simbot.component.kaiheila.KaiheilaGuild
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.model.GuildModel
@@ -90,9 +90,9 @@ internal class KaiheilaGuildImpl constructor(
     @JvmSynthetic
     internal fun internalMember(id: String): KaiheilaGuildMemberImpl? = internalMembers[id]
     
-    private lateinit var botMember: KaiheilaComponentGuildMemberBot
+    private lateinit var botMember: KaiheilaComponentGuildBot
     
-    override val bot: KaiheilaComponentGuildMemberBot
+    override val bot: KaiheilaComponentGuildBot
         get() {
             // 不关心实例唯一性
             if (::botMember.isInitialized) {

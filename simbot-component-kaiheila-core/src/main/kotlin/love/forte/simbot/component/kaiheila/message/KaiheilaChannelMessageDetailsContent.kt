@@ -18,7 +18,10 @@
 package love.forte.simbot.component.kaiheila.message
 
 import love.forte.simbot.ID
+import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
+import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.message.ChannelMessageDetails
+import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
 import love.forte.simbot.kaiheila.api.message.MessageViewRequest
 import love.forte.simbot.message.Messages
 import love.forte.simbot.message.ReceivedMessageContent
@@ -31,7 +34,7 @@ import love.forte.simbot.message.toText
  * @see MessageViewRequest
  * @author ForteScarlet
  */
-public data class KaiheilaChannelMessageDetailsContent(internal val details: ChannelMessageDetails) :
+public data class KaiheilaChannelMessageDetailsContent(internal val details: ChannelMessageDetails, private val bot: KaiheilaComponentBot) :
     ReceivedMessageContent() {
 
     /**
@@ -43,7 +46,19 @@ public data class KaiheilaChannelMessageDetailsContent(internal val details: Cha
      * 开黑啦消息事件中所收到的消息列表。
      */
     override val messages: Messages = details.toMessages()
-
+    
+    /**
+     * 删除当前的频道消息。
+     *
+     * 通过 [MessageDeleteRequest] 删除消息，除非 [delete] 抛出异常，否则将会恒返回 `true`。
+     * 会抛出请求 [MessageDeleteRequest] 过程中可能出现的任何异常。
+     *
+     */
+    override suspend fun delete(): Boolean {
+        MessageDeleteRequest(messageId).requestDataBy(bot)
+        return true
+    }
+    
     public companion object {
         /**
          * 使用消息事件并将其中的消息内容转化为 [Messages].
@@ -57,8 +72,8 @@ public data class KaiheilaChannelMessageDetailsContent(internal val details: Cha
          * 使用消息事件并将其中的消息内容转化为 [KaiheilaChannelMessageDetailsContent].
          */
         @JvmStatic
-        public fun ChannelMessageDetails.toContent(): KaiheilaChannelMessageDetailsContent =
-            KaiheilaChannelMessageDetailsContent(this)
+        public fun ChannelMessageDetails.toContent(bot: KaiheilaComponentBot): KaiheilaChannelMessageDetailsContent =
+            KaiheilaChannelMessageDetailsContent(this, bot)
 
     }
 
