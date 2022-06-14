@@ -65,7 +65,9 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
      *
      */
     public companion object Factory : ComponentFactory<KaiheilaComponent, KaiheilaComponentConfiguration> {
+        @ExperimentalSimbotApi
         internal val botUserStatus = UserStatus.builder().bot().fakeUser().build()
+        @ExperimentalSimbotApi
         internal val normalUserStatus = UserStatus.builder().normal().build()
         
         /**

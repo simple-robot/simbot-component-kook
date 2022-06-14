@@ -17,6 +17,7 @@
 
 package love.forte.simbot.component.kaiheila
 
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.definition.Contact
 import love.forte.simbot.definition.UserStatus
@@ -45,6 +46,7 @@ public interface KaiheilaContact : Contact {
     /**
      * 用户属性信息。
      */
+    @ExperimentalSimbotApi
     override val status: UserStatus
 
     /**

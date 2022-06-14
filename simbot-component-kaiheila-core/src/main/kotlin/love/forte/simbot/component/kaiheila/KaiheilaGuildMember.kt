@@ -306,10 +306,12 @@ public class KaiheilaGuildSystemMember(
         get() = source.nickname
     override val avatar: String
         get() = source.avatar
+    @ExperimentalSimbotApi
     override val status: UserStatus
         get() = STATUS
     
     public companion object {
+        @ExperimentalSimbotApi
         private val STATUS = UserStatus.builder().fakeUser().official().build()
     }
 }
