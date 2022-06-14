@@ -53,7 +53,7 @@ object V {
     object Kotlinx {
         const val GROUP = "org.jetbrains.kotlinx"
         object Serialization {
-            const val VERSION = "1.3.1"
+            const val VERSION = "1.3.3"
 
             object Core {
                 const val NOTATION = "$GROUP:kotlinx-serialization-core:$VERSION"
