@@ -19,7 +19,10 @@ package love.forte.simbot.component.kaiheila.message
 
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
+import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageType
@@ -58,19 +61,19 @@ public object KaiheilaMessages {
      * 构建一个 at(mention) 用户的 [At] 消息对象。
      */
     @JvmStatic
-    public fun atUser(id: ID): At = At(target = id, atType = AT_TYPE_USER, originContent = "(met)$id(met)")
+    public fun atUser(id: ID): At = At(target = id, type = AT_TYPE_USER, originContent = "(met)$id(met)")
 
     /**
      * 构建一个 at(mention) 整个角色的 [At] 消息对象。
      */
     @JvmStatic
-    public fun atRole(id: ID): At = At(target = id, atType = AT_TYPE_ROLE, originContent = "(rol)$id(rol)")
+    public fun atRole(id: ID): At = At(target = id, type = AT_TYPE_ROLE, originContent = "(rol)$id(rol)")
 
     /**
      * 构建一个 at(mention) 频道的 [At] 消息对象。
      */
     @JvmStatic
-    public fun atChannel(id: ID): At = At(target = id, atType = AT_TYPE_CHANNEL, originContent = "(chn)$id(chn)")
+    public fun atChannel(id: ID): At = At(target = id, type = AT_TYPE_CHANNEL, originContent = "(chn)$id(chn)")
 
 
 }
@@ -82,14 +85,15 @@ public object KaiheilaMessages {
  *
  */
 @OptIn(ExperimentalSimbotApi::class)
-public fun Message.toRequest(
+public suspend fun Message.toRequest(
+    bot: KaiheilaComponentBot,
     targetId: ID,
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): KaiheilaApiRequest<*>? {
     when (this) {
-        is Message.Element<*> -> return elementToRequestOrNull(targetId, quote, nonce, tempTargetId)
+        is Message.Element<*> -> return elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
         is Messages -> {
             // TODO 如果存在at，atAll，atAllRole，
             //  转为kmarkdown消息。
@@ -117,7 +121,7 @@ public fun Message.toRequest(
 
             for (i in this.indices.reversed()) {
                 val element = this[i]
-                val request = element.elementToRequestOrNull(targetId, quote, nonce, tempTargetId)
+                val request = element.elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
                 if (request != null) return request
             }
             return null
@@ -132,7 +136,8 @@ public fun Message.toRequest(
  * 尝试将一个消息元素转化为用于发送消息的请求。
  */
 @OptIn(ExperimentalSimbotApi::class)
-private fun Message.Element<*>.elementToRequestOrNull(
+private suspend fun Message.Element<*>.elementToRequestOrNull(
+    bot: KaiheilaComponentBot,
     targetId: ID,
     quote: ID? = null,
     nonce: String? = null,
@@ -149,10 +154,10 @@ private fun Message.Element<*>.elementToRequestOrNull(
 
             )
     }
+    
     return when (this) {
         // 文本消息
         is PlainText<*> -> request(MessageType.TEXT.type, text)
-
 
         is KaiheilaMessageElement<*> -> when (this) {
             // 媒体资源
@@ -186,8 +191,13 @@ private fun Message.Element<*>.elementToRequestOrNull(
             else -> null
         }
 
+        // 需要上传的图片
+        is ResourceImage -> {
+            val asset = AssetCreateRequest(resource).requestDataBy(bot)
+            request(MessageType.IMAGE.type, asset.url)
+        }
 
-        // 任意图片类型
+        // 其他任意图片类型
         is Image<*> -> request(MessageType.IMAGE.type, id.literal)
 
         is At -> {
@@ -227,11 +237,12 @@ private fun Message.Element<*>.appendToKMarkdownMessage(builder: KMarkdownBuilde
  * 将一个 [Message] 转化为用于发送消息的请求api。
  *
  */
-public fun Message.toDirectRequest(
+public suspend fun Message.toDirectRequest(
+    bot: KaiheilaComponentBot,
     targetId: ID,
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): DirectMessageCreateRequest? {
-    return (toRequest(targetId, quote, nonce, tempTargetId) as? MessageCreateRequest)?.toDirect()
+    return (toRequest(bot, targetId, quote, nonce, tempTargetId) as? MessageCreateRequest)?.toDirect()
 }

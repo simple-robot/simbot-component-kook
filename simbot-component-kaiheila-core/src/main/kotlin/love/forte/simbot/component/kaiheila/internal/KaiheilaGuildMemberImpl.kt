@@ -21,8 +21,6 @@ import kotlinx.coroutines.*
 import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.botUserStatus
-import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUserStatus
 import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.KaiheilaUserChat
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
@@ -30,7 +28,6 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.model.UserModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.update
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kaiheila.api.guild.GuildMuteDeleteRequest
 import love.forte.simbot.message.Message
@@ -61,9 +58,6 @@ internal class KaiheilaGuildMemberImpl(
     
     override val username: String = source.username
     override val avatar: String = source.avatar
-    
-    @ExperimentalSimbotApi
-    override val status: UserStatus = if (source.isBot) botUserStatus else normalUserStatus
     
     override val id: ID
         get() = source.id

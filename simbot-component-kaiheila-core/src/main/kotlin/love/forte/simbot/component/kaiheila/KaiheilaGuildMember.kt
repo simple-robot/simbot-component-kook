@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kaiheila
 
 import love.forte.simbot.Api4J
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.UnsupportedActionException
@@ -26,7 +25,6 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceip
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.definition.Role
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.guild.GuildMuteType
 import love.forte.simbot.kaiheila.objects.SystemUser
 import love.forte.simbot.message.Message
@@ -226,8 +224,6 @@ public interface KaiheilaGuildMember :
     override val joinTime: Timestamp get() = Timestamp.notSupport()
     override val nickname: String
     override val avatar: String
-    @ExperimentalSimbotApi
-    override val status: UserStatus
     override val username: String
     
     public companion object
@@ -306,12 +302,6 @@ public class KaiheilaGuildSystemMember(
         get() = source.nickname
     override val avatar: String
         get() = source.avatar
-    @ExperimentalSimbotApi
-    override val status: UserStatus
-        get() = STATUS
     
-    public companion object {
-        @ExperimentalSimbotApi
-        private val STATUS = UserStatus.builder().fakeUser().official().build()
-    }
+    public companion object
 }

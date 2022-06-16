@@ -26,7 +26,6 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage
 import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.GuildBot
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.api.message.MessageType
@@ -84,8 +83,6 @@ public interface KaiheilaComponentBot : Bot {
     public override val isStarted: Boolean
     public override val logger: Logger
     public override val manager: KaiheilaBotManager
-    @ExperimentalSimbotApi
-    public override val status: UserStatus
     public override val username: String
     
     /**
@@ -131,13 +128,14 @@ public interface KaiheilaComponentBot : Bot {
      * 提供一个资源类型并将其上传后作为 [KaiheilaAssetImage] 使用。
      */
     @JvmSynthetic
-    public override suspend fun uploadImage(resource: Resource): KaiheilaAssetImage
+    public suspend fun uploadAssetImage(resource: Resource): KaiheilaAssetImage
     
     /**
      * 提供一个资源类型并将其上传后作为 [KaiheilaAssetImage] 使用。
      */
     @Api4J
-    override fun uploadImageBlocking(resource: Resource): KaiheilaAssetImage = runInBlocking { uploadImage(resource) }
+    public fun uploadAssetImageBlocking(resource: Resource): KaiheilaAssetImage = runInBlocking { uploadAssetImage(resource) }
+    
     
     /**
      * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。

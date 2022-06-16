@@ -54,7 +54,7 @@ internal class KaiheilaUserChatImpl(
     }
 
     override suspend fun send(message: Message): KaiheilaMessageReceipt {
-        val request = message.toRequest(source.code, null, null, null)
+        val request = message.toRequest(bot, source.code, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
 
         val result = request.requestDataBy(bot)

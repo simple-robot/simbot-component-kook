@@ -17,10 +17,8 @@
 
 package love.forte.simbot.component.kaiheila
 
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.definition.Contact
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.kaiheila.objects.User as KhlUser
@@ -42,12 +40,6 @@ public interface KaiheilaContact : Contact {
      * 用户名。
      */
     override val username: String get() = sourceUser.username
-
-    /**
-     * 用户属性信息。
-     */
-    @ExperimentalSimbotApi
-    override val status: UserStatus
 
     /**
      * 开黑啦的源用户信息。

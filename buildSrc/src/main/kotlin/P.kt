@@ -43,7 +43,7 @@ object P {
         
         val version = Version(
             major = "3", minor = 0, patch = 0,
-            status = preview(14, 0),
+            status = preview(15, 0),
             isSnapshot = isSnapshot().also {
                 println("isSnapshot: $it")
             }
@@ -66,7 +66,7 @@ object P {
             major = "${Simbot.version.major}.${Simbot.version.minor}",
             minor = 0,
             patch = 0,
-            status = preview(10, 1),
+            status = preview(11, 0),
             isSnapshot = isSnapshot
         )
         
