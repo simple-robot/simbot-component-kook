@@ -136,11 +136,11 @@ internal fun toMessages(
         }
 
         for (mentionId in mention) {
-            add(At(mentionId, atType = AT_TYPE_USER))
+            add(At(mentionId, type = AT_TYPE_USER))
         }
 
         for (mentionRoleId in mentionRoles) {
-            add(At(mentionRoleId, atType = AT_TYPE_ROLE))
+            add(At(mentionRoleId, type = AT_TYPE_ROLE))
         }
     }
 

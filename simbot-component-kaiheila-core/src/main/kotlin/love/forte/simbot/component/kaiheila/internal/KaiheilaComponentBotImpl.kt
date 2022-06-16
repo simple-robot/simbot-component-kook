@@ -37,7 +37,6 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaAssetMessage.Key.asM
 import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kaiheila.KaiheilaBot
@@ -236,9 +235,6 @@ internal class KaiheilaComponentBotImpl(
     override val isStarted: Boolean
         get() = sourceBot.isStarted
     
-    @ExperimentalSimbotApi
-    override val status: UserStatus
-        get() = botStatus
     
     override suspend fun join() {
         sourceBot.join()
@@ -315,7 +311,7 @@ internal class KaiheilaComponentBotImpl(
                     val items = UserChatListRequest.requestDataBy(this@KaiheilaComponentBotImpl).items
                     items.forEach { emit(KaiheilaUserChatImpl(this@KaiheilaComponentBotImpl, it.toModel())) }
                 }
-    
+                
                 prop.effectOn(flow)
             }
         }
@@ -363,7 +359,7 @@ internal class KaiheilaComponentBotImpl(
         return KaiheilaAssetImage(AssetCreated(id.literal))
     }
     
-    override suspend fun uploadImage(resource: Resource): KaiheilaAssetImage {
+    override suspend fun uploadAssetImage(resource: Resource): KaiheilaAssetImage {
         val asset = AssetCreateRequest(resource).requestDataBy(this)
         return asset.asImage()
     }
@@ -513,8 +509,6 @@ internal class KaiheilaComponentBotImpl(
     // endregion
     
     companion object {
-        @ExperimentalSimbotApi
-        val botStatus = UserStatus.builder().bot().fakeUser().build()
         const val ASSET_PREFIX = "https://www.kaiheila.cn"
     }
 }

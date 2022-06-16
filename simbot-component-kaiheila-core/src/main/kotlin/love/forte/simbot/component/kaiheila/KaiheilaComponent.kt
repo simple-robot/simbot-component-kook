@@ -22,7 +22,6 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import love.forte.simbot.*
 import love.forte.simbot.component.kaiheila.message.*
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.objects.KMarkdown
 import love.forte.simbot.kaiheila.objects.RawValueKMarkdown
 import love.forte.simbot.message.Message
@@ -65,10 +64,6 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
      *
      */
     public companion object Factory : ComponentFactory<KaiheilaComponent, KaiheilaComponentConfiguration> {
-        @ExperimentalSimbotApi
-        internal val botUserStatus = UserStatus.builder().bot().fakeUser().build()
-        @ExperimentalSimbotApi
-        internal val normalUserStatus = UserStatus.builder().normal().build()
         
         /**
          * 组件 [KaiheilaComponent] 的ID

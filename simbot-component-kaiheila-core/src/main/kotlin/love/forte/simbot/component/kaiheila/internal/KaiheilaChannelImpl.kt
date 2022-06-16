@@ -76,7 +76,7 @@ internal class KaiheilaChannelImpl(
     
     
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KaiheilaMessageReceipt {
-        val request = message.toRequest(targetId = source.id, quote = quote, tempTargetId = tempTargetId)
+        val request = message.toRequest(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
         
         val result = request.requestDataBy(baseBot)

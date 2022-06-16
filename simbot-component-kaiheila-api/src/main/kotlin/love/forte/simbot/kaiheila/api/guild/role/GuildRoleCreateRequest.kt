@@ -99,11 +99,6 @@ public data class GuildRoleCreated @ApiResultType constructor(
      */
     @SerialName("permissions")
     public val permissions: Permissions,
-
-    /**
-     * 角色无法判断是否为拥有者。
-     */
-    override val isOwner: Boolean = false
 ) : Role, Comparable<GuildRoleCreated> {
 
     override fun compareTo(other: GuildRoleCreated): Int {

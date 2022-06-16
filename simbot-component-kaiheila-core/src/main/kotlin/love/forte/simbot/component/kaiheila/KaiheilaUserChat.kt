@@ -21,13 +21,11 @@ import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.action.DeleteSupport
-import love.forte.simbot.component.kaiheila.KaiheilaComponent.Factory.normalUserStatus
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.Contact
 import love.forte.simbot.definition.Friend
 import love.forte.simbot.definition.Stranger
-import love.forte.simbot.definition.UserStatus
 import love.forte.simbot.kaiheila.api.userchat.UserChatDeleteRequest
 import love.forte.simbot.kaiheila.api.userchat.UserChatView
 import love.forte.simbot.message.Message
@@ -56,8 +54,6 @@ public interface KaiheilaUserChat : /*Friend, */ Stranger, Contact, KaiheilaComp
     
     override val avatar: String get() = source.targetInfo.avatar
     override val username: String get() = source.targetInfo.username
-    @ExperimentalSimbotApi
-    override val status: UserStatus get() = normalUserStatus
     
     /**
      * 向当前好友（私聊会话）发送消息。
