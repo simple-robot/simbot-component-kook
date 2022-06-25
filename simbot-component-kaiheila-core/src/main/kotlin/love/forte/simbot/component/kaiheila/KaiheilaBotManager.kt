@@ -95,7 +95,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
         val serializer = KaiheilaBotVerifyInfoConfiguration.serializer()
         
         val component = verifyInfo.componentId
-        val currentComponent = this.component.id.literal
+        val currentComponent = this.component.id
         
         if (component != currentComponent) {
             logger.debug(
@@ -171,7 +171,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
             applicationConfiguration: ApplicationConfiguration,
             configurator: KaiheilaBotManagerConfiguration.() -> Unit,
         ): KaiheilaBotManager {
-            val component = components.find { it.id.literal == KaiheilaComponent.ID_VALUE } as? KaiheilaComponent
+            val component = components.find { it.id == KaiheilaComponent.ID_VALUE } as? KaiheilaComponent
                 ?: throw NoSuchComponentException("${KaiheilaComponent.ID_VALUE} type of KaiheilaComponent")
             
             val config = KaiheilaBotManagerConfigurationImpl().also {

@@ -36,8 +36,8 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
     /**
      * 组件的唯一标识ID。
      */
-    override val id: ID
-        get() = componentID
+    override val id: String
+        get() = ID_VALUE
     
     /**
      * 开黑啦组件中所涉及到的序列化模块。
@@ -76,6 +76,7 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
         /**
          * 组件的ID实例。
          */
+        @Deprecated("Unused")
         public val componentID: CharSequenceID = ID_VALUE.ID
         
         /**
