@@ -95,7 +95,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
         val serializer = KaiheilaBotVerifyInfoConfiguration.serializer()
         
         val component = verifyInfo.componentId
-        val currentComponent = this.component.id.literal
+        val currentComponent = this.component.id
         
         if (component != currentComponent) {
             logger.debug(
@@ -171,7 +171,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
             applicationConfiguration: ApplicationConfiguration,
             configurator: KaiheilaBotManagerConfiguration.() -> Unit,
         ): KaiheilaBotManager {
-            val component = components.find { it.id.literal == KaiheilaComponent.ID_VALUE } as? KaiheilaComponent
+            val component = components.find { it.id == KaiheilaComponent.ID_VALUE } as? KaiheilaComponent
                 ?: throw NoSuchComponentException("${KaiheilaComponent.ID_VALUE} type of KaiheilaComponent")
             
             val config = KaiheilaBotManagerConfigurationImpl().also {
@@ -263,6 +263,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [ticket] 和 [configuration] 注册bot。
      */
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
     public fun register(
         ticket: KaiheilaBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
@@ -272,6 +273,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
     public fun register(
         clientId: String,
         token: String,
@@ -282,6 +284,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [ticket] 和 [block] 注册bot。
      */
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
     public fun register(
         ticket: KaiheilaBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit = {},
@@ -291,6 +294,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
     public fun register(
         clientId: String,
         token: String,
@@ -316,6 +320,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
     /**
      * 通过 [ticket] 和 [configuration] 注册bot。
      */
+    @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
     override fun register(
         ticket: KaiheilaBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
@@ -329,6 +334,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
     /**
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
+    @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
     override fun register(
         clientId: String,
         token: String,
@@ -343,6 +349,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
     /**
      * 通过 [ticket] 和 [block] 注册bot。
      */
+    @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
     override fun register(
         ticket: KaiheilaBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit,
@@ -356,6 +363,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
     /**
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
+    @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
     override fun register(
         clientId: String,
         token: String,
@@ -372,25 +380,6 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
     }
 }
 
-
-/*
- * 暂且备份
- * `.bot` 配置文件读取的配置信息实体。
- *
- * ```json
- * {
- *  "component": "simbot.kaiheila",
- *  "clientId": "Your Client ID",
- *  "token": "Your ws token",
- *  "isCompress": true,
- *  "syncPeriods": {
- *      "guildSyncPeriod": 60000,
- *      "memberSyncPeriods": 60000
- *  }
- * }
- * ```
- *
- */
 
 /**
  * `.bot` 配置文件读取的配置信息实体, 用于接收从 [BotVerifyInfo] 中的序列化信息。
