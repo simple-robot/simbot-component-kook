@@ -20,7 +20,6 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.serialization")
-
     id("org.jetbrains.dokka")
 }
 
@@ -30,7 +29,7 @@ dependencies {
         exclude("love.forte.simbot")
     }
     compileOnly(V.Simbot.Core.NOTATION)
-    compileOnly(V.Jetbrains.Annotations.NOTATION)
+    compileOnly(libs.jetbrains.annotations)
 
     testImplementation(kotlin("test-junit5"))
     testImplementation(V.Simbot.Core.NOTATION)
@@ -51,7 +50,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 kotlin {
     // 严格模式
-    explicitApiWarning()
+    explicitApi()
 
 
     sourceSets.all {

@@ -47,6 +47,7 @@ plugins {
 
 group = P.ComponentKaiheila.GROUP
 version = P.ComponentKaiheila.VERSION
+description = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
 
 println("=== Current version: $version ===")
 
