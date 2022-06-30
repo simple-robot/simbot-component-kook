@@ -69,7 +69,7 @@ public inline fun ApplicationBuilder<*>.kookBotsIfSupport(
  * ```kotlin
  * simpleApplication {
  *     bots {
- *         kook {
+ *        Kook {
  *             val bot = register("client id", "token") {
  *                 // config...
  *             }
@@ -98,7 +98,7 @@ public suspend inline fun BotRegistrar.kook(
  * ```kotlin
  * simpleApplication {
  *     bots {
- *         kook {
+ *        Kook {
  *             val bot = register("client id", "token") {
  *                 // config...
  *             }

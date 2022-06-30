@@ -30,7 +30,7 @@ import love.forte.simbot.kook.objects.impl.RoleImpl
 
 /**
  *
- *  Kook objects - [服务器Guild](https://developer.kaiheila.cn/doc/objects#%E6%9C%8D%E5%8A%A1%E5%99%A8Guild)
+ * Kook objects - [服务器Guild](https://developer.kaiheila.cn/doc/objects#%E6%9C%8D%E5%8A%A1%E5%99%A8Guild)
  *
  * 官方数据结构示例：
  * ```json

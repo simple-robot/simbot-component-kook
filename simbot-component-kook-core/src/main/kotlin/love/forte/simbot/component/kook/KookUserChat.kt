@@ -24,7 +24,6 @@ import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.definition.Contact
-import love.forte.simbot.definition.Friend
 import love.forte.simbot.definition.Stranger
 import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
 import love.forte.simbot.kook.api.userchat.UserChatView
@@ -33,18 +32,16 @@ import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.runInBlocking
 
 /**
- *  Kook 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
+ * Kook 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
  *
- * ~~ Kook 组件会将私聊会话视为 [Friend] 处理~~
- *
- *  Kook 组件会将 [私聊会话][KookUserChat] 视为 [Stranger] 处理，但是会同时实现 [Contact] 来提供可交流的联系人能力。
+ * Kook 组件会将 [私聊会话][KookUserChat] 视为 [Stranger] 处理，同时实现 [Contact] 来提供可交流的联系人能力。
  *
  * ## 可删除的
- *  Kook 中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KookUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
+ * Kook 中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KookUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
  *
  */
 @ExperimentalSimbotApi
-public interface KookUserChat : /*Friend, */ Stranger, Contact, KookComponentDefinition<UserChatView>, DeleteSupport {
+public interface KookUserChat : Stranger, Contact, KookComponentDefinition<UserChatView>, DeleteSupport {
     /**
      * 私聊会话对应用户ID。
      */

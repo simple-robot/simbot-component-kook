@@ -38,7 +38,7 @@ import kotlin.streams.asStream
 import love.forte.simbot.kook.event.Event as KkEvent
 
 /**
- *  Kook 的频道成员变更事件。
+ * Kook 的频道成员变更事件。
  *
  * 相关的 Kook **原始**事件类型有：
  * - [UserExitedChannelEvent]
@@ -180,7 +180,7 @@ public abstract class KookMemberChangedEvent<out Body> :
 
 //region 频道进出相关
 /**
- *  Kook  [成员变更事件][KookMemberChangedEvent] 中与**频道进出**相关的变更事件。
+ * Kook  [成员变更事件][KookMemberChangedEvent] 中与**频道进出**相关的变更事件。
  * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
 @BaseEvent
@@ -220,7 +220,7 @@ public abstract class KookMemberChannelChangedEvent<out Body> : KookMemberChange
 
 
 /**
- *  Kook 成员离开(频道)事件。
+ * Kook 成员离开(频道)事件。
  *
  * @see UserExitedChannelEvent
  * @author forte
@@ -255,19 +255,19 @@ public abstract class KookMemberExitedChannelEvent :
 
 
     /**
-     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
     /**
-     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KookGuildMember? get() = null
 
     /**
-     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KookGuildMember? = null
@@ -284,7 +284,7 @@ public abstract class KookMemberExitedChannelEvent :
 }
 
 /**
- *  Kook 成员加入(频道)事件。
+ * Kook 成员加入(频道)事件。
  *
  * @see UserJoinedChannelEvent
  * @author forte
@@ -320,20 +320,20 @@ public abstract class KookMemberJoinedChannelEvent :
 
 
     /**
-     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
 
     /**
-     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KookGuildMember? get() = null
 
     /**
-     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KookGuildMember? = null
@@ -353,7 +353,7 @@ public abstract class KookMemberJoinedChannelEvent :
 
 //region 频道服务器进出
 /**
- *  Kook  [成员变更事件][KookMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
+ * Kook  [成员变更事件][KookMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
  */
 @BaseEvent
@@ -392,7 +392,7 @@ public abstract class KookMemberGuildChangedEvent<out Body> :
 
 
 /**
- *  Kook 成员离开(频道)事件。
+ * Kook 成员离开(频道)事件。
  *
  * @see ExitedGuildEvent
  * @author forte
@@ -428,12 +428,12 @@ public abstract class KookMemberExitedGuildEvent :
     override suspend fun after(): KookGuildMember? = null
 
     /**
-     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
     /**
-     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
@@ -441,7 +441,7 @@ public abstract class KookMemberExitedGuildEvent :
         get() = null
 
     /**
-     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KookGuildMember? = null
@@ -458,7 +458,7 @@ public abstract class KookMemberExitedGuildEvent :
 }
 
 /**
- *  Kook 成员加入(频道)事件。
+ * Kook 成员加入(频道)事件。
  *
  * @see JoinedGuildEvent
  * @author forte
@@ -494,20 +494,20 @@ public abstract class KookMemberJoinedGuildEvent :
     override suspend fun before(): KookGuildMember? = null
 
     /**
-     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
 
     /**
-     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KookGuildMember? get() = null
 
     /**
-     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
+     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KookGuildMember? = null
@@ -573,7 +573,7 @@ public abstract class KookBotMemberChangedEvent<out Body> :
 
 
 /**
- *  Kook BOT自身离开(频道)事件。
+ * Kook BOT自身离开(频道)事件。
  *
  * @see SelfExitedGuildEvent
  * @author forte
@@ -607,21 +607,21 @@ public abstract class KookBotSelfExitedGuildEvent :
     override suspend fun after(): KookGuildMember? = after
 
     /**
-     *  Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
+     * Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KookGuildMember? get() = null
 
     /**
-     *  Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
+     * Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KookGuildMember? = null
 
 
     /**
-     *  Kook 群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
+     * Kook 群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
@@ -638,7 +638,7 @@ public abstract class KookBotSelfExitedGuildEvent :
 }
 
 /**
- *  Kook BOT自身加入(频道)事件。
+ * Kook BOT自身加入(频道)事件。
  *
  * @see SelfJoinedGuildEvent
  * @author forte
@@ -671,14 +671,14 @@ public abstract class KookBotSelfJoinedGuildEvent :
     override suspend fun before(): KookGuildMember? = before
 
     /**
-     *  Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
+     * Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KookGuildMember? get() = null
 
     /**
-     *  Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
+     * Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override
@@ -686,7 +686,7 @@ public abstract class KookBotSelfJoinedGuildEvent :
 
 
     /**
-     *  Kook 群员离开频道事件的行为类型始终为主动的。
+     * Kook 群员离开频道事件的行为类型始终为主动的。
      */
     override val actionType: ActionType
         get() = ActionType.PROACTIVE
@@ -703,7 +703,7 @@ public abstract class KookBotSelfJoinedGuildEvent :
 //endregion
 
 /**
- *  Kook 用户在线状态变更相关事件的抽象父类。
+ * Kook 用户在线状态变更相关事件的抽象父类。
  *
  * 涉及到的原始事件有：
  * - [GuildMemberOfflineEvent]

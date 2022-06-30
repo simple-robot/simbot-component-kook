@@ -36,7 +36,7 @@ import love.forte.simbot.kook.objects.Channel as KkChannel
 
 
 /**
- *  Kook 与消息相关的事件, 即当 [KkEvent.extra] 类型为 [KkEvent.Extra.Text] 时所触发的事件。
+ * Kook 与消息相关的事件, 即当 [KkEvent.extra] 类型为 [KkEvent.Extra.Text] 时所触发的事件。
  *
  * 大部分消息事件都可能由同一个格式衍生为两种类型：私聊与群聊（频道消息），
  * 这由 [KkEvent.channelType] 所决定。当 [KkEvent.channelType]
@@ -45,7 +45,7 @@ import love.forte.simbot.kook.objects.Channel as KkChannel
  * [联系人消息][ContactMessageEvent] (并非 [好友消息][FriendMessageEvent])。
  *
  * ## 来源
- *  Kook 的消息推送同样会推送bot自己所发送的消息。在stdlib模块下，
+ * Kook 的消息推送同样会推送bot自己所发送的消息。在stdlib模块下，
  * 你可能需要自己手动处理对于消息来自于bot自身的情况。但是在当前组件下，[KookMessageEvent]
  *
  * 来自其他人的事件：[KookChannelMessageEvent]、[KookContactMessageEvent]；
@@ -204,7 +204,7 @@ public sealed class KookMessageEvent :
 
 
 /**
- *  Kook 普通频道消息事件。即来自bot以外的人发送的消息的类型。
+ * Kook 普通频道消息事件。即来自bot以外的人发送的消息的类型。
  *
  * 此事件只会由 bot 自身以外的人触发。
  */
@@ -273,7 +273,7 @@ public abstract class KookChannelMessageEvent : KookMessageEvent.Channel(), Chan
 }
 
 /**
- *  Kook 普通私聊消息事件。即来自bot以外的人发送的消息的类型。
+ * Kook 普通私聊消息事件。即来自bot以外的人发送的消息的类型。
  *
  * 此事件只会由 bot 以外的人触发。
  */
@@ -334,7 +334,7 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
 
 
 /**
- *  Kook bot频道消息事件。即来自bot自身发送的消息的类型。
+ * Kook bot频道消息事件。即来自bot自身发送的消息的类型。
  *
  * 此事件只会由 bot 自身触发。
  */

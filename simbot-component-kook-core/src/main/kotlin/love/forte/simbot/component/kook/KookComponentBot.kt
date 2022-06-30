@@ -41,7 +41,7 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  *
- *  Kook 组件在simbot下的组件 [Bot] 实现。
+ * Kook 组件在simbot下的组件 [Bot] 实现。
  *
  * @author ForteScarlet
  */
@@ -231,7 +231,7 @@ public interface KookComponentBot : Bot {
 
 
 /**
- *  Kook 组件中针对于 [GuildBot] 的实现类型。
+ * Kook 组件中针对于 [GuildBot] 的实现类型。
  *
  * 实现 [KookComponentBot] 和 [GuildBot],
  * 代表一个bot在某个频道服务器中所扮演的成员。

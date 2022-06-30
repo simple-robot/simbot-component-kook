@@ -19,7 +19,7 @@ public object Kook {
     public const val VERSION: String = "3"
 
     /**
-     *  Kook api的url host.
+     * Kook api的url host.
      *
      * 参考 https://developer.kaiheila.cn/doc/reference。
      */

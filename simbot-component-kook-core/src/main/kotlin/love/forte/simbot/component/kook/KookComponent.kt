@@ -31,7 +31,7 @@ import love.forte.simbot.message.Message
 
 /**
  *
- *  Kook 组件的 [Component] 实现。
+ * Kook 组件的 [Component] 实现。
  *
  * @author ForteScarlet
  */
@@ -43,7 +43,7 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
         get() = ID_VALUE
     
     /**
-     *  Kook 组件中所涉及到的序列化模块。
+     * Kook 组件中所涉及到的序列化模块。
      *
      */
     override val componentSerializersModule: SerializersModule

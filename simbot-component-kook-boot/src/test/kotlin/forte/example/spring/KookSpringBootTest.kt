@@ -10,7 +10,7 @@ import love.forte.simbot.OriginBotManager
  * @author ForteScarlet
  */
 // @SpringBootTest(classes = [SpringAppMain::class])
-class KaiheilaSpringBootTest {
+class KookSpringBootTest {
 
     // @Autowired
     lateinit var testListener: TestListener

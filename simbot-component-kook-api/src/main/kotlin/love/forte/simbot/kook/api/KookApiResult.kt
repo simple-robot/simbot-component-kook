@@ -25,7 +25,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 
 /**
  *
- *  Kook Api的响应值标准格式。
+ * Kook Api的响应值标准格式。
  *
  * 参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
  *

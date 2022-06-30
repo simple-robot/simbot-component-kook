@@ -43,7 +43,7 @@ public interface JsonValueFactory<T> {
 
 
 /**
- *  Kook  websocket概述 - [信令](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4%E6%A0%BC%E5%BC%8F)
+ * Kook  websocket概述 - [信令](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4%E6%A0%BC%E5%BC%8F)
  *
  * 信令基本格式：
  * ```json
@@ -419,7 +419,7 @@ public inline val Signal_0.extraType: Any
 
 
 /**
- *  Kook 信令异常。
+ * Kook 信令异常。
  */
 public open class KookSignalException : KookRuntimeException {
     public constructor() : super()
@@ -430,7 +430,7 @@ public open class KookSignalException : KookRuntimeException {
 
 
 /**
- *  Kook  [信令5 - Reconnect][Signal.Reconnect] 异常。
+ * Kook  [信令5 - Reconnect][Signal.Reconnect] 异常。
  *
  * @see Signal.Reconnect
  * @see reconnectException

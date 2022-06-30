@@ -32,7 +32,7 @@ import love.forte.simbot.kook.event.message.*
 import love.forte.simbot.message.*
 
 /**
- *  Kook 消息事件所收到的消息正文类型。
+ * Kook 消息事件所收到的消息正文类型。
  *
  * @author ForteScarlet
  */
@@ -44,7 +44,7 @@ public class KookReceiveMessageContent(private val isDirect: Boolean, internal v
     override val messageId: ID = source.msgId
 
     /**
-     *  Kook 消息事件中所收到的消息列表。
+     * Kook 消息事件中所收到的消息列表。
      */
     override val messages: Messages = source.toMessages()
     

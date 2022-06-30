@@ -40,7 +40,7 @@ import love.forte.simbot.kook.objects.User as KkUser
 
 /**
  *
- *  Kook 组件下，[频道服务器][KookGuild] 的成员信息.
+ * Kook 组件下，[频道服务器][KookGuild] 的成员信息.
  *
  * @author ForteScarlet
  */

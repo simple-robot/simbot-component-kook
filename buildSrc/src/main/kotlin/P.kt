@@ -56,7 +56,7 @@ object P {
         // = if (isSnapshot) "$REAL_VERSION-SNAPSHOT" else REAL_VERSION
     }
     
-    object ComponentKaiheila {
+    object ComponentKook {
         val isSnapshot: Boolean get() = Simbot.isSnapshot
         const val GROUP = "${Simbot.GROUP}.component"
         

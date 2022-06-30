@@ -32,7 +32,7 @@ public annotation class KookSendOnlyMessage
 
 
 /**
- *  Kook 组件中对 [Message.Element] 消息实现的根类型。
+ * Kook 组件中对 [Message.Element] 消息实现的根类型。
  *
  * ## SendOnlyMessage
  * 对于一些**仅用于发送**的消息，它们会被标记上 [KookSendOnlyMessage] 注解，并大概率无法支持序列化。

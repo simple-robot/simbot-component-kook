@@ -29,7 +29,7 @@ import love.forte.simbot.kook.objects.impl.RoleImpl
 
 /**
  *
- *  Kook objects - [角色Role](https://developer.kaiheila.cn/doc/objects#%E8%A7%92%E8%89%B2Role)
+ * Kook objects - [角色Role](https://developer.kaiheila.cn/doc/objects#%E8%A7%92%E8%89%B2Role)
  *
  * 官方示例：
  * ```json

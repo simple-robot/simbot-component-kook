@@ -26,7 +26,7 @@ import love.forte.simbot.kook.event.system.user.UserUpdatedEventBody
 import love.forte.simbot.kook.event.Event as KkEvent
 
 /**
- *  Kook 用户信息更新事件。
+ * Kook 用户信息更新事件。
  * 此事件属于一个 [ChangedEvent],
  * 变更的[源][ChangedEvent.source]为发送变更的用户 **的ID**
  * （因为此事件不一定是某个具体频道服务器中的用户，只要有好友关系即会推送），

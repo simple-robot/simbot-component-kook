@@ -28,13 +28,13 @@ import love.forte.simbot.kook.event.Event as KkEvent
 
 /**
  *
- *  Kook 组件在simbot中的所有事件总类。
+ * Kook 组件在simbot中的所有事件总类。
  *
  *
  * @see UnsupportedKookEvent
  *
- * @param E  Kook api模块中所定义的原始 Kook 事件对象 [KkEvent].
- * @param EX  Kook api模块中所定义的原始 Kook 事件对象的 [extra][KkEvent.Extra] 属性类型。
+ * @param E Kook api模块中所定义的原始 Kook 事件对象 [KkEvent].
+ * @param EX Kook api模块中所定义的原始 Kook 事件对象的 [extra][KkEvent.Extra] 属性类型。
  *
  * @author ForteScarlet
  */
@@ -68,7 +68,7 @@ public abstract class KookEvent<out EX : KkEvent.Extra, out E : KkEvent<EX>> : B
 
 
 /**
- *  Kook 组件在simbot中的**系统事件**相关的事件总类。
+ * Kook 组件在simbot中的**系统事件**相关的事件总类。
  *
  * @param Body 事件消息的 [extra][KkEvent.Extra] 作为 [Sys] 时，其 [Sys.body] 的类型。
  */

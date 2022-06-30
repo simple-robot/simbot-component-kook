@@ -84,7 +84,7 @@ public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageEleme
 
 /**
  *
- *  Kook 组件中针对 [AssetCreateRequest] api 的请求响应的消息封装。
+ * Kook 组件中针对 [AssetCreateRequest] api 的请求响应的消息封装。
  *
  * @author ForteScarlet
  */

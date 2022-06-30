@@ -30,7 +30,7 @@ import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.randomID
 
 /**
- *  Kook 进行消息回复、发送后得到的回执。
+ * Kook 进行消息回复、发送后得到的回执。
  *
  * @see KookMessageCreatedReceipt
  * @see KookApiRequestedReceipt

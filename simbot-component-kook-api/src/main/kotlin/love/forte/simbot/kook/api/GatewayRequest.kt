@@ -25,7 +25,7 @@ import love.forte.simbot.kook.api.GatewayRequest.*
 
 /**
  *
- *  Kook  v3-api的 [gateway](https://developer.kaiheila.cn/doc/http/gateway) 获取接口的请求参数。
+ * Kook  v3-api的 [gateway](https://developer.kaiheila.cn/doc/http/gateway) 获取接口的请求参数。
  *
  * 如果是重连请求，使用 [Resume].
  *

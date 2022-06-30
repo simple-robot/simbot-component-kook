@@ -22,7 +22,7 @@ import love.forte.simbot.SimbotIllegalStateException
 
 
 /**
- * 与  Kook api 相关的异常。
+ * 与 Kook api 相关的异常。
  * @author ForteScarlet
  */
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")

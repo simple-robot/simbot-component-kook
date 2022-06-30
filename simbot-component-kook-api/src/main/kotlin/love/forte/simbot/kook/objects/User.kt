@@ -30,7 +30,7 @@ import org.slf4j.Logger
 
 /**
  *
- *  Kook objects - [用户User](https://developer.kaiheila.cn/doc/objects#%E7%94%A8%E6%88%B7User)
+ * Kook objects - [用户User](https://developer.kaiheila.cn/doc/objects#%E7%94%A8%E6%88%B7User)
  *
  *
  * 官方示例数据：

@@ -25,7 +25,7 @@ import love.forte.simbot.kook.objects.User as KkUser
 
 /**
  *
- *  Kook 组件下的联系人信息。
+ * Kook 组件下的联系人信息。
  *
  * @author ForteScarlet
  */
@@ -42,7 +42,7 @@ public interface KookContact : Contact {
     override val username: String get() = sourceUser.username
 
     /**
-     *  Kook 的源用户信息。
+     * Kook 的源用户信息。
      */
     public val sourceUser: KkUser
 

@@ -28,7 +28,7 @@ import love.forte.simbot.kook.objects.Guild as KkGuild
 
 /**
  *
- *  Kook 组件中的频道服务器信息。
+ * Kook 组件中的频道服务器信息。
  *
  * @author ForteScarlet
  */

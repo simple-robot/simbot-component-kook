@@ -25,7 +25,7 @@ import love.forte.simbot.SimbotRuntimeException
 
 
 /**
- *  Kook 相关异常。
+ * Kook 相关异常。
  */
 public open class KookRuntimeException : SimbotRuntimeException {
     public constructor() : super()

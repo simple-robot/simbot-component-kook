@@ -45,8 +45,8 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
-group = P.ComponentKaiheila.GROUP
-version = P.ComponentKaiheila.VERSION
+group = P.ComponentKook.GROUP
+version = P.ComponentKook.VERSION
 description = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
 
 println("=== Current version: $version ===")
@@ -69,8 +69,8 @@ val isSnapshotOnly = System.getProperty("snapshotOnly") != null
 val isReleaseOnly = System.getProperty("releaseOnly") != null
 
 val isPublishConfigurable = when {
-    isSnapshotOnly -> P.ComponentKaiheila.isSnapshot
-    isReleaseOnly -> !P.ComponentKaiheila.isSnapshot
+    isSnapshotOnly -> P.ComponentKook.isSnapshot
+    isReleaseOnly -> !P.ComponentKook.isSnapshot
     else -> true
 }
 
@@ -81,8 +81,8 @@ println("isPublishConfigurable: $isPublishConfigurable")
 
 
 subprojects {
-    group = P.ComponentKaiheila.GROUP
-    version = P.ComponentKaiheila.VERSION
+    group = P.ComponentKook.GROUP
+    version = P.ComponentKook.VERSION
 
     apply(plugin = "java")
 
@@ -139,7 +139,7 @@ if (isPublishConfigurable) {
 
     if (sonatypeUsername != null && sonatypePassword != null) {
         nexusPublishing {
-            packageGroup.set(P.ComponentKaiheila.GROUP)
+            packageGroup.set(P.ComponentKook.GROUP)
 
             useStaging.set(
                 project.provider { !project.version.toString().endsWith("SNAPSHOT", ignoreCase = true) }
@@ -202,7 +202,7 @@ tasks.register("dokkaHtmlMultiModuleAndPost") {
 tasks.create("createChangelog") {
     group = "build"
     doFirst {
-        val version = "v${P.ComponentKaiheila.version.fullVersion(false)}"
+        val version = "v${P.ComponentKook.version.fullVersion(false)}"
         println("Generate change log for $version ...")
         // configurations.runtimeClasspath
         val changelogDir = rootProject.file(".changelog").also {
