@@ -20,10 +20,10 @@ package example
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.plus
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.component.kook.KaiheilaComponent
-import love.forte.simbot.component.kook.message.KaiheilaAssetImage
-import love.forte.simbot.component.kook.message.KaiheilaAtAllHere
-import love.forte.simbot.component.kook.message.KaiheilaKMarkdownMessage
+import love.forte.simbot.component.kook.KookComponent
+import love.forte.simbot.component.kook.message.KookAssetImage
+import love.forte.simbot.component.kook.message.KookAtAllHere
+import love.forte.simbot.component.kook.message.KookKMarkdownMessage
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.asset.AssetCreated
 import love.forte.simbot.kook.objects.buildKMarkdown
@@ -41,12 +41,12 @@ class MessageSerializerTest {
     @Test
     fun encodeTest() {
         val messages = buildMessages {
-            +KaiheilaAtAllHere
-            +KaiheilaKMarkdownMessage(buildKMarkdown {
+            +KookAtAllHere
+            +KookKMarkdownMessage(buildKMarkdown {
                 at("1234")
                 link("Simbot Home", "http://simbot.forte.love")
             })
-            +KaiheilaAssetImage(AssetCreated("https://baidu.com"))
+            +KookAssetImage(AssetCreated("https://baidu.com"))
         }
 
         println(messages)
@@ -55,7 +55,7 @@ class MessageSerializerTest {
             isLenient = true
             ignoreUnknownKeys = true
             prettyPrint = true
-            serializersModule += KaiheilaComponent.messageSerializersModule
+            serializersModule += KookComponent.messageSerializersModule
         }
 
         val str = json.encodeToString(Messages.serializer, messages)

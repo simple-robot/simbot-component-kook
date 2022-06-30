@@ -20,7 +20,7 @@ package love.forte.simbot.component.kook.internal
 import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.component.kook.KaiheilaComponentBot
+import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.internal.event.*
 import love.forte.simbot.component.kook.model.toModel
@@ -43,7 +43,7 @@ import love.forte.simbot.kook.objects.SystemUser
 /**
  * 注册各种标准事件。
  */
-internal suspend fun Event<*>.register(bot: KaiheilaComponentBotImpl) {
+internal suspend fun Event<*>.register(bot: KookComponentBotImpl) {
     when (this) {
         // 消息事件
         is MessageEvent<*> -> registerMessageEvent(bot)
@@ -60,25 +60,25 @@ internal suspend fun Event<*>.register(bot: KaiheilaComponentBotImpl) {
 
 
 @OptIn(DiscreetSimbotApi::class)
-private fun Event<*>.pushUnsupported(bot: KaiheilaComponentBotImpl) {
-    bot.pushIfProcessable(UnsupportedKaiheilaEvent) {
-        UnsupportedKaiheilaEvent(bot, this)
+private fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
+    bot.pushIfProcessable(UnsupportedKookEvent) {
+        UnsupportedKookEvent(bot, this)
     }
 }
 
 /**
  * 消息事件
  */
-private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) {
+private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
     when (channelType) {
         Channel.Type.PERSON -> {
             if (bot.isMe(authorId)) {
-                bot.pushIfProcessable(KaiheilaBotSelfPersonMessageEvent) {
-                    KaiheilaBotSelfPersonMessageEventImpl(bot, this)
+                bot.pushIfProcessable(KookBotSelfPersonMessageEvent) {
+                    KookBotSelfPersonMessageEventImpl(bot, this)
                 }
             } else {
-                bot.pushIfProcessable(KaiheilaNormalPersonMessageEvent) {
-                    KaiheilaNormalPersonMessageEventImpl(bot, this)
+                bot.pushIfProcessable(KookNormalPersonMessageEvent) {
+                    KookNormalPersonMessageEventImpl(bot, this)
                 }
             }
         }
@@ -87,8 +87,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
             val author = guild.internalMember(authorId) ?: return
             val channel = guild.internalChannel(targetId) ?: return
             if (bot.isMe(authorId)) {
-                bot.pushIfProcessable(KaiheilaBotSelfGroupMessageEvent) {
-                    KaiheilaBotSelfGroupMessageEventImpl(
+                bot.pushIfProcessable(KookBotSelfGroupMessageEvent) {
+                    KookBotSelfGroupMessageEventImpl(
                         bot,
                         this,
                         channel = channel,
@@ -97,8 +97,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
                 }
             } else {
                 // push event
-                bot.pushIfProcessable(KaiheilaNormalGroupMessageEvent) {
-                    KaiheilaNormalGroupMessageEventImpl(
+                bot.pushIfProcessable(KookNormalGroupMessageEvent) {
+                    KookNormalGroupMessageEventImpl(
                         bot,
                         this,
                         author,
@@ -115,7 +115,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KaiheilaComponentBotImpl) 
 /**
  * 系统事件
  */
-private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponentBotImpl) {
+private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotImpl) {
 
     // 准备资源
     val guild = bot.internalGuild(targetId) ?: return
@@ -128,9 +128,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
     @Suppress("UNCHECKED_CAST")
     when (val body = extra.body) {
         //region 成员变更相关
-        is UserExitedChannelEventBody -> bot.pushIfProcessable(KaiheilaMemberExitedChannelEvent) {
+        is UserExitedChannelEventBody -> bot.pushIfProcessable(KookMemberExitedChannelEvent) {
             val channel = guild.internalChannel(body.channelId) ?: return
-            KaiheilaMemberExitedChannelEventImpl(
+            KookMemberExitedChannelEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
                 channel,
@@ -138,9 +138,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
             )
         }
 
-        is UserJoinedChannelEventBody -> bot.pushIfProcessable(KaiheilaMemberJoinedChannelEvent) {
+        is UserJoinedChannelEventBody -> bot.pushIfProcessable(KookMemberJoinedChannelEvent) {
             val channel = guild.internalChannel(body.channelId) ?: return
-            KaiheilaMemberJoinedChannelEventImpl(
+            KookMemberJoinedChannelEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<UserJoinedChannelEventBody>>,
                 channel,
@@ -148,8 +148,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
             )
         }
 
-        is ExitedGuildEventBody -> bot.pushIfProcessable(KaiheilaMemberExitedGuildEvent) {
-            KaiheilaMemberExitedGuildEventImpl(
+        is ExitedGuildEventBody -> bot.pushIfProcessable(KookMemberExitedGuildEvent) {
+            KookMemberExitedGuildEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<ExitedGuildEventBody>>,
                 guild,
@@ -157,8 +157,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
             )
         }
 
-        is JoinedGuildEventBody -> bot.pushIfProcessable(KaiheilaMemberJoinedGuildEvent) {
-            KaiheilaMemberJoinedGuildEventImpl(
+        is JoinedGuildEventBody -> bot.pushIfProcessable(KookMemberJoinedGuildEvent) {
+            KookMemberJoinedGuildEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<JoinedGuildEventBody>>,
                 guild,
@@ -166,8 +166,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
             )
         }
 
-        is SelfExitedGuildEventBody -> bot.pushIfProcessable(KaiheilaBotSelfExitedGuildEvent) {
-            KaiheilaBotSelfExitedGuildEventImpl(
+        is SelfExitedGuildEventBody -> bot.pushIfProcessable(KookBotSelfExitedGuildEvent) {
+            KookBotSelfExitedGuildEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
                 guild,
@@ -175,8 +175,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
             )
         }
 
-        is SelfJoinedGuildEventBody -> bot.pushIfProcessable(KaiheilaBotSelfJoinedGuildEvent) {
-            KaiheilaBotSelfJoinedGuildEventImpl(
+        is SelfJoinedGuildEventBody -> bot.pushIfProcessable(KookBotSelfJoinedGuildEvent) {
+            KookBotSelfJoinedGuildEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
                 guild,
@@ -188,8 +188,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
         is GuildMemberOnlineEventBody -> {
             val userInfo = bot.findUserInGuilds(body.userId, body.guilds) ?: return
 
-            bot.pushIfProcessable(KaiheilaUserOnlineStatusChangedEvent.Online) {
-                KaiheilaMemberOnlineEventImpl(
+            bot.pushIfProcessable(KookUserOnlineStatusChangedEvent.Online) {
+                KookMemberOnlineEventImpl(
                     bot,
                     this as Event<Event.Extra.Sys<GuildMemberOnlineEventBody>>,
                     userInfo
@@ -201,8 +201,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
         is GuildMemberOfflineEventBody -> {
             val userInfo = bot.findUserInGuilds(body.userId, body.guilds) ?: return
 
-            bot.pushIfProcessable(KaiheilaUserOnlineStatusChangedEvent.Offline) {
-                KaiheilaMemberOfflineEventImpl(
+            bot.pushIfProcessable(KookUserOnlineStatusChangedEvent.Offline) {
+                KookMemberOfflineEventImpl(
                     bot,
                     this as Event<Event.Extra.Sys<GuildMemberOfflineEventBody>>,
                     userInfo
@@ -213,8 +213,8 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
         //endregion
 
         //region 用户信息更新事件
-        is UserUpdatedEventBody -> bot.pushIfProcessable(KaiheilaUserUpdatedEvent) {
-            KaiheilaUserUpdatedEventImpl(
+        is UserUpdatedEventBody -> bot.pushIfProcessable(KookUserUpdatedEvent) {
+            KookUserUpdatedEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<UserUpdatedEventBody>>
             )
@@ -222,43 +222,43 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
         //endregion
 
         // region 频道变更事件
-        is AddedChannelExtraBody -> bot.pushIfProcessable(KaiheilaAddedChannelChangedEvent) {
+        is AddedChannelExtraBody -> bot.pushIfProcessable(KookAddedChannelChangedEvent) {
             val channel = guild.internalChannel(body.id) ?: return
-            KaiheilaAddedChannelChangedEventImpl(
+            KookAddedChannelChangedEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<AddedChannelExtraBody>>,
                 guild, channel
             )
         }
-        is UpdatedChannelExtraBody -> bot.pushIfProcessable(KaiheilaUpdatedChannelChangedEvent) {
+        is UpdatedChannelExtraBody -> bot.pushIfProcessable(KookUpdatedChannelChangedEvent) {
             val channel = guild.internalChannel(body.id) ?: return
-            KaiheilaUpdatedChannelChangedEventImpl(
+            KookUpdatedChannelChangedEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<UpdatedChannelExtraBody>>,
                 guild, channel
             )
         }
-        is DeletedChannelExtraBody -> bot.pushIfProcessable(KaiheilaDeletedChannelChangedEvent) {
+        is DeletedChannelExtraBody -> bot.pushIfProcessable(KookDeletedChannelChangedEvent) {
             val channel = guild.internalChannel(body.id) ?: return
-            KaiheilaDeletedChannelChangedEventImpl(
+            KookDeletedChannelChangedEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<DeletedChannelExtraBody>>,
                 guild, channel
             )
         }
-        is PinnedMessageExtraBody -> bot.pushIfProcessable(KaiheilaPinnedMessageEvent) {
+        is PinnedMessageExtraBody -> bot.pushIfProcessable(KookPinnedMessageEvent) {
             val channel = guild.internalChannel(body.channelId) ?: return
             val operator = guild.internalMember(body.operatorId)
-            KaiheilaPinnedMessageEventImpl(
+            KookPinnedMessageEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<PinnedMessageExtraBody>>,
                 guild, channel, operator
             )
         }
-        is UnpinnedMessageExtraBody -> bot.pushIfProcessable(KaiheilaUnpinnedMessageEvent) {
+        is UnpinnedMessageExtraBody -> bot.pushIfProcessable(KookUnpinnedMessageEvent) {
             val channel = guild.internalChannel(body.channelId) ?: return
             val operator = guild.internalMember(body.operatorId)
-            KaiheilaUnpinnedMessageEventImpl(
+            KookUnpinnedMessageEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<UnpinnedMessageExtraBody>>,
                 guild, channel, operator
@@ -278,7 +278,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KaiheilaComponent
 
 }
 
-private suspend fun KaiheilaComponentBotImpl.findUserInGuilds(userId: ID, guildIds: Collection<ID>): UserInfo? {
+private suspend fun KookComponentBotImpl.findUserInGuilds(userId: ID, guildIds: Collection<ID>): UserInfo? {
     return guildIds.ifEmpty { return null }
         .asSequence()
         .mapNotNull { id -> internalGuild(id) }
@@ -289,7 +289,7 @@ private suspend fun KaiheilaComponentBotImpl.findUserInGuilds(userId: ID, guildI
 }
 
 
-private inline fun KaiheilaComponentBot.pushIfProcessable(
+private inline fun KookComponentBot.pushIfProcessable(
     eventKey: Key<*>,
     block: () -> love.forte.simbot.event.Event?,
 ): Boolean {
@@ -305,12 +305,12 @@ private inline fun KaiheilaComponentBot.pushIfProcessable(
 
 private fun toMemberIfSystem(
     id: ID,
-    bot: KaiheilaComponentBotImpl,
-    guild: KaiheilaGuildImpl
-): KaiheilaGuildMemberImpl? {
+    bot: KookComponentBotImpl,
+    guild: KookGuildImpl
+): KookGuildMemberImpl? {
     if (id != SystemUser.id) {
         return null
     }
 
-    return KaiheilaGuildMemberImpl(bot, guild, SystemUser.toModel())
+    return KookGuildMemberImpl(bot, guild, SystemUser.toModel())
 }

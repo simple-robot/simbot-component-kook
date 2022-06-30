@@ -1,0 +1,143 @@
+/*
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *
+ *  本文件是 simbot-component-kook 的一部分。
+ *
+ *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ *
+ *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ *
+ *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
+ *  https://www.gnu.org/licenses
+ *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ *
+ *
+ */
+
+package love.forte.simbot.component.kook
+
+import kotlinx.serialization.modules.PolymorphicModuleBuilder
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import love.forte.simbot.*
+import love.forte.simbot.component.kook.message.*
+import love.forte.simbot.kook.objects.KMarkdown
+import love.forte.simbot.kook.objects.RawValueKMarkdown
+import love.forte.simbot.message.Message
+
+/**
+ *
+ *  Kook 组件的 [Component] 实现。
+ *
+ * @author ForteScarlet
+ */
+public class KookComponent @InternalSimbotApi constructor() : Component {
+    /**
+     * 组件的唯一标识ID。
+     */
+    override val id: String
+        get() = ID_VALUE
+    
+    /**
+     *  Kook 组件中所涉及到的序列化模块。
+     *
+     */
+    override val componentSerializersModule: SerializersModule
+        get() = messageSerializersModule
+    
+    override fun toString(): String = TO_STRING_VALUE
+    
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is KookComponent) return false
+        
+        return id == other.id
+    }
+    
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+    
+    /**
+     * 组件 [KookComponent] 的注册器。
+     *
+     */
+    public companion object Factory : ComponentFactory<KookComponent, KookComponentConfiguration> {
+        
+        /**
+         * 组件 [KookComponent] 的ID
+         */
+        @Suppress("MemberVisibilityCanBePrivate")
+        public const val ID_VALUE: String = "simbot.kook"
+        
+        private const val TO_STRING_VALUE = "KookComponent(id=$ID_VALUE)"
+        
+        /**
+         * 组件的ID实例。
+         */
+        @Deprecated("Unused")
+        public val componentID: CharSequenceID = ID_VALUE.ID
+        
+        /**
+         * 注册器的唯一标识。
+         */
+        override val key: Attribute<KookComponent> = attribute(ID_VALUE)
+        
+        /**
+         * [KookComponent] 组件所使用的消息序列化信息。
+         */
+        @OptIn(ExperimentalSimbotApi::class)
+        public val messageSerializersModule: SerializersModule = SerializersModule {
+            fun PolymorphicModuleBuilder<KookMessageElement<*>>.include() {
+                subclass(KookSimpleAssetMessage::class, KookSimpleAssetMessage.serializer())
+                subclass(KookAssetImage::class, KookAssetImage.serializer())
+                subclass(KookAtAllHere::class, KookAtAllHere.serializer())
+                subclass(KookAttachmentMessage::class, KookAttachmentMessage.serializer())
+                subclass(KookCardMessage::class, KookCardMessage.serializer())
+                subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer())
+            }
+            polymorphic(KMarkdown::class) {
+                subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer())
+            }
+            
+            polymorphic(KookMessageElement::class) {
+                include()
+            }
+            
+            polymorphic(Message.Element::class) {
+                include()
+            }
+        }
+        
+        /**
+         * 构建一个 [KookComponent] 实例。
+         */
+        @OptIn(InternalSimbotApi::class)
+        override suspend fun create(configurator: KookComponentConfiguration.() -> Unit): KookComponent {
+            KookComponentConfiguration.configurator()
+            return KookComponent()
+        }
+    }
+    
+}
+
+/**
+ *
+ * [KookComponent] 注册时所使用的配置类。
+ *
+ * 目前对于 Kook 组件来讲没有需要配置的内容，因此 [KookComponentConfiguration] 中暂无可配置属性。
+ *
+ */
+public object KookComponentConfiguration
+
+
+/**
+ * [KookComponent] 的注册器工厂，用于支持组件的自动加载。
+ *
+ */
+public class KookComponentAutoRegistrarFactory :
+    ComponentAutoRegistrarFactory<KookComponent, KookComponentConfiguration> {
+    override val registrar: KookComponent.Factory
+        get() = KookComponent
+}

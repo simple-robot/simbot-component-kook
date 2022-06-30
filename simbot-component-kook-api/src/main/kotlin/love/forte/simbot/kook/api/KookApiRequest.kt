@@ -28,7 +28,7 @@ import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
-import love.forte.simbot.kook.KookApi
+import love.forte.simbot.kook.Kook
 import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
 import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
 import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
@@ -46,7 +46,7 @@ import java.util.function.Consumer
  * [KookApiRequest] 面向 ktor, 并基于 `kotlinx.serialization` 进行反序列化。
  *
  * ### Url内容
- * 最终进行请求的 [url] 中部分参数（例如host）来自于 [KookApi].
+ * 最终进行请求的 [url] 中部分参数（例如host）来自于 [Kook].
  *
  * ### 不可变
  * 此接口的实现类应当是不可变、可复用的。
@@ -54,7 +54,7 @@ import java.util.function.Consumer
 public abstract class KookApiRequest<T> {
 
     /**
-     * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [KookApi].
+     * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [Kook].
      */
     public abstract val url: Url
 
@@ -274,7 +274,7 @@ public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
             return if (::_url.isInitialized) {
                 _url
             } else {
-                val buildUrl = KookApi.buildApiUrl(apiPaths, true) {
+                val buildUrl = Kook.buildApiUrl(apiPaths, true) {
                     buildParameters()
                 }
                 buildUrl.also { _url = it }

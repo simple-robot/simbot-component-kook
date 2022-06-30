@@ -15,4 +15,4 @@
 #
 #
 
-love.forte.simbot.component.kook.KaiheilaBotManagerAutoRegistrarFactory
+love.forte.simbot.component.kook.KookBotManagerAutoRegistrarFactory

@@ -20,12 +20,12 @@ package love.forte.simboot.component.kaiheila
 import love.forte.di.annotation.Configurable
 import love.forte.di.annotation.SpareBean
 import love.forte.simbot.LoggerFactory
-import love.forte.simbot.component.kook.KaiheilaBotManagerConfiguration
+import love.forte.simbot.component.kook.KookBotManagerConfiguration
 import javax.inject.Named
 
 
 /**
- * [KaiheilaBotManagerConfiguration] 配置类。
+ * [KookBotManagerConfiguration] 配置类。
  * @author ForteScarlet
  */
 public interface KaiheilaBotManagerConfigure {
@@ -33,7 +33,7 @@ public interface KaiheilaBotManagerConfigure {
     /**
      * 得到配置文件并进行配置。
      */
-    public fun config(configuration: KaiheilaBotManagerConfiguration)
+    public fun config(configuration: KookBotManagerConfiguration)
 
 }
 
@@ -42,7 +42,7 @@ public interface KaiheilaBotManagerConfigure {
 @SpareBean(KaiheilaBotManagerConfigure::class)
 @Configurable(prefix = "simbot.component.tencentguild")
 public class DefaultKaiheilaBotManagerConfigure : KaiheilaBotManagerConfigure {
-    override fun config(configuration: KaiheilaBotManagerConfiguration) {
+    override fun config(configuration: KookBotManagerConfiguration) {
         logger.debug("Do tencent guild bot manager config by Default.")
         // do nothing?
     }
