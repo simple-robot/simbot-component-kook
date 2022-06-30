@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.Api4J
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.KookUserChat
@@ -175,14 +174,12 @@ public sealed class KookMessageEvent :
          * 消息事件发生的对话。
          */
         @Api4J
-        @OptIn(ExperimentalSimbotApi::class)
         abstract override val source: KookUserChat
 
         /**
          * 消息事件发生的对话。
          */
         @JvmSynthetic
-        @OptIn(ExperimentalSimbotApi::class)
         abstract override suspend fun source(): KookUserChat
 
 
@@ -285,7 +282,6 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
     @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
     override val user: KookUserChat
         get() = runInBlocking { user() }
 
@@ -295,7 +291,6 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
     @JvmSynthetic
-    @OptIn(ExperimentalSimbotApi::class)
     abstract override suspend fun user(): KookUserChat
 
     /**
@@ -304,7 +299,6 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
     @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
     override val source: KookUserChat
         get() = user
 
@@ -315,7 +309,6 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
     @JvmSynthetic
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun source(): KookUserChat = user()
 
 
@@ -427,7 +420,6 @@ public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
      * 发生事件的私聊会话。
      */
     @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
     override val source: KookUserChat
         get() = runInBlocking { source() }
 
@@ -435,7 +427,6 @@ public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
      * 发生事件的私聊会话。
      */
     @JvmSynthetic
-    @OptIn(ExperimentalSimbotApi::class)
     abstract override suspend fun source(): KookUserChat
 
 

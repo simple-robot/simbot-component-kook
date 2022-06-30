@@ -19,7 +19,6 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.Bot
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.message.KookAssetMessage
@@ -165,7 +164,6 @@ public interface KookComponentBot : Bot {
      * 但是会抛出任何可能由 [UserChatCreateRequest] 抛出的或者请求过程中产生的任何异常。
      *
      */
-    @OptIn(ExperimentalSimbotApi::class)
     @JvmSynthetic
     override suspend fun contact(id: ID): KookUserChat
     
@@ -179,7 +177,6 @@ public interface KookComponentBot : Bot {
      *
      */
     @Api4J
-    @OptIn(ExperimentalSimbotApi::class)
     override fun getContact(id: ID): KookUserChat = runInBlocking { contact(id) }
     
     
@@ -188,7 +185,6 @@ public interface KookComponentBot : Bot {
      *
      * 会通过 [UserChatListRequest] 直接进行查询，不会进行缓存。
      */
-    @OptIn(ExperimentalSimbotApi::class)
     override val contacts: Items<KookUserChat>
     
     

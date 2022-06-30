@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
@@ -40,10 +39,12 @@ import love.forte.simbot.utils.runInBlocking
  * Kook 中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KookUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
  *
  */
-@ExperimentalSimbotApi
 public interface KookUserChat : Stranger, Contact, KookComponentDefinition<UserChatView>, DeleteSupport {
     /**
      * 私聊会话对应用户ID。
+     *
+     * 如果需要此会话的会话code而不是用于id，使用 [source] 来获取 [UserChatView.code]。
+     *
      */
     override val id: ID
     override val bot: KookComponentBot
