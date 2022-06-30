@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.literal
 
 
@@ -35,8 +35,8 @@ import love.forte.simbot.literal
  * @param chatCode 会话ID
  * @author ForteScarlet
  */
-public class UserChatViewRequest(private val chatCode: ID) : KaiheilaGetRequest<UserChatView>() {
-    public companion object Key : BaseApiRequestKey("user-chat", "view")
+public class UserChatViewRequest(private val chatCode: ID) : KookGetRequest<UserChatView>() {
+    public companion object Key : BaseKookApiRequestKey("user-chat", "view")
     
     override val resultDeserializer: DeserializationStrategy<out UserChatView>
         get() = UserChatViewImpl.serializer()

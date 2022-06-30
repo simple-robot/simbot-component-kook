@@ -24,8 +24,8 @@ import love.forte.simbot.ID
 import love.forte.simbot.LongID
 import love.forte.simbot.definition.Role
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 import love.forte.simbot.kaiheila.objects.PermissionType
 import love.forte.simbot.kaiheila.objects.Permissions
 
@@ -40,8 +40,8 @@ import love.forte.simbot.kaiheila.objects.Permissions
 public class GuildRoleCreateRequest(
     private val guildId: ID,
     private val name: String? = null,
-) : KaiheilaPostRequest<GuildRoleCreated>() {
-    public companion object Key : BaseApiRequestKey("guild-role", "create")
+) : KookPostRequest<GuildRoleCreated>() {
+    public companion object Key : BaseKookApiRequestKey("guild-role", "create")
 
     override val resultDeserializer: DeserializationStrategy<out GuildRoleCreated>
         get() = GuildRoleCreated.serializer()

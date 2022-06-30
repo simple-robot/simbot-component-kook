@@ -22,8 +22,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -35,8 +35,8 @@ import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
 public class GuildKickoutRequest(
     guildId: ID,
     targetId: ID,
-) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("guild", "kickout")
+) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("guild", "kickout")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

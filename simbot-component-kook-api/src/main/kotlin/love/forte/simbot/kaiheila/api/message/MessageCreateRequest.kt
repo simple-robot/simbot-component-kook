@@ -20,8 +20,8 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 /**
  * [发送频道聊天消息](https://developer.kaiheila.cn/doc/http/message#%E5%8F%91%E9%80%81%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
@@ -67,8 +67,8 @@ public class MessageCreateRequest(
      */
     @Serializable(ID.AsCharSequenceIDSerializer::class)
     private val tempTargetId: ID? = null,
-) : KaiheilaPostRequest<MessageCreated>() {
-    public companion object Key : BaseApiRequestKey("message", "create")
+) : KookPostRequest<MessageCreated>() {
+    public companion object Key : BaseKookApiRequestKey("message", "create")
 
     override val resultDeserializer: DeserializationStrategy<out MessageCreated> get() = MessageCreated.serializer()
 

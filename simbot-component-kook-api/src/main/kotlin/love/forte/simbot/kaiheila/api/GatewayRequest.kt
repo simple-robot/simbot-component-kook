@@ -35,8 +35,8 @@ import love.forte.simbot.kaiheila.api.GatewayRequest.*
  *
  * @author ForteScarlet
  */
-public sealed class GatewayRequest(private val isCompress: Boolean) : KaiheilaGetRequest<Gateway>() {
-    public companion object Key : BaseApiRequestKey("gateway", "index")
+public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetRequest<Gateway>() {
+    public companion object Key : BaseKookApiRequestKey("gateway", "index")
 
 
     override fun ParametersBuilder.buildParameters() {

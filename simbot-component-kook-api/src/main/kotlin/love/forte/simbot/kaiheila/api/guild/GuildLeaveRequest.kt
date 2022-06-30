@@ -22,8 +22,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -32,8 +32,8 @@ import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
  * request method: POST
  *
  */
-public class GuildLeaveRequest(private val guildId: ID) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("guild", "leave")
+public class GuildLeaveRequest(private val guildId: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("guild", "leave")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

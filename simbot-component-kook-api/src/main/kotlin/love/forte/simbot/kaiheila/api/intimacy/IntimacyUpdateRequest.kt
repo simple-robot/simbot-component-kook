@@ -22,8 +22,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 /**
  * [更新用户亲密度](https://developer.kaiheila.cn/doc/http/intimacy#更新用户亲密度)
@@ -49,8 +49,8 @@ public class IntimacyUpdateRequest @JvmOverloads constructor(
      * 表情ID
      */
     private val imgId: ID? = null
-) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("intimacy", "update")
+) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("intimacy", "update")
 
     init {
         Simbot.require(score == null || score in 0..2200) { "Score must in 0 .. 2200" }

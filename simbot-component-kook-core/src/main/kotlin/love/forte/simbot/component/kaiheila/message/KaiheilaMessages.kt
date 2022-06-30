@@ -21,7 +21,7 @@ import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.kaiheila.api.KookApiRequest
 import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
 import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
@@ -91,7 +91,7 @@ public suspend fun Message.toRequest(
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
-): KaiheilaApiRequest<*>? {
+): KookApiRequest<*>? {
     when (this) {
         is Message.Element<*> -> return elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
         is Messages -> {
@@ -142,7 +142,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
-): KaiheilaApiRequest<*>? {
+): KookApiRequest<*>? {
     fun request(type: Int, content: String): MessageCreateRequest {
         return MessageCreateRequest(
             type = type,

@@ -37,7 +37,7 @@ import love.forte.simbot.kaiheila.KaiheilaBot
 import love.forte.simbot.kaiheila.KaiheilaBotConfiguration
 import love.forte.simbot.kaiheila.api.Gateway
 import love.forte.simbot.kaiheila.api.GatewayRequest
-import love.forte.simbot.kaiheila.api.KaiheilaApiException
+import love.forte.simbot.kaiheila.api.KookApiException
 import love.forte.simbot.kaiheila.api.err
 import love.forte.simbot.kaiheila.api.user.Me
 import love.forte.simbot.kaiheila.api.user.MeRequest
@@ -522,7 +522,7 @@ private fun waitForHello(decoder: Json, frame: Frame): Signal.Hello? {
 private fun Signal.Hello.check(): Signal.Hello {
     if (d.code != Signal.Hello.SUCCESS_CODE) {
         val info = Signal.Hello.getErrorInfo(d.code)
-        throw KaiheilaApiException(d.code.toInt(), info)
+        throw KookApiException(d.code.toInt(), info)
     }
     
     return this
@@ -530,4 +530,4 @@ private fun Signal.Hello.check(): Signal.Hello {
 
 
 internal class ReconnectException(code: Int, message: String, cause: Throwable? = null) :
-    KaiheilaApiException(code, message, cause)
+    KookApiException(code, message, cause)

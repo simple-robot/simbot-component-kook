@@ -21,8 +21,8 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -40,8 +40,8 @@ public class GuildRoleGrantRequest(
     private val userId: ID,
     /** 角色id */
     private val roleId: ID,
-) : KaiheilaPostRequest<UserRoleOperated>() {
-    public companion object Key : BaseApiRequestKey("guild-role", "grant")
+) : KookPostRequest<UserRoleOperated>() {
+    public companion object Key : BaseKookApiRequestKey("guild-role", "grant")
 
     override val resultDeserializer: DeserializationStrategy<out UserRoleOperated>
         get() = UserRoleOperated.serializer()

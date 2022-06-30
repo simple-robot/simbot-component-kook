@@ -21,8 +21,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 /**
  *
@@ -38,11 +38,11 @@ public class MessageAddReactionRequest(
      *	emoji的id, 可以为 `Guild Emoji` 或者 `Emoji`
      */
     private val emoji: ID,
-) : KaiheilaPostRequest<Unit>() {
+) : KookPostRequest<Unit>() {
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
 
-    public companion object Key : BaseApiRequestKey("message", "add-reaction")
+    public companion object Key : BaseKookApiRequestKey("message", "add-reaction")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

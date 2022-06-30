@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.objects.Channel
 import love.forte.simbot.kaiheila.objects.Guild
 import love.forte.simbot.kaiheila.objects.Role
@@ -40,8 +40,8 @@ import love.forte.simbot.literal
  * request method: GET
  *
  */
-public class GuildViewRequest(private val guildId: ID) : KaiheilaGetRequest<Guild>() {
-    public companion object Key : BaseApiRequestKey("guild", "view")
+public class GuildViewRequest(private val guildId: ID) : KookGetRequest<Guild>() {
+    public companion object Key : BaseKookApiRequestKey("guild", "view")
 
     override val apiPaths: List<String>
         get() = apiPathList

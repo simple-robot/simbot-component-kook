@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.LongID
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.objects.User
 import love.forte.simbot.kaiheila.util.unmodifiableListOf
 
@@ -32,7 +32,7 @@ import love.forte.simbot.kaiheila.util.unmodifiableListOf
  *
  * @author ForteScarlet
  */
-public object MeRequest : KaiheilaGetRequest<Me>() {
+public object MeRequest : KookGetRequest<Me>() {
     override val apiPaths: List<String> = unmodifiableListOf("user", "me")
 
     override val resultDeserializer: DeserializationStrategy<out Me>

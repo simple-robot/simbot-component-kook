@@ -26,8 +26,8 @@ import io.ktor.utils.io.streams.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 import love.forte.simbot.resources.Resource
 import love.forte.simbot.resources.URLResource
 import love.forte.simbot.utils.RandomIDUtil
@@ -51,9 +51,9 @@ public class AssetCreateRequest(
     private val resource: Resource,
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
-) : KaiheilaPostRequest<AssetCreated>(false) {
-    public companion object Key : BaseApiRequestKey("asset", "create") {
-        private val logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.api.asset.AssetCreateRequest")
+) : KookPostRequest<AssetCreated>(false) {
+    public companion object Key : BaseKookApiRequestKey("asset", "create") {
+        private val logger = LoggerFactory.getLogger("love.forte.simbot.kook.api.asset.AssetCreateRequest")
     }
 
     private val contentType: ContentType

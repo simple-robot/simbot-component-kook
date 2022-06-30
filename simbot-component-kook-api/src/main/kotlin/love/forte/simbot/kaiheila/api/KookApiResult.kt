@@ -40,15 +40,15 @@ import kotlinx.serialization.json.decodeFromJsonElement
  * ```
  *
  *
- * 当返回数据为对象时，使用 [KaiheilaApiRequest] 的预期结果即为目标结果。
+ * 当返回数据为对象时，使用 [KookApiRequest] 的预期结果即为目标结果。
  *
- * 当返回数据为空时，使用 [KaiheilaApiRequest] 的预期结果考虑使用不变常量，例如 [Unit].
+ * 当返回数据为空时，使用 [KookApiRequest] 的预期结果考虑使用不变常量，例如 [Unit].
  *
- * 当返回数据为列表时，使用 [KaiheilaApiRequest] 的预期结果考虑使用 [KaiheilaApiResult.ListData].
+ * 当返回数据为列表时，使用 [KookApiRequest] 的预期结果考虑使用 [KookApiResult.ListData].
  *
  * @author ForteScarlet
  */
-public object KaiheilaApiResult {
+public object KookApiResult {
     /**
      * 代表成功的 '错误码'。
      */
@@ -155,7 +155,7 @@ public class ApiResult @ApiResultType constructor(
     /**
      * 此接口的响应码是否为成功的响应码.
      */
-    public val isSuccess: Boolean get() = code == KaiheilaApiResult.SUCCESS_CODE
+    public val isSuccess: Boolean get() = code == KookApiResult.SUCCESS_CODE
 
     /**
      * 提供解析参数来使用当前result中的data内容解析为目标结果。
@@ -168,14 +168,14 @@ public class ApiResult @ApiResultType constructor(
     }
 
     /**
-     * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KaiheilaApiResult.SUCCESS_CODE]), 则抛出 [KaiheilaApiException] 异常。
+     * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KookApiResult.SUCCESS_CODE]), 则抛出 [KookApiException] 异常。
      *
-     * @throws KaiheilaApiException 如果 [code] 不为成功
+     * @throws KookApiException 如果 [code] 不为成功
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
     public fun <T> parseDataOrThrow(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
         if (!isSuccess) {
-            throw KaiheilaApiException(code, "$message, api=$this")
+            throw KookApiException(code, "$message, api=$this")
         }
         return parseData(json, deserializationStrategy)
     }

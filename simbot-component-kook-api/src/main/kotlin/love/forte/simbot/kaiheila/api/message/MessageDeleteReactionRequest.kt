@@ -21,8 +21,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 /**
  * [删除消息的某个回应](https://developer.kaiheila.cn/doc/http/message#%E5%88%A0%E9%99%A4%E6%B6%88%E6%81%AF%E7%9A%84%E6%9F%90%E4%B8%AA%E5%9B%9E%E5%BA%94)
@@ -32,11 +32,11 @@ public class MessageDeleteReactionRequest(
     private val msgId: ID,
     private val emoji: ID,
     private val userId: ID,
-) : KaiheilaPostRequest<Unit>() {
+) : KookPostRequest<Unit>() {
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji, userId: ID) : this(msgId, emoji.id, userId)
     public constructor(msgId: ID, emoji: Emoji, userId: ID) : this(msgId, emoji.id, userId)
 
-    public companion object Key : BaseApiRequestKey("message", "delete-reaction")
+    public companion object Key : BaseKookApiRequestKey("message", "delete-reaction")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

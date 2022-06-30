@@ -22,8 +22,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 /**
  * [更新私信聊天消息](https://developer.kaiheila.cn/doc/http/direct-message#%E6%9B%B4%E6%96%B0%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
@@ -46,8 +46,8 @@ public class DirectMessageUpdateRequest(
      * 回复某条消息的 msgId。如果为空，则代表删除回复，不传则无影响。
      */
     private val quote: ID?,
-) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("direct-message", "update")
+) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("direct-message", "update")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

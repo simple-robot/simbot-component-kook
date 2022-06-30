@@ -53,12 +53,12 @@ public class ChannelListRequest(
      * 频道类型, `1`为文字，`2`为语音, 默认为`1`.
      */
     private val type: Int? = null,
-) : KaiheilaGetRequest<KaiheilaApiResult.ListData<ChannelInfo>>() {
-    public companion object Key : BaseApiRequestKey("channel", "list") {
-        private val serializer = KaiheilaApiResult.ListData.serializer(ChannelInfoImpl.serializer())
+) : KookGetRequest<KookApiResult.ListData<ChannelInfo>>() {
+    public companion object Key : BaseKookApiRequestKey("channel", "list") {
+        private val serializer = KookApiResult.ListData.serializer(ChannelInfoImpl.serializer())
     }
     
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<ChannelInfo>>
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelInfo>>
         get() = serializer
     
     override val apiPaths: List<String>
@@ -76,7 +76,7 @@ public class ChannelListRequest(
         client: HttpClient,
         authorization: String,
         decoder: Json,
-    ): KaiheilaApiResult.ListData<ChannelInfo> {
+    ): KookApiResult.ListData<ChannelInfo> {
         val data = super.requestData(client, authorization, decoder)
         data.items.forEach {
             (it as? ChannelInfoImpl)?.guildIdLate = guildId

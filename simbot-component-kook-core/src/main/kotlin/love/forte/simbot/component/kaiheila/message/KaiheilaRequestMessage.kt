@@ -17,24 +17,24 @@
 
 package love.forte.simbot.component.kaiheila.message
 
-import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.kaiheila.api.KookApiRequest
 import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 
 /**
- * 提供一个 [KaiheilaApiRequest] 作为原始的消息发送请求（例如 [MessageCreateRequest]）。
+ * 提供一个 [KookApiRequest] 作为原始的消息发送请求（例如 [MessageCreateRequest]）。
  *
  * 此消息会直接使用 [request] 作为消息发送的请求。
  *
  * 这是一个**仅用于发送**的消息，且**不支持**序列化。
  *
- * @see KaiheilaApiRequest
+ * @see KookApiRequest
  *
  * @author ForteScarlet
  */
 @SendOnlyMessage
-public data class KaiheilaRequestMessage(public val request: KaiheilaApiRequest<*>) :
+public data class KaiheilaRequestMessage(public val request: KookApiRequest<*>) :
     KaiheilaMessageElement<KaiheilaRequestMessage> {
 
     override val key: Message.Key<KaiheilaRequestMessage>
@@ -47,7 +47,7 @@ public data class KaiheilaRequestMessage(public val request: KaiheilaApiRequest<
          * 通过 [KaiheilaRequestMessage] 构建 [KaiheilaRequestMessage].
          */
         @JvmStatic
-        public fun KaiheilaApiRequest<*>.toRequest(): KaiheilaRequestMessage = KaiheilaRequestMessage(this)
+        public fun KookApiRequest<*>.toRequest(): KaiheilaRequestMessage = KaiheilaRequestMessage(this)
 
     }
 }

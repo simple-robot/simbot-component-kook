@@ -1,8 +1,8 @@
 package love.forte.simbot.kaiheila.api.userchat
 
 import kotlinx.serialization.DeserializationStrategy
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.KookApiResult
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.util.unmodifiableListOf
 
 
@@ -11,9 +11,9 @@ import love.forte.simbot.kaiheila.util.unmodifiableListOf
  *
  * @author ForteScarlet
  */
-public object UserChatListRequest : KaiheilaGetRequest<KaiheilaApiResult.ListData<UserChatView>>() {
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<UserChatView>>
-        get() = KaiheilaApiResult.ListData.serializer(
+public object UserChatListRequest : KookGetRequest<KookApiResult.ListData<UserChatView>>() {
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<UserChatView>>
+        get() = KookApiResult.ListData.serializer(
             UserChatViewImpl.serializer()
         )
     override val apiPaths: List<String> = unmodifiableListOf("user-chat", "list")

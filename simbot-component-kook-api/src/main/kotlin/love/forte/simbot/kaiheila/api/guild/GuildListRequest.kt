@@ -53,16 +53,16 @@ public class GuildListRequest @JvmOverloads constructor(
      */
     private val sort: String? = null
 ) :
-    KaiheilaGetRequest<KaiheilaApiResult.ListData<Guild>>() {
-    public companion object Key : BaseApiRequestKey("guild", "list") {
-        private val serializer = KaiheilaApiResult.ListData.serializer(GuildListElement.serializer())
+    KookGetRequest<KookApiResult.ListData<Guild>>() {
+    public companion object Key : BaseKookApiRequestKey("guild", "list") {
+        private val serializer = KookApiResult.ListData.serializer(GuildListElement.serializer())
         public val DEFAULT: GuildListRequest = GuildListRequest()
     }
 
     override val apiPaths: List<String>
         get() = apiPathList
 
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<Guild>>
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<Guild>>
         get() = serializer
 
     override fun ParametersBuilder.buildParameters() {

@@ -21,8 +21,8 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 import love.forte.simbot.kaiheila.objects.Channel
 
 
@@ -47,8 +47,8 @@ public class ChannelCreateRequest @JvmOverloads constructor(
     private val limitAmount: Int = 99,
     /** 否 语音音质，默认为2。1流畅，2正常，3高质量 */
     private val voiceQuality: Int = 2,
-) : KaiheilaPostRequest<Channel>() {
-    public companion object Key : BaseApiRequestKey("channel", "create")
+) : KookPostRequest<Channel>() {
+    public companion object Key : BaseKookApiRequestKey("channel", "create")
 
     init {
         require(type in 1..2) { "The 'type' must be 1(Text) or 2(Voice), but $type" }

@@ -22,8 +22,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -45,8 +45,8 @@ public class GuildMuteDeleteRequest(
      * @see GuildMuteType.TYPE_EARPHONE
      */
     type: Int
-) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("guild-mute", "delete")
+) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("guild-mute", "delete")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

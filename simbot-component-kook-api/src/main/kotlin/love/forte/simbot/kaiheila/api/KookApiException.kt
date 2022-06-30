@@ -26,15 +26,15 @@ import love.forte.simbot.SimbotIllegalStateException
  * @author ForteScarlet
  */
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
-public open class KaiheilaApiException(
+public open class KookApiException(
     public val code: Int,
     public val msg: String?,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : SimbotIllegalStateException("code: $code, message: $msg", cause) {
     public companion object {
         public const val NOT_FOUNT: Int = 404
     }
-
+    
 }
 
 
@@ -42,28 +42,28 @@ public open class KaiheilaApiException(
 public inline fun CloseReason?.err(e: Throwable? = null): Nothing {
     if (this == null) {
         if (e != null) {
-            throw KaiheilaApiException(-1, "No reason", e)
+            throw KookApiException(-1, "No reason", e)
         } else {
-            throw KaiheilaApiException(-1, "No reason")
+            throw KookApiException(-1, "No reason")
         }
     }
     val known = knownReason
     val message = message
     if (known != null) {
         if (e != null) {
-            throw KaiheilaApiException(
+            throw KookApiException(
                 known.code.toInt(),
                 "${known.name}: $message",
                 e
             )
         } else {
-            throw KaiheilaApiException(known.code.toInt(), "${known.name}: $message")
+            throw KookApiException(known.code.toInt(), "${known.name}: $message")
         }
     } else {
         if (e != null) {
-            throw KaiheilaApiException(code.toInt(), message, e)
+            throw KookApiException(code.toInt(), message, e)
         } else {
-            throw KaiheilaApiException(code.toInt(), message)
+            throw KookApiException(code.toInt(), message)
         }
     }
 }

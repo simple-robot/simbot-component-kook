@@ -21,16 +21,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 /**
  * [删除频道聊天消息](https://developer.kaiheila.cn/doc/http/message#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
  *
  * @param msgId 消息 id
  */
-public class MessageDeleteRequest(private val msgId: ID) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("message", "delete")
+public class MessageDeleteRequest(private val msgId: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("message", "delete")
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
 

@@ -19,12 +19,6 @@ package love.forte.simbot.kaiheila.api
 
 import love.forte.simbot.SimbotRuntimeException
 
-/*
-    占位文件
- */
-
-public interface Kaiheila
-
 
 // signaling
 // signal

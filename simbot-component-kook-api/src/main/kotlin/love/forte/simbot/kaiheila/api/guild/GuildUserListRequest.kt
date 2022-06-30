@@ -54,7 +54,7 @@ public class GuildUserListRequest(
     private val page: Int = -1,
     /**	否 每页数据数量 */
     private val pageSize: Int = -1,
-) : KaiheilaGetRequest<GuildUserList>() {
+) : KookGetRequest<GuildUserList>() {
 
     @JvmOverloads
     public constructor(
@@ -68,7 +68,7 @@ public class GuildUserListRequest(
         pageSize = pageSize
     )
 
-    public companion object Key : BaseApiRequestKey("guild", "user-list")
+    public companion object Key : BaseKookApiRequestKey("guild", "user-list")
 
     override val resultDeserializer: DeserializationStrategy<out GuildUserList>
         get() = GuildUserList.serializer()
@@ -120,9 +120,9 @@ public data class GuildUserList @ApiResultType constructor(
      * 用户列表
      */
     override val items: List<GuildUser>,
-    override val meta: KaiheilaApiResult.ListMeta,
+    override val meta: KookApiResult.ListMeta,
     override val sort: Map<String, Int> = emptyMap()
-) : KaiheilaApiResult.ListDataResponse<GuildUser, Map<String, Int>>()
+) : KookApiResult.ListDataResponse<GuildUser, Map<String, Int>>()
 
 /**
  * Guild User from [GuildUserListRequest]

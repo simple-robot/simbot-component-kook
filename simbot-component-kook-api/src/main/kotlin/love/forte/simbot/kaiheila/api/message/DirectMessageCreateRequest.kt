@@ -22,8 +22,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -63,14 +63,14 @@ public class DirectMessageCreateRequest internal constructor(
      * nonce, 服务端不做处理, 原样返回
      */
     private val nonce: String? = null,
-) : KaiheilaPostRequest<MessageCreated>() {
+) : KookPostRequest<MessageCreated>() {
     init {
         Simbot.require(targetId != null || chatCode != null) {
             "At least one of target Id, chat Code, and quote must exist"
         }
     }
 
-    public companion object Key : BaseApiRequestKey("direct-message", "create") {
+    public companion object Key : BaseKookApiRequestKey("direct-message", "create") {
 
         /**
          * 通过 [chatCode] 构建一个 [DirectMessageCreateRequest] api实例。

@@ -1,6 +1,6 @@
 import kotlinx.serialization.json.Json
 import love.forte.simbot.kaiheila.api.ApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
+import love.forte.simbot.kaiheila.api.KookApiResult
 import kotlin.test.Test
 
 /**
@@ -33,10 +33,10 @@ class ApiRequestTest {
         """.trimIndent()
 
         val listDataResult = json.decodeFromString(ApiResult.serializer(), jsonStr)
-        val listData = listDataResult.parseDataOrThrow(json, KaiheilaApiResult.ListData.serializer(User.serializer()))
+        val listData = listDataResult.parseDataOrThrow(json, KookApiResult.ListData.serializer(User.serializer()))
         assert(listData.items.size == 2)
         assert(listDataResult.isSuccess)
-        assert(listData.meta == KaiheilaApiResult.ListMeta(1, 1, 10, 2))
+        assert(listData.meta == KookApiResult.ListMeta(1, 1, 10, 2))
         assert(listData.sort["name"] == 1)
     }
 

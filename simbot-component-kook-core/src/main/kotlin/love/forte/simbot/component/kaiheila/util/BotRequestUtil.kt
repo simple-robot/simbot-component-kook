@@ -22,7 +22,7 @@ package love.forte.simbot.component.kaiheila.util
 import love.forte.simbot.Api4J
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.kaiheila.api.ApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaApiRequest
+import love.forte.simbot.kaiheila.api.KookApiRequest
 import love.forte.simbot.kaiheila.requestBy
 import love.forte.simbot.kaiheila.requestData
 import love.forte.simbot.kaiheila.requestDataBlocking
@@ -39,7 +39,7 @@ import love.forte.simbot.utils.runInBlocking
  * @see requestDataBy
  */
 @JvmSynthetic
-public suspend inline fun KaiheilaApiRequest<*>.requestBy(bot: KaiheilaComponentBot): ApiResult {
+public suspend inline fun KookApiRequest<*>.requestBy(bot: KaiheilaComponentBot): ApiResult {
     return requestBy(bot.sourceBot)
 }
 
@@ -47,7 +47,7 @@ public suspend inline fun KaiheilaApiRequest<*>.requestBy(bot: KaiheilaComponent
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
 @JvmSynthetic
-public suspend inline fun <T> KaiheilaApiRequest<T>.requestDataBy(bot: KaiheilaComponentBot): T {
+public suspend inline fun <T> KookApiRequest<T>.requestDataBy(bot: KaiheilaComponentBot): T {
     return requestDataBy(bot.sourceBot)
 }
 
@@ -61,7 +61,7 @@ public suspend inline fun <T> KaiheilaApiRequest<T>.requestDataBy(bot: KaiheilaC
  *
  */
 @JvmSynthetic
-public suspend inline fun KaiheilaComponentBot.request(api: KaiheilaApiRequest<*>): ApiResult {
+public suspend inline fun KaiheilaComponentBot.request(api: KookApiRequest<*>): ApiResult {
     return api.requestBy(this)
 }
 
@@ -69,7 +69,7 @@ public suspend inline fun KaiheilaComponentBot.request(api: KaiheilaApiRequest<*
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
 @JvmSynthetic
-public suspend inline fun <T> KaiheilaComponentBot.requestData(api: KaiheilaApiRequest<T>): T {
+public suspend inline fun <T> KaiheilaComponentBot.requestData(api: KookApiRequest<T>): T {
     return api.requestDataBy(this)
 }
 
@@ -83,7 +83,7 @@ public suspend inline fun <T> KaiheilaComponentBot.requestData(api: KaiheilaApiR
  *
  */
 @Api4J
-public fun KaiheilaComponentBot.requestBlocking(api: KaiheilaApiRequest<*>): ApiResult {
+public fun KaiheilaComponentBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
     return runInBlocking { api.requestBy(this@requestBlocking) }
 }
 
@@ -91,7 +91,7 @@ public fun KaiheilaComponentBot.requestBlocking(api: KaiheilaApiRequest<*>): Api
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
 @Api4J
-public fun <T> KaiheilaComponentBot.requestDataBlocking(api: KaiheilaApiRequest<T>): T {
+public fun <T> KaiheilaComponentBot.requestDataBlocking(api: KookApiRequest<T>): T {
     return runInBlocking { api.requestDataBy(this@requestDataBlocking) }
 }
 

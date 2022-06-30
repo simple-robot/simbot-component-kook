@@ -2,7 +2,7 @@ package love.forte.simbot.kaiheila.api.user
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.serializer
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.KookPostRequest
 import love.forte.simbot.kaiheila.util.unmodifiableListOf
 
 
@@ -11,7 +11,7 @@ import love.forte.simbot.kaiheila.util.unmodifiableListOf
  *
  * @author ForteScarlet
  */
-public object OfflineRequest : KaiheilaPostRequest<Unit>() {
+public object OfflineRequest : KookPostRequest<Unit>() {
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
 

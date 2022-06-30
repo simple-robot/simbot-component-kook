@@ -20,8 +20,8 @@ package love.forte.simbot.kaiheila.api.user
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.objects.User
 import love.forte.simbot.kaiheila.objects.UserImpl
 import love.forte.simbot.literal
@@ -33,8 +33,8 @@ import love.forte.simbot.literal
 public class UserViewRequest(
     private val userId: ID,
     private val guildId: ID,
-) : KaiheilaGetRequest<User>() {
-    public companion object Key : BaseApiRequestKey("user", "view")
+) : KookGetRequest<User>() {
+    public companion object Key : BaseKookApiRequestKey("user", "view")
 
     override val resultDeserializer: DeserializationStrategy<out User>
         get() = UserImpl.serializer()

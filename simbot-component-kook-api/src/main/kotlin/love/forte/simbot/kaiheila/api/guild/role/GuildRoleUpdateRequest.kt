@@ -21,8 +21,8 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 import love.forte.simbot.kaiheila.objects.PermissionType
 import love.forte.simbot.kaiheila.objects.Permissions
 import love.forte.simbot.kaiheila.objects.Role
@@ -39,7 +39,7 @@ import love.forte.simbot.kaiheila.util.BooleanToIntSerializer
  * `/api/v3/guild-role/update`
  *
  */
-public class GuildRoleUpdateRequest(override val body: Body) : KaiheilaPostRequest<Role>() {
+public class GuildRoleUpdateRequest(override val body: Body) : KookPostRequest<Role>() {
     public constructor(
         /** 角色的id */
         roleId: ID,
@@ -57,7 +57,7 @@ public class GuildRoleUpdateRequest(override val body: Body) : KaiheilaPostReque
         permissions: Int,
     ) : this(Body(roleId, name, color, position, isHoist, isMentionable, permissions))
 
-    public companion object Key : BaseApiRequestKey("guild-role", "update")
+    public companion object Key : BaseKookApiRequestKey("guild-role", "update")
 
     override val resultDeserializer: DeserializationStrategy<out Role>
         get() = RoleImpl.serializer()

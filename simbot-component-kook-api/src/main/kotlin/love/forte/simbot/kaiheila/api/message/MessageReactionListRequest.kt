@@ -25,8 +25,8 @@ import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 
 /**
  * [获取频道消息某回应的用户列表](https://developer.kaiheila.cn/doc/http/message#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E6%B6%88%E6%81%AF%E6%9F%90%E5%9B%9E%E5%BA%94%E7%9A%84%E7%94%A8%E6%88%B7%E5%88%97%E8%A1%A8)
@@ -38,11 +38,11 @@ public class MessageReactionListRequest(
     private val msgId: ID,
     /** emoji的id, 可以为Guild Emoji或者Emoji, 注意：在get中，应该进行url-encode */
     private val emoji: ID,
-) : KaiheilaGetRequest<List<MessageReactor>>() {
+) : KookGetRequest<List<MessageReactor>>() {
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
 
-    public companion object Key : BaseApiRequestKey("message", "reaction-list") {
+    public companion object Key : BaseKookApiRequestKey("message", "reaction-list") {
         private val serializer = ListSerializer(MessageReactor.serializer())
     }
 

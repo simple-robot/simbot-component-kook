@@ -20,9 +20,9 @@ package love.forte.simbot.kaiheila.api.guild.role
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookApiResult
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.objects.Role
 import love.forte.simbot.kaiheila.objects.impl.RoleImpl
 import love.forte.simbot.literal
@@ -39,12 +39,12 @@ import love.forte.simbot.literal
  * @param guildId 服务器的id
  */
 public class GuildRoleListRequest(public val guildId: ID) :
-    KaiheilaGetRequest<KaiheilaApiResult.ListData<Role>>() {
-    public companion object Key : BaseApiRequestKey("guild-role", "list") {
-        private val serializer = KaiheilaApiResult.ListData.serializer(RoleImpl.serializer())
+    KookGetRequest<KookApiResult.ListData<Role>>() {
+    public companion object Key : BaseKookApiRequestKey("guild-role", "list") {
+        private val serializer = KookApiResult.ListData.serializer(RoleImpl.serializer())
     }
 
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<Role>>
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<Role>>
         get() = serializer
 
     override val apiPaths: List<String>

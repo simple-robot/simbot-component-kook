@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.literal
 
 
@@ -38,8 +38,8 @@ import love.forte.simbot.literal
  */
 public sealed class GuildMuteListRequest(
     private val guildId: ID
-) : KaiheilaGetRequest<GuildMuteList>() {
-    public companion object Key : BaseApiRequestKey("guild-mute", "list")
+) : KookGetRequest<GuildMuteList>() {
+    public companion object Key : BaseKookApiRequestKey("guild-mute", "list")
 
     override val resultDeserializer: DeserializationStrategy<out GuildMuteList>
         get() = GuildMuteList.serializer()

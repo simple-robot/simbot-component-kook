@@ -21,8 +21,8 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -30,8 +30,8 @@ import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
  *
  * @author ForteScarlet
  */
-public class UserChatCreateRequest(private val targetId: ID) : KaiheilaPostRequest<UserChatView>() {
-    public companion object Key : BaseApiRequestKey("user-chat", "create")
+public class UserChatCreateRequest(private val targetId: ID) : KookPostRequest<UserChatView>() {
+    public companion object Key : BaseKookApiRequestKey("user-chat", "create")
 
     override val resultDeserializer: DeserializationStrategy<out UserChatView> get() = UserChatViewImpl.serializer()
     override val apiPaths: List<String> get() = apiPathList

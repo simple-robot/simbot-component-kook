@@ -22,8 +22,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 
 
 /**
@@ -40,8 +40,8 @@ public class GuildRoleDeleteRequest(
     private val guildId: ID,
     /** 角色id */
     private val roleId: ID,
-) : KaiheilaPostRequest<Unit>() {
-    public companion object Key : BaseApiRequestKey("guild-role", "delete")
+) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("guild-role", "delete")
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

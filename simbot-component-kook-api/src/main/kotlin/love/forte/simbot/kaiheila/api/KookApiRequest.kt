@@ -43,7 +43,7 @@ import java.util.function.Consumer
  * 代表、包装了一个 Kook api的请求。
  *
  * ### 反序列化
- * [KaiheilaApiRequest] 面向 ktor, 并基于 `kotlinx.serialization` 进行反序列化。
+ * [KookApiRequest] 面向 ktor, 并基于 `kotlinx.serialization` 进行反序列化。
  *
  * ### Url内容
  * 最终进行请求的 [url] 中部分参数（例如host）来自于 [KookApi].
@@ -51,7 +51,7 @@ import java.util.function.Consumer
  * ### 不可变
  * 此接口的实现类应当是不可变、可复用的。
  */
-public abstract class KaiheilaApiRequest<T> {
+public abstract class KookApiRequest<T> {
 
     /**
      * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [KookApi].
@@ -234,7 +234,7 @@ public abstract class KaiheilaApiRequest<T> {
 /**
  * Do request for [HttpResponse].
  */
-private suspend inline fun KaiheilaApiRequest<*>.requestForResponse(
+private suspend inline fun KookApiRequest<*>.requestForResponse(
     client: HttpClient,
     authorization: String,
     finishingAction: HttpRequestBuilder.() -> Unit = {} // more, like content type, body, etc.
@@ -253,7 +253,7 @@ private suspend inline fun KaiheilaApiRequest<*>.requestForResponse(
 }
 
 
-public abstract class BaseKaiheilaApiRequest<T> : KaiheilaApiRequest<T>() {
+public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
     /**
      * api 路径。
      */
@@ -285,18 +285,18 @@ public abstract class BaseKaiheilaApiRequest<T> : KaiheilaApiRequest<T>() {
 
 
 /**
- * 使用 Get 请求的 [KaiheilaApiRequest] 基础实现。
+ * 使用 Get 请求的 [KookApiRequest] 基础实现。
  */
-public abstract class KaiheilaGetRequest<T> : BaseKaiheilaApiRequest<T>() {
+public abstract class KookGetRequest<T> : BaseKookApiRequest<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Get
 }
 
 
 /**
- * 使用 Get 请求的 [KaiheilaApiRequest] 基础实现。
+ * 使用 Get 请求的 [KookApiRequest] 基础实现。
  */
-public abstract class KaiheilaPostRequest<T>(
+public abstract class KookPostRequest<T>(
     /**
      * 是否缓存Body实例。如果开启缓存，且没有重写 [body] 或者 [createBody], 则会通过 [createBody] 懒初始化 [body] 实例。
      * 如果不缓存body, 且没有重写 [body] 或者 [createBody], 则 [body] 每次都会通过 [createBody] 构建新的实例。
@@ -304,7 +304,7 @@ public abstract class KaiheilaPostRequest<T>(
      * 默认开启。
      */
     private val cacheBody: Boolean = true,
-) : BaseKaiheilaApiRequest<T>() {
+) : BaseKookApiRequest<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
 
@@ -348,7 +348,7 @@ public abstract class KaiheilaPostRequest<T>(
      */
     override fun HttpRequestBuilder.requestFinishingAction() {
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
-        setBody(this@KaiheilaPostRequest.body ?: EmptyContent)
+        setBody(this@KookPostRequest.body ?: EmptyContent)
     }
 
 

@@ -20,9 +20,9 @@ package love.forte.simbot.kaiheila.api.message
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookApiResult
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.api.appendIfNotnull
 
 /**
@@ -57,15 +57,15 @@ public class MessageListRequest(
      * 当前分页消息数量, 如果小于等于零则不提供此参数。服务器此参数默认 50
      */
     private val pageSize: Int = -1
-) : KaiheilaGetRequest<KaiheilaApiResult.ListData<ChannelMessageDetails>>() {
-    public companion object Key : BaseApiRequestKey("message", "list") {
-        private val serializer = KaiheilaApiResult.ListData.serializer(ChannelMessageDetailsImpl.serializer())
+) : KookGetRequest<KookApiResult.ListData<ChannelMessageDetails>>() {
+    public companion object Key : BaseKookApiRequestKey("message", "list") {
+        private val serializer = KookApiResult.ListData.serializer(ChannelMessageDetailsImpl.serializer())
     }
 
     override val apiPaths: List<String>
         get() = apiPathList
 
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<ChannelMessageDetails>>
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelMessageDetails>>
         get() = serializer
 
     override fun ParametersBuilder.buildParameters() {

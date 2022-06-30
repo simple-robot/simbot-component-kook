@@ -21,11 +21,11 @@ import love.forte.simbot.kaiheila.util.unmodifiable
 
 /**
  *
- * 用于 [KaiheilaApiRequest] 实现类的伴生对象进行实现的辅助抽象类，
+ * 用于 [KookApiRequest] 实现类的伴生对象进行实现的辅助抽象类，
  * 用于提供 apiPathList等。
  * @author ForteScarlet
  */
-public abstract class BaseApiRequestKey(vararg paths: String) {
+public abstract class BaseKookApiRequestKey(vararg paths: String) {
 
     /**
      * 路径列表。

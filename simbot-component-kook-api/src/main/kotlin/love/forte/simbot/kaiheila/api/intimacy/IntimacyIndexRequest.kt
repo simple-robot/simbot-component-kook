@@ -23,8 +23,8 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 
 /**
  *
@@ -40,8 +40,8 @@ public class IntimacyIndexRequest(
      * 用户ID
      */
     private val userId: ID,
-) : KaiheilaGetRequest<IntimacyIndex>() {
-    public companion object Key : BaseApiRequestKey("intimacy", "index")
+) : KookGetRequest<IntimacyIndex>() {
+    public companion object Key : BaseKookApiRequestKey("intimacy", "index")
 
     override val resultDeserializer: DeserializationStrategy<out IntimacyIndex>
         get() = IntimacyIndex.serializer()

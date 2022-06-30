@@ -22,8 +22,8 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaPostRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookPostRequest
 import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_HALF_DAY
 import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_HALF_HOUR
 import love.forte.simbot.kaiheila.api.invite.InviteCreateRequest.Key.DURATION_NEVER
@@ -118,11 +118,11 @@ public class InviteCreateRequest @JvmOverloads constructor(
      */
     private val settingTimes: Int = SETTING_TIMES_UNLIMITED
 
-) : KaiheilaPostRequest<InviteCreated>() {
+) : KookPostRequest<InviteCreated>() {
 
 
     @Suppress("MemberVisibilityCanBePrivate")
-    public companion object Key : BaseApiRequestKey("invite", "create") {
+    public companion object Key : BaseKookApiRequestKey("invite", "create") {
 
         //region duration常量
         /** 0 => 永不 */

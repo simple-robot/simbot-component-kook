@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.objects.Channel
 import love.forte.simbot.kaiheila.objects.ChannelPermissionOverwrites
 import love.forte.simbot.literal
@@ -39,9 +39,9 @@ import love.forte.simbot.literal
  *
  * @author ForteScarlet
  */
-public class ChannelViewRequest(private val targetId: ID) : KaiheilaGetRequest<ChannelView>() {
+public class ChannelViewRequest(private val targetId: ID) : KookGetRequest<ChannelView>() {
 
-    public companion object Key : BaseApiRequestKey("channel", "view")
+    public companion object Key : BaseKookApiRequestKey("channel", "view")
 
     override val resultDeserializer: DeserializationStrategy<out ChannelView>
         get() = ChannelView.serializer()

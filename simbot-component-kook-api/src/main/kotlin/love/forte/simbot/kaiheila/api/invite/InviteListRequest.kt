@@ -20,9 +20,9 @@ import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookApiResult
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.api.appendIfNotnull
 import love.forte.simbot.literal
 
@@ -44,9 +44,9 @@ public class InviteListRequest(
     private val channelId: ID?,
     private val page: Int = -1,
     private val pageSize: Int = -1,
-) : KaiheilaGetRequest<KaiheilaApiResult.ListData<InviteInfo>>() {
-    public companion object Key : BaseApiRequestKey("invite", "list") {
-        private val serializer = KaiheilaApiResult.ListData.serializer(InviteInfoImpl.serializer())
+) : KookGetRequest<KookApiResult.ListData<InviteInfo>>() {
+    public companion object Key : BaseKookApiRequestKey("invite", "list") {
+        private val serializer = KookApiResult.ListData.serializer(InviteInfoImpl.serializer())
     }
 
     init {
@@ -55,7 +55,7 @@ public class InviteListRequest(
         }
     }
 
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<InviteInfo>>
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<InviteInfo>>
         get() = serializer
 
     override val apiPaths: List<String>

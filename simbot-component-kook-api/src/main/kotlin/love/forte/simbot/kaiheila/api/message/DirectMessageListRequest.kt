@@ -20,9 +20,9 @@ package love.forte.simbot.kaiheila.api.message
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.BaseApiRequestKey
-import love.forte.simbot.kaiheila.api.KaiheilaApiResult
-import love.forte.simbot.kaiheila.api.KaiheilaGetRequest
+import love.forte.simbot.kaiheila.api.BaseKookApiRequestKey
+import love.forte.simbot.kaiheila.api.KookApiResult
+import love.forte.simbot.kaiheila.api.KookGetRequest
 import love.forte.simbot.kaiheila.api.appendIfNotnull
 import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Key.byChatCode
 import love.forte.simbot.kaiheila.api.message.DirectMessageListRequest.Key.byTargetId
@@ -52,8 +52,8 @@ public class DirectMessageListRequest private constructor(
      * 查询模式，有三种模式可以选择。不传则默认查询最新的消息
      */
     private val flag: MessageListFlag? = null,
-) : KaiheilaGetRequest<KaiheilaApiResult.ListData<DirectMessageDetails>>() {
-    public companion object Key : BaseApiRequestKey("direct-message", "list") {
+) : KookGetRequest<KookApiResult.ListData<DirectMessageDetails>>() {
+    public companion object Key : BaseKookApiRequestKey("direct-message", "list") {
         @JvmStatic
         @JvmOverloads
         @JvmName("getInstanceByChatCode")
@@ -81,8 +81,8 @@ public class DirectMessageListRequest private constructor(
         }
     }
 
-    override val resultDeserializer: DeserializationStrategy<out KaiheilaApiResult.ListData<DirectMessageDetails>>
-        get() = KaiheilaApiResult.ListData.serializer(DirectMessageDetails.serializer)
+    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<DirectMessageDetails>>
+        get() = KookApiResult.ListData.serializer(DirectMessageDetails.serializer)
 
     override val apiPaths: List<String> get() = apiPathList
 
