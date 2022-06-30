@@ -162,6 +162,7 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
 
 /*
     下面这些用于 rename 的序列化内容用于使用兼容 `khl.xx.xx` 的消息序列化命名中。
+    当 [khlCompatibleMessageSerializersModule] 被移除后，它们也将被移除。
  */
 
 private fun <T> KSerializer<T>.rename(newSerialName: String): KSerializer<T> = RenameKSerializer(newSerialName, this)
