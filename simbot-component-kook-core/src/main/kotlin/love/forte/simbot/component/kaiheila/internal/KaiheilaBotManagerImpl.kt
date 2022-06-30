@@ -25,8 +25,8 @@ import love.forte.simbot.component.kaiheila.event.KaiheilaBotRegisteredEvent
 import love.forte.simbot.component.kaiheila.internal.event.KaiheilaBotRegisteredEventImpl
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
-import love.forte.simbot.kook.KaiheilaBot
-import love.forte.simbot.kook.kaiheilaBot
+import love.forte.simbot.kook.KookBot
+import love.forte.simbot.kook.kookBot
 import love.forte.simbot.literal
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -55,12 +55,12 @@ internal class KaiheilaBotManagerImpl(
     }
     
     override fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot {
         return bots.compute(ticket.clientId.literal) { key, old ->
             if (old != null) throw BotAlreadyRegisteredException(key)
-            val khlBot = kaiheilaBot(ticket, configuration.botConfiguration)
+            val khlBot = kookBot(ticket, configuration.botConfiguration)
             KaiheilaComponentBotImpl(khlBot, this, eventProcessor, component, configuration)
         }!!.also { bot ->
             launch {

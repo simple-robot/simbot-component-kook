@@ -1,7 +1,7 @@
 package love.forte.simbot.component.kaiheila
 
 import kotlinx.serialization.Serializable
-import love.forte.simbot.kook.KaiheilaBotConfiguration
+import love.forte.simbot.kook.KookBotConfiguration
 
 
 /**
@@ -10,7 +10,7 @@ import love.forte.simbot.kook.KaiheilaBotConfiguration
  *
  * @author ForteScarlet
  */
-public class KaiheilaComponentBotConfiguration(public var botConfiguration: KaiheilaBotConfiguration) {
+public class KaiheilaComponentBotConfiguration(public var botConfiguration: KookBotConfiguration) {
 
     /**
      * 内部缓存对象信息的同步周期。

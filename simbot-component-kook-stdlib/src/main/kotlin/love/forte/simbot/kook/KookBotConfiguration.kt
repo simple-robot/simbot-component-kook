@@ -26,41 +26,41 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 @Retention(AnnotationRetention.BINARY)
 @DslMarker
-public annotation class KaiheilaBotConfigurationDSL
+public annotation class KookBotConfigurationDSL
 
 
 /**
- * [KaiheilaBot] 需要使用的配置类。
+ * [KookBot] 需要使用的配置类。
  *
  * 配置类不应在bot构建完成之后再做修改。
  *
  * @author ForteScarlet
  */
-public class KaiheilaBotConfiguration {
+public class KookBotConfiguration {
 
     /**
      * 设置bot进行连接的时候使用要使用压缩数据。
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public var isCompress: Boolean = true
 
     /**
      * Bot用于解析api请求或其他用途的解析器。
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public var decoder: Json = defaultDecoder
 
     /**
      * 为bot提供一个 [CoroutineContext]. 如果其中存在 [kotlinx.coroutines.Job], 则会作为parent job。
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public var coroutineContext: CoroutineContext = EmptyCoroutineContext
 
 
     /**
      * 配置bot内部要使用的client Engine。
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public var clientEngine: HttpClientEngine? = null
 
     /**
@@ -68,7 +68,7 @@ public class KaiheilaBotConfiguration {
      *
      * 如果 [clientEngine] 存在，则优先使用 [clientEngine].
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public var clientEngineFactory: HttpClientEngineFactory<*>? = null
 
     /**
@@ -80,7 +80,7 @@ public class KaiheilaBotConfiguration {
      * [WebSockets][io.ktor.client.plugins.websocket.WebSockets.Plugin].
      *
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public var httpClientConfig: HttpClientConfig<*>.() -> Unit = {}
 
 
@@ -92,29 +92,29 @@ public class KaiheilaBotConfiguration {
      * 和
      * [WebSockets][io.ktor.client.plugins.websocket.WebSockets.Plugin].
      */
-    @KaiheilaBotConfigurationDSL
+    @KookBotConfigurationDSL
     public fun httpClientConfig(block: HttpClientConfig<*>.() -> Unit) {
         this.httpClientConfig = block
     }
 
     /**
-     * 在执行 [KaiheilaBot.start] 建立连接成功后、进行事件处理之前执行此函数。
+     * 在执行 [KookBot.start] 建立连接成功后、进行事件处理之前执行此函数。
      */
-    public var preEventProcessor: suspend (bot: KaiheilaBot, sessionId: String) -> Unit = { _, _ -> }
+    public var preEventProcessor: suspend (bot: KookBot, sessionId: String) -> Unit = { _, _ -> }
 
 
     /**
-     * 在执行 [KaiheilaBot.start] 建立连接成功后、进行事件处理之前执行此函数。
+     * 在执行 [KookBot.start] 建立连接成功后、进行事件处理之前执行此函数。
      */
-    @KaiheilaBotConfigurationDSL
-    public fun preEventProcessor(block: suspend (bot: KaiheilaBot, sessionId: String) -> Unit) {
+    @KookBotConfigurationDSL
+    public fun preEventProcessor(block: suspend (bot: KookBot, sessionId: String) -> Unit) {
         this.preEventProcessor = block
     }
 
 
     public companion object {
         /**
-         * [KaiheilaBotConfiguration] 默认使用的解析器。
+         * [KookBotConfiguration] 默认使用的解析器。
          */
         public val defaultDecoder: Json = Json {
             isLenient = true

@@ -27,7 +27,7 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.GuildBot
 import love.forte.simbot.event.EventProcessor
-import love.forte.simbot.kook.KaiheilaBot
+import love.forte.simbot.kook.KookBot
 import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.api.userchat.UserChatCreateRequest
 import love.forte.simbot.kook.api.userchat.UserChatListRequest
@@ -47,7 +47,7 @@ import kotlin.coroutines.CoroutineContext
  */
 public interface KaiheilaComponentBot : Bot {
     /**
-     * botID。此id通常代表 client id, 即 [KaiheilaBot.Ticket.clientId].
+     * botID。此id通常代表 client id, 即 [KookBot.Ticket.clientId].
      */
     override val id: ID get() = sourceBot.ticket.clientId
     
@@ -57,7 +57,7 @@ public interface KaiheilaComponentBot : Bot {
     override val bot: KaiheilaComponentBot get() = this
     
     /**
-     * 判断此ID是否代表当前bot。可能代表bot的id有可能是 [clientId][KaiheilaBot.Ticket.clientId],
+     * 判断此ID是否代表当前bot。可能代表bot的id有可能是 [clientId][KookBot.Ticket.clientId],
      * 也有可能是此bot在系统中作为User时候的 user id.
      *
      * 对于 user id 的判断，只有当至少执行过一次 [start] 来启动bot的时候才会生效匹配，在那之前将只会通过 [id] 进行匹配。
@@ -68,7 +68,7 @@ public interface KaiheilaComponentBot : Bot {
     /**
      * 得到在stdlib标准库模块下所提供的 Kook bot实例。
      */
-    public val sourceBot: KaiheilaBot
+    public val sourceBot: KookBot
     
     /**
      * 得到对应的组件实例。

@@ -33,8 +33,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.SimbotIllegalStateException
-import love.forte.simbot.kook.KaiheilaBot
-import love.forte.simbot.kook.KaiheilaBotConfiguration
+import love.forte.simbot.kook.KookBot
+import love.forte.simbot.kook.KookBotConfiguration
 import love.forte.simbot.kook.api.Gateway
 import love.forte.simbot.kook.api.GatewayRequest
 import love.forte.simbot.kook.api.KookApiException
@@ -56,14 +56,14 @@ import kotlin.math.max
 
 /**
  *
- * [KaiheilaBot] 基础实现。
+ * [KookBot] 基础实现。
  *
  * @author ForteScarlet
  */
-internal class KaiheilaBotImpl(
-    override val ticket: KaiheilaBot.Ticket,
-    override val configuration: KaiheilaBotConfiguration,
-) : KaiheilaBot {
+internal class KookBotImpl(
+    override val ticket: KookBot.Ticket,
+    override val configuration: KookBotConfiguration,
+) : KookBot {
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.client.${ticket.clientId}")
     private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
@@ -87,7 +87,7 @@ internal class KaiheilaBotImpl(
     init {
         val parentJob = configuration.coroutineContext[Job]
         this.job = SupervisorJob(parentJob)
-        this.coroutineContext = configuration.coroutineContext + job + CoroutineName("KaiheilaBot.${ticket.clientId}")
+        this.coroutineContext = configuration.coroutineContext + job + CoroutineName("KookBot.${ticket.clientId}")
         
         val engine = configuration.clientEngine
         val engineFactory = configuration.clientEngineFactory
@@ -427,17 +427,17 @@ internal class KaiheilaBotImpl(
         private val sessionData: Signal.Hello,
         private val _sn: AtomicLong,
         private var session: DefaultClientWebSocketSession,
-    ) : KaiheilaBot.Client {
+    ) : KookBot.Client {
         override val sn: Long get() = _sn.get()
         
         override val isActive: Boolean get() = session.isActive
         // override val isResuming: Boolean get() = _resuming.get()
         
-        override val bot: KaiheilaBot
-            get() = this@KaiheilaBotImpl
+        override val bot: KookBot
+            get() = this@KookBotImpl
         
         override val isCompress: Boolean
-            get() = this@KaiheilaBotImpl.isCompress
+            get() = this@KookBotImpl.isCompress
         
         
         suspend fun cancel(reason: Throwable? = null) {

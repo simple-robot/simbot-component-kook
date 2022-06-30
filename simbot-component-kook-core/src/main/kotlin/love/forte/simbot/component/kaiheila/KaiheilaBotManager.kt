@@ -25,15 +25,15 @@ import love.forte.simbot.application.EventProviderAutoRegistrarFactory
 import love.forte.simbot.application.EventProviderFactory
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
 import love.forte.simbot.event.EventProcessor
-import love.forte.simbot.kook.KaiheilaBot
-import love.forte.simbot.kook.KaiheilaBotConfiguration
+import love.forte.simbot.kook.KookBot
+import love.forte.simbot.kook.KookBotConfiguration
 import love.forte.simbot.kook.SimpleTicket
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 
 /**
- * 在 Kook 组件中对于 [Bot][KaiheilaBot] 的注册函数的常见形式。
+ * 在 Kook 组件中对于 [Bot][KookBot] 的注册函数的常见形式。
  *
  * @see KaiheilaBotManager
  */
@@ -43,7 +43,7 @@ public interface KaiheilaBotRegistrar {
      * 通过 [ticket] 和 [configuration] 注册bot。
      */
     public fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot
     
@@ -61,7 +61,7 @@ public interface KaiheilaBotRegistrar {
      * 通过 [ticket] 和 [block] 注册bot。
      */
     public fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit = {},
     ): KaiheilaComponentBot
     
@@ -117,7 +117,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
      * 通过 [ticket] 和 [configuration] 注册bot。
      */
     abstract override fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
     ): KaiheilaComponentBot
     
@@ -137,10 +137,10 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
      * 通过 [ticket] 和 [block] 注册bot。
      */
     override fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit,
     ): KaiheilaComponentBot {
-        return register(ticket, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
+        return register(ticket, KaiheilaComponentBotConfiguration(KookBotConfiguration()).also(block))
     }
     
     
@@ -152,7 +152,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
         token: String,
         block: KaiheilaComponentBotConfiguration.() -> Unit,
     ): KaiheilaComponentBot {
-        return register(clientId, token, KaiheilaComponentBotConfiguration(KaiheilaBotConfiguration()).also(block))
+        return register(clientId, token, KaiheilaComponentBotConfiguration(KookBotConfiguration()).also(block))
     }
     
     
@@ -265,7 +265,7 @@ public interface KaiheilaBotManagerConfiguration {
      */
     @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kook { ... }")
     public fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
         onBot: suspend (KaiheilaComponentBot) -> Unit,
     )
@@ -286,7 +286,7 @@ public interface KaiheilaBotManagerConfiguration {
      */
     @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kook { ... }")
     public fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit = {},
         onBot: suspend (KaiheilaComponentBot) -> Unit,
     )
@@ -322,7 +322,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
      */
     @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
     override fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
         onBot: suspend (KaiheilaComponentBot) -> Unit,
     ) {
@@ -351,7 +351,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
      */
     @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
     override fun register(
-        ticket: KaiheilaBot.Ticket,
+        ticket: KookBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit,
         onBot: suspend (KaiheilaComponentBot) -> Unit,
     ) {

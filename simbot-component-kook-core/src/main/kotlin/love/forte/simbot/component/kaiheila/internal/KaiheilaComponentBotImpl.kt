@@ -39,7 +39,7 @@ import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
-import love.forte.simbot.kook.KaiheilaBot
+import love.forte.simbot.kook.KookBot
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.asset.AssetCreateRequest
 import love.forte.simbot.kook.api.asset.AssetCreated
@@ -82,7 +82,7 @@ import love.forte.simbot.kook.event.Event as KhlEvent
  * @author ForteScarlet
  */
 internal class KaiheilaComponentBotImpl(
-    override val sourceBot: KaiheilaBot,
+    override val sourceBot: KookBot,
     override val manager: KaiheilaBotManager,
     override val eventProcessor: EventProcessor,
     override val component: KaiheilaComponent,

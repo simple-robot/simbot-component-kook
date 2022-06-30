@@ -24,7 +24,7 @@ import love.forte.simbot.kook.event.*
  * 提供一个事件类型，
  * 并且可选的提供一个extra的子类型，监听这个事件。
  */
-public inline fun KaiheilaBot.processor(
+public inline fun KookBot.processor(
     eventType: Event.Type,
     extraType: String,
     crossinline block: suspend Signal.Event.(decoder: Json, decoded: () -> Any) -> Unit
@@ -41,7 +41,7 @@ public inline fun KaiheilaBot.processor(
  * 提供一个事件类型，
  * 并且可选的提供一个extra的子类型，监听这个事件。
  */
-public inline fun KaiheilaBot.processor(
+public inline fun KookBot.processor(
     eventType: Event.Type,
     extraType: Event.Type?,
     crossinline block: suspend Signal.Event.(decoder: Json, decoded: () -> Any) -> Unit
@@ -54,7 +54,7 @@ public inline fun KaiheilaBot.processor(
  * 并且可选的提供一个extra的子类型，监听这个事件。
  */
 @PublishedApi
-internal inline fun KaiheilaBot.processor0(
+internal inline fun KookBot.processor0(
     eventType: Event.Type,
     extraType: Any?,
     crossinline block: suspend Signal.Event.(decoder: Json, decoded: () -> Any) -> Unit
@@ -78,7 +78,7 @@ internal inline fun KaiheilaBot.processor0(
  * @see love.forte.simbot.kook.event.system.channel.ChannelEvents
  *
  */
-public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processor(
+public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KookBot.processor(
     eventParser: EventParser<EX, E>,
     crossinline block: suspend (E) -> Unit
 ) {
@@ -105,7 +105,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
  * @see love.forte.simbot.kook.event.system.channel.ChannelEvents
  *
  */
-public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processor(
+public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KookBot.processor(
     eventDefinition: KookEventParserDefinition<EX, E>,
     crossinline block: suspend (E) -> Unit
 ) {
@@ -126,7 +126,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
  * @see love.forte.simbot.kook.event.system.channel.ChannelEvents
  *
  */
-public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processorExcludeSelf(
+public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KookBot.processorExcludeSelf(
     eventParser: EventParser<EX, E>,
     crossinline block: suspend (E) -> Unit
 ) {
@@ -153,7 +153,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
  * @see love.forte.simbot.kook.event.system.channel.ChannelEvents
  *
  */
-public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processorExcludeSelf(
+public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KookBot.processorExcludeSelf(
     eventDefinition: KookEventParserDefinition<EX, E>,
     crossinline block: suspend (E) -> Unit
 ) {

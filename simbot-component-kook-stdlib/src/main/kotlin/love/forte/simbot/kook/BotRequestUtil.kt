@@ -34,7 +34,7 @@ import love.forte.simbot.utils.runInBlocking
  * @see requestDataBy
  */
 @JvmSynthetic
-public suspend inline fun KookApiRequest<*>.requestBy(bot: KaiheilaBot): ApiResult {
+public suspend inline fun KookApiRequest<*>.requestBy(bot: KookBot): ApiResult {
     return request(
         bot.httpClient,
         bot.ticket.authorization,
@@ -46,7 +46,7 @@ public suspend inline fun KookApiRequest<*>.requestBy(bot: KaiheilaBot): ApiResu
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
 @JvmSynthetic
-public suspend inline fun <T> KookApiRequest<T>.requestDataBy(bot: KaiheilaBot): T {
+public suspend inline fun <T> KookApiRequest<T>.requestDataBy(bot: KookBot): T {
     return requestData(
         bot.httpClient,
         bot.ticket.authorization,
@@ -64,7 +64,7 @@ public suspend inline fun <T> KookApiRequest<T>.requestDataBy(bot: KaiheilaBot):
  *
  */
 @JvmSynthetic
-public suspend inline fun KaiheilaBot.request(api: KookApiRequest<*>): ApiResult {
+public suspend inline fun KookBot.request(api: KookApiRequest<*>): ApiResult {
     return api.requestBy(this)
 }
 
@@ -72,7 +72,7 @@ public suspend inline fun KaiheilaBot.request(api: KookApiRequest<*>): ApiResult
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
 @JvmSynthetic
-public suspend inline fun <T> KaiheilaBot.requestData(api: KookApiRequest<T>): T {
+public suspend inline fun <T> KookBot.requestData(api: KookApiRequest<T>): T {
     return api.requestDataBy(this)
 }
 
@@ -87,7 +87,7 @@ public suspend inline fun <T> KaiheilaBot.requestData(api: KookApiRequest<T>): T
  *
  */
 @Api4J
-public fun KaiheilaBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
+public fun KookBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
     return runInBlocking { api.requestBy(this@requestBlocking) }
 }
 
@@ -95,7 +95,7 @@ public fun KaiheilaBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
  * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
  */
 @Api4J
-public fun <T> KaiheilaBot.requestDataBlocking(api: KookApiRequest<T>): T {
+public fun <T> KookBot.requestDataBlocking(api: KookApiRequest<T>): T {
     return runInBlocking { api.requestDataBy(this@requestDataBlocking) }
 }
 

@@ -34,11 +34,11 @@ import kotlin.coroutines.CoroutineContext
 /**
  *  Kook Bot对应的bot类型。
  *
- * [KaiheilaBot] 提供标准定义，但是不实现 simple-robot-api 中的 [love.forte.simbot.Bot] 接口。
+ * [KookBot] 提供标准定义，但是不实现 simple-robot-api 中的 [love.forte.simbot.Bot] 接口。
  *
  * @author ForteScarlet
  */
-public interface KaiheilaBot : CoroutineScope, LoggerContainer {
+public interface KookBot : CoroutineScope, LoggerContainer {
     override val coroutineContext: CoroutineContext
     override val logger: Logger
 
@@ -46,7 +46,7 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
      * 当前bot所使用的配置类。
      *
      */
-    public val configuration: KaiheilaBotConfiguration
+    public val configuration: KookBotConfiguration
 
 
     /**
@@ -186,7 +186,7 @@ public interface KaiheilaBot : CoroutineScope, LoggerContainer {
         /**
          * 此连接所属Bot。
          */
-        public val bot: KaiheilaBot
+        public val bot: KookBot
 
 
         /**
@@ -244,13 +244,13 @@ public fun interface EventProcessor4J<out EX : Event.Extra, E : Event<EX>> {
 
 
 /**
- * [KaiheilaBot.Ticket] 的基础实现。
+ * [KookBot.Ticket] 的基础实现。
  *
  */
 public class SimpleTicket(
     clientId: String,
     token: String,
-) : KaiheilaBot.Ticket {
+) : KookBot.Ticket {
     override val clientId: CharSequenceID = clientId.ID
     
     // Bot xxx
