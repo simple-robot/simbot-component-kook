@@ -26,7 +26,7 @@ import io.ktor.client.statement.*
  *
  * @author ForteScarlet
  */
-public open class ApiRateLimitException : KhlRuntimeException {
+public open class ApiRateLimitException : KookRuntimeException {
     public constructor() : super()
     public constructor(message: String?) : super(message)
     public constructor(message: String?, cause: Throwable?) : super(message, cause)

@@ -16,13 +16,13 @@
  */
 package love.forte.simbot.kaiheila.event
 
-import love.forte.simbot.kaiheila.api.KhlRuntimeException
+import love.forte.simbot.kaiheila.api.KookRuntimeException
 
 /**
  * khl事件解析相关错误。
  * @author ForteScarlet
  */
-public class EventParserException : KhlRuntimeException {
+public class EventParserException : KookRuntimeException {
     public constructor() : super()
     public constructor(message: String?) : super(message)
     public constructor(message: String?, cause: Throwable?) : super(message, cause)

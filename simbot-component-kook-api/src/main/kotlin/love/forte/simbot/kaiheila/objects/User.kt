@@ -159,7 +159,7 @@ internal data class UserImpl(
     }
 
     companion object {
-        private val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kaiheila.objects.User")
+        private val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kook.objects.User")
     }
 }
 

@@ -22,8 +22,8 @@ package love.forte.simbot.kaiheila.event
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import love.forte.simbot.kaiheila.api.KhlRuntimeException
-import love.forte.simbot.kaiheila.event.KhlSignalReconnectException.Companion.reconnectException
+import love.forte.simbot.kaiheila.api.KookRuntimeException
+import love.forte.simbot.kaiheila.event.KookSignalReconnectException.Companion.reconnectException
 
 public typealias Signal_0 = Signal.Event
 public typealias Signal_1 = Signal.Hello
@@ -362,37 +362,37 @@ public inline val <T> Signal<T>.data: T get() = d
 /**
  * 尝试获取一个事件的外层 type 属性字段，并转化为 type。
  *
- * @throws KhlSignalException 当出现预料之外的格式时。
+ * @throws KookSignalException 当出现预料之外的格式时。
  */
 public inline val Signal_0.type: Event.Type
     get() {
-        if (d !is JsonObject) throw KhlSignalException("Event json property 'd' is not a object type: $d")
+        if (d !is JsonObject) throw KookSignalException("Event json property 'd' is not a object type: $d")
 
         val type = d["type"]
 
-        if (type !is JsonPrimitive) throw KhlSignalException("Event json property 'type' is not a primitive type: $type")
+        if (type !is JsonPrimitive) throw KookSignalException("Event json property 'type' is not a primitive type: $type")
 
         return type.intOrNull?.let { Event.Type.byTypeOr(it, Event.Type.UNKNOWN) }
-            ?: throw KhlSignalException("Unknown event type property: $type")
+            ?: throw KookSignalException("Unknown event type property: $type")
     }
 
 /**
  * 尝试获取一个事件的内部 `extra` 的 `type` 属性字段(的 [JsonPrimitive] 类型 )。
  *
- * @throws KhlSignalException 当出现预料之外的格式时。
+ * @throws KookSignalException 当出现预料之外的格式时。
  *
  */
 public inline val Signal_0.extraTypePrimitive: JsonPrimitive
     get() {
-        if (d !is JsonObject) throw KhlSignalException("Event json property 'd' is not a object type: $d")
+        if (d !is JsonObject) throw KookSignalException("Event json property 'd' is not a object type: $d")
 
         val extra = d["extra"]
 
-        if (extra !is JsonObject) throw KhlSignalException("Event json property 'extra' is not a object type: $extra")
+        if (extra !is JsonObject) throw KookSignalException("Event json property 'extra' is not a object type: $extra")
 
         val type = extra["type"]
 
-        if (type !is JsonPrimitive) throw KhlSignalException("Event json property 'type' in property 'extra' is not a primitive type.")
+        if (type !is JsonPrimitive) throw KookSignalException("Event json property 'type' in property 'extra' is not a primitive type.")
 
         return type
 
@@ -401,7 +401,7 @@ public inline val Signal_0.extraTypePrimitive: JsonPrimitive
 /**
  * 尝试获取一个事件的内部 `extra` 的 `type` 属性字段。
  *
- * @throws KhlSignalException 当出现预料之外的格式时。
+ * @throws KookSignalException 当出现预料之外的格式时。
  *
  * @return 只可能是 [Event.Type] 或 [String] 类型。
  */
@@ -414,14 +414,14 @@ public inline val Signal_0.extraType: Any
         }
 
         return type.contentOrNull
-            ?: throw KhlSignalException("Unknown type of event json property 'type' in property 'extra': $type")
+            ?: throw KookSignalException("Unknown type of event json property 'type' in property 'extra': $type")
     }
 
 
 /**
  *  Kook 信令异常。
  */
-public open class KhlSignalException : KhlRuntimeException {
+public open class KookSignalException : KookRuntimeException {
     public constructor() : super()
     public constructor(message: String?) : super(message)
     public constructor(message: String?, cause: Throwable?) : super(message, cause)
@@ -435,7 +435,7 @@ public open class KhlSignalException : KhlRuntimeException {
  * @see Signal.Reconnect
  * @see reconnectException
  */
-public open class KhlSignalReconnectException : KhlSignalException {
+public open class KookSignalReconnectException : KookSignalException {
     public constructor() : super()
     public constructor(message: String?) : super(message)
     public constructor(message: String?, cause: Throwable?) : super(message, cause)
@@ -443,10 +443,10 @@ public open class KhlSignalReconnectException : KhlSignalException {
 
     public companion object {
         @JvmStatic
-        public fun reconnectException(resp: Signal.ReconnectPack): KhlSignalReconnectException {
+        public fun reconnectException(resp: Signal.ReconnectPack): KookSignalReconnectException {
             val code = resp.code
             val err = resp.err ?: Signal.ReconnectCode.byCode(code).err
-            return KhlSignalReconnectException("code: $code, err: $err")
+            return KookSignalReconnectException("code: $code, err: $err")
         }
     }
 }

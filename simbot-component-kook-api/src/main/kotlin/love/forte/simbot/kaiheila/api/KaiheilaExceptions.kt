@@ -33,7 +33,7 @@ public interface Kaiheila
 /**
  *  Kook 相关异常。
  */
-public open class KhlRuntimeException : SimbotRuntimeException {
+public open class KookRuntimeException : SimbotRuntimeException {
     public constructor() : super()
     public constructor(message: String?) : super(message)
     public constructor(message: String?, cause: Throwable?) : super(message, cause)

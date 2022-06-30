@@ -51,7 +51,7 @@ public object SystemUser : User {
     override val status: Int
         get() = 0
     override val avatar: String
-        get() = "https://www.kaiheila.cn/css/image/logo.png"
+        get() = "https://www.kookapp.cn/css/image/logo.png"
     override val vipAvatar: String
         get() = avatar
     override val mobileVerified: Boolean
