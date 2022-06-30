@@ -23,7 +23,7 @@ public object KookApi {
      *
      * 参考 https://developer.kaiheila.cn/doc/reference。
      */
-    public const val HOST: String = "www.kaiheila.cn"
+    public const val HOST: String = "www.kookapp.cn"
 
     /**
      * 得到一个 Kook API下的BaseUrl, 相当于 `"https://$HOST/api/v$VERSION"`.
