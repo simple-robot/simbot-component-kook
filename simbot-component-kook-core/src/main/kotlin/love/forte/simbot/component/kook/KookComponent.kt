@@ -17,6 +17,9 @@
 
 package love.forte.simbot.component.kook
 
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -86,6 +89,8 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
         
         /**
          * [KookComponent] 组件所使用的消息序列化信息。
+         *
+         * _早期版本的 `khl.xx.xx` 格式的序列化模块请参考 [khlCompatibleMessageSerializersModule] _
          */
         @OptIn(ExperimentalSimbotApi::class)
         public val messageSerializersModule: SerializersModule = SerializersModule {
@@ -109,6 +114,39 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
                 include()
             }
         }
+    
+        /**
+         * 用于兼容 `khl.xx.xx` 更名为 `kook.xx.xx` 之前的消息序列化模组。
+         *
+         * 不会默认添加到任何地方，且理论上与 [messageSerializersModule] 相互冲突。如果有需要，请自行使用。
+         *
+         * **会在beta版本中择机删除，请不要过分依赖。**
+         *
+         */
+        @Deprecated("Only for compatible. Will remove in future.")
+        @FragileSimbotApi
+        @OptIn(ExperimentalSimbotApi::class)
+        public val khlCompatibleMessageSerializersModule: SerializersModule = SerializersModule {
+            fun PolymorphicModuleBuilder<KookMessageElement<*>>.include() {
+                subclass(KookSimpleAssetMessage::class, KookSimpleAssetMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
+                subclass(KookAssetImage::class, KookAssetImage.serializer().rename { it.replaceFirst("kook.", "khl.") })
+                subclass(KookAtAllHere::class, KookAtAllHere.serializer().rename { it.replaceFirst("kook.", "khl.") })
+                subclass(KookAttachmentMessage::class, KookAttachmentMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
+                subclass(KookCardMessage::class, KookCardMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
+                subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
+            }
+            polymorphic(KMarkdown::class) {
+                subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer().rename { "RAW_V_K_MD" }) // 曾经的序列化name为此。
+            }
+    
+            polymorphic(KookMessageElement::class) {
+                include()
+            }
+    
+            polymorphic(Message.Element::class) {
+                include()
+            }
+        }
         
         /**
          * 构建一个 [KookComponent] 实例。
@@ -121,6 +159,27 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
     }
     
 }
+
+/*
+    下面这些用于 rename 的序列化内容用于使用兼容 `khl.xx.xx` 的消息序列化命名中。
+ */
+
+private fun <T> KSerializer<T>.rename(newSerialName: String): KSerializer<T> = RenameKSerializer(newSerialName, this)
+
+@OptIn(ExperimentalSerializationApi::class)
+private inline fun <T> KSerializer<T>.rename(newSerialName: (String) -> String): KSerializer<T> {
+    return rename(newSerialName(descriptor.serialName))
+}
+
+private class RenameKSerializer<T>(serialName: String, serializer: KSerializer<T>) : KSerializer<T> by serializer {
+    @OptIn(ExperimentalSerializationApi::class)
+    override val descriptor: SerialDescriptor = RenameSerialDescriptor(serialName, serializer.descriptor)
+}
+
+@ExperimentalSerializationApi
+private class RenameSerialDescriptor(override val serialName: String, serialDescriptor: SerialDescriptor) :
+    SerialDescriptor by serialDescriptor
+
 
 /**
  *

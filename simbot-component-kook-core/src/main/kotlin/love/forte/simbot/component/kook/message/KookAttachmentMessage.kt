@@ -32,7 +32,7 @@ import love.forte.simbot.message.doSafeCast
  *
  * @author ForteScarlet
  */
-@SerialName("khl.attachment")
+@SerialName("kook.attachment")
 @Serializable
 public data class KookAttachmentMessage(public val attachment: Attachments) : KookMessageElement<KookAttachmentMessage> {
 

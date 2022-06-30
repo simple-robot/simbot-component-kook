@@ -31,7 +31,7 @@ import love.forte.simbot.kook.objects.CardMessage as KkCardMessage
  * @author ForteScarlet
  */
 @ExperimentalSimbotApi
-@SerialName("khl.card")
+@SerialName("kook.card")
 @Serializable
 public data class KookCardMessage(public val cards: KkCardMessage) : KookMessageElement<KookCardMessage> {
     override val key: Message.Key<KookCardMessage>

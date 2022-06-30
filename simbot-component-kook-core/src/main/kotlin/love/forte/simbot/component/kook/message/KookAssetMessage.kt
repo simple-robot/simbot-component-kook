@@ -88,7 +88,7 @@ public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageEleme
  *
  * @author ForteScarlet
  */
-@SerialName("khl.asset.std")
+@SerialName("kook.asset.std")
 @Serializable
 public data class KookSimpleAssetMessage(
     /**
@@ -119,7 +119,7 @@ public data class KookSimpleAssetMessage(
 /**
  * 使用 [AssetCreated] 作为一个 [Image] 消息类型。当前消息的ID等同于 [AssetCreated.url].
  */
-@SerialName("khl.asset.img")
+@SerialName("kook.asset.img")
 @Serializable
 public data class KookAssetImage(override val asset: AssetCreated) : KookAssetMessage<KookAssetImage>(), Image<KookAssetImage> {
     override val type: Int

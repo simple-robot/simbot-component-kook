@@ -29,7 +29,7 @@ import love.forte.simbot.message.doSafeCast
  * 将 [KMarkdown] 作为消息使用。
  * @author ForteScarlet
  */
-@SerialName("khl.kmd")
+@SerialName("kook.kmd")
 @Serializable
 @OptIn(ExperimentalSimbotApi::class)
 public data class KookKMarkdownMessage(public val kMarkdown: KMarkdown) : KookMessageElement<KookKMarkdownMessage> {

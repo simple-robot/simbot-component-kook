@@ -84,7 +84,7 @@ public data class RawValueKMarkdown(
     override val mentionRolePart: List<MentionRolePart> = emptyList(),
 ) : KMarkdown {
     public companion object {
-        internal const val SERIAL_NAME = "RAW_V_K_MD"
+        internal const val SERIAL_NAME = "raw.kmd"
     }
 
 

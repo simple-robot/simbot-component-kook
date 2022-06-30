@@ -35,7 +35,7 @@ import love.forte.simbot.message.Message
  * 此情况也适用于 [At] 和 [AtAll]。**
  *
  */
-@SerialName("khl.AtAllHere")
+@SerialName("kook.AtAllHere")
 @Serializable
 public object KookAtAllHere : KookMessageElement<KookAtAllHere>, Message.Key<KookAtAllHere> {
     override val key: Message.Key<KookAtAllHere>
