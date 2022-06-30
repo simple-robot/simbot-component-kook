@@ -27,7 +27,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
  *
  *  Kook Api的响应值标准格式。
  *
- * 参考 <https://developer.kook.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
+ * 参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
  *
  * 响应值类型无外乎三种形式：列表、对象、空。
  *
@@ -207,7 +207,7 @@ public class ApiResult @ApiResultType constructor(
 
 
 /**
- * [速率限制](https://developer.kook.cn/doc/rate-limit) 请求头中的数据体。
+ * [速率限制](https://developer.kaiheila.cn/doc/rate-limit) 请求头中的数据体。
  */
 @Serializable
 public data class RateLimit(

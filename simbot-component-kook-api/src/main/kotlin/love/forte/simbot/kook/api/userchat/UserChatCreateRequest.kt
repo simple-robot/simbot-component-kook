@@ -26,7 +26,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 
 /**
- * [创建私信聊天会话](https://developer.kook.cn/doc/http/user-chat#%E5%88%9B%E5%BB%BA%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E4%BC%9A%E8%AF%9D)
+ * [创建私信聊天会话](https://developer.kaiheila.cn/doc/http/user-chat#%E5%88%9B%E5%BB%BA%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E4%BC%9A%E8%AF%9D)
  *
  * @author ForteScarlet
  */

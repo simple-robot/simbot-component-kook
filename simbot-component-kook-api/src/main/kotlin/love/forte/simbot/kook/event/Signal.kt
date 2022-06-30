@@ -43,7 +43,7 @@ public interface JsonValueFactory<T> {
 
 
 /**
- *  Kook  websocket概述 - [信令](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4%E6%A0%BC%E5%BC%8F)
+ *  Kook  websocket概述 - [信令](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4%E6%A0%BC%E5%BC%8F)
  *
  * 信令基本格式：
  * ```json
@@ -71,13 +71,13 @@ public sealed class Signal<T> {
 
     //region 信令[0] - EVENT
     /**
-     * ## 信令0 - [EVENT](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[0]%20EVENT)
+     * ## 信令0 - [EVENT](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[0]%20EVENT)
      *
      * 方向： server->client
      *  说明： 在正常连接状态下，收到的消息事件等。
      *  参数列表：
      *
-     *  具体参见 [Event](https://developer.kook.cn/doc/event)
+     *  具体参见 [Event](https://developer.kaiheila.cn/doc/event)
      *
      *  注意： 该消息会有 `sn`, 代表消息序号, 针对当前 `session` 的消息的序号, 客户端需记录该数字,并按顺序接收消息， `resume` 时需传入该参数才能完成。
      *
@@ -97,7 +97,7 @@ public sealed class Signal<T> {
 
     //region 信令[1] - HELLO
     /**
-     * ## 信令1 - [HELLO](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[1]%20HELLO)
+     * ## 信令1 - [HELLO](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[1]%20HELLO)
      *
      * 方向： server->client
      *
@@ -162,7 +162,7 @@ public sealed class Signal<T> {
 
     //region 信令[2] - PING
     /**
-     * 信令2 - [PING](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[2]%20PING)
+     * 信令2 - [PING](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[2]%20PING)
      *
      * 方向： client -> server
      * 说明： 每隔30s(随机-5，+5),将当前的最大 sn 传给服务端,客户端应该在6s内收到PONG, 否则心跳超时。
@@ -192,7 +192,7 @@ public sealed class Signal<T> {
 
     //region 信令[3] - PONG
     /**
-     * ## 信令3 - [PONG](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[3]%20PONG)
+     * ## 信令3 - [PONG](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[3]%20PONG)
      *
      * 方向： server -> client
      *
@@ -245,7 +245,7 @@ public sealed class Signal<T> {
 
     //region 信令[5] - RECONNECT
     /**
-     * ## 信令5 - [RECONNECT](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[5]%20RECONNECT)
+     * ## 信令5 - [RECONNECT](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[5]%20RECONNECT)
      *
      * 方向： server->client
      *
@@ -319,7 +319,7 @@ public sealed class Signal<T> {
     //region 信令[6] - RESUME ACK
     /**
      *
-     * ## 信令6 - [RESUME ACK](https://developer.kook.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[6]%20RESUME%20ACK)
+     * ## 信令6 - [RESUME ACK](https://developer.kaiheila.cn/doc/websocket#%E4%BF%A1%E4%BB%A4[6]%20RESUME%20ACK)
      *
      * 方向： server->client
      *

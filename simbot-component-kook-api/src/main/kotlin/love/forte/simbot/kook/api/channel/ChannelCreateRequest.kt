@@ -28,7 +28,7 @@ import love.forte.simbot.kook.objects.Channel
 
 /**
  *
- * [创建频道](https://developer.kook.cn/doc/http/channel#%E5%88%9B%E5%BB%BA%E9%A2%91%E9%81%93)
+ * [创建频道](https://developer.kaiheila.cn/doc/http/channel#%E5%88%9B%E5%BB%BA%E9%A2%91%E9%81%93)
  *
  * request method: POST
  *

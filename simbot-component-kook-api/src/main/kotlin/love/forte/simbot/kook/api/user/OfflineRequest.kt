@@ -7,7 +7,7 @@ import love.forte.simbot.kook.util.unmodifiableListOf
 
 
 /**
- * [下线机器人](https://developer.kook.cn/doc/http/user#%E4%B8%8B%E7%BA%BF%E6%9C%BA%E5%99%A8%E4%BA%BA)
+ * [下线机器人](https://developer.kaiheila.cn/doc/http/user#%E4%B8%8B%E7%BA%BF%E6%9C%BA%E5%99%A8%E4%BA%BA)
  *
  * @author ForteScarlet
  */

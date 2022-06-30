@@ -30,7 +30,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 /**
  *
- * [删除频道](https://developer.kook.cn/doc/http/channel#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93)
+ * [删除频道](https://developer.kaiheila.cn/doc/http/channel#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93)
  *
  *
  * @author ForteScarlet

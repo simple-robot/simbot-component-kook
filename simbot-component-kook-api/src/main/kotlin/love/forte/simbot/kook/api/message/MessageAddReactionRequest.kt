@@ -26,7 +26,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 /**
  *
- * [给某个消息添加回应](https://developer.kook.cn/doc/http/message#%E7%BB%99%E6%9F%90%E4%B8%AA%E6%B6%88%E6%81%AF%E6%B7%BB%E5%8A%A0%E5%9B%9E%E5%BA%94)
+ * [给某个消息添加回应](https://developer.kaiheila.cn/doc/http/message#%E7%BB%99%E6%9F%90%E4%B8%AA%E6%B6%88%E6%81%AF%E6%B7%BB%E5%8A%A0%E5%9B%9E%E5%BA%94)
  *
  */
 public class MessageAddReactionRequest(

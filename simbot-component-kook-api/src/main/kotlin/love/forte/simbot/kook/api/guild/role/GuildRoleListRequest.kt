@@ -30,7 +30,7 @@ import love.forte.simbot.literal
 
 /**
  *
- * [获取服务器角色列表](https://developer.kook.cn/doc/http/guild-role#获取服务器角色列表)
+ * [获取服务器角色列表](https://developer.kaiheila.cn/doc/http/guild-role#获取服务器角色列表)
  *
  * method: `GET`
  *

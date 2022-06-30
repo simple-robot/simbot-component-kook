@@ -28,7 +28,7 @@ import love.forte.simbot.literal
 
 /**
  *
- * [获取邀请列表](https://developer.kook.cn/doc/http/invite#%E8%8E%B7%E5%8F%96%E9%82%80%E8%AF%B7%E5%88%97%E8%A1%A8)
+ * [获取邀请列表](https://developer.kaiheila.cn/doc/http/invite#%E8%8E%B7%E5%8F%96%E9%82%80%E8%AF%B7%E5%88%97%E8%A1%A8)
  *
  * `/api/v3/invite/list`
  *

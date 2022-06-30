@@ -33,7 +33,7 @@ import love.forte.simbot.literal
 
 /**
  *
- * [获取频道详情](https://developer.kook.cn/doc/http/channel#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%AF%A6%E6%83%85)
+ * [获取频道详情](https://developer.kaiheila.cn/doc/http/channel#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%AF%A6%E6%83%85)
  *
  * request method: GET
  *
@@ -56,7 +56,7 @@ public class ChannelViewRequest(private val targetId: ID) : KookGetRequest<Chann
 
 
 /**
- * [频道详情](https://developer.kook.cn/doc/http/channel#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%AF%A6%E6%83%85)
+ * [频道详情](https://developer.kaiheila.cn/doc/http/channel#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%AF%A6%E6%83%85)
  */
 @Serializable
 public data class ChannelView @ApiResultType constructor(

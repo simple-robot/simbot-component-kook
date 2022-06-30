@@ -25,7 +25,7 @@ import love.forte.simbot.kook.objects.ReactionEmoji
 
 
 /**
- * [频道内用户添加 reaction](https://developer.kook.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction)
+ * [频道内用户添加 reaction](https://developer.kaiheila.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction)
  * @author ForteScarlet
  */
 public interface AddedReactionExtraBody : ChannelEventExtraBody {
@@ -53,7 +53,7 @@ public interface AddedReactionExtraBody : ChannelEventExtraBody {
 }
 
 /**
- * [频道内用户添加 reaction](https://developer.kook.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction)
+ * [频道内用户添加 reaction](https://developer.kaiheila.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction)
  * @author ForteScarlet
  */
 @Serializable

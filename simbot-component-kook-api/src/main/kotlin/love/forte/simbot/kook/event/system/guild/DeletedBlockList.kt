@@ -25,7 +25,7 @@ import love.forte.simbot.ID
 
 /**
  *
- * [服务器取消封禁用户](https://developer.kook.cn/doc/event/guild#服务器取消封禁用户)
+ * [服务器取消封禁用户](https://developer.kaiheila.cn/doc/event/guild#服务器取消封禁用户)
  *
  * `deleted_block_list`
  *
@@ -46,7 +46,7 @@ public interface DeletedBlockListExtraBody : GuildEventExtraBody {
 
 /**
  *
- * [服务器取消封禁用户](https://developer.kook.cn/doc/event/guild#服务器取消封禁用户)
+ * [服务器取消封禁用户](https://developer.kaiheila.cn/doc/event/guild#服务器取消封禁用户)
  *
  * `deleted_block_list`
  *

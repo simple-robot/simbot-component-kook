@@ -49,7 +49,7 @@ import love.forte.simbot.kook.api.invite.InviteCreateRequest.Key.SETTING_TIMES_U
 
 /**
  *
- * [创建邀请链接](https://developer.kook.cn/doc/http/invite#创建邀请链接)
+ * [创建邀请链接](https://developer.kaiheila.cn/doc/http/invite#创建邀请链接)
  *
  * `/api/v3/invite/create`
  *

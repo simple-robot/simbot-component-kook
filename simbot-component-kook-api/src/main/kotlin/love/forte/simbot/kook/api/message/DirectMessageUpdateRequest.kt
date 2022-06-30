@@ -26,7 +26,7 @@ import love.forte.simbot.kook.api.BaseKookApiRequestKey
 import love.forte.simbot.kook.api.KookPostRequest
 
 /**
- * [更新私信聊天消息](https://developer.kook.cn/doc/http/direct-message#%E6%9B%B4%E6%96%B0%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
+ * [更新私信聊天消息](https://developer.kaiheila.cn/doc/http/direct-message#%E6%9B%B4%E6%96%B0%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */

@@ -24,7 +24,7 @@ import love.forte.simbot.kook.objects.SystemUser.id
  *
  * 当 [id] == `1` 的时候，用户代表为 _系统用户_ 。
  *
- * 参考 [事件结构/格式说明](https://developer.kook.cn/doc/event/event-introduction) 中事件结构的 `author_id` 字段说明。
+ * 参考 [事件结构/格式说明](https://developer.kaiheila.cn/doc/event/event-introduction) 中事件结构的 `author_id` 字段说明。
  *
  * @see User
  */

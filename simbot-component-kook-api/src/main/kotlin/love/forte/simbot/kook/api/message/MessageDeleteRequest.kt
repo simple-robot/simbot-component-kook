@@ -25,7 +25,7 @@ import love.forte.simbot.kook.api.BaseKookApiRequestKey
 import love.forte.simbot.kook.api.KookPostRequest
 
 /**
- * [删除频道聊天消息](https://developer.kook.cn/doc/http/message#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
+ * [删除频道聊天消息](https://developer.kaiheila.cn/doc/http/message#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
  *
  * @param msgId 消息 id
  */

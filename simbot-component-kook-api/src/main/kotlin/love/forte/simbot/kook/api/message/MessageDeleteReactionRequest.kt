@@ -25,7 +25,7 @@ import love.forte.simbot.kook.api.BaseKookApiRequestKey
 import love.forte.simbot.kook.api.KookPostRequest
 
 /**
- * [删除消息的某个回应](https://developer.kook.cn/doc/http/message#%E5%88%A0%E9%99%A4%E6%B6%88%E6%81%AF%E7%9A%84%E6%9F%90%E4%B8%AA%E5%9B%9E%E5%BA%94)
+ * [删除消息的某个回应](https://developer.kaiheila.cn/doc/http/message#%E5%88%A0%E9%99%A4%E6%B6%88%E6%81%AF%E7%9A%84%E6%9F%90%E4%B8%AA%E5%9B%9E%E5%BA%94)
  *
  */
 public class MessageDeleteReactionRequest(

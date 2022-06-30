@@ -39,7 +39,7 @@ public annotation class KookMarkdownBuilderTopDsl
 
 
 /**
- *  Kook 的 [KMarkdown](https://developer.kook.cn/doc/kmarkdown).
+ *  Kook 的 [KMarkdown](https://developer.kaiheila.cn/doc/kmarkdown).
  * 此接口中定义的三个属性主要用于 **接收消息** 用。
  *
  * @see RawValueKMarkdown
@@ -55,7 +55,7 @@ public interface KMarkdown {
     public val rawContent: String
 
     /**
-     * 提及部分，参考自 [KMarkdown消息](https://developer.kook.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF) 字段
+     * 提及部分，参考自 [KMarkdown消息](https://developer.kaiheila.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF) 字段
      */
     public val mentionPart: List<MentionPart>
 

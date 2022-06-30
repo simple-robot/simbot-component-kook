@@ -22,7 +22,7 @@ import io.ktor.client.statement.*
 
 // TODO
 /**
- *  Kook  [超速限制](https://developer.kook.cn/doc/rate-limit) 异常。
+ *  Kook  [超速限制](https://developer.kaiheila.cn/doc/rate-limit) 异常。
  *
  * @author ForteScarlet
  */
@@ -34,7 +34,7 @@ public open class ApiRateLimitException : KookRuntimeException {
 }
 
 /**
- * [超速限制](https://developer.kook.cn/doc/rate-limit) 中的部分常量信息。
+ * [超速限制](https://developer.kaiheila.cn/doc/rate-limit) 中的部分常量信息。
  *
  * @author ForteScarlet
  */

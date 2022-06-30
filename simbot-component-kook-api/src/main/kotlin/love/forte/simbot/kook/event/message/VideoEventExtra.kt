@@ -29,7 +29,7 @@ import love.forte.simbot.kook.objects.UserImpl
 
 /**
  *
- * [视频消息事件](https://developer.kook.cn/doc/event/message#%E8%A7%86%E9%A2%91%E6%B6%88%E6%81%AF)
+ * [视频消息事件](https://developer.kaiheila.cn/doc/event/message#%E8%A7%86%E9%A2%91%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */
@@ -48,7 +48,7 @@ public interface VideoEventExtra : MessageEventExtra, AttachmentsMessageEventExt
 
 /**
  *
- * [视频消息事件](https://developer.kook.cn/doc/event/message#%E8%A7%86%E9%A2%91%E6%B6%88%E6%81%AF)
+ * [视频消息事件](https://developer.kaiheila.cn/doc/event/message#%E8%A7%86%E9%A2%91%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */

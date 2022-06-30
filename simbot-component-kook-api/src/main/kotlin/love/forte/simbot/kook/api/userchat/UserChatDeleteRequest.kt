@@ -27,7 +27,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 
 /**
- * [删除私信聊天会话](https://developer.kook.cn/doc/http/user-chat#%E5%88%A0%E9%99%A4%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E4%BC%9A%E8%AF%9D)
+ * [删除私信聊天会话](https://developer.kaiheila.cn/doc/http/user-chat#%E5%88%A0%E9%99%A4%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E4%BC%9A%E8%AF%9D)
  *
  * @param chatCode 删除目标会话的ID
  * @author ForteScarlet

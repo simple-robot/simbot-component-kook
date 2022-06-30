@@ -29,7 +29,7 @@ import love.forte.simbot.kook.objects.UserImpl
 import love.forte.simbot.kook.objects.impl.AttachmentsImpl
 
 /**
- * [图片消息事件](https://developer.kook.cn/doc/event/message#%E5%9B%BE%E7%89%87%E6%B6%88%E6%81%AF)
+ * [图片消息事件](https://developer.kaiheila.cn/doc/event/message#%E5%9B%BE%E7%89%87%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */
@@ -51,7 +51,7 @@ public interface ImageEventExtra : MessageEventExtra, AttachmentsMessageEventExt
 }
 
 /**
- * [图片消息事件](https://developer.kook.cn/doc/event/message#%E5%9B%BE%E7%89%87%E6%B6%88%E6%81%AF)
+ * [图片消息事件](https://developer.kaiheila.cn/doc/event/message#%E5%9B%BE%E7%89%87%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */

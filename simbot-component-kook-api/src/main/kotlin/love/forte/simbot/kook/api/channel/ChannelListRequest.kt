@@ -34,7 +34,7 @@ import love.forte.simbot.literal
 
 
 /**
- * [获取频道列表](https://developer.kook.cn/doc/http/channel#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E5%88%97%E8%A1%A8)
+ * [获取频道列表](https://developer.kaiheila.cn/doc/http/channel#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E5%88%97%E8%A1%A8)
  *
  * request method: GET
  *

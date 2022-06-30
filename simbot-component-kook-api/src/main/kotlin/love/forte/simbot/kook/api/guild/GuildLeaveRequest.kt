@@ -27,7 +27,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 
 /**
- * [离开服务器](https://developer.kook.cn/doc/http/guild#%E7%A6%BB%E5%BC%80%E6%9C%8D%E5%8A%A1%E5%99%A8)
+ * [离开服务器](https://developer.kaiheila.cn/doc/http/guild#%E7%A6%BB%E5%BC%80%E6%9C%8D%E5%8A%A1%E5%99%A8)
  *
  * request method: POST
  *

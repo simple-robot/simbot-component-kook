@@ -25,7 +25,7 @@ import love.forte.simbot.kook.objects.impl.QuoteImpl
 
 /**
  *
- * [引用消息Quote](https://developer.kook.cn/doc/objects#%E5%BC%95%E7%94%A8%E6%B6%88%E6%81%AFQuote)
+ * [引用消息Quote](https://developer.kaiheila.cn/doc/objects#%E5%BC%95%E7%94%A8%E6%B6%88%E6%81%AFQuote)
  *
  * @author ForteScarlet
  */

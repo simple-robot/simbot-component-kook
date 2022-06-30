@@ -6,7 +6,7 @@ import love.forte.simbot.kook.util.buildUrl
 /**
  * 部分当前 Kook api的信息常量，例如api版本信息。
  *
- * 相关内容参考 [ Kook 文档](https://developer.kook.cn/doc/reference)
+ * 相关内容参考 [ Kook 文档](https://developer.kaiheila.cn/doc/reference)
  */
 @Suppress("MemberVisibilityCanBePrivate")
 public object KookApi {
@@ -14,14 +14,14 @@ public object KookApi {
     /**
      * 当前的 Kook api的版本。
      *
-     * 参考 <https://developer.kook.cn/doc/reference>。
+     * 参考 <https://developer.kaiheila.cn/doc/reference>。
      */
     public const val VERSION: String = "3"
 
     /**
      *  Kook api的url host.
      *
-     * 参考 https://developer.kook.cn/doc/reference。
+     * 参考 https://developer.kaiheila.cn/doc/reference。
      */
     public const val HOST: String = "www.kookapp.cn"
 

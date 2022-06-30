@@ -28,7 +28,7 @@ import love.forte.simbot.kook.api.message.DirectMessageListRequest.Key.byChatCod
 import love.forte.simbot.kook.api.message.DirectMessageListRequest.Key.byTargetId
 
 /**
- * [获取私信聊天消息列表](https://developer.kook.cn/doc/http/direct-message#%E8%8E%B7%E5%8F%96%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF%E5%88%97%E8%A1%A8)
+ * [获取私信聊天消息列表](https://developer.kaiheila.cn/doc/http/direct-message#%E8%8E%B7%E5%8F%96%E7%A7%81%E4%BF%A1%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF%E5%88%97%E8%A1%A8)
  *
  * method: GET
  *

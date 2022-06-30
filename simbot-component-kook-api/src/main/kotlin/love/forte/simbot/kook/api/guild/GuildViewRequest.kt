@@ -33,7 +33,7 @@ import love.forte.simbot.literal
 
 
 /**
- * [获取服务器详情](https://developer.kook.cn/doc/http/guild#%E8%8E%B7%E5%8F%96%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AF%A6%E6%83%85)
+ * [获取服务器详情](https://developer.kaiheila.cn/doc/http/guild#%E8%8E%B7%E5%8F%96%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AF%A6%E6%83%85)
  *
  * api: /guild/view
  *

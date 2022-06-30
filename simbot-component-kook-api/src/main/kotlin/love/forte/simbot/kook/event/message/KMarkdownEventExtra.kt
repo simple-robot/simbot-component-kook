@@ -29,7 +29,7 @@ import love.forte.simbot.kook.objects.User
 import love.forte.simbot.kook.objects.UserImpl
 
 /**
- * [KMarkdown消息事件](https://developer.kook.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF)
+ * [KMarkdown消息事件](https://developer.kaiheila.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */
@@ -48,7 +48,7 @@ public interface KMarkdownEventExtra : MessageEventExtra {
 
 
 /**
- * [KMarkdown消息事件](https://developer.kook.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF)
+ * [KMarkdown消息事件](https://developer.kaiheila.cn/doc/event/message#KMarkdown%E6%B6%88%E6%81%AF)
  *
  * @author ForteScarlet
  */

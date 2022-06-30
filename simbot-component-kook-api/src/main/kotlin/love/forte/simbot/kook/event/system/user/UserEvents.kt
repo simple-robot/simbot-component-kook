@@ -25,7 +25,7 @@ import love.forte.simbot.kook.event.system.sysParser
 
 
 /**
- * [用户相关事件](https://developer.kook.cn/doc/event/user) 的子事件type常量类。
+ * [用户相关事件](https://developer.kaiheila.cn/doc/event/user) 的子事件type常量类。
  *
  * @see SelfExitedGuildEvent
  * @see SelfJoinedGuildEvent

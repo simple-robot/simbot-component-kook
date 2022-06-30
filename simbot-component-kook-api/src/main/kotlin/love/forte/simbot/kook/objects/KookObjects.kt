@@ -20,6 +20,6 @@ package love.forte.simbot.kook.objects
 /**
  * Kook 文档中所定义的部分标准object规则的父接口。
  *
- * see: https://developer.kook.cn/doc/objects
+ * see: https://developer.kaiheila.cn/doc/objects
  */
 public interface KookObjects

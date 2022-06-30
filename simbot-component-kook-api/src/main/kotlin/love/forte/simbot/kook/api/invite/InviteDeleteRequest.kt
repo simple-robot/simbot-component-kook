@@ -27,7 +27,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 
 /**
- * [删除邀请链接](https://developer.kook.cn/doc/http/invite#删除邀请链接)
+ * [删除邀请链接](https://developer.kaiheila.cn/doc/http/invite#删除邀请链接)
  *
  * `/api/v3/invite/delete`
  *

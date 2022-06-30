@@ -29,7 +29,7 @@ import love.forte.simbot.kook.objects.UserImpl
 
 
 /**
- * [文件消息](https://developer.kook.cn/doc/event/message#%E6%96%87%E4%BB%B6%E6%B6%88%E6%81%AF)
+ * [文件消息](https://developer.kaiheila.cn/doc/event/message#%E6%96%87%E4%BB%B6%E6%B6%88%E6%81%AF)
  * @author ForteScarlet
  */
 public interface FileEventExtra : MessageEventExtra, AttachmentsMessageEventExtra<FileAttachments> {
@@ -50,7 +50,7 @@ public interface FileEventExtra : MessageEventExtra, AttachmentsMessageEventExtr
 }
 
 /**
- * [文件消息](https://developer.kook.cn/doc/event/message#%E6%96%87%E4%BB%B6%E6%B6%88%E6%81%AF)
+ * [文件消息](https://developer.kaiheila.cn/doc/event/message#%E6%96%87%E4%BB%B6%E6%B6%88%E6%81%AF)
  * @author ForteScarlet
  */
 @Serializable

@@ -28,7 +28,7 @@ import love.forte.simbot.kook.objects.User
 import love.forte.simbot.kook.util.unmodifiableListOf
 
 /**
- * [获取当前用户信息](https://developer.kook.cn/doc/http/user#%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
+ * [获取当前用户信息](https://developer.kaiheila.cn/doc/http/user#%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
  *
  * @author ForteScarlet
  */

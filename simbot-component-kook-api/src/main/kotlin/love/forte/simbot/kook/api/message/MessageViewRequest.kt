@@ -24,7 +24,7 @@ import love.forte.simbot.kook.api.BaseKookApiRequestKey
 import love.forte.simbot.kook.api.KookGetRequest
 
 /**
- * [获取频道聊天消息详情](https://developer.kook.cn/doc/http/message#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF%E8%AF%A6%E6%83%85)
+ * [获取频道聊天消息详情](https://developer.kaiheila.cn/doc/http/message#%E8%8E%B7%E5%8F%96%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF%E8%AF%A6%E6%83%85)
  * @author ForteScarlet
  */
 public class MessageViewRequest(private val msgId: ID) : KookGetRequest<ChannelMessageDetails>() {

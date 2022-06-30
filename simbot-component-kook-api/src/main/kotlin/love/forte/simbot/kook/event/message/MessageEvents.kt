@@ -28,7 +28,7 @@ import love.forte.simbot.kook.objects.Channel
 
 
 /**
- * [消息相关事件列表](https://developer.kook.cn/doc/event/message)
+ * [消息相关事件列表](https://developer.kaiheila.cn/doc/event/message)
  *
  * 由于消息相关事件中没有系统事件，因此 [Event.extra] 全部都是 [Event.Extra.Text] 类型。
  *

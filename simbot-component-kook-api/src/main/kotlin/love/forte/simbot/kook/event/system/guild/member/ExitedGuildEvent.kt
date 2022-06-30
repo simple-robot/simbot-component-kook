@@ -25,7 +25,7 @@ import love.forte.simbot.Timestamp
 
 
 /**
- * [服务器成员退出](https://developer.kook.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E9%80%80%E5%87%BA)
+ * [服务器成员退出](https://developer.kaiheila.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E9%80%80%E5%87%BA)
  *
  *
  */

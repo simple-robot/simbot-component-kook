@@ -27,7 +27,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 /**
  *
- * [赋予用户角色](https://developer.kook.cn/doc/http/guild-role#赋予用户角色)
+ * [赋予用户角色](https://developer.kaiheila.cn/doc/http/guild-role#赋予用户角色)
  *
  * method `POST`
  *

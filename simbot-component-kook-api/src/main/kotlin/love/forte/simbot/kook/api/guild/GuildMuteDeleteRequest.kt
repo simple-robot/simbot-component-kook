@@ -28,7 +28,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 /**
  *
- * [删除服务器静音或闭麦](https://developer.kook.cn/doc/http/guild#%E5%88%A0%E9%99%A4%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%9D%99%E9%9F%B3%E6%88%96%E9%97%AD%E9%BA%A6)
+ * [删除服务器静音或闭麦](https://developer.kaiheila.cn/doc/http/guild#%E5%88%A0%E9%99%A4%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%9D%99%E9%9F%B3%E6%88%96%E9%97%AD%E9%BA%A6)
  *
  * request method: POST
  *

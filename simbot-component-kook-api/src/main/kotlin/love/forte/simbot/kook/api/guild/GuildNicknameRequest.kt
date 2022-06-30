@@ -28,7 +28,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 /**
  *
- * [修改服务器中用户的昵称](https://developer.kook.cn/doc/http/guild#%E4%BF%AE%E6%94%B9%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%AD%E7%94%A8%E6%88%B7%E7%9A%84%E6%98%B5%E7%A7%B0)
+ * [修改服务器中用户的昵称](https://developer.kaiheila.cn/doc/http/guild#%E4%BF%AE%E6%94%B9%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%AD%E7%94%A8%E6%88%B7%E7%9A%84%E6%98%B5%E7%A7%B0)
  *
  * request method: POST
  *

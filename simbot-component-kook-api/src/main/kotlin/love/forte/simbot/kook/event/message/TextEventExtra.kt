@@ -31,7 +31,7 @@ import love.forte.simbot.kook.objects.impl.QuoteImpl
 
 
 /**
- * [文字消息事件](https://developer.kook.cn/doc/event/message#%E6%96%87%E5%AD%97%E6%B6%88%E6%81%AF)
+ * [文字消息事件](https://developer.kaiheila.cn/doc/event/message#%E6%96%87%E5%AD%97%E6%B6%88%E6%81%AF)
  *
  * 当此事件的频道类型为 [Channel.Type.PERSON] 时，例如 [guildId] 等频道才有的属性可能会使用空内容填充。
  *
@@ -55,7 +55,7 @@ public interface TextEventExtra : MessageEventExtra {
 
 
 /**
- * [文字消息事件](https://developer.kook.cn/doc/event/message#%E6%96%87%E5%AD%97%E6%B6%88%E6%81%AF)
+ * [文字消息事件](https://developer.kaiheila.cn/doc/event/message#%E6%96%87%E5%AD%97%E6%B6%88%E6%81%AF)
  * @author ForteScarlet
  */
 @Serializable

@@ -83,7 +83,7 @@ public abstract class KookApiRequest<T> {
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
-     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kook.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
+     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
      * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
      * ```kotlin
      * Json {
@@ -145,7 +145,7 @@ public abstract class KookApiRequest<T> {
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
-     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kook.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
+     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
      * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
      * ```kotlin
      * Json {
@@ -180,7 +180,7 @@ public abstract class KookApiRequest<T> {
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
-     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kook.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
+     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
      * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
      * ```kotlin
      * Json {
@@ -203,7 +203,7 @@ public abstract class KookApiRequest<T> {
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
-     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kook.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
+     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
      * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
      * ```kotlin
      * Json {

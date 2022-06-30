@@ -28,7 +28,7 @@ import love.forte.simbot.kook.api.KookPostRequest
 
 /**
  *
- * [删除服务器角色](https://developer.kook.cn/doc/http/guild-role#删除服务器角色)
+ * [删除服务器角色](https://developer.kaiheila.cn/doc/http/guild-role#删除服务器角色)
  *
  * method `POST`
  *

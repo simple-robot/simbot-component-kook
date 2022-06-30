@@ -24,7 +24,7 @@ package love.forte.simbot.kook.objects
  *
  * 权限bitValue类型枚举.
  *
- * see [权限说明](https://developer.kook.cn/doc/http/guild-role#权限说明)
+ * see [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明)
  *
  * @author ForteScarlet
  *

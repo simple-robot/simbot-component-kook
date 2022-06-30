@@ -26,7 +26,7 @@ import love.forte.simbot.kook.api.BaseKookApiRequestKey
 import love.forte.simbot.kook.api.KookPostRequest
 
 /**
- * [更新用户亲密度](https://developer.kook.cn/doc/http/intimacy#更新用户亲密度)
+ * [更新用户亲密度](https://developer.kaiheila.cn/doc/http/intimacy#更新用户亲密度)
  *
  * `/api/v3/intimacy/update`
  *

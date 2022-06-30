@@ -34,7 +34,7 @@ import love.forte.simbot.Simbot
 
 
 /**
- * [卡片消息](https://developer.kook.cn/doc/cardmessage)
+ * [卡片消息](https://developer.kaiheila.cn/doc/cardmessage)
  *
  * > `cardmessage` 主要由json构成，在卡片消息中，有四种类别的卡片结构：
  *
@@ -128,7 +128,7 @@ internal object CardMessageSerializer : KSerializer<CardMessage> {
  * 默认为 `primary`，
  * 为 none 时不显示侧边框。
  *
- * see [整体结构说明](https://developer.kook.cn/doc/cardmessage#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E)。
+ * see [整体结构说明](https://developer.kaiheila.cn/doc/cardmessage#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E)。
  */
 @Serializable
 public enum class Theme {
@@ -166,7 +166,7 @@ public enum class Theme {
  *
  * 大小。可选值为：`xs`, `sm`, `md`, `lg`, 一般默认为 `lg`。
  *
- * see [整体结构说明](https://developer.kook.cn/doc/cardmessage#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E)。
+ * see [整体结构说明](https://developer.kaiheila.cn/doc/cardmessage#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E)。
  */
 @Serializable
 public enum class Size {
@@ -194,7 +194,7 @@ public enum class Size {
 
 
 /**
- * [卡片](https://developer.kook.cn/doc/cardmessage#%E5%8D%A1%E7%89%87).
+ * [卡片](https://developer.kaiheila.cn/doc/cardmessage#%E5%8D%A1%E7%89%87).
  *
  * e.g.
  *
@@ -240,7 +240,7 @@ public data class Card @JvmOverloads constructor(
 
 
 /**
- * [元素](https://developer.kook.cn/doc/cardmessage#%E5%85%83%E7%B4%A0)
+ * [元素](https://developer.kaiheila.cn/doc/cardmessage#%E5%85%83%E7%B4%A0)
  *
  */
 @Serializable
@@ -356,7 +356,7 @@ public sealed class CardElement {
      * - [click] 代表用户点击的事件,默认为""，代表无任何事件。
      * - 当为 link 时，会跳转到 value 代表的链接;
      * - 当为 return-val 时，系统会通过系统消息将消息 id,点击用户 id 和 value 发回给发送者，
-     * 发送者可以根据自己的需求进行处理,消息事件参见[button 点击事件](https://developer.kook.cn/doc/event/user#Card%20%E6%B6%88%E6%81%AF%E4%B8%AD%E7%9A%84%20Button%20%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6)。
+     * 发送者可以根据自己的需求进行处理,消息事件参见[button 点击事件](https://developer.kaiheila.cn/doc/event/user#Card%20%E6%B6%88%E6%81%AF%E4%B8%AD%E7%9A%84%20Button%20%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6)。
      * 私聊和频道内均可使用按钮点击事件。
      *
      *
@@ -387,7 +387,7 @@ public sealed class CardElement {
 
 
     /**
-     * [结构体](https://developer.kook.cn/doc/cardmessage#%E7%BB%93%E6%9E%84%E4%BD%93)
+     * [结构体](https://developer.kaiheila.cn/doc/cardmessage#%E7%BB%93%E6%9E%84%E4%BD%93)
      * 的 **区域文本**。
      *
      * 作用说明： 支持分栏结构，将模块分为左右两栏，根据顺序自动排列，支持更自由的文字排版模式，提高可维护性
@@ -428,14 +428,14 @@ public sealed class CardElement {
 
 
 /**
- * [模块](https://developer.kook.cn/doc/cardmessage#%E6%A8%A1%E5%9D%97)
+ * [模块](https://developer.kaiheila.cn/doc/cardmessage#%E6%A8%A1%E5%9D%97)
  *
  */
 @Serializable
 public sealed class CardModule {
 
     /**
-     * 标题[模块](https://developer.kook.cn/doc/cardmessage#%E6%A8%A1%E5%9D%97)
+     * 标题[模块](https://developer.kaiheila.cn/doc/cardmessage#%E6%A8%A1%E5%9D%97)
      *
      * 标题模块只能支持展示标准文本（text），突出标题样式。
      *

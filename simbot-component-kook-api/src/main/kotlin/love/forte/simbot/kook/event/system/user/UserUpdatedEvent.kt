@@ -24,7 +24,7 @@ import love.forte.simbot.ID
 
 
 /**
- * [用户信息更新](https://developer.kook.cn/doc/event/user#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0)
+ * [用户信息更新](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0)
  *
  *
  *  该事件与服务器无关, 遵循以下条件
@@ -54,7 +54,7 @@ public interface UserUpdatedEventBody {
 
 
 /**
- * [用户信息更新](https://developer.kook.cn/doc/event/user#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0)
+ * [用户信息更新](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0)
  *
  *
  *  该事件与服务器无关, 遵循以下条件

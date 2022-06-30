@@ -31,7 +31,7 @@ import love.forte.simbot.literal
 
 /**
  *
- * [服务器静音闭麦列表](https://developer.kook.cn/doc/http/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%9D%99%E9%9F%B3%E9%97%AD%E9%BA%A6%E5%88%97%E8%A1%A8)
+ * [服务器静音闭麦列表](https://developer.kaiheila.cn/doc/http/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%9D%99%E9%9F%B3%E9%97%AD%E9%BA%A6%E5%88%97%E8%A1%A8)
  *
  * request method: GET
  *
@@ -58,7 +58,7 @@ public sealed class GuildMuteListRequest(
 
 /**
  *
- * 通过 [服务器静音列表](https://developer.kook.cn/doc/http/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%9D%99%E9%9F%B3%E9%97%AD%E9%BA%A6%E5%88%97%E8%A1%A8)
+ * 通过 [服务器静音列表](https://developer.kaiheila.cn/doc/http/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%9D%99%E9%9F%B3%E9%97%AD%E9%BA%A6%E5%88%97%E8%A1%A8)
  * 的 `return_type = 'detail'` 得到的结果.
  *
  */

@@ -32,7 +32,7 @@ import love.forte.simbot.kook.util.BooleanToIntSerializer
 
 /**
  *
- * [更新服务器角色](https://developer.kook.cn/doc/http/guild-role#更新服务器角色)
+ * [更新服务器角色](https://developer.kaiheila.cn/doc/http/guild-role#更新服务器角色)
  *
  * method `POST`
  *
@@ -53,7 +53,7 @@ public class GuildRoleUpdateRequest(override val body: Body) : KookPostRequest<R
         isHoist: Boolean,
         /** 只能为0或者1，该角色是否可以被提及 */
         isMentionable: Boolean,
-        /** 权限,参见 [权限说明](https://developer.kook.cn/doc/http/guild-role#权限说明) */
+        /** 权限,参见 [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明) */
         permissions: Int,
     ) : this(Body(roleId, name, color, position, isHoist, isMentionable, permissions))
 
@@ -97,7 +97,7 @@ public class GuildRoleUpdateRequest(override val body: Body) : KookPostRequest<R
         @Serializable(BooleanToIntSerializer::class)
         val isMentionable: Boolean,
         /**
-         * 权限,参见 [权限说明](https://developer.kook.cn/doc/http/guild-role#权限说明)
+         * 权限,参见 [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明)
          *
          * @see Permissions
          * @see PermissionType

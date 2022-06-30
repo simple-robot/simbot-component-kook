@@ -80,7 +80,7 @@ public interface MessageDetails {
 
 /**
  *
- * 频道的[消息详情](https://developer.kook.cn/doc/http/message#%E6%B6%88%E6%81%AF%E8%AF%A6%E6%83%85%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E)
+ * 频道的[消息详情](https://developer.kaiheila.cn/doc/http/message#%E6%B6%88%E6%81%AF%E8%AF%A6%E6%83%85%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E)
  *
  */
 public interface ChannelMessageDetails : MessageDetails {

@@ -26,7 +26,7 @@ import love.forte.simbot.Timestamp
 
 /**
  *
- * [用户加入语音频道](https://developer.kook.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
+ * [用户加入语音频道](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
  *
  * type: [UserEvents.JOINED_CHANNEL]
  *
@@ -51,7 +51,7 @@ public interface UserJoinedChannelEventBody {
 
 /**
  *
- * [用户加入语音频道](https://developer.kook.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
+ * [用户加入语音频道](https://developer.kaiheila.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93)
  *
  * type: `joined_channel`
  *

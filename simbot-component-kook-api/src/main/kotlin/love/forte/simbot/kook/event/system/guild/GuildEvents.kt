@@ -34,7 +34,7 @@ import love.forte.simbot.kook.event.system.sysParser
 
 /**
  *
- * [服务器相关事件列表](https://developer.kook.cn/doc/event/guild)
+ * [服务器相关事件列表](https://developer.kaiheila.cn/doc/event/guild)
  *
  * @see Event.Extra.Sys.body
  */

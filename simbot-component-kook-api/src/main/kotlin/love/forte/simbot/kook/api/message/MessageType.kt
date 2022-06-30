@@ -35,8 +35,8 @@ import love.forte.simbot.kook.event.Event
 /**
  *
  * 消息的类型。
- * - [消息发送 - type字段](https://developer.kook.cn/doc/http/message#%E5%8F%91%E9%80%81%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
- * - [事件主要格式 - 格式说明](https://developer.kook.cn/doc/event/event-introduction)
+ * - [消息发送 - type字段](https://developer.kaiheila.cn/doc/http/message#%E5%8F%91%E9%80%81%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)
+ * - [事件主要格式 - 格式说明](https://developer.kaiheila.cn/doc/event/event-introduction)
  *
  * @see TEXT
  * @see IMAGE

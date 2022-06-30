@@ -31,7 +31,7 @@ import love.forte.simbot.kook.objects.Permissions
 
 /**
  *
- * [创建服务器角色](https://developer.kook.cn/doc/http/guild-role#创建服务器角色)
+ * [创建服务器角色](https://developer.kaiheila.cn/doc/http/guild-role#创建服务器角色)
  *
  * guild-role/create
  *

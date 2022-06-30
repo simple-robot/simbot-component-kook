@@ -23,7 +23,7 @@ import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 
 /**
- * [服务器成员信息更新](https://developer.kook.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0)
+ * [服务器成员信息更新](https://developer.kaiheila.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0)
  *
  * `updated_guild_member`
  *

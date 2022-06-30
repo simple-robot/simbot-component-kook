@@ -37,7 +37,7 @@ import java.net.URL
 
 /**
  *
- * [上传媒体文件](https://developer.kook.cn/doc/http/asset).
+ * [上传媒体文件](https://developer.kaiheila.cn/doc/http/asset).
  *
  * 创建（上传）文件资源，例如图片等。
  *

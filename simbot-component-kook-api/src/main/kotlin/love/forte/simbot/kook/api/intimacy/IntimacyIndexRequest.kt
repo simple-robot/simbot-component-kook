@@ -28,7 +28,7 @@ import love.forte.simbot.kook.api.KookGetRequest
 
 /**
  *
- * [获取用户亲密度](https://developer.kook.cn/doc/http/intimacy#获取用户亲密度)
+ * [获取用户亲密度](https://developer.kaiheila.cn/doc/http/intimacy#获取用户亲密度)
  *
  * `/api/v3/intimacy/index`
  *

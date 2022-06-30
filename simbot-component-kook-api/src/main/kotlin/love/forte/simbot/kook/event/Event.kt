@@ -36,7 +36,7 @@ import java.util.*
 
 /**
  *
- *  Kook Event - [事件Event](https://developer.kook.cn/doc/event)
+ *  Kook Event - [事件Event](https://developer.kaiheila.cn/doc/event)
  *
  *
  * 当 websocket 或 webhook 收到 s=0 的消息时，代表当前收到的消息是事件(包含用户的聊天消息及系统的通知消息等)。
@@ -69,7 +69,7 @@ public interface Event<out Extra : Event.Extra> {
 
 
     /**
-     * 事件基本类型。详见 [事件 - 事件主要格式](https://developer.kook.cn/doc/event)
+     * 事件基本类型。详见 [事件 - 事件主要格式](https://developer.kaiheila.cn/doc/event)
      *
      * - 1:文字消息,
      * - 2:图片消息，
@@ -202,7 +202,7 @@ public interface Event<out Extra : Event.Extra> {
 
 
         /**
-         * 当 [Event.type] == `255` 时的 [结构](https://developer.kook.cn/doc/event/event-introduction#).
+         * 当 [Event.type] == `255` 时的 [结构](https://developer.kaiheila.cn/doc/event/event-introduction#).
          *
          *
          *
@@ -220,7 +220,7 @@ public interface Event<out Extra : Event.Extra> {
         }
 
         /**
-         * 当 [Event.type] != `255` 时的 [结构](https://developer.kook.cn/doc/event/event-introduction#)
+         * 当 [Event.type] != `255` 时的 [结构](https://developer.kaiheila.cn/doc/event/event-introduction#)
          */
         public interface Text : Extra {
             /**
@@ -259,7 +259,7 @@ public interface Event<out Extra : Event.Extra> {
             public val isMentionHere: Boolean
 
             /**
-             * 用户信息, 见 [对象-用户User](https://developer.kook.cn/doc/objects#%E7%94%A8%E6%88%B7User) ([User])
+             * 用户信息, 见 [对象-用户User](https://developer.kaiheila.cn/doc/objects#%E7%94%A8%E6%88%B7User) ([User])
              */
             public val author: User
         }
