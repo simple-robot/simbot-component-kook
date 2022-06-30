@@ -20,7 +20,7 @@ package love.forte.simboot.component.kaiheila
 import love.forte.di.annotation.Configurable
 import love.forte.di.annotation.SpareBean
 import love.forte.simbot.LoggerFactory
-import love.forte.simbot.component.kaiheila.KaiheilaBotManagerConfiguration
+import love.forte.simbot.component.kook.KaiheilaBotManagerConfiguration
 import javax.inject.Named
 
 

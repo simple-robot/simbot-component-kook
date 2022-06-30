@@ -20,10 +20,10 @@ package example
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.plus
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.component.kaiheila.KaiheilaComponent
-import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
-import love.forte.simbot.component.kaiheila.message.KaiheilaAtAllHere
-import love.forte.simbot.component.kaiheila.message.KaiheilaKMarkdownMessage
+import love.forte.simbot.component.kook.KaiheilaComponent
+import love.forte.simbot.component.kook.message.KaiheilaAssetImage
+import love.forte.simbot.component.kook.message.KaiheilaAtAllHere
+import love.forte.simbot.component.kook.message.KaiheilaKMarkdownMessage
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.asset.AssetCreated
 import love.forte.simbot.kook.objects.buildKMarkdown
