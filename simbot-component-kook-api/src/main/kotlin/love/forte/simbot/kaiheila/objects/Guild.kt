@@ -75,7 +75,7 @@ import love.forte.simbot.kaiheila.objects.impl.RoleImpl
  *
  * @author ForteScarlet
  */
-public interface Guild : KhlObjects, GuildInfo {
+public interface Guild : KookObjects, GuildInfo {
 
     /** 服务器id */
     override val id: ID

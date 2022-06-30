@@ -55,7 +55,7 @@ import love.forte.simbot.definition.ChannelInfo
  *
  * @author ForteScarlet
  */
-public interface Channel : KhlObjects, ChannelInfo {
+public interface Channel : KookObjects, ChannelInfo {
 
     /** 频道id */
     override val id: ID

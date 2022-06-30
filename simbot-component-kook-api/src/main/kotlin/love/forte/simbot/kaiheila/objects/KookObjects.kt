@@ -18,8 +18,8 @@ package love.forte.simbot.kaiheila.objects
 
 
 /**
- *  Kook 文档中所定义的部分标准object规则的父接口。
+ * Kook 文档中所定义的部分标准object规则的父接口。
  *
- * see <https://developer.kaiheila.cn/doc/objects>
+ * see: https://developer.kaiheila.cn/doc/objects
  */
-public interface KhlObjects
+public interface KookObjects

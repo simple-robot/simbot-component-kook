@@ -58,7 +58,7 @@ import org.slf4j.Logger
  *
  * @author ForteScarlet
  */
-public interface User : KhlObjects, UserInfo {
+public interface User : KookObjects, UserInfo {
 
     /** 用户的id */
     override val id: ID

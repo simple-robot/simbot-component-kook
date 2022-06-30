@@ -47,7 +47,7 @@ import love.forte.simbot.kaiheila.objects.impl.RoleImpl
  * @see RoleImpl
  * @author ForteScarlet
  */
-public interface Role : KhlObjects, Comparable<Role> {
+public interface Role : KookObjects, Comparable<Role> {
 
     /** 角色id */
     public val roleId: ID
