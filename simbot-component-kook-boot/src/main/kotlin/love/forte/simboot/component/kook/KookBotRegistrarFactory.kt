@@ -15,7 +15,7 @@
  *
  */
 
-package love.forte.simboot.component.kaiheila
+package love.forte.simboot.component.kook
 
 
 @Deprecated("Unused")

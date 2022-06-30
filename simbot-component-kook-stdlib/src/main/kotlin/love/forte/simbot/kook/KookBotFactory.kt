@@ -1,4 +1,4 @@
-@file:JvmName("KaiheilaBotFactory")
+@file:JvmName("KookBotFactory")
 
 package love.forte.simbot.kook
 
