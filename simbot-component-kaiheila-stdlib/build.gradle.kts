@@ -20,9 +20,7 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.serialization")
-
     id("org.jetbrains.dokka")
-
 }
 
 
@@ -31,20 +29,14 @@ plugins {
 dependencies {
     api(project(":simbot-component-kaiheila-api"))
     api(V.Simbot.Api.NOTATION)
-    api(V.Ktor.Client.Websockets.NOTATION)
-    api(V.Ktor.Client.ContentNegotiation.NOTATION)
-    api(V.Ktor.Serialization.KotlinxJson.NOTATION)
-    // api(V.Ktor.Client.Serialization)
+    
+    api(libs.ktor.client.websockets)
+    api(libs.ktor.client.contentNegotiation)
+    api(libs.ktor.serialization.kotlinx.json)
 
-    compileOnly(V.Jetbrains.Annotations.NOTATION)
+    compileOnly(libs.jetbrains.annotations)
 
     testImplementation(kotlin("test-junit5"))
-}
-repositories {
-    maven {
-        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
-        name = "ktor-eap"
-    }
 }
 
 tasks.getByName<Test>("test") {
@@ -61,7 +53,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 kotlin {
     // 严格模式
-    explicitApiWarning()
+    explicitApi()
 
 
     sourceSets.all {

@@ -20,35 +20,23 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.serialization")
-
     id("org.jetbrains.dokka")
-
 }
-
-
 
 
 dependencies {
     api(V.Simbot.Api.NOTATION)
-
-    // api(V.Kotlin.Reflect.notation)
     api(kotlin("reflect"))
 
-    api(V.Ktor.Client.Jvm.Core.NOTATION)
-    api(V.Ktor.Client.Jvm.CIO.NOTATION)
-    api(V.Ktor.Client.Serialization.NOTATION)
-
-    api(V.Kotlinx.Serialization.Json.NOTATION)
-    compileOnly(V.Jetbrains.Annotations.NOTATION)
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.cio)
+    api(libs.ktor.client.serialization)
+    api(libs.kotlinx.serialization.json)
+    compileOnly(libs.jetbrains.annotations)
 
     testImplementation(kotlin("test-junit5"))
 }
-repositories {
-    maven {
-        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
-        name = "ktor-eap"
-    }
-}
+
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
@@ -64,7 +52,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 kotlin {
     // 严格模式
-    explicitApiWarning()
+    explicitApi()
 
 
     sourceSets.all {

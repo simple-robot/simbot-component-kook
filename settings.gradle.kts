@@ -17,6 +17,16 @@
 
 rootProject.name = "simbot-component-kaiheila"
 
+enableFeaturePreview("VERSION_CATALOGS")
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files(File(rootProject.projectDir, "libs.versions.toml")))
+        }
+    }
+}
+
 pluginManagement {
     plugins {
         kotlin("jvm") version "1.6.21"

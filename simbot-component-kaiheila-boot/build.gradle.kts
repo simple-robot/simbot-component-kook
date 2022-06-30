@@ -20,11 +20,8 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.serialization")
-
     id("org.jetbrains.dokka")
 }
-
-val springBootVersion = "2.7.0"
 
 dependencies {
     api(project(":simbot-component-kaiheila-core")) {
@@ -33,10 +30,9 @@ dependencies {
     
     compileOnly(V.Simbot.BootApi.NOTATION)
 
-    testImplementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
-    // testImplementation(V.Simbot.BootCore.NOTATION)
+    
+    testImplementation(libs.spring.boot.test)
     testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
-    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
     testImplementation(kotlin("test-junit5"))
 }
 repositories {
@@ -60,7 +56,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 kotlin {
     // 严格模式
-    explicitApiWarning()
+    explicitApi()
 
 
     sourceSets.all {
