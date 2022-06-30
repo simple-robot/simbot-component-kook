@@ -21,10 +21,10 @@ import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookUserChat
-import love.forte.simbot.component.kook.event.KookBotSelfGroupMessageEvent
-import love.forte.simbot.component.kook.event.KookBotSelfPersonMessageEvent
-import love.forte.simbot.component.kook.event.KookNormalGroupMessageEvent
-import love.forte.simbot.component.kook.event.KookNormalPersonMessageEvent
+import love.forte.simbot.component.kook.event.KookBotSelfChannelMessageEvent
+import love.forte.simbot.component.kook.event.KookBotSelfMessageEvent
+import love.forte.simbot.component.kook.event.KookChannelMessageEvent
+import love.forte.simbot.component.kook.event.KookContactMessageEvent
 import love.forte.simbot.component.kook.internal.KookChannelImpl
 import love.forte.simbot.component.kook.internal.KookComponentBotImpl
 import love.forte.simbot.component.kook.internal.KookGuildMemberImpl
@@ -42,12 +42,12 @@ import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.lazyValue
 
 
-internal class KookNormalGroupMessageEventImpl(
+internal class KookChannelMessageEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
     override val author: KookGuildMemberImpl,
     override val channel: KookChannelImpl,
-) : KookNormalGroupMessageEvent() {
+) : KookChannelMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
     
     override suspend fun reply(message: Message): KookMessageReceipt {
@@ -70,10 +70,10 @@ internal class KookNormalGroupMessageEventImpl(
 }
 
 
-internal class KookNormalPersonMessageEventImpl(
+internal class KookContactMessageEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
-) : KookNormalPersonMessageEvent() {
+) : KookContactMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
 
     
@@ -107,12 +107,12 @@ internal class KookNormalPersonMessageEventImpl(
 }
 
 
-internal class KookBotSelfGroupMessageEventImpl(
+internal class KookBotSelfChannelMessageEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
     override val channel: KookChannelImpl,
     override val member: KookGuildMemberImpl,
-) : KookBotSelfGroupMessageEvent() {
+) : KookBotSelfChannelMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
     
     
@@ -136,10 +136,10 @@ internal class KookBotSelfGroupMessageEventImpl(
 }
 
 
-internal class KookBotSelfPersonMessageEventImpl(
+internal class KookBotSelfMessageEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
-) : KookBotSelfPersonMessageEvent() {
+) : KookBotSelfMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
 
 

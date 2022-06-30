@@ -48,8 +48,8 @@ import love.forte.simbot.kook.objects.Channel as KkChannel
  *  Kook 的消息推送同样会推送bot自己所发送的消息。在stdlib模块下，
  * 你可能需要自己手动处理对于消息来自于bot自身的情况。但是在当前组件下，[KookMessageEvent]
  *
- * 来自其他人的事件：[KookNormalGroupMessageEvent]、[KookNormalPersonMessageEvent]；
- * 来自bot自己的事件：[KookBotSelfGroupMessageEvent]、[KookBotSelfPersonMessageEvent]。
+ * 来自其他人的事件：[KookChannelMessageEvent]、[KookContactMessageEvent]；
+ * 来自bot自己的事件：[KookBotSelfChannelMessageEvent]、[KookBotSelfMessageEvent]。
  *
  *
  *
@@ -118,17 +118,17 @@ public sealed class KookMessageEvent :
     /**
      * 频道消息事件。
      *
-     * 此类型可能是 [KookNormalGroupMessageEvent], 则代表为一个普通的频道成员发送的消息事件；
-     * 或者是 [KookBotSelfGroupMessageEvent], 则代表为bot自己所发出的消息。
+     * 此类型可能是 [KookChannelMessageEvent], 则代表为一个普通的频道成员发送的消息事件；
+     * 或者是 [KookBotSelfChannelMessageEvent], 则代表为bot自己所发出的消息。
      *
-     * [普通成员消息][KookNormalGroupMessageEvent] 会实现 [ChannelMessageEvent],
-     * 但是 [bot频道消息][KookBotSelfGroupMessageEvent] 只会实现基础的 [MessageEvent]、[ChannelEvent]、[MemberEvent].
+     * [普通成员消息][KookChannelMessageEvent] 会实现 [ChannelMessageEvent],
+     * 但是 [bot频道消息][KookBotSelfChannelMessageEvent] 只会实现基础的 [MessageEvent]、[ChannelEvent]、[MemberEvent].
      *
-     * @see KookNormalGroupMessageEvent
-     * @see KookBotSelfGroupMessageEvent
+     * @see KookChannelMessageEvent
+     * @see KookBotSelfChannelMessageEvent
      *
      */
-    public abstract class Group : KookMessageEvent(), MessageEvent {
+    public abstract class Channel : KookMessageEvent(), MessageEvent {
 
 
         /**
@@ -147,27 +147,27 @@ public sealed class KookMessageEvent :
         /**
          * Event Key.
          */
-        override val key: Event.Key<out Group>
+        override val key: Event.Key<out Channel>
             get() = Key
 
 
         public companion object Key :
-            BaseEventKey<Group>("kook.message_group", KookMessageEvent, MessageEvent) {
-            override fun safeCast(value: Any): Group? = doSafeCast(value)
+            BaseEventKey<Channel>("kook.message_group", KookMessageEvent, MessageEvent) {
+            override fun safeCast(value: Any): Channel? = doSafeCast(value)
         }
     }
 
     /**
      * 私聊消息事件。
      *
-     * 此类型可能是 [KookNormalPersonMessageEvent], 则代表为一个普通的联系人发送的私聊消息事件；
-     * 或者是 [KookBotSelfPersonMessageEvent], 则代表为bot自己所发出的私聊消息。
+     * 此类型可能是 [KookContactMessageEvent], 则代表为一个普通的联系人发送的私聊消息事件；
+     * 或者是 [KookBotSelfMessageEvent], 则代表为bot自己所发出的私聊消息。
      *
-     * [普通联系人私聊消息][KookNormalPersonMessageEvent] 会实现 [ContactMessageEvent],
-     * 但是 [bot私聊消息][KookBotSelfPersonMessageEvent] 只会实现基础的 [MessageEvent]
+     * [普通联系人私聊消息][KookContactMessageEvent] 会实现 [ContactMessageEvent],
+     * 但是 [bot私聊消息][KookBotSelfMessageEvent] 只会实现基础的 [MessageEvent]
      *
-     * @see KookNormalPersonMessageEvent
-     * @see KookBotSelfPersonMessageEvent
+     * @see KookContactMessageEvent
+     * @see KookBotSelfMessageEvent
      */
     public abstract class Person : KookMessageEvent(), MessageEvent {
 
@@ -208,7 +208,7 @@ public sealed class KookMessageEvent :
  *
  * 此事件只会由 bot 自身以外的人触发。
  */
-public abstract class KookNormalGroupMessageEvent : KookMessageEvent.Group(), ChannelMessageEvent {
+public abstract class KookChannelMessageEvent : KookMessageEvent.Channel(), ChannelMessageEvent {
 
     /**
      * 消息的发送者。不会是bot自己。
@@ -263,12 +263,12 @@ public abstract class KookNormalGroupMessageEvent : KookMessageEvent.Group(), Ch
     /**
      * Event Key.
      */
-    override val key: Event.Key<out Group>
+    override val key: Event.Key<out Channel>
         get() = Key
 
     public companion object Key :
-        BaseEventKey<Group>("kook.normal_group_message", Group, ChannelMessageEvent) {
-        override fun safeCast(value: Any): Group? = doSafeCast(value)
+        BaseEventKey<Channel>("kook.normal_group_message", Channel, ChannelMessageEvent) {
+        override fun safeCast(value: Any): Channel? = doSafeCast(value)
     }
 }
 
@@ -277,7 +277,7 @@ public abstract class KookNormalGroupMessageEvent : KookMessageEvent.Group(), Ch
  *
  * 此事件只会由 bot 以外的人触发。
  */
-public abstract class KookNormalPersonMessageEvent : KookMessageEvent.Person(), ContactMessageEvent {
+public abstract class KookContactMessageEvent : KookMessageEvent.Person(), ContactMessageEvent {
 
     /**
      * 私聊消息所来自的聊天会话。
@@ -338,7 +338,7 @@ public abstract class KookNormalPersonMessageEvent : KookMessageEvent.Person(), 
  *
  * 此事件只会由 bot 自身触发。
  */
-public abstract class KookBotSelfGroupMessageEvent : KookMessageEvent.Group(), ChannelEvent, MemberEvent {
+public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(), ChannelEvent, MemberEvent {
 
 
     /**
@@ -407,12 +407,12 @@ public abstract class KookBotSelfGroupMessageEvent : KookMessageEvent.Group(), C
     override suspend fun user(): KookGuildMember = member
 
 
-    override val key: Event.Key<out Group>
+    override val key: Event.Key<out Channel>
         get() = Key
 
     public companion object Key :
-        BaseEventKey<Group>("kook.bot_self_group_message", Group, ChannelEvent, MemberEvent) {
-        override fun safeCast(value: Any): Group? = doSafeCast(value)
+        BaseEventKey<Channel>("kook.bot_self_group_message", Channel, ChannelEvent, MemberEvent) {
+        override fun safeCast(value: Any): Channel? = doSafeCast(value)
     }
 }
 
@@ -421,7 +421,7 @@ public abstract class KookBotSelfGroupMessageEvent : KookMessageEvent.Group(), C
  *
  * 此事件只会由 bot 自身触发，代表bot在私聊会话中发出的消息。
  */
-public abstract class KookBotSelfPersonMessageEvent : KookMessageEvent.Person() {
+public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
 
     /**
      * 发生事件的私聊会话。

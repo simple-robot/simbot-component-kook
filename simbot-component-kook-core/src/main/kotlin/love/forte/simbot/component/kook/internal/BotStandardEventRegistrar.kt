@@ -73,12 +73,12 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
     when (channelType) {
         Channel.Type.PERSON -> {
             if (bot.isMe(authorId)) {
-                bot.pushIfProcessable(KookBotSelfPersonMessageEvent) {
-                    KookBotSelfPersonMessageEventImpl(bot, this)
+                bot.pushIfProcessable(KookBotSelfMessageEvent) {
+                    KookBotSelfMessageEventImpl(bot, this)
                 }
             } else {
-                bot.pushIfProcessable(KookNormalPersonMessageEvent) {
-                    KookNormalPersonMessageEventImpl(bot, this)
+                bot.pushIfProcessable(KookContactMessageEvent) {
+                    KookContactMessageEventImpl(bot, this)
                 }
             }
         }
@@ -87,8 +87,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
             val author = guild.internalMember(authorId) ?: return
             val channel = guild.internalChannel(targetId) ?: return
             if (bot.isMe(authorId)) {
-                bot.pushIfProcessable(KookBotSelfGroupMessageEvent) {
-                    KookBotSelfGroupMessageEventImpl(
+                bot.pushIfProcessable(KookBotSelfChannelMessageEvent) {
+                    KookBotSelfChannelMessageEventImpl(
                         bot,
                         this,
                         channel = channel,
@@ -97,8 +97,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
                 }
             } else {
                 // push event
-                bot.pushIfProcessable(KookNormalGroupMessageEvent) {
-                    KookNormalGroupMessageEventImpl(
+                bot.pushIfProcessable(KookChannelMessageEvent) {
+                    KookChannelMessageEventImpl(
                         bot,
                         this,
                         author,
