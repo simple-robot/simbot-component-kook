@@ -19,7 +19,7 @@ package love.forte.simbot.kook.event
 import love.forte.simbot.kook.api.KookRuntimeException
 
 /**
- * khl事件解析相关错误。
+ * Kook 事件解析相关错误。
  * @author ForteScarlet
  */
 public class EventParserException : KookRuntimeException {

@@ -163,7 +163,7 @@ public object EventSignals {
  * ```
  *
  */
-public interface KaiheilaEventParserDefinition<out EX : Event.Extra, out E : Event<EX>> {
+public interface KookEventParserDefinition<out EX : Event.Extra, out E : Event<EX>> {
 
     /**
      * 此事件的解析器。

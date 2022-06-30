@@ -24,7 +24,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventParser
-import love.forte.simbot.kook.event.KaiheilaEventParserDefinition
+import love.forte.simbot.kook.event.KookEventParserDefinition
 import love.forte.simbot.kook.event.SysEventParser
 import love.forte.simbot.kook.objects.Channel
 import kotlin.collections.set
@@ -49,10 +49,10 @@ internal inline fun <reified B> MutableMap<Any, EventParser<*, *>>.registerParse
 }
 
 /**
- * 系统事件的 [KaiheilaEventParserDefinition] 的基础抽象定义, 使用 [SimpleSystemEventExtra] 作为 extra 数据的解析类型。
+ * 系统事件的 [KookEventParserDefinition] 的基础抽象定义, 使用 [SimpleSystemEventExtra] 作为 extra 数据的解析类型。
  */
 public abstract class SystemEventParserDefinition<out B> :
-    KaiheilaEventParserDefinition<SimpleSystemEventExtra<B>, SystemEvent<B, SimpleSystemEventExtra<B>>> {
+    KookEventParserDefinition<SimpleSystemEventExtra<B>, SystemEvent<B, SimpleSystemEventExtra<B>>> {
     abstract override val parser: SysEventParser<B>
 }
 

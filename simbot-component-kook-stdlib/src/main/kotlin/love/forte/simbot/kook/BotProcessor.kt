@@ -94,7 +94,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
 }
 
 /**
- * 提供一个 [KaiheilaEventParserDefinition] 进行事件验证并在验证通过时进行事件处理。
+ * 提供一个 [KookEventParserDefinition] 进行事件验证并在验证通过时进行事件处理。
  *
  * @see love.forte.simbot.kook.event.message.MessageEventDefinition
  * @see love.forte.simbot.kook.event.system.user.UserEvents
@@ -106,7 +106,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
  *
  */
 public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processor(
-    eventDefinition: KaiheilaEventParserDefinition<EX, E>,
+    eventDefinition: KookEventParserDefinition<EX, E>,
     crossinline block: suspend (E) -> Unit
 ) {
     processor(eventDefinition.parser, block)
@@ -142,7 +142,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
 }
 
 /**
- * 提供一个 [KaiheilaEventParserDefinition] 进行事件验证并在验证通过时进行事件处理。
+ * 提供一个 [KookEventParserDefinition] 进行事件验证并在验证通过时进行事件处理。
  *
  * @see love.forte.simbot.kook.event.message.MessageEventDefinition
  * @see love.forte.simbot.kook.event.system.user.UserEvents
@@ -154,7 +154,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
  *
  */
 public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.processorExcludeSelf(
-    eventDefinition: KaiheilaEventParserDefinition<EX, E>,
+    eventDefinition: KookEventParserDefinition<EX, E>,
     crossinline block: suspend (E) -> Unit
 ) {
     processor(eventDefinition.parser, block)

@@ -19,15 +19,15 @@ package love.forte.simbot.kook.event.message
 
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventParser
-import love.forte.simbot.kook.event.KaiheilaEventParserDefinition
+import love.forte.simbot.kook.event.KookEventParserDefinition
 import love.forte.simbot.kook.event.MessageEventParser
 
 
 /**
- * 消息相关事件所使用的 [KaiheilaEventParserDefinition] 基础抽象类。
+ * 消息相关事件所使用的 [KookEventParserDefinition] 基础抽象类。
  */
 public abstract class MessageEventDefinition<EX : MessageEventExtra> :
-    KaiheilaEventParserDefinition<EX, MessageEvent<EX>>
+    KookEventParserDefinition<EX, MessageEvent<EX>>
 
 
 /**
