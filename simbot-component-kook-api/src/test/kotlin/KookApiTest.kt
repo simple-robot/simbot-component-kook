@@ -1,5 +1,5 @@
 import io.ktor.http.*
-import love.forte.simbot.kaiheila.KookApi
+import love.forte.simbot.kook.KookApi
 import kotlin.test.Test
 
 /**

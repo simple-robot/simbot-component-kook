@@ -22,7 +22,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.event.BaseEventKey
-import love.forte.simbot.kaiheila.event.Event
+import love.forte.simbot.kook.event.Event
 import love.forte.simbot.message.doSafeCast
 
 
@@ -80,7 +80,7 @@ public class UnsupportedKaiheilaEvent(
     override val key: love.forte.simbot.event.Event.Key<UnsupportedKaiheilaEvent>
         get() = Key
 
-    public companion object Key : BaseEventKey<UnsupportedKaiheilaEvent>("kaiheila.unsupported", KaiheilaEvent) {
+    public companion object Key : BaseEventKey<UnsupportedKaiheilaEvent>("kook.unsupported", KaiheilaEvent) {
         override fun safeCast(value: Any): UnsupportedKaiheilaEvent? = doSafeCast(value)
     }
 

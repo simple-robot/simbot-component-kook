@@ -22,8 +22,8 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import love.forte.simbot.*
 import love.forte.simbot.component.kaiheila.message.*
-import love.forte.simbot.kaiheila.objects.KMarkdown
-import love.forte.simbot.kaiheila.objects.RawValueKMarkdown
+import love.forte.simbot.kook.objects.KMarkdown
+import love.forte.simbot.kook.objects.RawValueKMarkdown
 import love.forte.simbot.message.Message
 
 /**
@@ -69,7 +69,7 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
          * 组件 [KaiheilaComponent] 的ID
          */
         @Suppress("MemberVisibilityCanBePrivate")
-        public const val ID_VALUE: String = "simbot.kaiheila"
+        public const val ID_VALUE: String = "simbot.kook"
         
         private const val TO_STRING_VALUE = "KaiheilaComponent(id=$ID_VALUE)"
         

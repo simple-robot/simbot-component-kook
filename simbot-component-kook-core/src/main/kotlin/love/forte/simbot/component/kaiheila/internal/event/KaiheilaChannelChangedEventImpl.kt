@@ -26,9 +26,9 @@ import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaGuildImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaGuildMemberImpl
 import love.forte.simbot.event.IncreaseEvent
-import love.forte.simbot.kaiheila.event.Event.Extra.Sys
-import love.forte.simbot.kaiheila.event.system.channel.*
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kook.event.Event.Extra.Sys
+import love.forte.simbot.kook.event.system.channel.*
+import love.forte.simbot.kook.event.Event as KhlEvent
 
 /**
  * 某频道服务器中新增了一个频道后的事件。

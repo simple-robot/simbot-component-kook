@@ -2,8 +2,8 @@ package love.forte.simbot.component.kaiheila.model
 
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.kaiheila.objects.Guild
-import love.forte.simbot.kaiheila.objects.Role
+import love.forte.simbot.kook.objects.Guild
+import love.forte.simbot.kook.objects.Role
 
 /**
  * 针对于 [Guild] 在核心模块中的可变数据模型。

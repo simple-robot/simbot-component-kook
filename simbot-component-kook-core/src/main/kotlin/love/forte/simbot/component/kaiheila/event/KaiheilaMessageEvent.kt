@@ -25,14 +25,14 @@ import love.forte.simbot.component.kaiheila.KaiheilaUserChat
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageContent
 import love.forte.simbot.event.*
-import love.forte.simbot.kaiheila.event.message.MessageEventExtra
+import love.forte.simbot.kook.event.message.MessageEventExtra
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.utils.runInBlocking
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
-import love.forte.simbot.kaiheila.event.message.MessageEvent as KhlMessageEvent
-import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
+import love.forte.simbot.kook.event.Event as KhlEvent
+import love.forte.simbot.kook.event.message.MessageEvent as KhlMessageEvent
+import love.forte.simbot.kook.objects.Channel as KhlChannel
 
 
 /**
@@ -152,7 +152,7 @@ public sealed class KaiheilaMessageEvent :
 
 
         public companion object Key :
-            BaseEventKey<Group>("kaiheila.message_group", KaiheilaMessageEvent, MessageEvent) {
+            BaseEventKey<Group>("kook.message_group", KaiheilaMessageEvent, MessageEvent) {
             override fun safeCast(value: Any): Group? = doSafeCast(value)
         }
     }
@@ -190,13 +190,13 @@ public sealed class KaiheilaMessageEvent :
             get() = Key
 
         public companion object Key :
-            BaseEventKey<Person>("kaiheila.message_person", KaiheilaMessageEvent, MessageEvent) {
+            BaseEventKey<Person>("kook.message_person", KaiheilaMessageEvent, MessageEvent) {
             override fun safeCast(value: Any): Person? = doSafeCast(value)
         }
     }
 
     public companion object Key : BaseEventKey<KaiheilaMessageEvent>(
-        "kaiheila.message", MessageEvent
+        "kook.message", MessageEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMessageEvent? = doSafeCast(value)
     }
@@ -267,7 +267,7 @@ public abstract class KaiheilaNormalGroupMessageEvent : KaiheilaMessageEvent.Gro
         get() = Key
 
     public companion object Key :
-        BaseEventKey<Group>("kaiheila.normal_group_message", Group, ChannelMessageEvent) {
+        BaseEventKey<Group>("kook.normal_group_message", Group, ChannelMessageEvent) {
         override fun safeCast(value: Any): Group? = doSafeCast(value)
     }
 }
@@ -325,7 +325,7 @@ public abstract class KaiheilaNormalPersonMessageEvent : KaiheilaMessageEvent.Pe
 
     public companion object Key :
         BaseEventKey<Person>(
-            "kaiheila.normal_person_message",
+            "kook.normal_person_message",
             Person, ContactMessageEvent
         ) {
         override fun safeCast(value: Any): Person? = doSafeCast(value)
@@ -411,7 +411,7 @@ public abstract class KaiheilaBotSelfGroupMessageEvent : KaiheilaMessageEvent.Gr
         get() = Key
 
     public companion object Key :
-        BaseEventKey<Group>("kaiheila.bot_self_group_message", Group, ChannelEvent, MemberEvent) {
+        BaseEventKey<Group>("kook.bot_self_group_message", Group, ChannelEvent, MemberEvent) {
         override fun safeCast(value: Any): Group? = doSafeCast(value)
     }
 }
@@ -445,7 +445,7 @@ public abstract class KaiheilaBotSelfPersonMessageEvent : KaiheilaMessageEvent.P
 
     public companion object Key :
         BaseEventKey<Person>(
-            "kaiheila.bot_self_person_message",
+            "kook.bot_self_person_message",
             Person
         ) {
         override fun safeCast(value: Any): Person? = doSafeCast(value)

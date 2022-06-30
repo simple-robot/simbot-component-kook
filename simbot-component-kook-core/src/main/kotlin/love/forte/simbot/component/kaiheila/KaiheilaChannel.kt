@@ -24,8 +24,8 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceip
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.*
-import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
-import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kook.api.message.MessageCreateRequest
+import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
@@ -33,7 +33,7 @@ import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
+import love.forte.simbot.kook.objects.Channel as KhlChannel
 
 
 /**

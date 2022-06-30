@@ -34,9 +34,9 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaReceiveMessageConten
 import love.forte.simbot.component.kaiheila.message.toContent
 import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
-import love.forte.simbot.kaiheila.event.message.MessageEvent
-import love.forte.simbot.kaiheila.event.message.MessageEventExtra
+import love.forte.simbot.kook.api.userchat.UserChatCreateRequest
+import love.forte.simbot.kook.event.message.MessageEvent
+import love.forte.simbot.kook.event.message.MessageEventExtra
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.lazyValue

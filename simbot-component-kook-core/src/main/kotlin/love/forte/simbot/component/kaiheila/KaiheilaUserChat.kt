@@ -26,14 +26,14 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.Contact
 import love.forte.simbot.definition.Friend
 import love.forte.simbot.definition.Stranger
-import love.forte.simbot.kaiheila.api.userchat.UserChatDeleteRequest
-import love.forte.simbot.kaiheila.api.userchat.UserChatView
+import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
+import love.forte.simbot.kook.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.runInBlocking
 
 /**
- *  Kook 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
+ *  Kook 的 [user-chat 私聊会话](https://developer.kook.cn/doc/http/user-chat)。
  *
  * ~~ Kook 组件会将私聊会话视为 [Friend] 处理~~
  *

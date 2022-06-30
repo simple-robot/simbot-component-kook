@@ -20,10 +20,10 @@ package love.forte.simbot.component.kaiheila.internal.event
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.event.KaiheilaUserUpdatedEvent
 import love.forte.simbot.event.ChangedEvent
-import love.forte.simbot.kaiheila.event.Event.Extra.Sys
-import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEvent
-import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEventBody
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kook.event.Event.Extra.Sys
+import love.forte.simbot.kook.event.system.user.UserUpdatedEvent
+import love.forte.simbot.kook.event.system.user.UserUpdatedEventBody
+import love.forte.simbot.kook.event.Event as KhlEvent
 
 /**
  *  Kook 用户信息更新事件。

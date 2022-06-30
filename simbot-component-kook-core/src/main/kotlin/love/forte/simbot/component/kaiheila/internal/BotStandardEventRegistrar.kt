@@ -27,18 +27,18 @@ import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.event.Event.Key
-import love.forte.simbot.kaiheila.api.user.UserViewRequest
-import love.forte.simbot.kaiheila.event.Event
-import love.forte.simbot.kaiheila.event.message.MessageEvent
-import love.forte.simbot.kaiheila.event.system.SystemEvent
-import love.forte.simbot.kaiheila.event.system.channel.*
-import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOfflineEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOnlineEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.*
-import love.forte.simbot.kaiheila.objects.Channel
-import love.forte.simbot.kaiheila.objects.SystemUser
+import love.forte.simbot.kook.api.user.UserViewRequest
+import love.forte.simbot.kook.event.Event
+import love.forte.simbot.kook.event.message.MessageEvent
+import love.forte.simbot.kook.event.system.SystemEvent
+import love.forte.simbot.kook.event.system.channel.*
+import love.forte.simbot.kook.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kook.event.system.guild.member.GuildMemberOfflineEventBody
+import love.forte.simbot.kook.event.system.guild.member.GuildMemberOnlineEventBody
+import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
+import love.forte.simbot.kook.event.system.user.*
+import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.kook.objects.SystemUser
 
 /**
  * 注册各种标准事件。

@@ -1,9 +1,9 @@
 package event
 
 import kotlinx.serialization.json.Json
-import love.forte.simbot.kaiheila.event.system.SystemEventImpl
-import love.forte.simbot.kaiheila.event.system.channel.AddedChannelExtraBodyImpl
-import love.forte.simbot.kaiheila.event.system.channel.UpdatedChannelExtraBodyImpl
+import love.forte.simbot.kook.event.system.SystemEventImpl
+import love.forte.simbot.kook.event.system.channel.AddedChannelExtraBodyImpl
+import love.forte.simbot.kook.event.system.channel.UpdatedChannelExtraBodyImpl
 import kotlin.test.Test
 
 

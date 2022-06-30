@@ -20,9 +20,9 @@ package love.forte.simbot.component.kaiheila.message
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.message.ChannelMessageDetails
-import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
-import love.forte.simbot.kaiheila.api.message.MessageViewRequest
+import love.forte.simbot.kook.api.message.ChannelMessageDetails
+import love.forte.simbot.kook.api.message.MessageDeleteRequest
+import love.forte.simbot.kook.api.message.MessageViewRequest
 import love.forte.simbot.message.Messages
 import love.forte.simbot.message.ReceivedMessageContent
 import love.forte.simbot.message.toText

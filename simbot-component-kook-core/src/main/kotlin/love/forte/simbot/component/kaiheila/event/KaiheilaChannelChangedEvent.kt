@@ -27,8 +27,8 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaChannelMessageDetail
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.definition.ChannelInfoContainer
 import love.forte.simbot.event.*
-import love.forte.simbot.kaiheila.api.message.MessageViewRequest
-import love.forte.simbot.kaiheila.event.system.channel.*
+import love.forte.simbot.kook.api.message.MessageViewRequest
+import love.forte.simbot.kook.event.system.channel.*
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.utils.runInBlocking
@@ -74,7 +74,7 @@ public abstract class KaiheilaChannelChangedEvent<out Body : ChannelEventExtraBo
     abstract override val key: Event.Key<out KaiheilaChannelChangedEvent<*>>
 
     public companion object Key : BaseEventKey<KaiheilaChannelChangedEvent<*>>(
-        "kaiheila.channel_changed", KaiheilaSystemEvent, ChangedEvent
+        "kook.channel_changed", KaiheilaSystemEvent, ChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaChannelChangedEvent<*>? = doSafeCast(value)
     }
@@ -116,7 +116,7 @@ public abstract class KaiheilaAddedChannelChangedEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaAddedChannelChangedEvent>(
-        "kaiheila.added_channel_changed", KaiheilaChannelChangedEvent, IncreaseEvent
+        "kook.added_channel_changed", KaiheilaChannelChangedEvent, IncreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaAddedChannelChangedEvent? = doSafeCast(value)
     }
@@ -174,7 +174,7 @@ public abstract class KaiheilaUpdatedChannelChangedEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaUpdatedChannelChangedEvent>(
-        "kaiheila.updated_channel_changed", KaiheilaChannelChangedEvent, ChangedEvent
+        "kook.updated_channel_changed", KaiheilaChannelChangedEvent, ChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaUpdatedChannelChangedEvent? = doSafeCast(value)
     }
@@ -219,7 +219,7 @@ public abstract class KaiheilaDeletedChannelChangedEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaDeletedChannelChangedEvent>(
-        "kaiheila.deleted_channel_changed", KaiheilaChannelChangedEvent, DecreaseEvent
+        "kook.deleted_channel_changed", KaiheilaChannelChangedEvent, DecreaseEvent
     ) {
 
         override fun safeCast(value: Any): KaiheilaDeletedChannelChangedEvent? = doSafeCast(value)
@@ -332,7 +332,7 @@ public abstract class KaiheilaMessagePinEvent<Body : ChannelEventExtraBody> :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMessagePinEvent<*>>(
-        "kaiheila.message_pin", KaiheilaChannelChangedEvent, ChangedEvent
+        "kook.message_pin", KaiheilaChannelChangedEvent, ChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMessagePinEvent<*>? = doSafeCast(value)
     }
@@ -401,7 +401,7 @@ public abstract class KaiheilaPinnedMessageEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaPinnedMessageEvent>(
-        "kaiheila.pinned_message", KaiheilaMessagePinEvent
+        "kook.pinned_message", KaiheilaMessagePinEvent
     ) {
         override fun safeCast(value: Any): KaiheilaPinnedMessageEvent? = doSafeCast(value)
     }
@@ -463,7 +463,7 @@ public abstract class KaiheilaUnpinnedMessageEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaUnpinnedMessageEvent>(
-        "kaiheila.unpinned_message", KaiheilaMessagePinEvent
+        "kook.unpinned_message", KaiheilaMessagePinEvent
     ) {
         override fun safeCast(value: Any): KaiheilaUnpinnedMessageEvent? = doSafeCast(value)
     }

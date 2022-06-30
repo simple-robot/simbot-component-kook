@@ -2,8 +2,8 @@ package love.forte.simbot.component.kaiheila.model
 
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.kaiheila.api.userchat.UserChatTargetInfo
-import love.forte.simbot.kaiheila.api.userchat.UserChatView
+import love.forte.simbot.kook.api.userchat.UserChatTargetInfo
+import love.forte.simbot.kook.api.userchat.UserChatView
 
 /**
  * 针对于 [UserChatView] 在核心模块中的可变数据模型。

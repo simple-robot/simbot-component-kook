@@ -25,10 +25,10 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaKMarkdownMessage.Key
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessages.AT_TYPE_USER
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.message.DirectMessageDeleteRequest
-import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
-import love.forte.simbot.kaiheila.event.Event
-import love.forte.simbot.kaiheila.event.message.*
+import love.forte.simbot.kook.api.message.DirectMessageDeleteRequest
+import love.forte.simbot.kook.api.message.MessageDeleteRequest
+import love.forte.simbot.kook.event.Event
+import love.forte.simbot.kook.event.message.*
 import love.forte.simbot.message.*
 
 /**

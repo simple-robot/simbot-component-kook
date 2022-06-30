@@ -25,8 +25,8 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceip
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.definition.Role
-import love.forte.simbot.kaiheila.api.guild.GuildMuteType
-import love.forte.simbot.kaiheila.objects.SystemUser
+import love.forte.simbot.kook.api.guild.GuildMuteType
+import love.forte.simbot.kook.objects.SystemUser
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
@@ -35,7 +35,7 @@ import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import love.forte.simbot.kaiheila.objects.User as KhlUser
+import love.forte.simbot.kook.objects.User as KhlUser
 
 
 /**
@@ -58,15 +58,15 @@ public interface KaiheilaGuildMember :
     /**
      * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @JvmSynthetic
     override suspend fun unmute(): Boolean = unmute(GuildMuteType.TYPE_MICROPHONE)
     
     /**
-     * 取消禁言。[type] 代表 [love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
+     * 取消禁言。[type] 代表 [love.forte.simbot.kook.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @JvmSynthetic
     public suspend fun unmute(type: Int): Boolean
@@ -76,7 +76,7 @@ public interface KaiheilaGuildMember :
      * 对此用户进行静音操作。
      * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @JvmSynthetic
     override suspend fun mute(duration: Duration): Boolean = mute(duration, GuildMuteType.TYPE_MICROPHONE)
@@ -84,7 +84,7 @@ public interface KaiheilaGuildMember :
     /**
      * 对此用户进行静音操作。
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @JvmSynthetic
     public suspend fun mute(duration: Duration, type: Int): Boolean
@@ -94,7 +94,7 @@ public interface KaiheilaGuildMember :
      * 对此用户进行静音操作。
      * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @Api4J
     override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean =
@@ -103,7 +103,7 @@ public interface KaiheilaGuildMember :
     /**
      * 对此用户进行静音操作。
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @Api4J
     public fun muteBlocking(time: Long, unit: TimeUnit, type: Int): Boolean =
@@ -112,16 +112,16 @@ public interface KaiheilaGuildMember :
     /**
      * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @Api4J
     override fun unmuteBlocking(): Boolean = runInBlocking { unmute() }
     
     
     /**
-     * 取消禁言。[type] 代表 [love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
+     * 取消禁言。[type] 代表 [love.forte.simbot.kook.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
      *
-     * @see love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @Api4J
     public fun unmuteBlocking(type: Int): Boolean = runInBlocking { unmute(type) }

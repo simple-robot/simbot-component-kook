@@ -27,15 +27,15 @@ import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaGuildImpl
 import love.forte.simbot.component.kaiheila.internal.KaiheilaGuildMemberImpl
 import love.forte.simbot.definition.UserInfo
-import love.forte.simbot.kaiheila.event.Event
-import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOfflineEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.GuildMemberOnlineEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.SelfExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.UserExitedChannelEventBody
-import love.forte.simbot.kaiheila.event.system.user.UserJoinedChannelEventBody
+import love.forte.simbot.kook.event.Event
+import love.forte.simbot.kook.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kook.event.system.guild.member.GuildMemberOfflineEventBody
+import love.forte.simbot.kook.event.system.guild.member.GuildMemberOnlineEventBody
+import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
+import love.forte.simbot.kook.event.system.user.SelfExitedGuildEventBody
+import love.forte.simbot.kook.event.system.user.SelfJoinedGuildEventBody
+import love.forte.simbot.kook.event.system.user.UserExitedChannelEventBody
+import love.forte.simbot.kook.event.system.user.UserJoinedChannelEventBody
 
 @OptIn(Api4J::class)
 internal data class KaiheilaMemberExitedChannelEventImpl(

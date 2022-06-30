@@ -17,8 +17,8 @@
 
 package love.forte.simbot.component.kaiheila.message
 
-import love.forte.simbot.kaiheila.api.KookApiRequest
-import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
+import love.forte.simbot.kook.api.KookApiRequest
+import love.forte.simbot.kook.api.message.MessageCreateRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 

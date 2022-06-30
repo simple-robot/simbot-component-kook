@@ -20,10 +20,10 @@ package love.forte.simbot.component.kaiheila.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.kaiheila.objects.Card
+import love.forte.simbot.kook.objects.Card
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.kaiheila.objects.CardMessage as KhlCardMessage
+import love.forte.simbot.kook.objects.CardMessage as KhlCardMessage
 
 
 /**

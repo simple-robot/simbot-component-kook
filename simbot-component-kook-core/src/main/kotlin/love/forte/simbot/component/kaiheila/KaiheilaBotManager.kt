@@ -25,9 +25,9 @@ import love.forte.simbot.application.EventProviderAutoRegistrarFactory
 import love.forte.simbot.application.EventProviderFactory
 import love.forte.simbot.component.kaiheila.internal.KaiheilaBotManagerImpl
 import love.forte.simbot.event.EventProcessor
-import love.forte.simbot.kaiheila.KaiheilaBot
-import love.forte.simbot.kaiheila.KaiheilaBotConfiguration
-import love.forte.simbot.kaiheila.SimpleTicket
+import love.forte.simbot.kook.KaiheilaBot
+import love.forte.simbot.kook.KaiheilaBotConfiguration
+import love.forte.simbot.kook.SimpleTicket
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -158,7 +158,7 @@ public abstract class KaiheilaBotManager : BotManager<KaiheilaComponentBot>(), K
     
     // TODO Auto registrar
     public companion object Factory : EventProviderFactory<KaiheilaBotManager, KaiheilaBotManagerConfiguration> {
-        override val key: Attribute<KaiheilaBotManager> = attribute("simbot.kaiheila")
+        override val key: Attribute<KaiheilaBotManager> = attribute("simbot.kook")
         private val logger = LoggerFactory.getLogger(KaiheilaBotManager::class.java)
         
         
@@ -263,7 +263,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [ticket] 和 [configuration] 注册bot。
      */
-    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kook { ... }")
     public fun register(
         ticket: KaiheilaBot.Ticket,
         configuration: KaiheilaComponentBotConfiguration,
@@ -273,7 +273,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [clientId]、 [token] 和 [configuration] 注册bot。
      */
-    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kook { ... }")
     public fun register(
         clientId: String,
         token: String,
@@ -284,7 +284,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [ticket] 和 [block] 注册bot。
      */
-    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kook { ... }")
     public fun register(
         ticket: KaiheilaBot.Ticket,
         block: KaiheilaComponentBotConfiguration.() -> Unit = {},
@@ -294,7 +294,7 @@ public interface KaiheilaBotManagerConfiguration {
     /**
      * 通过 [clientId]、 [token] 和 [block] 注册bot。
      */
-    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kaiheila { ... }")
+    @Deprecated("Use ApplicationBuilder.kaiheilaBots {...} or BotRegistrar.kook { ... }")
     public fun register(
         clientId: String,
         token: String,
@@ -391,7 +391,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
  * 简化json e.g.
  * ```json
  * {
- *   "component": "simbot.kaiheila",
+ *   "component": "simbot.kook",
  *   "clientId": "Your client ID",
  *   "token": "Your ws token"
  * }
@@ -400,7 +400,7 @@ private class KaiheilaBotManagerConfigurationImpl : KaiheilaBotManagerConfigurat
  * 完整json e.g.
  * ```json
  * {
- *  "component": "simbot.kaiheila",
+ *  "component": "simbot.kook",
  *  "clientId": "Your client ID",
  *  "token": "Your ws token",
  *  "config": {

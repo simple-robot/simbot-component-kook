@@ -25,8 +25,8 @@ import love.forte.simbot.component.kaiheila.event.KaiheilaBotRegisteredEvent
 import love.forte.simbot.component.kaiheila.internal.event.KaiheilaBotRegisteredEventImpl
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
-import love.forte.simbot.kaiheila.KaiheilaBot
-import love.forte.simbot.kaiheila.kaiheilaBot
+import love.forte.simbot.kook.KaiheilaBot
+import love.forte.simbot.kook.kaiheilaBot
 import love.forte.simbot.literal
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext

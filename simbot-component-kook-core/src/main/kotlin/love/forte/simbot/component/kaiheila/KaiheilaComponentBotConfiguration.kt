@@ -1,7 +1,7 @@
 package love.forte.simbot.component.kaiheila
 
 import kotlinx.serialization.Serializable
-import love.forte.simbot.kaiheila.KaiheilaBotConfiguration
+import love.forte.simbot.kook.KaiheilaBotConfiguration
 
 
 /**

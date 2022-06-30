@@ -39,31 +39,31 @@ import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
-import love.forte.simbot.kaiheila.KaiheilaBot
-import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
-import love.forte.simbot.kaiheila.api.asset.AssetCreated
-import love.forte.simbot.kaiheila.api.channel.ChannelViewRequest
-import love.forte.simbot.kaiheila.api.guild.GuildListRequest
-import love.forte.simbot.kaiheila.api.guild.GuildViewRequest
-import love.forte.simbot.kaiheila.api.message.MessageType
-import love.forte.simbot.kaiheila.api.user.Me
-import love.forte.simbot.kaiheila.api.user.UserViewRequest
-import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
-import love.forte.simbot.kaiheila.api.userchat.UserChatListRequest
-import love.forte.simbot.kaiheila.event.Event.Extra.Sys
-import love.forte.simbot.kaiheila.event.Event.Extra.Text
-import love.forte.simbot.kaiheila.event.system.channel.AddedChannelExtraBody
-import love.forte.simbot.kaiheila.event.system.channel.DeletedChannelExtraBody
-import love.forte.simbot.kaiheila.event.system.channel.UpdatedChannelExtraBody
-import love.forte.simbot.kaiheila.event.system.guild.DeletedGuildExtraBody
-import love.forte.simbot.kaiheila.event.system.guild.UpdatedGuildExtraBody
-import love.forte.simbot.kaiheila.event.system.guild.member.ExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.JoinedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.guild.member.UpdatedGuildMemberEventBody
-import love.forte.simbot.kaiheila.event.system.user.SelfExitedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.SelfJoinedGuildEventBody
-import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEventBody
+import love.forte.simbot.kook.KaiheilaBot
+import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.api.asset.AssetCreateRequest
+import love.forte.simbot.kook.api.asset.AssetCreated
+import love.forte.simbot.kook.api.channel.ChannelViewRequest
+import love.forte.simbot.kook.api.guild.GuildListRequest
+import love.forte.simbot.kook.api.guild.GuildViewRequest
+import love.forte.simbot.kook.api.message.MessageType
+import love.forte.simbot.kook.api.user.Me
+import love.forte.simbot.kook.api.user.UserViewRequest
+import love.forte.simbot.kook.api.userchat.UserChatCreateRequest
+import love.forte.simbot.kook.api.userchat.UserChatListRequest
+import love.forte.simbot.kook.event.Event.Extra.Sys
+import love.forte.simbot.kook.event.Event.Extra.Text
+import love.forte.simbot.kook.event.system.channel.AddedChannelExtraBody
+import love.forte.simbot.kook.event.system.channel.DeletedChannelExtraBody
+import love.forte.simbot.kook.event.system.channel.UpdatedChannelExtraBody
+import love.forte.simbot.kook.event.system.guild.DeletedGuildExtraBody
+import love.forte.simbot.kook.event.system.guild.UpdatedGuildExtraBody
+import love.forte.simbot.kook.event.system.guild.member.ExitedGuildEventBody
+import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
+import love.forte.simbot.kook.event.system.guild.member.UpdatedGuildMemberEventBody
+import love.forte.simbot.kook.event.system.user.SelfExitedGuildEventBody
+import love.forte.simbot.kook.event.system.user.SelfJoinedGuildEventBody
+import love.forte.simbot.kook.event.system.user.UserUpdatedEventBody
 import love.forte.simbot.literal
 import love.forte.simbot.resources.Resource
 import love.forte.simbot.utils.item.Items
@@ -75,7 +75,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kook.event.Event as KhlEvent
 
 /**
  *
@@ -91,7 +91,7 @@ internal class KaiheilaComponentBotImpl(
     internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
     override val logger: Logger =
-        LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.bot.${sourceBot.ticket.clientId}")
+        LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
     
     private lateinit var internalGuilds: ConcurrentHashMap<String, KaiheilaGuildImpl>
     
@@ -131,7 +131,7 @@ internal class KaiheilaComponentBotImpl(
     /**
      * 以 flow 的方式查询guild列表
      */
-    private fun requestGuilds(): Flow<love.forte.simbot.kaiheila.objects.Guild> {
+    private fun requestGuilds(): Flow<love.forte.simbot.kook.objects.Guild> {
         return flow {
             var page = 1
             do {
@@ -342,7 +342,7 @@ internal class KaiheilaComponentBotImpl(
     @JvmSynthetic
     override suspend fun resolveImage(id: ID): KaiheilaAssetImage {
         Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
-            "The id must be the resource id of the kaiheila and must start with $ASSET_PREFIX"
+            "The id must be the resource id of the kook and must start with $ASSET_PREFIX"
         }
         return KaiheilaAssetImage(AssetCreated(id.literal))
     }
@@ -354,7 +354,7 @@ internal class KaiheilaComponentBotImpl(
     @JvmSynthetic
     override fun resolveImageBlocking(id: ID): KaiheilaAssetImage {
         Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
-            "The id must be the resource id of the kaiheila and must start with $ASSET_PREFIX"
+            "The id must be the resource id of the kook and must start with $ASSET_PREFIX"
         }
         return KaiheilaAssetImage(AssetCreated(id.literal))
     }

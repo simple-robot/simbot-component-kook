@@ -36,11 +36,11 @@ import love.forte.simbot.component.kaiheila.KaiheilaGuildMember
 import love.forte.simbot.component.kaiheila.model.GuildModel
 import love.forte.simbot.component.kaiheila.model.toModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.channel.ChannelInfo
-import love.forte.simbot.kaiheila.api.channel.ChannelListRequest
-import love.forte.simbot.kaiheila.api.guild.GuildUser
-import love.forte.simbot.kaiheila.api.guild.GuildUserListRequest
-import love.forte.simbot.kaiheila.api.user.UserViewRequest
+import love.forte.simbot.kook.api.channel.ChannelInfo
+import love.forte.simbot.kook.api.channel.ChannelListRequest
+import love.forte.simbot.kook.api.guild.GuildUser
+import love.forte.simbot.kook.api.guild.GuildUserListRequest
+import love.forte.simbot.kook.api.user.UserViewRequest
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems

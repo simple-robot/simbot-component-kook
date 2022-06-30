@@ -43,7 +43,7 @@ public abstract class KaiheilaBotStartedEvent : BotStartedEvent() {
     }
 
     public companion object Key : BaseInternalKey<KaiheilaBotStartedEvent>(
-        "kaiheila.bot_started", BotStartedEvent
+        "kook.bot_started", BotStartedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaBotStartedEvent? = doSafeCast(value)
     }

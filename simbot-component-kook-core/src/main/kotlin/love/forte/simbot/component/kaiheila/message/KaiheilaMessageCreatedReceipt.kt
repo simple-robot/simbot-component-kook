@@ -23,9 +23,9 @@ import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.definition.BotContainer
-import love.forte.simbot.kaiheila.api.message.DirectMessageDeleteRequest
-import love.forte.simbot.kaiheila.api.message.MessageCreated
-import love.forte.simbot.kaiheila.api.message.MessageDeleteRequest
+import love.forte.simbot.kook.api.message.DirectMessageDeleteRequest
+import love.forte.simbot.kook.api.message.MessageCreated
+import love.forte.simbot.kook.api.message.MessageDeleteRequest
 import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.randomID
 

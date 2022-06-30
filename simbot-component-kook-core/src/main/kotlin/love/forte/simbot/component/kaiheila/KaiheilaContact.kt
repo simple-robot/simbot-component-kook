@@ -21,7 +21,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.definition.Contact
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageReceipt
-import love.forte.simbot.kaiheila.objects.User as KhlUser
+import love.forte.simbot.kook.objects.User as KhlUser
 
 /**
  *

@@ -27,10 +27,10 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaSimpleAssetMessage
 import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.GuildBot
 import love.forte.simbot.event.EventProcessor
-import love.forte.simbot.kaiheila.KaiheilaBot
-import love.forte.simbot.kaiheila.api.message.MessageType
-import love.forte.simbot.kaiheila.api.userchat.UserChatCreateRequest
-import love.forte.simbot.kaiheila.api.userchat.UserChatListRequest
+import love.forte.simbot.kook.KaiheilaBot
+import love.forte.simbot.kook.api.message.MessageType
+import love.forte.simbot.kook.api.userchat.UserChatCreateRequest
+import love.forte.simbot.kook.api.userchat.UserChatListRequest
 import love.forte.simbot.resources.Resource
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
@@ -140,7 +140,7 @@ public interface KaiheilaComponentBot : Bot {
     /**
      * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      *
-     * 但是需要验证此 [id] 是否为 `https://www.kaiheila.cn` 开头，即是否为kaiheila的资源。
+     * 但是需要验证此 [id] 是否为 `https://www.kook.cn` 开头，即是否为kaiheila的资源。
      *
      */
     @JvmSynthetic
@@ -149,7 +149,7 @@ public interface KaiheilaComponentBot : Bot {
     /**
      * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      *
-     * 但是需要验证此 [id] 是否为 `https://www.kaiheila.cn` 开头，即是否为kaiheila的资源。
+     * 但是需要验证此 [id] 是否为 `https://www.kook.cn` 开头，即是否为kaiheila的资源。
      *
      */
     @OptIn(Api4J::class)

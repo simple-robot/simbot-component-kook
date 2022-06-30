@@ -69,7 +69,7 @@ public inline fun ApplicationBuilder<*>.kaiheilaBotsIfSupport(
  * ```kotlin
  * simpleApplication {
  *     bots {
- *         kaiheila {
+ *         kook {
  *             val bot = register("client id", "token") {
  *                 // config...
  *             }
@@ -98,7 +98,7 @@ public suspend inline fun BotRegistrar.kaiheila(
  * ```kotlin
  * simpleApplication {
  *     bots {
- *         kaiheila {
+ *         kook {
  *             val bot = register("client id", "token") {
  *                 // config...
  *             }

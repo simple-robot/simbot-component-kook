@@ -1,8 +1,8 @@
 package love.forte.simbot.component.kaiheila.model
 
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.objects.Channel
-import love.forte.simbot.kaiheila.objects.ChannelPermissionOverwrites
+import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.kook.objects.ChannelPermissionOverwrites
 
 /**
  * 针对于 [Channel] 在核心模块中的可变数据模型。

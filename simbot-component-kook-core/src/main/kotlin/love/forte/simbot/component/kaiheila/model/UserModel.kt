@@ -1,7 +1,7 @@
 package love.forte.simbot.component.kaiheila.model
 
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.objects.User
+import love.forte.simbot.kook.objects.User
 
 /**
  * 针对于 [User] 在核心模块中的可变数据模型。

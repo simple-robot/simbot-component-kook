@@ -24,7 +24,7 @@ import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import love.forte.simbot.kaiheila.objects.Guild as KhlGuild
+import love.forte.simbot.kook.objects.Guild as KhlGuild
 
 /**
  *

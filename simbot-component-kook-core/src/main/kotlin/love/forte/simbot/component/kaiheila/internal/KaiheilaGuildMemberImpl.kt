@@ -28,8 +28,8 @@ import love.forte.simbot.component.kaiheila.message.KaiheilaMessageReceipt
 import love.forte.simbot.component.kaiheila.model.UserModel
 import love.forte.simbot.component.kaiheila.util.requestBy
 import love.forte.simbot.component.kaiheila.util.update
-import love.forte.simbot.kaiheila.api.guild.GuildMuteCreateRequest
-import love.forte.simbot.kaiheila.api.guild.GuildMuteDeleteRequest
+import love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+import love.forte.simbot.kook.api.guild.GuildMuteDeleteRequest
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
@@ -161,7 +161,7 @@ internal class KaiheilaGuildMemberImpl(
     }
     
     companion object {
-        private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kaiheila.KaiheilaMember")
+        private val logger = org.slf4j.LoggerFactory.getLogger("love.forte.simbot.component.kook.KaiheilaMember")
         private val MUTE_JOB_ATOMIC =
             AtomicReferenceFieldUpdater.newUpdater(KaiheilaGuildMemberImpl::class.java, Job::class.java, "_muteJob")
     }

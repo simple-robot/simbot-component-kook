@@ -21,9 +21,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
-import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
-import love.forte.simbot.kaiheila.api.asset.AssetCreated
-import love.forte.simbot.kaiheila.api.message.MessageType
+import love.forte.simbot.kook.api.asset.AssetCreateRequest
+import love.forte.simbot.kook.api.asset.AssetCreated
+import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.message.Image
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast

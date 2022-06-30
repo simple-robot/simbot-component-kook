@@ -21,12 +21,12 @@ package love.forte.simbot.component.kaiheila.util
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
-import love.forte.simbot.kaiheila.api.ApiResult
-import love.forte.simbot.kaiheila.api.KookApiRequest
-import love.forte.simbot.kaiheila.requestBy
-import love.forte.simbot.kaiheila.requestData
-import love.forte.simbot.kaiheila.requestDataBlocking
-import love.forte.simbot.kaiheila.requestDataBy
+import love.forte.simbot.kook.api.ApiResult
+import love.forte.simbot.kook.api.KookApiRequest
+import love.forte.simbot.kook.requestBy
+import love.forte.simbot.kook.requestData
+import love.forte.simbot.kook.requestDataBlocking
+import love.forte.simbot.kook.requestDataBy
 import love.forte.simbot.utils.runInBlocking
 
 

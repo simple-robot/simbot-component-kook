@@ -21,15 +21,15 @@ import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.KookApiRequest
-import love.forte.simbot.kaiheila.api.asset.AssetCreateRequest
-import love.forte.simbot.kaiheila.api.message.DirectMessageCreateRequest
-import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
-import love.forte.simbot.kaiheila.api.message.MessageType
-import love.forte.simbot.kaiheila.objects.AtTarget
-import love.forte.simbot.kaiheila.objects.KMarkdown
-import love.forte.simbot.kaiheila.objects.KMarkdownBuilder
-import love.forte.simbot.kaiheila.objects.buildRawKMarkdown
+import love.forte.simbot.kook.api.KookApiRequest
+import love.forte.simbot.kook.api.asset.AssetCreateRequest
+import love.forte.simbot.kook.api.message.DirectMessageCreateRequest
+import love.forte.simbot.kook.api.message.MessageCreateRequest
+import love.forte.simbot.kook.api.message.MessageType
+import love.forte.simbot.kook.objects.AtTarget
+import love.forte.simbot.kook.objects.KMarkdown
+import love.forte.simbot.kook.objects.KMarkdownBuilder
+import love.forte.simbot.kook.objects.buildRawKMarkdown
 import love.forte.simbot.literal
 import love.forte.simbot.message.*
 

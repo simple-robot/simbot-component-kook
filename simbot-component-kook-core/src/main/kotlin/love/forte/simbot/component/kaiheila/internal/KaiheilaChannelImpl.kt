@@ -28,8 +28,8 @@ import love.forte.simbot.component.kaiheila.message.*
 import love.forte.simbot.component.kaiheila.message.KaiheilaMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kaiheila.model.ChannelModel
 import love.forte.simbot.component.kaiheila.util.requestDataBy
-import love.forte.simbot.kaiheila.api.message.MessageCreateRequest
-import love.forte.simbot.kaiheila.api.message.MessageCreated
+import love.forte.simbot.kook.api.message.MessageCreateRequest
+import love.forte.simbot.kook.api.message.MessageCreated
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items

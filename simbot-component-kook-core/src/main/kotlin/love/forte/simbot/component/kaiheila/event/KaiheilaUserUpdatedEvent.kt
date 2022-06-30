@@ -23,8 +23,8 @@ import love.forte.simbot.Timestamp
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.ChangedEvent
 import love.forte.simbot.event.Event
-import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEvent
-import love.forte.simbot.kaiheila.event.system.user.UserUpdatedEventBody
+import love.forte.simbot.kook.event.system.user.UserUpdatedEvent
+import love.forte.simbot.kook.event.system.user.UserUpdatedEventBody
 import love.forte.simbot.message.doSafeCast
 
 /**
@@ -90,7 +90,7 @@ public abstract class KaiheilaUserUpdatedEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaUserUpdatedEvent>(
-        "kaiheila.user_updated", KaiheilaSystemEvent
+        "kook.user_updated", KaiheilaSystemEvent
     ) {
         override fun safeCast(value: Any): KaiheilaUserUpdatedEvent? = doSafeCast(value)
     }

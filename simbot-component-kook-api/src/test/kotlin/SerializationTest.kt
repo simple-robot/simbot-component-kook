@@ -20,7 +20,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import love.forte.simbot.kaiheila.objects.*
+import love.forte.simbot.kook.objects.*
 import kotlin.test.Test
 
 /**

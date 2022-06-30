@@ -29,13 +29,13 @@ import love.forte.simbot.component.kaiheila.event.KaiheilaUserOnlineStatusChange
 import love.forte.simbot.definition.Organization
 import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.event.*
-import love.forte.simbot.kaiheila.event.Event.Extra.Sys
-import love.forte.simbot.kaiheila.event.system.guild.member.*
-import love.forte.simbot.kaiheila.event.system.user.*
+import love.forte.simbot.kook.event.Event.Extra.Sys
+import love.forte.simbot.kook.event.system.guild.member.*
+import love.forte.simbot.kook.event.system.user.*
 import love.forte.simbot.message.doSafeCast
 import java.util.stream.Stream
 import kotlin.streams.asStream
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kook.event.Event as KhlEvent
 
 /**
  *  Kook 的频道成员变更事件。
@@ -169,7 +169,7 @@ public abstract class KaiheilaMemberChangedEvent<out Body> :
     override suspend fun operator(): KaiheilaGuildMember? = operator
 
     public companion object Key : BaseEventKey<KaiheilaMemberChangedEvent<*>>(
-        "kaiheila.member_changed", KaiheilaEvent, MemberChangedEvent
+        "kook.member_changed", KaiheilaEvent, MemberChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberChangedEvent<*>? = doSafeCast(value)
     }
@@ -211,7 +211,7 @@ public abstract class KaiheilaMemberChannelChangedEvent<out Body> : KaiheilaMemb
 
 
     public companion object Key : BaseEventKey<KaiheilaMemberChannelChangedEvent<*>>(
-        "kaiheila.member_channel_changed", KaiheilaMemberChangedEvent
+        "kook.member_channel_changed", KaiheilaMemberChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberChannelChangedEvent<*>? = doSafeCast(value)
     }
@@ -277,7 +277,7 @@ public abstract class KaiheilaMemberExitedChannelEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberExitedChannelEvent>(
-        "kaiheila.member_exited_channel", KaiheilaMemberChannelChangedEvent, MemberDecreaseEvent
+        "kook.member_exited_channel", KaiheilaMemberChannelChangedEvent, MemberDecreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberExitedChannelEvent? = doSafeCast(value)
     }
@@ -343,7 +343,7 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberJoinedChannelEvent>(
-        "kaiheila.member_joined_channel", KaiheilaMemberChannelChangedEvent, MemberIncreaseEvent
+        "kook.member_joined_channel", KaiheilaMemberChannelChangedEvent, MemberIncreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberJoinedChannelEvent? = doSafeCast(value)
     }
@@ -384,7 +384,7 @@ public abstract class KaiheilaMemberGuildChangedEvent<out Body> :
 
 
     public companion object Key : BaseEventKey<KaiheilaMemberGuildChangedEvent<*>>(
-        "kaiheila.member_guild_changed", KaiheilaMemberChangedEvent
+        "kook.member_guild_changed", KaiheilaMemberChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberGuildChangedEvent<*>? = doSafeCast(value)
     }
@@ -451,7 +451,7 @@ public abstract class KaiheilaMemberExitedGuildEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberExitedChannelEvent>(
-        "kaiheila.member_exited_channel", KaiheilaMemberChannelChangedEvent, MemberDecreaseEvent
+        "kook.member_exited_channel", KaiheilaMemberChannelChangedEvent, MemberDecreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberExitedChannelEvent? = doSafeCast(value)
     }
@@ -516,7 +516,7 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaMemberJoinedGuildEvent>(
-        "kaiheila.member_joined_guild", KaiheilaMemberGuildChangedEvent, MemberIncreaseEvent
+        "kook.member_joined_guild", KaiheilaMemberGuildChangedEvent, MemberIncreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaMemberJoinedGuildEvent? = doSafeCast(value)
     }
@@ -565,7 +565,7 @@ public abstract class KaiheilaBotMemberChangedEvent<out Body> :
 
 
     public companion object Key : BaseEventKey<KaiheilaBotMemberChangedEvent<*>>(
-        "kaiheila.bot_member_changed", KaiheilaMemberChangedEvent
+        "kook.bot_member_changed", KaiheilaMemberChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaBotMemberChangedEvent<*>? = doSafeCast(value)
     }
@@ -631,7 +631,7 @@ public abstract class KaiheilaBotSelfExitedGuildEvent :
 
 
     public companion object Key : BaseEventKey<KaiheilaBotSelfExitedGuildEvent>(
-        "kaiheila.bot_self_exited", KaiheilaBotMemberChangedEvent, MemberDecreaseEvent
+        "kook.bot_self_exited", KaiheilaBotMemberChangedEvent, MemberDecreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaBotSelfExitedGuildEvent? = doSafeCast(value)
     }
@@ -695,7 +695,7 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaBotSelfJoinedGuildEvent>(
-        "kaiheila.bot_self_joined", KaiheilaBotMemberChangedEvent, MemberIncreaseEvent
+        "kook.bot_self_joined", KaiheilaBotMemberChangedEvent, MemberIncreaseEvent
     ) {
         override fun safeCast(value: Any): KaiheilaBotSelfJoinedGuildEvent? = doSafeCast(value)
     }
@@ -826,7 +826,7 @@ public sealed class KaiheilaUserOnlineStatusChangedEvent :
         get() = Key
 
     public companion object Key : BaseEventKey<KaiheilaUserOnlineStatusChangedEvent>(
-        "kaiheila.guild_member_online_status_changed", KaiheilaSystemEvent, ChangedEvent
+        "kook.guild_member_online_status_changed", KaiheilaSystemEvent, ChangedEvent
     ) {
         override fun safeCast(value: Any): KaiheilaUserOnlineStatusChangedEvent? = doSafeCast(value)
     }
@@ -859,7 +859,7 @@ public sealed class KaiheilaUserOnlineStatusChangedEvent :
 
 
         public companion object Key :
-            BaseEventKey<Online>("kaiheila.member_online", KaiheilaUserOnlineStatusChangedEvent) {
+            BaseEventKey<Online>("kook.member_online", KaiheilaUserOnlineStatusChangedEvent) {
             override fun safeCast(value: Any): Online? = doSafeCast(value)
         }
     }
@@ -890,7 +890,7 @@ public sealed class KaiheilaUserOnlineStatusChangedEvent :
             get() = sourceBody.guilds
 
         public companion object Key :
-            BaseEventKey<Offline>("kaiheila.member_offline", KaiheilaUserOnlineStatusChangedEvent) {
+            BaseEventKey<Offline>("kook.member_offline", KaiheilaUserOnlineStatusChangedEvent) {
             override fun safeCast(value: Any): Offline? = doSafeCast(value)
         }
     }

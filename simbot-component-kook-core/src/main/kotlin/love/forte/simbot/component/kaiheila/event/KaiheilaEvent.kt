@@ -21,9 +21,9 @@ import love.forte.simbot.ID
 import love.forte.simbot.component.kaiheila.KaiheilaComponentBot
 import love.forte.simbot.definition.BotContainer
 import love.forte.simbot.event.*
-import love.forte.simbot.kaiheila.event.Event.Extra.Sys
+import love.forte.simbot.kook.event.Event.Extra.Sys
 import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.kaiheila.event.Event as KhlEvent
+import love.forte.simbot.kook.event.Event as KhlEvent
 
 
 /**
@@ -59,7 +59,7 @@ public abstract class KaiheilaEvent<out EX : KhlEvent.Extra, out E : KhlEvent<EX
 
 
     public companion object Key : BaseEventKey<KaiheilaEvent<*, *>>(
-        "kaiheila.event", Event
+        "kook.event", Event
     ) {
         override fun safeCast(value: Any): KaiheilaEvent<*, *>? = doSafeCast(value)
     }
@@ -87,7 +87,7 @@ public abstract class KaiheilaSystemEvent<out Body> :
     abstract override val key: Event.Key<out KaiheilaSystemEvent<*>>
 
     public companion object Key : BaseEventKey<KaiheilaSystemEvent<*>>(
-        "kaiheila.system_event", KaiheilaEvent
+        "kook.system_event", KaiheilaEvent
     ) {
         override fun safeCast(value: Any): KaiheilaSystemEvent<*>? = doSafeCast(value)
     }

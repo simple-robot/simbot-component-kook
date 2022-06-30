@@ -24,9 +24,9 @@ import love.forte.simbot.component.kaiheila.KaiheilaComponent
 import love.forte.simbot.component.kaiheila.message.KaiheilaAssetImage
 import love.forte.simbot.component.kaiheila.message.KaiheilaAtAllHere
 import love.forte.simbot.component.kaiheila.message.KaiheilaKMarkdownMessage
-import love.forte.simbot.kaiheila.api.ApiResultType
-import love.forte.simbot.kaiheila.api.asset.AssetCreated
-import love.forte.simbot.kaiheila.objects.buildKMarkdown
+import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.api.asset.AssetCreated
+import love.forte.simbot.kook.objects.buildKMarkdown
 import love.forte.simbot.message.Messages
 import love.forte.simbot.message.buildMessages
 import kotlin.test.Test

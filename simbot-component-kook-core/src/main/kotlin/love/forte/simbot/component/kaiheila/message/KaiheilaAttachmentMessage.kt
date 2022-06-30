@@ -19,7 +19,7 @@ package love.forte.simbot.component.kaiheila.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.kaiheila.objects.Attachments
+import love.forte.simbot.kook.objects.Attachments
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 
