@@ -17,22 +17,6 @@
 
 package love.forte.simboot.component.kaiheila
 
-import love.forte.di.annotation.Depend
-import javax.inject.Named
 
-
-/**
- *
- * @author ForteScarlet
- */
-@Named("tencentGuildBotRegistrarFactory")
 @Deprecated("Unused")
-public class KaiheilaBotRegistrarFactory @Depend(required = false) constructor(
-    @Depend(required = false) private val configure: KaiheilaBotManagerConfigure? = null
-) {
-    // override fun invoke(processor: EventProcessor): BotRegistrar {
-    //     return kaiheilaBotManager(processor) {
-    //         configure?.config(this)
-    //     }
-    // }
-}
+public class KookBotRegistrarFactory
