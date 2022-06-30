@@ -2,8 +2,9 @@ package forte.example.spring.app
 
 import love.forte.simboot.annotation.Listener
 import love.forte.simboot.spring.autoconfigure.EnableSimbot
-import love.forte.simbot.event.ContactMessageEvent
+import love.forte.simbot.component.kook.event.KookContactMessageEvent
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 import org.springframework.stereotype.Component
 
 
@@ -15,11 +16,15 @@ import org.springframework.stereotype.Component
 @SpringBootApplication
 open class SpringAppMain
 
+fun main() {
+    runApplication<SpringAppMain>()
+}
+
 @Component
 open class TestListener {
 
     @Listener
-    suspend fun ContactMessageEvent.onMsg() {
+    suspend fun KookContactMessageEvent.onMsg() {
         println(messageContent)
         user().send(messageContent)
     }

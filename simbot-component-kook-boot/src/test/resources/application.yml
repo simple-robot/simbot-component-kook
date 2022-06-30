@@ -2,3 +2,8 @@ logging:
   level:
     love.forte.simboot: debug
     love.forte.simbot: debug
+    forte.example: debug
+
+simbot:
+  bot-configuration-resources:
+    - 'classpath:simbot-bots/test-bot.bot'

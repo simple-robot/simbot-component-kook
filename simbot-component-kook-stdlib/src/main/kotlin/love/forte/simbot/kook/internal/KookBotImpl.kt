@@ -96,9 +96,7 @@ internal class KookBotImpl(
             install(ContentNegotiation) {
                 json(decoder)
             }
-            // install(JsonFeature) {
-            //     serializer = KotlinxSerializer(decoder)
-            // }
+            
             // install ws
             install(WebSockets)
             

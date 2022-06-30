@@ -34,6 +34,7 @@ dependencies {
     testImplementation(libs.spring.boot.test)
     testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
     testImplementation(kotlin("test-junit5"))
+    testImplementation(libs.ktor.client.cio)
 }
 
 
