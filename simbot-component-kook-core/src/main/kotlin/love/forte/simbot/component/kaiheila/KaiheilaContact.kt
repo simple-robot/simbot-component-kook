@@ -25,7 +25,7 @@ import love.forte.simbot.kaiheila.objects.User as KhlUser
 
 /**
  *
- * 开黑啦组件下的联系人信息。
+ *  Kook 组件下的联系人信息。
  *
  * @author ForteScarlet
  */
@@ -42,7 +42,7 @@ public interface KaiheilaContact : Contact {
     override val username: String get() = sourceUser.username
 
     /**
-     * 开黑啦的源用户信息。
+     *  Kook 的源用户信息。
      */
     public val sourceUser: KhlUser
 

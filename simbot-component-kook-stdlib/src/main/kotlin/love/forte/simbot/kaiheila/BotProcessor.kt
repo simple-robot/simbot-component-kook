@@ -115,7 +115,7 @@ public inline fun <reified EX : Event.Extra, reified E : Event<EX>> KaiheilaBot.
 /**
  * 提供一个 [EventParser] 进行事件验证并在验证通过时进行事件处理。
  *
- * 由于开黑啦事件可能会触发bot自身发的消息，通过 [processorExcludeSelf]
+ * 由于 Kook 事件可能会触发bot自身发的消息，通过 [processorExcludeSelf]
  *
  * @see love.forte.simbot.kaiheila.event.message.MessageEventDefinition
  * @see love.forte.simbot.kaiheila.event.system.user.UserEvents

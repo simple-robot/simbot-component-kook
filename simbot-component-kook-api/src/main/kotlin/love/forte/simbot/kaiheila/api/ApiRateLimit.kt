@@ -22,7 +22,7 @@ import io.ktor.client.statement.*
 
 // TODO
 /**
- * 开黑啦 [超速限制](https://developer.kaiheila.cn/doc/rate-limit) 异常。
+ *  Kook  [超速限制](https://developer.kaiheila.cn/doc/rate-limit) 异常。
  *
  * @author ForteScarlet
  */

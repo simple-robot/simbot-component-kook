@@ -28,7 +28,7 @@ import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
-import love.forte.simbot.kaiheila.KaiheilaApi
+import love.forte.simbot.kaiheila.KookApi
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
 import love.forte.simbot.kaiheila.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
@@ -40,13 +40,13 @@ import java.util.function.Consumer
 
 
 /**
- * 代表、包装了一个开黑啦api的请求。
+ * 代表、包装了一个 Kook api的请求。
  *
  * ### 反序列化
  * [KaiheilaApiRequest] 面向 ktor, 并基于 `kotlinx.serialization` 进行反序列化。
  *
  * ### Url内容
- * 最终进行请求的 [url] 中部分参数（例如host）来自于 [KaiheilaApi].
+ * 最终进行请求的 [url] 中部分参数（例如host）来自于 [KookApi].
  *
  * ### 不可变
  * 此接口的实现类应当是不可变、可复用的。
@@ -54,7 +54,7 @@ import java.util.function.Consumer
 public abstract class KaiheilaApiRequest<T> {
 
     /**
-     * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [KaiheilaApi].
+     * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [KookApi].
      */
     public abstract val url: Url
 
@@ -274,7 +274,7 @@ public abstract class BaseKaiheilaApiRequest<T> : KaiheilaApiRequest<T>() {
             return if (::_url.isInitialized) {
                 _url
             } else {
-                val buildUrl = KaiheilaApi.buildApiUrl(apiPaths, true) {
+                val buildUrl = KookApi.buildApiUrl(apiPaths, true) {
                     buildParameters()
                 }
                 buildUrl.also { _url = it }

@@ -38,7 +38,7 @@ import love.forte.simbot.kaiheila.objects.Channel as KhlChannel
 
 /**
  *
- * 开黑啦组件的子频道类型定义。
+ *  Kook 组件的子频道类型定义。
  *
  * @author ForteScarlet
  */

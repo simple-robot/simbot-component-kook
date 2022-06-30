@@ -2,7 +2,7 @@ package love.forte.simbot.component.kaiheila
 
 
 /**
- * 一个开黑啦组件的对象定义，实现此接口并提供一个可以获取 [源][source] 对象的api。
+ * 一个 Kook 组件的对象定义，实现此接口并提供一个可以获取 [源][source] 对象的api。
  *
  * @author ForteScarlet
  */

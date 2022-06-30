@@ -27,10 +27,10 @@ import love.forte.simbot.message.doSafeCast
 
 
 /**
- * 所有未提供针对性实现的其他开黑啦事件。
+ * 所有未提供针对性实现的其他 Kook 事件。
  *
  * [UnsupportedKaiheilaEvent] 不实现任何其他事件类型，
- * 仅实现开黑啦组件中的事件父类型 [KaiheilaEvent]，是一个完全独立的事件类型。
+ * 仅实现 Kook 组件中的事件父类型 [KaiheilaEvent]，是一个完全独立的事件类型。
  *
  * [UnsupportedKaiheilaEvent] 会将所有未支持或难以支持的事件都会通过此类型进行推送，
  * 但是如果要监听 [UnsupportedKaiheilaEvent], 你需要谨慎处理其中的一切，

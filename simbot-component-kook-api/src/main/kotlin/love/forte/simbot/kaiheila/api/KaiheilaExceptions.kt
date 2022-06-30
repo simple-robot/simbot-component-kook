@@ -31,7 +31,7 @@ public interface Kaiheila
 
 
 /**
- * 开黑啦相关异常。
+ *  Kook 相关异常。
  */
 public open class KhlRuntimeException : SimbotRuntimeException {
     public constructor() : super()

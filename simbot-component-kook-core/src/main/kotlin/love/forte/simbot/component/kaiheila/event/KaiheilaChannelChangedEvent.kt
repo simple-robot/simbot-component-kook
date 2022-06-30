@@ -35,9 +35,9 @@ import love.forte.simbot.utils.runInBlocking
 
 /**
  *
- * 开黑啦系统事件中与频道变更事件相关的事件针对simbot标准事件的实现基准类。
+ *  Kook 系统事件中与频道变更事件相关的事件针对simbot标准事件的实现基准类。
  *
- * 涉及的相关开黑啦**原始**事件有：
+ * 涉及的相关 Kook **原始**事件有：
  * - [AddedChannelEvent]
  * - [UpdatedChannelEvent]
  * - [DeletedChannelEvent]

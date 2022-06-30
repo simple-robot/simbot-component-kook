@@ -39,7 +39,7 @@ public annotation class KhlMarkdownBuilderTopDsl
 
 
 /**
- * 开黑啦的 [KMarkdown](https://developer.kaiheila.cn/doc/kmarkdown).
+ *  Kook 的 [KMarkdown](https://developer.kaiheila.cn/doc/kmarkdown).
  * 此接口中定义的三个属性主要用于 **接收消息** 用。
  *
  * @see RawValueKMarkdown
@@ -370,7 +370,7 @@ public inline fun buildKMarkdown(block: KMarkdownBuilder.() -> Unit): KMarkdown 
 
 
 /**
- * 开黑啦 `KMarkdown` 语法封装.
+ *  Kook  `KMarkdown` 语法封装.
  *
  * @param P 参数类型。一般情况下参数为字符串，但是有些时候参数可能是多个，则或许需要提供一个封装参数。
  */
@@ -409,12 +409,12 @@ public interface KhlMarkdownGrammar<P> {
         /** 来源 - markdown官方 */
         public object Markdown : Source("official")
 
-        /** 来源 - 开黑啦官方 */
+        /** 来源 -  Kook 官方 */
         public sealed class Kaiheila(name: String) : Source(name) {
-            /** 开黑啦官方 - 自定义 */
+            /**  Kook 官方 - 自定义 */
             public object Custom : Kaiheila("kaiheila-custom")
 
-            /** 开黑啦官方 - emoji */
+            /**  Kook 官方 - emoji */
             public object Emoji : Kaiheila("kaiheila-emoji")
         }
 

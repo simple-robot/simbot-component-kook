@@ -43,7 +43,7 @@ public data class KaiheilaChannelMessageDetailsContent(internal val details: Cha
     override val messageId: ID = details.id
 
     /**
-     * 开黑啦消息事件中所收到的消息列表。
+     *  Kook 消息事件中所收到的消息列表。
      */
     override val messages: Messages = details.toMessages()
     

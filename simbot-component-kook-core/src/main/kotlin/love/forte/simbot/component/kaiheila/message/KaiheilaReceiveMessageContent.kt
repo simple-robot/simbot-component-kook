@@ -32,7 +32,7 @@ import love.forte.simbot.kaiheila.event.message.*
 import love.forte.simbot.message.*
 
 /**
- * 开黑啦消息事件所收到的消息正文类型。
+ *  Kook 消息事件所收到的消息正文类型。
  *
  * @author ForteScarlet
  */
@@ -44,7 +44,7 @@ public class KaiheilaReceiveMessageContent(private val isDirect: Boolean, intern
     override val messageId: ID = source.msgId
 
     /**
-     * 开黑啦消息事件中所收到的消息列表。
+     *  Kook 消息事件中所收到的消息列表。
      */
     override val messages: Messages = source.toMessages()
     

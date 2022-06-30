@@ -28,7 +28,7 @@ import love.forte.simbot.kaiheila.objects.Guild as KhlGuild
 
 /**
  *
- * 开黑啦组件中的频道服务器信息。
+ *  Kook 组件中的频道服务器信息。
  *
  * @author ForteScarlet
  */

@@ -84,7 +84,7 @@ public sealed class KaiheilaAssetMessage<M : KaiheilaAssetMessage<M>> : Kaiheila
 
 /**
  *
- * 开黑啦组件中针对 [AssetCreateRequest] api 的请求响应的消息封装。
+ *  Kook 组件中针对 [AssetCreateRequest] api 的请求响应的消息封装。
  *
  * @author ForteScarlet
  */

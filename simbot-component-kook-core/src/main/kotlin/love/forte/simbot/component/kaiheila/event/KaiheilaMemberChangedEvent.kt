@@ -38,9 +38,9 @@ import kotlin.streams.asStream
 import love.forte.simbot.kaiheila.event.Event as KhlEvent
 
 /**
- * 开黑啦的频道成员变更事件。
+ *  Kook 的频道成员变更事件。
  *
- * 相关的开黑啦**原始**事件类型有：
+ * 相关的 Kook **原始**事件类型有：
  * - [UserExitedChannelEvent]
  * - [UserJoinedChannelEvent]
  * - [JoinedGuildEvent]
@@ -180,7 +180,7 @@ public abstract class KaiheilaMemberChangedEvent<out Body> :
 
 //region 频道进出相关
 /**
- * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道进出**相关的变更事件。
+ *  Kook  [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道进出**相关的变更事件。
  * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
 @BaseEvent
@@ -220,7 +220,7 @@ public abstract class KaiheilaMemberChannelChangedEvent<out Body> : KaiheilaMemb
 
 
 /**
- * 开黑啦成员离开(频道)事件。
+ *  Kook 成员离开(频道)事件。
  *
  * @see UserExitedChannelEvent
  * @author forte
@@ -255,19 +255,19 @@ public abstract class KaiheilaMemberExitedChannelEvent :
 
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
     /**
-     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KaiheilaGuildMember? get() = null
 
     /**
-     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KaiheilaGuildMember? = null
@@ -284,7 +284,7 @@ public abstract class KaiheilaMemberExitedChannelEvent :
 }
 
 /**
- * 开黑啦成员加入(频道)事件。
+ *  Kook 成员加入(频道)事件。
  *
  * @see UserJoinedChannelEvent
  * @author forte
@@ -320,20 +320,20 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
 
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
 
     /**
-     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KaiheilaGuildMember? get() = null
 
     /**
-     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KaiheilaGuildMember? = null
@@ -353,7 +353,7 @@ public abstract class KaiheilaMemberJoinedChannelEvent :
 
 //region 频道服务器进出
 /**
- * 开黑啦 [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
+ *  Kook  [成员变更事件][KaiheilaMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
  */
 @BaseEvent
@@ -392,7 +392,7 @@ public abstract class KaiheilaMemberGuildChangedEvent<out Body> :
 
 
 /**
- * 开黑啦成员离开(频道)事件。
+ *  Kook 成员离开(频道)事件。
  *
  * @see ExitedGuildEvent
  * @author forte
@@ -428,12 +428,12 @@ public abstract class KaiheilaMemberExitedGuildEvent :
     override suspend fun after(): KaiheilaGuildMember? = null
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
     /**
-     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
@@ -441,7 +441,7 @@ public abstract class KaiheilaMemberExitedGuildEvent :
         get() = null
 
     /**
-     * 开黑啦群员离开频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KaiheilaGuildMember? = null
@@ -458,7 +458,7 @@ public abstract class KaiheilaMemberExitedGuildEvent :
 }
 
 /**
- * 开黑啦成员加入(频道)事件。
+ *  Kook 成员加入(频道)事件。
  *
  * @see JoinedGuildEvent
  * @author forte
@@ -494,20 +494,20 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
     override suspend fun before(): KaiheilaGuildMember? = null
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
+     *  Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
 
     /**
-     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KaiheilaGuildMember? get() = null
 
     /**
-     * 开黑啦群员进入频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KaiheilaGuildMember? = null
@@ -530,7 +530,7 @@ public abstract class KaiheilaMemberJoinedGuildEvent :
 
 //region bot相关
 /**
- * 频道成员的变动事件中，变动本体为bot自身时的事件。对应开黑啦原始事件的 [SelfExitedGuildEvent] 和 [SelfJoinedGuildEvent]。
+ * 频道成员的变动事件中，变动本体为bot自身时的事件。对应 Kook 原始事件的 [SelfExitedGuildEvent] 和 [SelfJoinedGuildEvent]。
  *
  * @see KaiheilaBotMemberChangedEvent
  *
@@ -573,7 +573,7 @@ public abstract class KaiheilaBotMemberChangedEvent<out Body> :
 
 
 /**
- * 开黑啦BOT自身离开(频道)事件。
+ *  Kook BOT自身离开(频道)事件。
  *
  * @see SelfExitedGuildEvent
  * @author forte
@@ -607,21 +607,21 @@ public abstract class KaiheilaBotSelfExitedGuildEvent :
     override suspend fun after(): KaiheilaGuildMember? = after
 
     /**
-     * 开黑啦bot离开频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KaiheilaGuildMember? get() = null
 
     /**
-     * 开黑啦bot离开频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override suspend fun operator(): KaiheilaGuildMember? = null
 
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
+     *  Kook 群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
 
@@ -638,7 +638,7 @@ public abstract class KaiheilaBotSelfExitedGuildEvent :
 }
 
 /**
- * 开黑啦BOT自身加入(频道)事件。
+ *  Kook BOT自身加入(频道)事件。
  *
  * @see SelfJoinedGuildEvent
  * @author forte
@@ -671,14 +671,14 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
     override suspend fun before(): KaiheilaGuildMember? = before
 
     /**
-     * 开黑啦bot进入频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(Api4J::class)
     override val operator: KaiheilaGuildMember? get() = null
 
     /**
-     * 开黑啦bot进入频道事件的操作者始终为null （无法确定操作者）。
+     *  Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
     @JvmSynthetic
     override
@@ -686,7 +686,7 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
 
 
     /**
-     * 开黑啦群员离开频道事件的行为类型始终为主动的。
+     *  Kook 群员离开频道事件的行为类型始终为主动的。
      */
     override val actionType: ActionType
         get() = ActionType.PROACTIVE
@@ -703,7 +703,7 @@ public abstract class KaiheilaBotSelfJoinedGuildEvent :
 //endregion
 
 /**
- * 开黑啦用户在线状态变更相关事件的抽象父类。
+ *  Kook 用户在线状态变更相关事件的抽象父类。
  *
  * 涉及到的原始事件有：
  * - [GuildMemberOfflineEvent]

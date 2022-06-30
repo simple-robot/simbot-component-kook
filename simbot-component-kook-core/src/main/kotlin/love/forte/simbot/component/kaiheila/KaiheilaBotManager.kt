@@ -33,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 
 /**
- * 在开黑啦组件中对于 [Bot][KaiheilaBot] 的注册函数的常见形式。
+ * 在 Kook 组件中对于 [Bot][KaiheilaBot] 的注册函数的常见形式。
  *
  * @see KaiheilaBotManager
  */

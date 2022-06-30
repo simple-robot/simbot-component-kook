@@ -32,7 +32,7 @@ import org.slf4j.Logger
 import kotlin.coroutines.CoroutineContext
 
 /**
- * 开黑啦Bot对应的bot类型。
+ *  Kook Bot对应的bot类型。
  *
  * [KaiheilaBot] 提供标准定义，但是不实现 simple-robot-api 中的 [love.forte.simbot.Bot] 接口。
  *

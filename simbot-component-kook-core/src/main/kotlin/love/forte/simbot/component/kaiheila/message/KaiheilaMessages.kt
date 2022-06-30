@@ -34,7 +34,7 @@ import love.forte.simbot.literal
 import love.forte.simbot.message.*
 
 /**
- * 提供开黑啦组件中一些会用到的信息。
+ * 提供 Kook 组件中一些会用到的信息。
  *
  * @author ForteScarlet
  */
@@ -126,7 +126,7 @@ public suspend fun Message.toRequest(
             }
             return null
         }
-        // SingleMessage，开黑啦中无支持类型
+        // SingleMessage， Kook 中无支持类型
         else -> return null
     }
 }

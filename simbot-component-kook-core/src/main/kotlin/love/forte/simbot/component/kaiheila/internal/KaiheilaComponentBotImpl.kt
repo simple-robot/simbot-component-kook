@@ -336,7 +336,7 @@ internal class KaiheilaComponentBotImpl(
     
     
     /**
-     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      */
     @OptIn(ApiResultType::class)
     @JvmSynthetic
@@ -348,7 +348,7 @@ internal class KaiheilaComponentBotImpl(
     }
     
     /**
-     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      */
     @OptIn(ApiResultType::class)
     @JvmSynthetic

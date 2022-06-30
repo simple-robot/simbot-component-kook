@@ -28,13 +28,13 @@ import love.forte.simbot.kaiheila.event.Event as KhlEvent
 
 /**
  *
- * 开黑啦组件在simbot中的所有事件总类。
+ *  Kook 组件在simbot中的所有事件总类。
  *
  *
  * @see UnsupportedKaiheilaEvent
  *
- * @param E 开黑啦api模块中所定义的原始开黑啦事件对象 [KhlEvent].
- * @param EX 开黑啦api模块中所定义的原始开黑啦事件对象的 [extra][KhlEvent.Extra] 属性类型。
+ * @param E  Kook api模块中所定义的原始 Kook 事件对象 [KhlEvent].
+ * @param EX  Kook api模块中所定义的原始 Kook 事件对象的 [extra][KhlEvent.Extra] 属性类型。
  *
  * @author ForteScarlet
  */
@@ -68,7 +68,7 @@ public abstract class KaiheilaEvent<out EX : KhlEvent.Extra, out E : KhlEvent<EX
 
 
 /**
- * 开黑啦组件在simbot中的**系统事件**相关的事件总类。
+ *  Kook 组件在simbot中的**系统事件**相关的事件总类。
  *
  * @param Body 事件消息的 [extra][KhlEvent.Extra] 作为 [Sys] 时，其 [Sys.body] 的类型。
  */

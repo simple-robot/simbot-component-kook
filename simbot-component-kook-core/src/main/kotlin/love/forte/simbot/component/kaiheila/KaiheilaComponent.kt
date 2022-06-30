@@ -28,7 +28,7 @@ import love.forte.simbot.message.Message
 
 /**
  *
- * 开黑啦组件的 [Component] 实现。
+ *  Kook 组件的 [Component] 实现。
  *
  * @author ForteScarlet
  */
@@ -40,7 +40,7 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
         get() = ID_VALUE
     
     /**
-     * 开黑啦组件中所涉及到的序列化模块。
+     *  Kook 组件中所涉及到的序列化模块。
      *
      */
     override val componentSerializersModule: SerializersModule
@@ -126,7 +126,7 @@ public class KaiheilaComponent @InternalSimbotApi constructor() : Component {
  *
  * [KaiheilaComponent] 注册时所使用的配置类。
  *
- * 目前对于开黑啦组件来讲没有需要配置的内容，因此 [KaiheilaComponentConfiguration] 中暂无可配置属性。
+ * 目前对于 Kook 组件来讲没有需要配置的内容，因此 [KaiheilaComponentConfiguration] 中暂无可配置属性。
  *
  */
 public object KaiheilaComponentConfiguration

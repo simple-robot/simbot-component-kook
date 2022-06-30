@@ -41,7 +41,7 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  *
- * 开黑啦组件在simbot下的组件 [Bot] 实现。
+ *  Kook 组件在simbot下的组件 [Bot] 实现。
  *
  * @author ForteScarlet
  */
@@ -66,7 +66,7 @@ public interface KaiheilaComponentBot : Bot {
     override fun isMe(id: ID): Boolean
     
     /**
-     * 得到在stdlib标准库模块下所提供的开黑啦bot实例。
+     * 得到在stdlib标准库模块下所提供的 Kook bot实例。
      */
     public val sourceBot: KaiheilaBot
     
@@ -138,7 +138,7 @@ public interface KaiheilaComponentBot : Bot {
     
     
     /**
-     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      *
      * 但是需要验证此 [id] 是否为 `https://www.kaiheila.cn` 开头，即是否为kaiheila的资源。
      *
@@ -147,7 +147,7 @@ public interface KaiheilaComponentBot : Bot {
     public override suspend fun resolveImage(id: ID): KaiheilaAssetImage
     
     /**
-     * 由于开黑啦中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
+     * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      *
      * 但是需要验证此 [id] 是否为 `https://www.kaiheila.cn` 开头，即是否为kaiheila的资源。
      *
@@ -231,7 +231,7 @@ public interface KaiheilaComponentBot : Bot {
 
 
 /**
- * 开黑啦组件中针对于 [GuildBot] 的实现类型。
+ *  Kook 组件中针对于 [GuildBot] 的实现类型。
  *
  * 实现 [KaiheilaComponentBot] 和 [GuildBot],
  * 代表一个bot在某个频道服务器中所扮演的成员。
@@ -242,12 +242,12 @@ public interface KaiheilaComponentBot : Bot {
 public abstract class KaiheilaComponentGuildBot : KaiheilaComponentBot, GuildBot {
     
     /**
-     * 得到当前组织中的开黑啦bot在当前组织中所扮演的成员对象。
+     * 得到当前组织中的 Kook bot在当前组织中所扮演的成员对象。
      */
     abstract override suspend fun asMember(): KaiheilaGuildMember
     
     /**
-     * 得到当前组织中的开黑啦bot在当前组织中所扮演的成员对象。
+     * 得到当前组织中的 Kook bot在当前组织中所扮演的成员对象。
      */
     @OptIn(Api4J::class)
     abstract override fun toMember(): KaiheilaGuildMember

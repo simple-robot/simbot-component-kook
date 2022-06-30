@@ -33,14 +33,14 @@ import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.runInBlocking
 
 /**
- * 开黑啦的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
+ *  Kook 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
  *
- * ~~开黑啦组件会将私聊会话视为 [Friend] 处理~~
+ * ~~ Kook 组件会将私聊会话视为 [Friend] 处理~~
  *
- * 开黑啦组件会将 [私聊会话][KaiheilaUserChat] 视为 [Stranger] 处理，但是会同时实现 [Contact] 来提供可交流的联系人能力。
+ *  Kook 组件会将 [私聊会话][KaiheilaUserChat] 视为 [Stranger] 处理，但是会同时实现 [Contact] 来提供可交流的联系人能力。
  *
  * ## 可删除的
- * 开黑啦中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KaiheilaUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
+ *  Kook 中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KaiheilaUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
  *
  */
 @ExperimentalSimbotApi

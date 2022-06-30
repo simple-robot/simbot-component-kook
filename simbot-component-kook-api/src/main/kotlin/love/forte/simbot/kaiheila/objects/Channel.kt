@@ -24,7 +24,7 @@ import love.forte.simbot.definition.ChannelInfo
 
 
 /**
- * 开黑啦objects - [频道Channel](https://developer.kaiheila.cn/doc/objects#%E9%A2%91%E9%81%93Channel)
+ *  Kook objects - [频道Channel](https://developer.kaiheila.cn/doc/objects#%E9%A2%91%E9%81%93Channel)
  *
  * #### 示例
  *

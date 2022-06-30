@@ -205,7 +205,7 @@ public inline fun firstKaiheilaBotManagerOrNull(): KaiheilaBotManager? =
 
 
 /**
- * 得到 [OriginBotManager] 中的所有开黑啦组件。
+ * 得到 [OriginBotManager] 中的所有 Kook 组件。
  *
  * @see OriginBotManager
  */

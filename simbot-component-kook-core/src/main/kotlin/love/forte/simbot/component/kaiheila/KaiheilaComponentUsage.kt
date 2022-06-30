@@ -7,7 +7,7 @@ import love.forte.simbot.application.ApplicationBuilderDsl
 
 
 /**
- * 注册 [开黑啦组件][KaiheilaComponent] 信息。
+ * 注册 [ Kook 组件][KaiheilaComponent] 信息。
  *
  * usage:
  * ```kotlin
@@ -35,7 +35,7 @@ public fun <A : Application> ApplicationBuilder<A>.useKaiheilaComponent(configur
 
 
 /**
- * 注册使用 [开黑啦botManager][KaiheilaBotManager]。
+ * 注册使用 [ Kook botManager][KaiheilaBotManager]。
  *
  * usage:
  * ```kotlin
@@ -65,8 +65,8 @@ public fun <A : Application> ApplicationBuilder<A>.useKaiheilaBotManager(configu
 
 /**
  * 通过 [KaiheilaComponentUsageBuilder] 来同时配置使用
- * [开黑啦组件][KaiheilaComponent] 和
- * [开黑啦botManager][KaiheilaBotManager]。
+ * [ Kook 组件][KaiheilaComponent] 和
+ * [ Kook botManager][KaiheilaBotManager]。
  *
  * usage:
  * ```kotlin
@@ -119,7 +119,7 @@ internal annotation class KaiheilaComponentUsageBuilderDsl
 
 
 /**
- * 同时配置 [开黑啦组件][KaiheilaComponent] 和 [开黑啦botManager][KaiheilaBotManager]
+ * 同时配置 [ Kook 组件][KaiheilaComponent] 和 [ Kook botManager][KaiheilaBotManager]
  * 的构建器。
  *
  * 应用于 [useKaiheila] 中。
@@ -131,7 +131,7 @@ internal annotation class KaiheilaComponentUsageBuilderDsl
 public interface KaiheilaComponentUsageBuilder<A : Application> {
     
     /**
-     * 提供针对 [开黑啦组件][KaiheilaComponent] 的配置。
+     * 提供针对 [ Kook 组件][KaiheilaComponent] 的配置。
      *
      */
     @KaiheilaComponentUsageBuilderDsl
@@ -139,7 +139,7 @@ public interface KaiheilaComponentUsageBuilder<A : Application> {
     
     
     /**
-     * 提供针对 [开黑啦BotManager][KaiheilaBotManager] 的配置。
+     * 提供针对 [ Kook BotManager][KaiheilaBotManager] 的配置。
      */
     @KaiheilaComponentUsageBuilderDsl
     public fun botManager(configurator: KaiheilaBotManagerConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit)
