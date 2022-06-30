@@ -69,9 +69,7 @@ internal data class KMarkdownEventExtraImpl(
 
     override val author: UserImpl,
     override val kmarkdown: RawValueKMarkdown,
-) : KMarkdownEventExtra {
-
-}
+) : KMarkdownEventExtra
 
 
 // @Serializable

@@ -24,17 +24,20 @@ plugins {
 }
 
 
+
+
 dependencies {
-    api(project(":simbot-component-kaiheila-stdlib")) {
-        exclude("love.forte.simbot")
-    }
-    compileOnly(V.Simbot.Core.NOTATION)
+    api(project(":simbot-component-kook-api"))
+    api(V.Simbot.Api.NOTATION)
+    
+    api(libs.ktor.client.websockets)
+    api(libs.ktor.client.contentNegotiation)
+    api(libs.ktor.serialization.kotlinx.json)
+
     compileOnly(libs.jetbrains.annotations)
 
     testImplementation(kotlin("test-junit5"))
-    testImplementation(V.Simbot.Core.NOTATION)
 }
-
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()

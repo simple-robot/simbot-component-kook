@@ -24,7 +24,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":simbot-component-kaiheila-core")) {
+    api(project(":simbot-component-kook-core")) {
         exclude("love.forte.simbot")
     }
     

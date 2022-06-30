@@ -15,15 +15,47 @@
  *
  */
 
-package love.forte.simbot.component.kaiheila.internal.event
 
-import love.forte.simbot.component.kaiheila.event.KaiheilaBotRegisteredEvent
-import love.forte.simbot.component.kaiheila.internal.KaiheilaComponentBotImpl
+plugins {
+    `java-library`
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+    id("org.jetbrains.dokka")
+}
 
-/**
- *
- * @author ForteScarlet
- */
-internal class KaiheilaBotRegisteredEventImpl(override val bot: KaiheilaComponentBotImpl) :
-    KaiheilaBotRegisteredEvent() {
+
+dependencies {
+    api(project(":simbot-component-kook-stdlib")) {
+        exclude("love.forte.simbot")
+    }
+    compileOnly(V.Simbot.Core.NOTATION)
+    compileOnly(libs.jetbrains.annotations)
+
+    testImplementation(kotlin("test-junit5"))
+    testImplementation(V.Simbot.Core.NOTATION)
+}
+
+
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        javaParameters = true
+        jvmTarget = "1.8"
+    }
+}
+
+
+kotlin {
+    // 严格模式
+    explicitApi()
+
+
+    sourceSets.all {
+        languageSettings {
+            optIn("kotlin.RequiresOptIn")
+        }
+    }
 }

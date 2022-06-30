@@ -15,7 +15,7 @@
  *
  */
 
-rootProject.name = "simbot-component-kaiheila"
+rootProject.name = "simbot-component-kook"
 
 enableFeaturePreview("VERSION_CATALOGS")
 
@@ -27,7 +27,7 @@ dependencyResolutionManagement {
     }
 }
 
-include("simbot-component-kaiheila-api")
-include("simbot-component-kaiheila-stdlib")
-include("simbot-component-kaiheila-core")
-include("simbot-component-kaiheila-boot")
+include("simbot-component-kook-api")
+include("simbot-component-kook-stdlib")
+include("simbot-component-kook-core")
+include("simbot-component-kook-boot")
