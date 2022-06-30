@@ -36,9 +36,9 @@ import util.getProp
 
 plugins {
     // `java-library`
-    kotlin("jvm") apply false
-    kotlin("plugin.serialization") apply false
-    id("org.jetbrains.dokka")
+    kotlin("jvm") version "1.6.21" apply false
+    kotlin("plugin.serialization") version "1.6.21" apply false
+    id("org.jetbrains.dokka") version "1.6.21"
     `maven-publish`
     signing
     // see https://github.com/gradle-nexus/publish-plugin
