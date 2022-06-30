@@ -35,12 +35,7 @@ dependencies {
     testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
     testImplementation(kotlin("test-junit5"))
 }
-repositories {
-    maven {
-        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
-        name = "ktor-eap"
-    }
-}
+
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()

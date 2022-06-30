@@ -17,8 +17,6 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
-import org.gradle.api.Project
-
 /*
 *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
 *
@@ -69,9 +67,6 @@ object P {
             status = preview(14, 0),
             isSnapshot = isSnapshot
         )
-        
-        // 0: v3 api
-        // const val REAL_VERSION = "3.0.1.0"
         
         val VERSION = version.fullVersion(true)
     }
