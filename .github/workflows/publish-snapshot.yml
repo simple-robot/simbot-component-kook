@@ -16,8 +16,8 @@ env:
   GPG_PASSWORD: ${{ secrets.SIGN_PASS }}
   OSSRH_USER: ${{ secrets.OSS_USERNAME }}
   OSSRH_PASSWORD: ${{ secrets.OSS_PASSWORD }}
-  simbot.snapshot: true
-  simbot.snapshotOnly: true
+  "simbot.snapshot": true
+  "simbot.snapshotOnly": true
 
 jobs:
   publish-snapshot:
@@ -45,6 +45,6 @@ jobs:
       - name: Gradle publish snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.4
+          gradle-version: 7.4.2
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
 

@@ -31,7 +31,7 @@ jobs:
       - name: Gradle Run Test
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.4
+          gradle-version: 7.4.2
           arguments: clean build test
 
 
@@ -62,7 +62,7 @@ jobs:
       - name: Gradle Publish Release
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.4
+          gradle-version: 7.4.2
           arguments: clean build test publishToSonatype closeAndReleaseStagingRepository -Psigning.secretKeyRingFile=ForteScarlet.gpg -Psigning.keyId=${{ secrets.SIGN_KEY_ID }} -Psigning.password=${{ secrets.SIGN_PASS }} -Psonatype.username=${{ secrets.OSS_USERNAME }} -Psonatype.password=${{ secrets.OSS_PASSWORD }}
         env:
           simbot.snapshot: false
@@ -114,7 +114,7 @@ jobs:
       - name: Gradle publish snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.4
+          gradle-version: 7.4.2
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
         env:
           simbot.snapshot: true

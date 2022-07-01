@@ -23,10 +23,8 @@ sealed class Sonatype {
     object Central : Sonatype() {
         const val NAME = "central"
         const val URL = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-        override val name: String
-            get() = NAME
-        override val url: String
-            get() = URL
+        override val name: String get() = NAME
+        override val url: String get() = URL
     }
     
     object Snapshot : Sonatype() {
