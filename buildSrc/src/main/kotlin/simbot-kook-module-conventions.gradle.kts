@@ -63,12 +63,6 @@ kotlin {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
-    }
-}
-
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
