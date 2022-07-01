@@ -39,8 +39,8 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
-val isSnapshotOnly = (System.getProperty("snapshotOnly") ?: System.getenv("simbot.snapshotOnly")) != null
-val isReleaseOnly = (System.getProperty("releaseOnly") ?: System.getenv("simbot.releaseOnly")) != null
+val isSnapshotOnly = systemProp("snapshotOnly", "simbot.snapshotOnly") != null
+val isReleaseOnly = systemProp("releaseOnly", "simbot.releaseOnly") != null
 
 val isPublishConfigurable = when {
     isSnapshotOnly -> P.ComponentKook.isSnapshot
@@ -75,8 +75,8 @@ if (isPublishConfigurable) {
         
         repositories {
             sonatype {
-                nexusUrl.set(uri(Sonatype.oss.URL))
-                snapshotRepositoryUrl.set(uri(Sonatype.`snapshot-oss`.URL))
+                nexusUrl.set(uri(Sonatype.Central.URL))
+                snapshotRepositoryUrl.set(uri(Sonatype.Snapshot.URL))
                 username.set(sonatypeUsername)
                 password.set(sonatypePassword)
             }

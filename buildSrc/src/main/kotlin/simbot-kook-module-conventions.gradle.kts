@@ -29,7 +29,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url = uri(Sonatype.`snapshot-oss`.URL)
+        url = uri(Sonatype.Snapshot.URL)
         mavenContent {
             snapshotsOnly()
         }

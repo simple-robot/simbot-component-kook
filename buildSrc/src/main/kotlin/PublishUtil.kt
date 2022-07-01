@@ -60,11 +60,11 @@ inline fun Project.configurePublishing(artifactId: String) {
             maven {
                 if (version.toString().contains("SNAPSHOT", true)) {
                     // snapshot
-                    name = Sonatype.`snapshot-oss`.NAME
-                    url = uri(Sonatype.`snapshot-oss`.URL)
+                    name = Sonatype.Snapshot.NAME
+                    url = uri(Sonatype.Snapshot.URL)
                 } else {
-                    name = Sonatype.oss.NAME
-                    url = uri(Sonatype.oss.URL)
+                    name = Sonatype.Central.NAME
+                    url = uri(Sonatype.Central.URL)
                 }
                 println("Publish repository name: $name")
                 println("Publish repository url:  $url")

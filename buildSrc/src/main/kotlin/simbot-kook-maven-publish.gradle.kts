@@ -16,7 +16,6 @@
  */
 
 import util.systemProp
-import java.time.Duration
 
 /*
  *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
@@ -116,23 +115,11 @@ if (isPublishConfigurable) {
                 }
             }
             
+            
+            
             repositories {
-                maven {
-                    name = Sonatype.oss.NAME
-                    url = uri(Sonatype.oss.URL)
-                    credentials {
-                        username = sonatypeUsername
-                        password = sonatypePassword
-                    }
-                }
-                maven {
-                    name = Sonatype.`snapshot-oss`.NAME
-                    url = uri(Sonatype.`snapshot-oss`.URL)
-                    credentials {
-                        username = sonatypeUsername
-                        password = sonatypePassword
-                    }
-                }
+                configMaven(Sonatype.Central, sonatypeUsername, sonatypePassword)
+                configMaven(Sonatype.Snapshot, sonatypeUsername, sonatypePassword)
             }
         }
     }
@@ -148,8 +135,6 @@ if (isPublishConfigurable) {
         
         useInMemoryPgpKeys(keyId, secretKey, password)
         
-        
-        val publishing = extensions.getByName<PublishingExtension>("publishing")
         sign(publishing.publications["dist"])
     }
     
@@ -157,6 +142,17 @@ if (isPublishConfigurable) {
     println("[publishing-configure] - [$name] configured.")
 }
 
+
+fun RepositoryHandler.configMaven(sonatype: Sonatype, username: String?, password: String?) {
+    maven {
+        name = sonatype.name
+        url = uri(sonatype.url)
+        credentials {
+            this.username = username
+            this.password = password
+        }
+    }
+}
 
 
 
