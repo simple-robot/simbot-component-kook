@@ -6,7 +6,7 @@ on: # push
        - v3.**.**
 
 env:
-  simbot.snapshot: false
+  SIMBOT_IS_SNAPSHOT: false
 
 jobs:
   deploy-doc:

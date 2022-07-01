@@ -162,10 +162,10 @@ internal fun preview(minor: Int, patch: Int) = PVS(PVS.PREVIEW_STATUS, minor, pa
 
 private fun isSnapshot(): Boolean {
     println("property: ${System.getProperty("simbot.snapshot")}")
-    println("env: ${System.getenv("simbot.snapshot")}")
+    println("env: ${System.getenv(Env.IS_SNAPSHOT)}")
     
     return System.getProperty("simbot.snapshot")?.toBoolean()
-        ?: System.getenv("simbot.snapshot")?.toBoolean()
+        ?: System.getenv(Env.IS_SNAPSHOT)?.toBoolean()
         ?: false
     
 }

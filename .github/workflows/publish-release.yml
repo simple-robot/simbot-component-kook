@@ -65,8 +65,8 @@ jobs:
           gradle-version: 7.4.2
           arguments: clean build test publishToSonatype closeAndReleaseStagingRepository -Psigning.secretKeyRingFile=ForteScarlet.gpg -Psigning.keyId=${{ secrets.SIGN_KEY_ID }} -Psigning.password=${{ secrets.SIGN_PASS }} -Psonatype.username=${{ secrets.OSS_USERNAME }} -Psonatype.password=${{ secrets.OSS_PASSWORD }}
         env:
-          simbot.snapshot: false
-          simbot.releaseOnly: true
+          SIMBOT_IS_SNAPSHOT: false
+          SIMBOT_RELEASES_ONLY: true
 
   create-release:
     name: Create release
@@ -117,6 +117,6 @@ jobs:
           gradle-version: 7.4.2
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
         env:
-          simbot.snapshot: true
-          simbot.snapshotOnly: true
+          SIMBOT_IS_SNAPSHOT: true
+          SIMBOT_SNAPSHOT_ONLY: true
 

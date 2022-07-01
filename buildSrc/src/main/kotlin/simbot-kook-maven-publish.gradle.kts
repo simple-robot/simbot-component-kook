@@ -39,8 +39,8 @@ plugins {
     id("maven-publish")
 }
 
-val isSnapshotOnly = (System.getProperty("snapshotOnly") ?: System.getenv("simbot.snapshotOnly")) != null
-val isReleaseOnly = (System.getProperty("releaseOnly") ?: System.getenv("simbot.releaseOnly")) != null
+val isSnapshotOnly = (System.getProperty("snapshotOnly") ?: System.getenv(Env.IS_SNAPSHOT)) != null
+val isReleaseOnly = (System.getProperty("releaseOnly") ?: System.getenv(Env.RELEASES_ONLY)) != null
 
 val isPublishConfigurable = when {
     isSnapshotOnly -> P.ComponentKook.isSnapshot

@@ -16,8 +16,8 @@ env:
   GPG_PASSWORD: ${{ secrets.SIGN_PASS }}
   OSSRH_USER: ${{ secrets.OSS_USERNAME }}
   OSSRH_PASSWORD: ${{ secrets.OSS_PASSWORD }}
-  "simbot.snapshot": true
-  "simbot.snapshotOnly": true
+  SIMBOT_IS_SNAPSHOT: true
+  SIMBOT_SNAPSHOT_ONLY: true
 
 jobs:
   publish-snapshot:
