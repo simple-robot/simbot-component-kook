@@ -81,7 +81,7 @@ configurations.all {
 
 //// show project info
 println("========================================================")
-println("|| project.group:   ${group}")
-println("|| project.name:    ${name}")
-println("|| project.version: ${version}")
+println("== project.group:   ${group}")
+println("== project.name:    ${name}")
+println("== project.version: ${version}")
 println("========================================================")

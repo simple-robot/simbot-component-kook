@@ -20,11 +20,15 @@ plugins {
     id("simbot-kook-gradle-nexus-publish")
 }
 
+val v = P.ComponentKook.VERSION
+
 group = P.ComponentKook.GROUP
-version = P.ComponentKook.VERSION
+version = v
 description = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
 
-println("=== Current version: $version ===")
+println("================================================")
+println("======== Current version: $v")
+println("================================================")
 
 
 

@@ -32,10 +32,7 @@ dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation(kotlin("serialization", kotlinVersion))
     implementation("org.jetbrains.dokka", "dokka-gradle-plugin", dokkaVersion)
+ 
     // see https://github.com/gradle-nexus/publish-plugin
-    // id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
-    // dokka
-    
-    implementation(gradleApi())
 }
