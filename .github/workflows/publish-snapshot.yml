@@ -17,7 +17,7 @@ env:
   OSSRH_USER: ${{ secrets.OSS_USERNAME }}
   OSSRH_PASSWORD: ${{ secrets.OSS_PASSWORD }}
   simbot.snapshot: true
-  simbot.snapshotOnly = true
+  simbot.snapshotOnly: true
 
 jobs:
   publish-snapshot:

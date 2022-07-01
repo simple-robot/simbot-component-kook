@@ -118,5 +118,5 @@ jobs:
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
         env:
           simbot.snapshot: true
-          simbot.snapshotOnly = true
+          simbot.snapshotOnly: true
 
