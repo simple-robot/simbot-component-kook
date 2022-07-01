@@ -17,10 +17,8 @@
 
 
 plugins {
-    `java-library`
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("org.jetbrains.dokka")
+    id("simbot-kook-module-conventions")
+    id("simbot-kook-maven-publish")
 }
 
 
@@ -35,30 +33,4 @@ dependencies {
     api(libs.ktor.serialization.kotlinx.json)
 
     compileOnly(libs.jetbrains.annotations)
-
-    testImplementation(kotlin("test-junit5"))
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        javaParameters = true
-        jvmTarget = "1.8"
-    }
-}
-
-
-kotlin {
-    // 严格模式
-    explicitApi()
-
-
-    sourceSets.all {
-        languageSettings {
-            optIn("kotlin.RequiresOptIn")
-        }
-    }
 }

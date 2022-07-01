@@ -16,18 +16,27 @@
  */
 
 
-plugins {
-    id("simbot-kook-module-conventions")
-    id("simbot-kook-maven-publish")
-}
+tasks.create("createChangelog") {
+    group = "build"
+    doFirst {
+        val version = "v${P.ComponentKook.version.fullVersion(false)}"
+        println("Generate change log for $version ...")
+        // configurations.runtimeClasspath
+        val changelogDir = rootProject.file(".changelog").also {
+            it.mkdirs()
+        }
+        val file = File(changelogDir, "$version.md")
+        if (!file.exists()) {
+            file.createNewFile()
+            val coreVersion = P.Simbot.version.fullVersion(false)
+            val autoGenerateText = """
+                > 对应核心版本: [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion)
 
-
-dependencies {
-    api(project(":simbot-component-kook-stdlib")) {
-        exclude("love.forte.simbot")
+                
+            """.trimIndent()
+            
+            
+            file.writeText(autoGenerateText)
+        }
     }
-    compileOnly(V.Simbot.Core.NOTATION)
-    compileOnly(libs.jetbrains.annotations)
-
-    testImplementation(V.Simbot.Core.NOTATION)
 }
