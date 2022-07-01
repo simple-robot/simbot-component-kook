@@ -8,6 +8,8 @@ env:
   GPG_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
   GPG_SECRET_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   GPG_PASSWORD: ${{ secrets.SIGN_PASS }}
+  OSSRH_USER: ${{ secrets.OSS_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSS_PASSWORD }}
 
 jobs:
   run-test:
@@ -113,7 +115,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.4
-          arguments: clean test publishToSonatype closeAndReleaseStagingRepository -Psigning.secretKeyRingFile=ForteScarlet.gpg -Psigning.keyId=${{ secrets.SIGN_KEY_ID }} -Psigning.password=${{ secrets.SIGN_PASS }} -Psonatype.username=${{ secrets.OSS_USERNAME }} -Psonatype.password=${{ secrets.OSS_PASSWORD }}
+          arguments: clean test publishToSonatype closeAndReleaseStagingRepository
         env:
           simbot.snapshot: true
           simbot.snapshotOnly = true
