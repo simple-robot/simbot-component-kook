@@ -1,4 +1,0 @@
-logging:
-  level:
-    love.forte.simboot: debug
-    love.forte.simbot: debug

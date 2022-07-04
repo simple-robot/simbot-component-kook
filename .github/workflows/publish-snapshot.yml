@@ -10,6 +10,15 @@ on:
       - '**.kts'
       - '**src/main/java/**.java'
 
+env:
+  GPG_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
+  GPG_SECRET_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  GPG_PASSWORD: ${{ secrets.SIGN_PASS }}
+  OSSRH_USER: ${{ secrets.OSS_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSS_PASSWORD }}
+  SIMBOT_IS_SNAPSHOT: true
+  SIMBOT_SNAPSHOT_ONLY: true
+
 jobs:
   publish-snapshot:
     name: Publish snapshot
@@ -36,6 +45,6 @@ jobs:
       - name: Gradle publish snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.4
-          arguments: clean test publishToSonatype closeAndReleaseStagingRepository -DsnapshotOnly -Dsimbot.snapshot=true -Psigning.secretKeyRingFile=ForteScarlet.gpg -Psigning.keyId=${{ secrets.SIGN_KEY_ID }} -Psigning.password=${{ secrets.SIGN_PASS }} -Psonatype.username=${{ secrets.OSS_USERNAME }} -Psonatype.password=${{ secrets.OSS_PASSWORD }}
+          gradle-version: 7.4.2
+          arguments: clean test publishToSonatype closeAndReleaseStagingRepository
 

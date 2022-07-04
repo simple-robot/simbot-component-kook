@@ -5,6 +5,9 @@ on: # push
        - doc**
        - v3.**.**
 
+env:
+  SIMBOT_IS_SNAPSHOT: false
+
 jobs:
   deploy-doc:
     name: Deploy-doc
@@ -34,7 +37,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.4
-          arguments: clean build dokkaHtmlMultiModuleAndPost -DisSnapshot=false
+          arguments: clean build dokkaHtmlMultiModuleAndPost
 
       - name: Push to doc repository
         uses: peaceiris/actions-gh-pages@v3

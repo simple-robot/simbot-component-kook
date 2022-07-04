@@ -1,20 +1,41 @@
-# Simple Robot 开黑啦组件
+# Simple Robot Kook 组件
 
-##          
+此为 [Simple Robot v3](https://github.com/ForteScarlet/simpler-robot) 下基于simbot标准API对 [Kook](https://www.kookapp.cn/) 的组件支持。
+
+更多详情请参考 [Simple Robot v3 仓库](https://github.com/ForteScarlet/simpler-robot) 或者 [Simple Robot v3 官网](https://simbot.forte.love)
+
 
 ## 支持情况
 
-| 功能                                               | 开启情况    | 相关模块   | 备注                                                               |
-|--------------------------------------------------|---------|--------|------------------------------------------------------------------|
-| 开黑啦api的定义与实现                                     | 完成      | api    |                                                                  |
-| 开黑啦事件的定义与实现                                      | 完成      | api    |                                                                  |
-| 开黑啦的BOT对象定义（ws连接）                                | 完成      | stdlib |                                                                  |
-| 开黑啦的KMarkdown基础定义                                | 完成(实验中) | api    |                                                                  |
-| 开黑啦的Card基础定义                                     | 完成(实验中) | api    |                                                                  |
-| 对接simbot-BOT实现(`Bot`、`BotManager`、`Component`实现) | 完成      | core   |                                                                  |
-| 对接simbot-api实现(例如 `send`、`getGuilds()` )         | 完成      | core   | 开黑啦中的 `user-chat` 暂时视为`Friend`对象，但是私聊消息仅实现 `ContactMessageEvent` |
-| 对接simbot-boot                                    | 完成      | boot   |                                                                  |
-| 对接simbot-事件实现                                    | *完成部分*  | core   | 目前仅实现了ChannelMessageEvent 和 ContactMessageEvent，即频道消息与私聊消息       |
-| 稳定性测试                                            | 极少      | -      | 尚未进行一定规模程度的稳定性测试                                                 |
+已经基本完成。
+
+> ⚠🔧 README 待施工中。。。
 
 
+
+### 走马观花
+
+```kotlin
+// simbot-core / simbot-boot
+suspend fun KookContactMessageEvent.onEvent() {
+    author().send("Hello World")
+}
+```
+
+
+```kotlin
+// simbot-boot
+@Listener
+@Filter("签到")
+suspend fun KookChannelMessageEvent.onEvent() {
+    reply("签到成功")
+}
+```
+
+```kotlin
+@Listener
+@Filter("叫我{{name,.+}}")
+suspend fun KookChannelMessageEvent.onEvent(name: String) {
+    group.send(At(author.id) + "好的，以后就叫你$name了".toText())
+}
+```
