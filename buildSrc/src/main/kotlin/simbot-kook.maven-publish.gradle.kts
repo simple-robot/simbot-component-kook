@@ -17,6 +17,7 @@
 
 import gradle.kotlin.dsl.accessors._c787c0d43b9a088cc091c6042ccb1462.sourceSets
 import util.systemProp
+import util.checkPublishConfigurable
 
 /*
  *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
@@ -40,14 +41,8 @@ plugins {
     id("maven-publish")
 }
 
-val isSnapshotOnly = (System.getProperty("snapshotOnly") ?: System.getenv(Env.IS_SNAPSHOT)) != null
-val isReleaseOnly = (System.getProperty("releaseOnly") ?: System.getenv(Env.RELEASES_ONLY)) != null
+val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
 
-val isPublishConfigurable = when {
-    isSnapshotOnly -> P.ComponentKook.isSnapshot
-    isReleaseOnly -> !P.ComponentKook.isSnapshot
-    else -> true
-}
 
 println("isSnapshotOnly: $isSnapshotOnly")
 println("isReleaseOnly: $isReleaseOnly")

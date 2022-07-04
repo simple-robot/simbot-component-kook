@@ -16,6 +16,7 @@
  */
 
 import util.systemProp
+import util.checkPublishConfigurable
 import java.time.Duration
 
 /*
@@ -41,17 +42,10 @@ plugins {
 
 group = P.ComponentKook.GROUP
 version = P.ComponentKook.VERSION
-description = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
+description = P.ComponentKook.DESCRIPTION
 
 
-val isSnapshotOnly = systemProp("snapshotOnly", "simbot.snapshotOnly") != null
-val isReleaseOnly = systemProp("releaseOnly", "simbot.releaseOnly") != null
-
-val isPublishConfigurable = when {
-    isSnapshotOnly -> P.ComponentKook.isSnapshot
-    isReleaseOnly -> !P.ComponentKook.isSnapshot
-    else -> true
-}
+val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
 
 println("isSnapshotOnly: $isSnapshotOnly")
 println("isReleaseOnly: $isReleaseOnly")
