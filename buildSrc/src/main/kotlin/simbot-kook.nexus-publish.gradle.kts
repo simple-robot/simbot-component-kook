@@ -39,6 +39,11 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
+group = P.ComponentKook.GROUP
+version = P.ComponentKook.VERSION
+description = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
+
+
 val isSnapshotOnly = systemProp("snapshotOnly", "simbot.snapshotOnly") != null
 val isReleaseOnly = systemProp("releaseOnly", "simbot.releaseOnly") != null
 
@@ -69,13 +74,12 @@ if (isPublishConfigurable) {
         )
         
         transitionCheckOptions {
-            maxRetries.set(60)
-            delayBetween.set(Duration.ofSeconds(30))
+            maxRetries.set(100)
+            delayBetween.set(Duration.ofSeconds(5))
         }
         
         repositories {
             sonatype {
-                nexusUrl.set(uri(Sonatype.Central.URL))
                 snapshotRepositoryUrl.set(uri(Sonatype.Snapshot.URL))
                 username.set(sonatypeUsername)
                 password.set(sonatypePassword)

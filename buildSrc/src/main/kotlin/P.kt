@@ -50,15 +50,13 @@ object P {
         
         val isSnapshot: Boolean get() = version.isSnapshot
         
-        // val REAL_VERSION = version.fullVersion(false)
-        // "3.0.0.preview.6.0"
-        val VERSION = version.fullVersion(true)
-        // = if (isSnapshot) "$REAL_VERSION-SNAPSHOT" else REAL_VERSION
+        val VERSION: String get() = version.fullVersion(true)
     }
     
     object ComponentKook {
         val isSnapshot: Boolean get() = Simbot.isSnapshot
         const val GROUP = "${Simbot.GROUP}.component"
+        const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
         
         val version = Version(
             major = "${Simbot.version.major}.${Simbot.version.minor}",
@@ -68,7 +66,7 @@ object P {
             isSnapshot = isSnapshot
         )
         
-        val VERSION = version.fullVersion(true)
+        val VERSION get() = version.fullVersion(true)
     }
 }
 

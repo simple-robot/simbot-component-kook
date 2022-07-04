@@ -15,6 +15,7 @@
  *
  */
 
+import gradle.kotlin.dsl.accessors._c787c0d43b9a088cc091c6042ccb1462.sourceSets
 import util.systemProp
 
 /*
@@ -72,7 +73,7 @@ if (isPublishConfigurable) {
     
     publishing {
         publications {
-            create<MavenPublication>("dist") {
+            create<MavenPublication>("kookDist") {
                 from(components["java"])
                 artifact(jarSources)
                 artifact(jarJavadoc)
@@ -80,8 +81,11 @@ if (isPublishConfigurable) {
                 groupId = project.group.toString()
                 artifactId = project.name
                 version = project.version.toString()
+                description = project.description?.toString() ?: P.ComponentKook.DESCRIPTION
                 
                 pom {
+                    show()
+                    
                     name.set("${project.group}:${project.name}")
                     description.set("Simple Robot框架下针对开黑啦(Kook)平台的组件实现")
                     url.set("https://github.com/simple-robot/simbot-component-kook")
@@ -100,18 +104,8 @@ if (isPublishConfigurable) {
                         connection.set("scm:git:https://github.com/simple-robot/simbot-component-kook.git")
                         developerConnection.set("scm:git:ssh://git@github.com/simple-robot/simbot-component-kook.git")
                     }
-                    developers {
-                        developer {
-                            id.set("forte")
-                            name.set("ForteScarlet")
-                            email.set("ForteScarlet@163.com")
-                        }
-                        developer {
-                            id.set("forliy")
-                            name.set("ForliyScarlet")
-                            email.set("ForliyScarlet@163.com")
-                        }
-                    }
+                    
+                    setupDevelopers()
                 }
             }
             
@@ -135,7 +129,7 @@ if (isPublishConfigurable) {
         
         useInMemoryPgpKeys(keyId, secretKey, password)
         
-        sign(publishing.publications["dist"])
+        sign(publishing.publications["kookDist"])
     }
     
     
@@ -154,5 +148,36 @@ fun RepositoryHandler.configMaven(sonatype: Sonatype, username: String?, passwor
     }
 }
 
+
+/**
+ * 配置开发者/协作者信息。
+ *
+ */
+fun MavenPom.setupDevelopers() {
+    developers {
+        developer {
+            id.set("forte")
+            name.set("ForteScarlet")
+            email.set("ForteScarlet@163.com")
+            url.set("https://github.com/ForteScarlet")
+        }
+        developer {
+            id.set("forliy")
+            name.set("ForliyScarlet")
+            email.set("ForliyScarlet@163.com")
+            url.set("https://github.com/ForliyScarlet")
+        }
+    }
+}
+
+fun show() {
+    //// show project info
+    println("========================================================")
+    println("== project.group:       $group")
+    println("== project.name:        $name")
+    println("== project.version:     $version")
+    println("== project.description: $description")
+    println("========================================================")
+}
 
 

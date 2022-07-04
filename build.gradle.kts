@@ -16,63 +16,8 @@
  */
 
 plugins {
-    id("org.jetbrains.dokka")
-    id("simbot-kook-gradle-nexus-publish")
+    id("simbot-kook.nexus-publish")
+    id("simbot-kook.changelog-generator")
+    id("simbot-kook.dokka-multi-module")
 }
 
-val v = P.ComponentKook.VERSION
-
-group = P.ComponentKook.GROUP
-version = v
-description = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
-
-println("================================================")
-println("======== Current version: $v")
-println("================================================")
-
-
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        url = uri(Sonatype.Snapshot.URL)
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
-}
-
-
-fun org.jetbrains.dokka.gradle.AbstractDokkaTask.configOutput(format: String) {
-    outputDirectory.set(rootProject.file("dokka/$format/v$version"))
-}
-
-tasks.dokkaHtmlMultiModule.configure {
-    configOutput("html")
-}
-tasks.dokkaGfmMultiModule.configure {
-    configOutput("gfm")
-}
-
-tasks.register("dokkaHtmlMultiModuleAndPost") {
-    group = JavaBasePlugin.DOCUMENTATION_GROUP
-    dependsOn("dokkaHtmlMultiModule")
-    doLast {
-        val outDir = rootProject.file("dokka/html")
-        val indexFile = File(outDir, "index.html")
-        indexFile.createNewFile()
-        indexFile.writeText(
-            """
-            <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-                <meta http-equiv="refresh" content="0;URL='v$version'" />
-            </head>
-            <body>
-            </body>
-            </html>
-        """.trimIndent()
-        )
-        
-    }
-}

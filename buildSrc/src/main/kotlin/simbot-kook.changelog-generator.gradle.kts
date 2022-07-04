@@ -19,7 +19,8 @@
 tasks.create("createChangelog") {
     group = "build"
     doFirst {
-        val version = "v${P.ComponentKook.version.fullVersion(false)}"
+        val realVersion = P.ComponentKook.version.fullVersion(false)
+        val version = "v$realVersion"
         println("Generate change log for $version ...")
         // configurations.runtimeClasspath
         val changelogDir = rootProject.file(".changelog").also {
@@ -31,7 +32,15 @@ tasks.create("createChangelog") {
             val coreVersion = P.Simbot.version.fullVersion(false)
             val autoGenerateText = """
                 > 对应核心版本: [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion)
-
+                
+                **仓库参考:**
+                
+                | **模块** | **repo1.maven** | **search.maven** |
+                |---------|-----------------|------------------|
+                ${repoRow("simbot-kook-api", "love.forte.simbot.component", "simbot-component-kook-api", realVersion)}
+                ${repoRow("simbot-kook-stdlib", "love.forte.simbot.component", "simbot-component-kook-stdlib", realVersion)}
+                ${repoRow("simbot-kook-core", "love.forte.simbot.component", "simbot-component-kook-core", realVersion)}
+                ${repoRow("simbot-kook-boot", "love.forte.simbot.component", "simbot-component-kook-boot", realVersion)}
                 
             """.trimIndent()
             
@@ -39,4 +48,9 @@ tasks.create("createChangelog") {
             file.writeText(autoGenerateText)
         }
     }
+}
+
+
+fun repoRow(moduleName: String, group: String, id: String, version: String): String {
+    return "| $moduleName | [$moduleName: v$version](https://repo1.maven.org/maven2/${group.replace(".", "/")}/${id.replace(".", "/")}/$version) | [$moduleName: v$version](https://search.maven.org/artifact/$group/$id/$version/jar)  |"
 }
