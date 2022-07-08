@@ -19,6 +19,7 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
+import love.forte.simbot.JavaDuration
 import love.forte.simbot.definition.*
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
@@ -109,7 +110,7 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     
     @OptIn(Api4J::class)
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean = false
+    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean = false
     
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
@@ -117,6 +118,14 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     @OptIn(Api4J::class)
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(duration: JavaDuration): Boolean = false
     
     // endregion
     

@@ -22,6 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookChannel
+import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookComponentGuildBot
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.message.*
@@ -123,3 +124,6 @@ internal class KookChannelImpl(
     }
     
 }
+
+
+internal class KookChannelCategoryImpl(@Volatile override var source: ChannelModel) : KookChannelCategory

@@ -18,8 +18,8 @@
 package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
-import love.forte.simbot.Bot
 import love.forte.simbot.ID
+import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.message.KookAssetMessage
 import love.forte.simbot.component.kook.message.KookSimpleAssetMessage
