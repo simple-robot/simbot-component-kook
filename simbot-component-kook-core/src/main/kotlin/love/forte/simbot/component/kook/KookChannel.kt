@@ -19,6 +19,7 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
+import love.forte.simbot.JavaDuration
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
@@ -49,6 +50,13 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
      */
     override val source: KkChannel
     
+    /**
+     * 此频道对应的分组类型。
+     *
+     * @see KookChannelCategory
+     */
+    // TODO 实现!
+    override val category: KookChannelCategory? get() = null
     
     override val bot: KookComponentGuildBot
     override val id: ID get() = source.id
@@ -293,10 +301,49 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     
     @OptIn(Api4J::class)
     @Deprecated("Channel mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean = false
+    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean = false
     
     @OptIn(Api4J::class)
     @Deprecated("Channel mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(duration: JavaDuration): Boolean = false
+    
     // endregion
 }
+
+
+/**
+ * Kook 组件中对于 [频道类型][Category] 的定义。
+ *
+ * [KookChannelCategory] 包装那些 [KkChannel.isCategory] 值为true的原始子频道类型。
+ *
+ */
+// TODO
+public interface KookChannelCategory : Category, KookComponentDefinition<KkChannel> {
+    
+    /**
+     * 此分类类型对应的原始 [KkChannel] 对象。
+     */
+    override val source: KkChannel
+    
+    /**
+     * 此分类ID。
+     */
+    override val id: ID
+        get() = source.id
+    
+    /**
+     * 此分类名称。
+     */
+    override val name: String
+        get() = source.name
+    
+}
+

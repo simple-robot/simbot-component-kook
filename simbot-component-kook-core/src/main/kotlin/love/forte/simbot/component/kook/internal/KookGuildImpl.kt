@@ -72,6 +72,10 @@ internal class KookGuildImpl constructor(
     override val name: String get() = source.name
     override val icon: String get() = source.icon
     
+    // TODO impl
+    @JvmSynthetic
+    internal lateinit var internalChannelCategories: ConcurrentHashMap<String, KookChannelCategoryImpl>
+    
     @JvmSynthetic
     internal lateinit var internalChannels: ConcurrentHashMap<String, KookChannelImpl>
     
