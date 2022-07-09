@@ -133,7 +133,7 @@ public interface ChannelInfo : Channel {
     override val topic: String
     override val slowMode: Int
     override val permissionOverwrites: List<ChannelPermissionOverwrites>
-    override val permissionUsers: List<ID> // TODO User type
+    override val permissionUsers: List<ID>
     override val permissionSync: Int
 }
 
