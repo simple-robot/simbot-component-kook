@@ -53,10 +53,13 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     /**
      * 此频道对应的分组类型。
      *
+     * 如果当前频道是属于“顶层分类”的频道（即 [source.parentId][KkChannel.parentId] 为空），则 [category] 结果为null。
+     * 如果你希望能够得到“顶层分类”下的所有频道，请参考 [KookGuild.rootCategory]。
+     *
+     *
      * @see KookChannelCategory
      */
-    // TODO 实现!
-    override val category: KookChannelCategory? get() = null
+    override val category: KookChannelCategory?
     
     override val bot: KookComponentGuildBot
     override val id: ID get() = source.id
@@ -318,32 +321,4 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     // endregion
 }
 
-
-/**
- * Kook 组件中对于 [频道类型][Category] 的定义。
- *
- * [KookChannelCategory] 包装那些 [KkChannel.isCategory] 值为true的原始子频道类型。
- *
- */
-// TODO
-public interface KookChannelCategory : Category, KookComponentDefinition<KkChannel> {
-    
-    /**
-     * 此分类类型对应的原始 [KkChannel] 对象。
-     */
-    override val source: KkChannel
-    
-    /**
-     * 此分类ID。
-     */
-    override val id: ID
-        get() = source.id
-    
-    /**
-     * 此分类名称。
-     */
-    override val name: String
-        get() = source.name
-    
-}
 

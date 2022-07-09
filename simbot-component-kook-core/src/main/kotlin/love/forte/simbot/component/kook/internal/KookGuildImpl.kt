@@ -19,7 +19,6 @@ package love.forte.simbot.component.kook.internal
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
@@ -29,10 +28,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookComponentGuildBot
-import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.component.kook.*
+import love.forte.simbot.component.kook.model.ChannelModel
 import love.forte.simbot.component.kook.model.GuildModel
 import love.forte.simbot.component.kook.model.toModel
 import love.forte.simbot.component.kook.util.requestDataBy
@@ -44,6 +41,7 @@ import love.forte.simbot.kook.api.user.UserViewRequest
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
+import love.forte.simbot.utils.item.effectedSequenceItems
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -74,10 +72,13 @@ internal class KookGuildImpl constructor(
     
     // TODO impl
     @JvmSynthetic
-    internal lateinit var internalChannelCategories: ConcurrentHashMap<String, KookChannelCategoryImpl>
+    internal lateinit var internalChannelCategories: ConcurrentHashMap<String, KookChannelCategoryAgent>
     
-    @JvmSynthetic
-    internal lateinit var internalChannels: ConcurrentHashMap<String, KookChannelImpl>
+    override val rootCategory: RootKookChannelCategoryImpl
+        get() = internalChannelCategories[""]!! as RootKookChannelCategoryImpl
+    
+    // @JvmSynthetic
+    // internal lateinit var internalChannels: ConcurrentHashMap<String, KookChannelImpl>
     
     @JvmSynthetic
     internal lateinit var internalMembers: ConcurrentHashMap<String, KookGuildMemberImpl>
@@ -86,7 +87,9 @@ internal class KookGuildImpl constructor(
     internal fun internalChannel(id: ID): KookChannelImpl? = internalChannel(id.literal)
     
     @JvmSynthetic
-    internal fun internalChannel(id: String): KookChannelImpl? = internalChannels[id]
+    internal fun internalChannel(id: String): KookChannelImpl? =
+        internalChannelCategories.values.firstNotNullOfOrNull { it[id] }
+    
     
     @JvmSynthetic
     internal fun internalMember(id: ID): KookGuildMemberImpl? = internalMember(id.literal)
@@ -118,21 +121,69 @@ internal class KookGuildImpl constructor(
     internal suspend fun init() {
         val guildId = source.id
         
-        val channelsMap = ConcurrentHashMap<String, KookChannelImpl>()
+        val channelBuffer = mutableListOf<ChannelModel>()
+        val channelCategories = ConcurrentHashMap<String, NormalKookChannelCategoryImpl>()
+        val rootCategory = RootKookChannelCategoryImpl()
+        
         val membersMap = ConcurrentHashMap<String, KookGuildMemberImpl>()
         var owner: KookGuildMemberImpl? = null
+        
+        fun KookChannelCategoryAgent.computeNew(model: ChannelModel) {
+            channelMap.compute(model.id.literal) { _, current ->
+                if (current != null) {
+                    current.source = model
+                    current
+                } else {
+                    KookChannelImpl(baseBot, this@KookGuildImpl, this.asCategory, model)
+                }
+            }
+        }
         
         // sync channels
         requestChannels(guildId)
             .buffer(100)
             .map { it.toModel() }
-            .map { channel -> KookChannelImpl(baseBot, this, channel) }
-            .collect {
-                channelsMap.merge(it.id.literal, it) { old, cur ->
-                    old.cancel()
-                    cur
+            // .map { channel -> KookChannelImpl(baseBot, this, channel) }
+            .collect { channelModel ->
+                if (channelModel.isCategory) {
+                    // 分类类型
+                    channelCategories.compute(channelModel.id.literal) { _, current ->
+                        if (current != null) {
+                            current.source = channelModel
+                            current
+                        } else {
+                            NormalKookChannelCategoryImpl(channelModel)
+                        }
+                    }
+                } else {
+                    // 不是分类类型，寻找分类
+                    val categoryId = channelModel.parentId.literal
+                    if (categoryId.isEmpty()) {
+                        rootCategory.computeNew(channelModel)
+                    } else {
+                        val category = channelCategories[categoryId]
+                        if (category == null) {
+                            channelBuffer.add(channelModel)
+                        } else {
+                            category.computeNew(channelModel)
+                        }
+                    }
                 }
+                // channelsMap.merge(it.id.literal, it) { old, cur ->
+                //     old.cancel()
+                //     cur
+                // }
             }
+        
+        channelBuffer.forEach { channelModel ->
+            val categoryId = channelModel.parentId.literal
+            val category = channelCategories[categoryId] ?: rootCategory
+            category.computeNew(channelModel)
+        }
+        
+        // val channelsMap
+        val channelsMap = ConcurrentHashMap<String, KookChannelCategoryAgent>(channelCategories)
+        channelsMap[""] = rootCategory
         
         baseBot.logger.info("Sync channel data finished. {} channels of data have been synchronized.", channelsMap.size)
         
@@ -141,12 +192,20 @@ internal class KookGuildImpl constructor(
         requestGuildUsers(guildId)
             .buffer(100)
             .map { it.toModel() }
-            .map { user -> KookGuildMemberImpl(baseBot, this, user) }
-            .collect {
-                val member = membersMap.merge(it.id.literal, it) { old, cur ->
-                    old.cancel()
-                    cur
+            // .map { user -> KookGuildMemberImpl(baseBot, this, user) }
+            .collect { userModel ->
+                val member = membersMap.compute(userModel.id.literal) { _, current ->
+                    if (current != null) {
+                        current.source = userModel
+                        current
+                    } else {
+                        KookGuildMemberImpl(baseBot, this, userModel)
+                    }
                 }
+                // val member = membersMap.merge(it.id.literal, it) { old, cur ->
+                //     old.cancel()
+                //     cur
+                // }
                 
                 if (owner == null && member != null && member.id == ownerId) {
                     owner = member
@@ -156,7 +215,7 @@ internal class KookGuildImpl constructor(
         baseBot.logger.info("Sync member data finished, {} members of data have been synchronized.", membersMap.size)
         
         
-        this.internalChannels = channelsMap
+        this.internalChannelCategories = channelsMap
         this.internalMembers = membersMap
         this.lastOwnerMember = owner ?: KookGuildMemberImpl(
             baseBot,
@@ -167,10 +226,10 @@ internal class KookGuildImpl constructor(
     }
     
     override val currentMember: Int
-        get() = internalChannels.values.sumOf { c -> c.currentMember }
+        get() = internalMembers.size
     
     override val currentChannel: Int
-        get() = internalChannels.size
+        get() = internalChannelCategories.values.sumOf { it.channelMap.size }
     
     private val ownerSyncLock = Mutex()
     
@@ -209,6 +268,9 @@ internal class KookGuildImpl constructor(
     override val members: Items<KookGuildMember>
         get() = internalMembers.values.asItems()
     
+    override val memberList: List<KookGuildMember>
+        get() = internalMembers.values.toList()
+    
     override suspend fun member(id: ID): KookGuildMember? {
         return internalMembers[id.literal]
     }
@@ -217,11 +279,24 @@ internal class KookGuildImpl constructor(
     
     
     override val children: Items<KookChannel>
-        get() = internalChannels.values.asItems()
+        get() = effectedSequenceItems {
+            internalChannelCategories.values.forEach {
+                yieldAll(it.channelMap.values)
+            }
+        }
     
+    override val channelList: List<KookChannel>
+        get() = internalChannelCategories.values.flatMap { it.channelMap.values }
+    
+    override val categories: List<KookChannelCategory>
+        get() = internalChannelCategories.values.map { it.asCategory }
+    
+    override fun getCategory(id: ID): KookChannelCategory? {
+        return internalChannelCategories[id.literal]?.asCategory
+    }
     
     override fun toString(): String {
-        return "KookGuild(source=$source)"
+        return "KookGuildImpl(id=$id, name=$name, source=$source)"
     }
     
     /**
@@ -235,20 +310,22 @@ internal class KookGuildImpl constructor(
     
     
     private suspend fun syncChannels(guildId: ID, batchDelay: Long = 0L) {
-        requestChannels(guildId, batchDelay = batchDelay)
-            .buffer(100)
-            .map { it.toModel() }
-            .collect { model ->
-                internalChannels.compute(model.id.literal) { _, old ->
-                    if (old == null) {
-                        KookChannelImpl(baseBot, this, model)
-                    } else {
-                        // update source.
-                        old.source = model
-                        old
-                    }
-                }
-            }
+        baseBot.logger.warn("TODO sync channels!")
+        // TODO()
+        // requestChannels(guildId, batchDelay = batchDelay)
+        //     .buffer(100)
+        //     .map { it.toModel() }
+        //     .collect { model ->
+        //         internalChannels.compute(model.id.literal) { _, old ->
+        //             if (old == null) {
+        //                 KookChannelImpl(baseBot, this, model)
+        //             } else {
+        //                 // update source.
+        //                 old.source = model
+        //                 old
+        //             }
+        //         }
+        //     }
     }
     
     

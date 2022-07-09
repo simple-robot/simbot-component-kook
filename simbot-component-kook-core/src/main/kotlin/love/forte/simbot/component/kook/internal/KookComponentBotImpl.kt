@@ -293,6 +293,9 @@ internal class KookComponentBotImpl(
     
     override fun getGuild(id: ID): KookGuildImpl? = internalGuilds[id.literal]
     
+    override val guildList: List<KookGuild>
+        get() = internalGuilds.values.toList()
+    
     override val guilds: Items<KookGuild>
         get() = internalGuilds.values.asItems()
     
@@ -437,15 +440,50 @@ internal class KookComponentBotImpl(
                             val channelView = ChannelViewRequest(channelId).requestDataBy(this@KookComponentBotImpl)
                             val channelModel = channelView.toModel()
                             
-                            // 如果已经存在，覆盖source
-                            guild.internalChannels.compute(channelId.literal) { _, old ->
-                                if (old == null) {
-                                    KookChannelImpl(this@KookComponentBotImpl, guild, channelModel)
-                                } else {
-                                    old.source = channelModel
-                                    old
+                            // 是不是分类
+                            if (channelModel.isCategory) {
+                                guild.internalChannelCategories.compute(channelId.literal) { _, current ->
+                                    if (current != null) {
+                                        val category = current.asCategory
+                                        if (category is NormalKookChannelCategoryImpl) {
+                                            category.source = channelModel
+                                        }
+                                        current
+                                    } else {
+                                        NormalKookChannelCategoryImpl(channelModel)
+                                    }
                                 }
+                                
+                            } else {
+                                // 不是分类
+                                val categoryId = channelModel.parentId.literal
+                                val category  = guild.internalChannelCategories[categoryId]
+                                if (category == null) {
+                                    // WARN?
+                                    logger.warn("Cannot found category(id={}) for new channel({})", categoryId, channelModel)
+                                } else {
+                                    category.channelMap.compute(channelId.literal) { _, current ->
+                                        if (current != null) {
+                                            current.source = channelModel
+                                            current
+                                        } else {
+                                            KookChannelImpl(this@KookComponentBotImpl, guild, category.asCategory, channelModel)
+                                        }
+                                    }
+                                }
+                                
+                                
                             }
+                            
+                            // // 如果已经存在，覆盖source
+                            // guild.internalChannels.compute(channelId.literal) { _, old ->
+                            //     if (old == null) {
+                            //         KookChannelImpl(this@KookComponentBotImpl, guild, channelModel)
+                            //     } else {
+                            //         old.source = channelModel
+                            //         old
+                            //     }
+                            // }
                         }
                     }
                     // 某服务器更新频道信息
@@ -466,7 +504,18 @@ internal class KookComponentBotImpl(
                     }
                     // 某服务器频道被删除
                     is DeletedChannelExtraBody -> {
-                        guild(this.targetId)?.internalChannels?.remove(body.id.literal)?.also { it.cancel() }
+                        
+                        guild(targetId)?.also { guild ->
+                            val removedId = body.id.literal
+                            val removedCategory = guild.internalChannelCategories.remove(removedId)
+                            if (removedCategory != null) {
+                                removedCategory.cancel()
+                            } else {
+                                // find
+                                guild.internalChannelCategories.values.firstNotNullOfOrNull { it.remove(removedId) }?.cancel()
+                            }
+                        }
+                        // guild(this.targetId)?.internalChannels?.remove(body.id.literal)?.also { it.cancel() }
                     }
                     // endregion
                     

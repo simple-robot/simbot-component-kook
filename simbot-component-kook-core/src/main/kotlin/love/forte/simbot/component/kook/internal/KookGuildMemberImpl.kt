@@ -148,7 +148,7 @@ internal class KookGuildMemberImpl(
     
     
     override fun toString(): String {
-        return "KookGuildMemberImpl(source=$source)"
+        return "KookGuildMemberImpl(id=$id, username=$username, source=$source)"
     }
     
     companion object {

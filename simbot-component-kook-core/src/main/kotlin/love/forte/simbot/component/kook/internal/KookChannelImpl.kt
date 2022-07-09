@@ -21,10 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
-import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookChannelCategory
-import love.forte.simbot.component.kook.KookComponentGuildBot
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.message.*
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.model.ChannelModel
@@ -44,9 +41,11 @@ import kotlin.coroutines.CoroutineContext
 internal class KookChannelImpl(
     private val baseBot: KookComponentBotImpl,
     override val guild: KookGuildImpl,
+    category: KookChannelCategory,
     @Volatile override var source: ChannelModel,
 ) : KookChannel, CoroutineScope {
     
+    override val category: KookChannelCategory? = category.takeIf { it !is RootKookChannelCategory }
     
     override val bot: KookComponentGuildBot
         get() = guild.bot
@@ -120,10 +119,9 @@ internal class KookChannelImpl(
     }
     
     override fun toString(): String {
-        return "KookChannel(source=$source)"
+        return "KookChannelImpl(id=$id, name=$name, source=$source, category=$category)"
     }
     
 }
 
 
-internal class KookChannelCategoryImpl(@Volatile override var source: ChannelModel) : KookChannelCategory

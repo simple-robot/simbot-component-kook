@@ -81,12 +81,37 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
      */
     override val members: Items<KookGuildMember>
     
+    /**
+     * 直接获取用户列表的副本。
+     */
+    public val memberList: List<KookGuildMember>
     
     /**
      * 获取当前频道服务器下的子频道序列。
      */
     override val children: Items<KookChannel>
     
+    /**
+     * 直接获取当前频道服务器下的子频道列表的副本。
+     */
+    public val channelList: List<KookChannel>
+    
+    /**
+     * 获取当前频道服务器中所有分类频道的列表副本。
+     */
+    public val categories: List<KookChannelCategory>
+    
+    /**
+     * 得到此频道服务器中代表“顶层”分类的分类对象。
+     *
+     * @see RootKookChannelCategory
+     */
+    public val rootCategory: RootKookChannelCategory
+    
+    /**
+     * 获取一个指定id的分类类型。
+     */
+    public fun getCategory(id: ID): KookChannelCategory?
     
     // region role api
     /**

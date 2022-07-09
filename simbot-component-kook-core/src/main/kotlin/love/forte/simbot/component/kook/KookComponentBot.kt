@@ -83,11 +83,16 @@ public interface KookComponentBot : Bot {
     public override val logger: Logger
     public override val manager: KookBotManager
     public override val username: String
-    
+
     /**
      * 获取当前bot存在的频道服务器序列。
      */
     override val guilds: Items<KookGuild>
+    
+    /**
+     * 直接获取当前bot存在的频道服务器列表。
+     */
+    public val guildList: List<KookGuild>
     
     /**
      * 根据指定ID寻找频道服务器。
