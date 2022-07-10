@@ -8,22 +8,22 @@ import love.forte.simbot.kook.objects.ChannelPermissionOverwrites
  * 针对于 [Channel] 在核心模块中的可变数据模型。
  */
 internal data class ChannelModel(
-    override var id: ID,
-    override var currentMember: Int,
-    override var icon: String,
-    override var maximumMember: Int,
-    override var name: String,
-    override var userId: ID,
-    override var guildId: ID,
-    override var topic: String,
-    override var isCategory: Boolean,
-    override var parentId: ID,
-    override var level: Int,
-    override var slowMode: Int,
-    override var type: Int,
-    override var permissionOverwrites: List<ChannelPermissionOverwrites>,
-    override var permissionUsers: List<ID>,
-    override var permissionSync: Int,
+    override val id: ID,
+    override val currentMember: Int,
+    override val icon: String,
+    override val maximumMember: Int,
+    override val name: String,
+    override val userId: ID,
+    override val guildId: ID,
+    override val topic: String,
+    override val isCategory: Boolean,
+    override val parentId: ID,
+    override val level: Int,
+    override val slowMode: Int,
+    override val type: Int,
+    override val permissionOverwrites: List<ChannelPermissionOverwrites>,
+    override val permissionUsers: List<ID>,
+    override val permissionSync: Int,
 ) : Channel
 
 

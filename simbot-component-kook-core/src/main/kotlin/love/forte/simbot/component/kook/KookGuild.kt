@@ -88,30 +88,24 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     
     /**
      * 获取当前频道服务器下的子频道序列。
+     *
+     * 子频道列表不包含分组类型的频道，这类频道请参考 [categories]。
+     *
+     * @see channelList
      */
     override val children: Items<KookChannel>
     
     /**
      * 直接获取当前频道服务器下的子频道列表的副本。
+     *
+     * 子频道列表不包含分组类型的频道，这类频道请参考 [categories]。
      */
     public val channelList: List<KookChannel>
     
     /**
-     * 获取当前频道服务器中所有分类频道的列表副本。
+     * 得到当前频道下所有的分组型频道。
      */
     public val categories: List<KookChannelCategory>
-    
-    /**
-     * 得到此频道服务器中代表“顶层”分类的分类对象。
-     *
-     * @see RootKookChannelCategory
-     */
-    public val rootCategory: RootKookChannelCategory
-    
-    /**
-     * 获取一个指定id的分类类型。
-     */
-    public fun getCategory(id: ID): KookChannelCategory?
     
     // region role api
     /**

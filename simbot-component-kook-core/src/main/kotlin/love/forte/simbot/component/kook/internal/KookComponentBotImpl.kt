@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.*
@@ -301,13 +300,11 @@ internal class KookComponentBotImpl(
     
     
     // region friend api
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun contact(id: ID): KookUserChatImpl {
         val chat = UserChatCreateRequest(id).requestDataBy(bot)
         return KookUserChatImpl(this, chat.toModel())
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override val contacts: Items<KookUserChatImpl>
         get() {
             return itemsByFlow { prop ->
@@ -392,13 +389,10 @@ internal class KookComponentBotImpl(
                             UserViewRequest(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
-                        guild.internalMembers.compute(body.userId.literal) { _, old ->
-                            if (old == null) {
-                                KookGuildMemberImpl(this@KookComponentBotImpl, guild, userModel)
-                            } else {
-                                old.source = userModel
-                                old
-                            }
+                        guild.internalMembers.compute(body.userId.literal) { _, current ->
+                            current?.also {
+                                it.source = userModel
+                            } ?: KookGuildMemberImpl(this@KookComponentBotImpl, guild, userModel)
                         }
                     }
                     // 信息变更 （昵称变更）
@@ -416,22 +410,27 @@ internal class KookComponentBotImpl(
                     // 服务器更新
                     is UpdatedGuildExtraBody -> {
                         val guild = internalGuild(body.id) ?: return
-                        guild.source = guild.source.copy(
-                            name = body.name,
-                            icon = body.icon,
-                            masterId = body.userId,
-                            notifyType = body.notifyType,
-                            region = body.region,
-                            enableOpen = body.enableOpen,
-                            openId = body.openId,
-                            defaultChannelId = body.defaultChannelId,
-                            welcomeChannelId = body.welcomeChannelId,
-                        )
+                        guild.source.also { old ->
+                            guild.source = old.copy(
+                                name = body.name,
+                                icon = body.icon,
+                                masterId = body.userId,
+                                notifyType = body.notifyType,
+                                region = body.region,
+                                enableOpen = body.enableOpen,
+                                openId = body.openId,
+                                defaultChannelId = body.defaultChannelId,
+                                welcomeChannelId = body.welcomeChannelId,
+                            )
+                        }
+                        
                     }
                     // endregion
                     // region channels
                     // 某服务器新增频道
                     is AddedChannelExtraBody -> {
+                        // TODO
+                        
                         val channelId = body.id
                         val guildId = body.guildId.literal
                         
@@ -439,83 +438,56 @@ internal class KookComponentBotImpl(
                             // query channel info.
                             val channelView = ChannelViewRequest(channelId).requestDataBy(this@KookComponentBotImpl)
                             val channelModel = channelView.toModel()
-                            
-                            // 是不是分类
-                            if (channelModel.isCategory) {
-                                guild.internalChannelCategories.compute(channelId.literal) { _, current ->
-                                    if (current != null) {
-                                        val category = current.asCategory
-                                        if (category is NormalKookChannelCategoryImpl) {
-                                            category.source = channelModel
-                                        }
-                                        current
-                                    } else {
-                                        NormalKookChannelCategoryImpl(channelModel)
-                                    }
-                                }
-                                
-                            } else {
-                                // 不是分类
-                                val categoryId = channelModel.parentId.literal
-                                val category  = guild.internalChannelCategories[categoryId]
-                                if (category == null) {
-                                    // WARN?
-                                    logger.warn("Cannot found category(id={}) for new channel({})", categoryId, channelModel)
-                                } else {
-                                    category.channelMap.compute(channelId.literal) { _, current ->
-                                        if (current != null) {
-                                            current.source = channelModel
-                                            current
-                                        } else {
-                                            KookChannelImpl(this@KookComponentBotImpl, guild, category.asCategory, channelModel)
-                                        }
-                                    }
-                                }
-                                
-                                
-                            }
-                            
-                            // // 如果已经存在，覆盖source
-                            // guild.internalChannels.compute(channelId.literal) { _, old ->
-                            //     if (old == null) {
-                            //         KookChannelImpl(this@KookComponentBotImpl, guild, channelModel)
-                            //     } else {
-                            //         old.source = channelModel
-                            //         old
-                            //     }
-                            // }
+                            guild.computeMergeChannelModel(channelModel)
                         }
                     }
                     // 某服务器更新频道信息
                     is UpdatedChannelExtraBody -> {
                         guild(body.guildId)?.also { guild ->
-                            val channel = guild.internalChannel(body.id) ?: return@also
-                            channel.source = channel.source.copy(
+                            val channelId = body.id.literal
+                            val mutableChannelModelContainer: MutableChannelModelContainer = if (body.isCategory) {
+                                guild.getInternalCategory(channelId)
+                            } else {
+                                guild.getInternalChannel(channelId)
+                            } ?: return@also
+                            
+                            val oldSource = mutableChannelModelContainer.source
+                            
+                            val newSource = oldSource.copy(
                                 userId = body.masterId,
-                                parentId = body.parentId,
+                                parentId = body.parentId, // update parent -> update category
                                 name = body.name,
                                 topic = body.topic,
                                 type = body.type,
                                 level = body.level,
                                 slowMode = body.slowMode,
-                                isCategory = body.isCategory,
+                                // isCategory = body.isCategory, // changeable?
                             )
+                            
+                            mutableChannelModelContainer.source = newSource
+                            if (mutableChannelModelContainer is KookChannelImpl) {
+                                val newCategoryIdValue = newSource.parentId.literal
+                                if (newCategoryIdValue.isEmpty()) {
+                                    // set null
+                                    mutableChannelModelContainer.category = null
+                                } else if (oldSource.parentId.literal != newCategoryIdValue) {
+                                    val newCategory =
+                                        guild.findOrQueryAndComputeCategory(newSource.parentId.literal) ?: return@also
+                                    // set new category
+                                    mutableChannelModelContainer.category = newCategory
+                                }
+                            }
+                            
                         }
                     }
                     // 某服务器频道被删除
                     is DeletedChannelExtraBody -> {
+                        // TODO check isCategory?
                         
                         guild(targetId)?.also { guild ->
                             val removedId = body.id.literal
-                            val removedCategory = guild.internalChannelCategories.remove(removedId)
-                            if (removedCategory != null) {
-                                removedCategory.cancel()
-                            } else {
-                                // find
-                                guild.internalChannelCategories.values.firstNotNullOfOrNull { it.remove(removedId) }?.cancel()
-                            }
+                            guild.removeInternalChannel(removedId) ?: guild.removeInternalCategory(removedId)
                         }
-                        // guild(this.targetId)?.internalChannels?.remove(body.id.literal)?.also { it.cancel() }
                     }
                     // endregion
                     
