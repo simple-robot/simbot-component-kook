@@ -148,10 +148,7 @@ internal data class GuildListElement @ApiResultType constructor(
     @Serializable(ID.AsCharSequenceIDSerializer::class)
     override val welcomeChannelId: ID,
 ) : Guild {
-    // TODO
     override val roles: List<Role>? = null
-
-    // TODO
     override val channels: List<Channel>? = null
 
     // 可选的

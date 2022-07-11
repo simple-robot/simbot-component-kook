@@ -159,12 +159,10 @@ public abstract class KookBotManager : BotManager<KookComponentBot>(), KookBotRe
     }
     
     
-    // TODO Auto registrar
     public companion object Factory : EventProviderFactory<KookBotManager, KookBotManagerConfiguration> {
         override val key: Attribute<KookBotManager> = attribute("simbot.kook")
         private val logger = LoggerFactory.getLogger(KookBotManager::class.java)
-        
-        
+    
         /**
          * 通过各项配置构建 [KookBotManager] 实例。
          */
@@ -230,7 +228,6 @@ public class KookBotManagerAutoRegistrarFactory :
 }
 
 
-// TODO DELETE
 /**
  * 配置并构建一个 [KookBotManager] 实例。
  *
