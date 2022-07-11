@@ -28,10 +28,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookComponentGuildBot
-import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.component.kook.*
+import love.forte.simbot.component.kook.internal.KookComponentGuildBotImpl.Companion.toMemberBot
 import love.forte.simbot.component.kook.model.GuildModel
 import love.forte.simbot.component.kook.model.toModel
 import love.forte.simbot.component.kook.util.requestDataBy
@@ -51,19 +49,17 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author ForteScarlet
  */
-internal class KookGuildImpl constructor(
+internal class KookGuildImpl private constructor(
     internal val baseBot: KookComponentBotImpl,
     @Volatile override var source: GuildModel,
 ) : KookGuild, CoroutineScope {
-    
-    
+    override val id: ID get() = source.id
     internal val job = SupervisorJob(baseBot.job)
+    
     override val coroutineContext: CoroutineContext = baseBot.coroutineContext + job
     
     override val createTime: Timestamp get() = Timestamp.notSupport()
-    
     override val maximumMember: Int get() = source.maximumMember
-    override val id: ID get() = source.id
     override val description: String get() = source.description
     override val maximumChannel: Int get() = source.maximumChannel
     
@@ -71,16 +67,12 @@ internal class KookGuildImpl constructor(
     override val name: String get() = source.name
     override val icon: String get() = source.icon
     
-    @JvmSynthetic
     internal val internalChannelCategories = ConcurrentHashMap<String, KookChannelCategoryImpl>()
     
-    @JvmSynthetic
     internal val internalChannels = ConcurrentHashMap<String, KookChannelImpl>()
     
-    @JvmSynthetic
     internal val internalMembers = ConcurrentHashMap<String, KookGuildMemberImpl>()
     
-    @JvmSynthetic
     internal fun internalMember(id: ID): KookGuildMemberImpl? = internalMembers[id.literal]
     
     private lateinit var botMember: KookComponentGuildBot
@@ -97,14 +89,13 @@ internal class KookGuildImpl constructor(
             }
         }
     
-    @JvmSynthetic
     @Volatile
     private lateinit var lastOwnerMember: KookGuildMemberImpl
     
     @Volatile
     internal var initTimestamp: Long = 0L
     
-    internal suspend fun init() {
+    private suspend fun init() {
         val guildId = source.id
         var owner: KookGuildMemberImpl? = null
         
@@ -183,19 +174,20 @@ internal class KookGuildImpl constructor(
     override val memberList: List<KookGuildMember>
         get() = internalMembers.values.toList()
     
-    override suspend fun member(id: ID): KookGuildMember? {
-        return internalMembers[id.literal]
-    }
-    
     override fun getMember(id: ID): KookGuildMember? = internalMembers[id.literal]
     
-    
-    override val children: Items<KookChannel>
+    override val channels: Items<KookChannel>
         get() = internalChannels.values.asItems()
+    
+    override fun getChannel(id: ID): KookChannel? = internalChannels[id.literal]
     
     override val channelList: List<KookChannel>
         get() = internalChannels.values.toList()
     
+    override val categories: List<KookChannelCategory>
+        get() = internalChannelCategories.values.toList()
+    
+    override fun getCategory(id: ID): KookChannelCategory? = internalChannelCategories[id.literal]
     
     override fun toString(): String {
         return "KookGuildImpl(id=$id, name=$name, source=$source)"
@@ -279,4 +271,14 @@ internal class KookGuildImpl constructor(
         
     }
     
+    
+    companion object {
+        internal suspend fun GuildModel.toKookGuild(
+            baseBot: KookComponentBotImpl,
+        ): KookGuildImpl {
+            return KookGuildImpl(baseBot, this).apply { init() }
+        }
+    }
 }
+
+

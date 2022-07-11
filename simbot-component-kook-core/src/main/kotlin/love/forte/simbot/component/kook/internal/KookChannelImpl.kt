@@ -45,7 +45,7 @@ internal interface MutableChannelModelContainer {
  *
  * @author ForteScarlet
  */
-internal class KookChannelImpl(
+internal class KookChannelImpl private constructor(
     private val baseBot: KookComponentBotImpl,
     override val guild: KookGuildImpl,
     @Volatile
@@ -128,6 +128,18 @@ internal class KookChannelImpl(
         return "KookChannelImpl(id=$id, name=$name, source=$source, category=$category)"
     }
     
+    
+    companion object {
+        internal fun ChannelModel.toKookChannel(
+            baseBot: KookComponentBotImpl,
+            guild: KookGuildImpl,
+            category: KookChannelCategoryImpl?,
+        ): KookChannelImpl {
+            return KookChannelImpl(baseBot, guild, category, this)
+        }
+    }
 }
+
+
 
 

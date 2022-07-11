@@ -28,6 +28,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.event.KookBotStartedEvent
+import love.forte.simbot.component.kook.internal.KookGuildImpl.Companion.toKookGuild
 import love.forte.simbot.component.kook.internal.event.KookBotStartedEventImpl
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.message.KookAssetMessage
@@ -73,9 +74,39 @@ import love.forte.simbot.utils.item.itemsByFlow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.event.Event as KkEvent
+
+private class MuteDelayCoroutineDispatcherContainer(name: String) {
+    private val threadGroup = ThreadGroup(name).also {
+        it.isDaemon = true
+    }
+    
+    @Volatile
+    private var threadNum = 1
+    
+    @Synchronized
+    private fun nextThreadNum(): Int {
+        return threadNum++
+    }
+    
+    val muteDelayDispatcher: ExecutorCoroutineDispatcher = ThreadPoolExecutor(
+        0,
+        1,
+        1,
+        TimeUnit.MINUTES,
+        LinkedBlockingQueue(),
+    ) { runnable ->
+        Thread(threadGroup, runnable, "${threadGroup.name}-${nextThreadNum()}").also {
+            it.isDaemon = true
+        }
+    }.asCoroutineDispatcher()
+    
+}
 
 /**
  *
@@ -92,6 +123,11 @@ internal class KookComponentBotImpl(
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
+    
+    private val muteDelayCoroutineDispatcherContainer =
+        MuteDelayCoroutineDispatcherContainer("muteDelay-bot-${sourceBot.ticket.clientId}")
+    
+    internal val muteDelayCoroutineDispatcher get() = muteDelayCoroutineDispatcherContainer.muteDelayDispatcher
     
     private lateinit var internalGuilds: ConcurrentHashMap<String, KookGuildImpl>
     
@@ -125,7 +161,6 @@ internal class KookComponentBotImpl(
         updateMe(sourceBot.me())
         initGuilds()
         initSyncJob()
-        // clearFriendCache()
     }
     
     /**
@@ -152,10 +187,8 @@ internal class KookComponentBotImpl(
         requestGuilds()
             .buffer(100)
             .map { guild -> guild.toModel() }
-            .map { guild ->
-                KookGuildImpl(this, guild)
-            }.collect {
-                guildsMap[it.id.literal] = it.also { it.init() }
+            .collect { model ->
+                guildsMap[model.id.literal] = model.toKookGuild(this)
             }
         
         bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
@@ -188,7 +221,7 @@ internal class KookComponentBotImpl(
                     val curr = guild(guild.id)
                     val syncNeedGuild = if (curr == null) {
                         // compute it.
-                        val guildImpl = KookGuildImpl(this, guildModel).also { it.init() }
+                        val guildImpl = guildModel.toKookGuild(this)
                         internalGuilds.compute(guildId) { _, cur ->
                             if (cur == null) {
                                 // 不存在旧的，直接添加
@@ -399,7 +432,9 @@ internal class KookComponentBotImpl(
                     is UpdatedGuildMemberEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
                         val member = guild.internalMembers[body.userId.literal] ?: return
-                        member.source.nickname = body.nickname
+                        member.source.also { old ->
+                            member.source = old.copy(nickname = body.nickname)
+                        }
                     }
                     // endregion
                     // region guilds
@@ -507,7 +542,7 @@ internal class KookComponentBotImpl(
                     is SelfJoinedGuildEventBody -> {
                         val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KookComponentBotImpl)
                         val guildModel = guildInfo.toModel()
-                        val newGuild = KookGuildImpl(this@KookComponentBotImpl, guildModel).also { it.init() }
+                        val newGuild = guildModel.toKookGuild(this@KookComponentBotImpl)
                         internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
                             old.cancel()
                             cur
