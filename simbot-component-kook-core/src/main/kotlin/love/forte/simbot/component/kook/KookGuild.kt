@@ -19,6 +19,7 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
+import love.forte.simbot.JavaDuration
 import love.forte.simbot.definition.*
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
@@ -66,26 +67,95 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     /**
      * 根据指定ID查询对应用户信息，或得到null。
      */
-    @JvmSynthetic
-    override suspend fun member(id: ID): KookGuildMember?
-    
-    /**
-     * 根据指定ID查询对应用户信息，或得到null。
-     */
     @OptIn(Api4J::class)
     override fun getMember(id: ID): KookGuildMember?
     
     /**
+     * 根据指定ID查询对应用户信息，或得到null。
+     */
+    @JvmSynthetic
+    override suspend fun member(id: ID): KookGuildMember? = getMember(id)
+    
+    /**
+     * 直接获取用户列表的副本。
+     */
+    public val memberList: List<KookGuildMember>
+    
+    /**
      * 查询用户列表。
+     *
+     * @see memberList
      */
     override val members: Items<KookGuildMember>
     
+    /**
+     * 直接获取当前频道服务器下的子频道列表的副本。
+     *
+     * 子频道列表不包含分组类型的频道，这类频道请参考 [categories]。
+     */
+    public val channelList: List<KookChannel>
     
     /**
      * 获取当前频道服务器下的子频道序列。
+     *
+     * 子频道列表不包含分组类型的频道，这类频道请参考 [categories]。
+     *
+     * @see channelList
+     */
+    override val channels: Items<KookChannel>
+    
+    /**
+     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
+     *
+     * 未找到时得到null。
+     */
+    @OptIn(Api4J::class)
+    override fun getChannel(id: ID): KookChannel?
+    
+    /**
+     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
+     *
+     * 未找到时得到null。
+     */
+    @JvmSynthetic
+    override suspend fun channel(id: ID): KookChannel? = getChannel(id)
+    
+    /**
+     * 获取当前频道服务器下的子频道序列。
+     *
+     * 子频道列表不包含分组类型的频道，这类"分类频道"请参考 [categories]。
+     *
+     * @see channels
      */
     override val children: Items<KookChannel>
+        get() = channels
     
+    /**
+     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
+     *
+     * 未找到时得到null。
+     */
+    @JvmSynthetic
+    override suspend fun child(id: ID): KookChannel? = channel(id)
+    
+    /**
+     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
+     *
+     * 未找到时得到null。
+     */
+    @OptIn(Api4J::class)
+    override fun getChild(id: ID): KookChannel? = getChannel(id)
+    
+    /**
+     * 得到当前频道下所有的分组型频道。
+     */
+    public val categories: List<KookChannelCategory>
+   
+    
+    /**
+     * 尝试根据ID获取匹配的分类对象。
+     */
+    public fun getCategory(id: ID): KookChannelCategory?
     
     // region role api
     /**
@@ -109,7 +179,7 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     
     @OptIn(Api4J::class)
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean = false
+    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean = false
     
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
@@ -117,6 +187,14 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     @OptIn(Api4J::class)
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(duration: JavaDuration): Boolean = false
     
     // endregion
     

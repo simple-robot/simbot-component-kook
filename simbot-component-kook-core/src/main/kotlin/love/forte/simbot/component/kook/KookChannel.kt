@@ -19,6 +19,7 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
+import love.forte.simbot.JavaDuration
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
@@ -49,6 +50,16 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
      */
     override val source: KkChannel
     
+    /**
+     * 此频道对应的分组类型。
+     *
+     * 如果当前频道是属于“顶层分类”的频道（即 [source.parentId][KkChannel.parentId] 为空），则 [category] 结果为null。
+     * 如果你希望能够得到“顶层分类”下的所有频道，请参考 [KookGuild.rootCategory]。
+     *
+     *
+     * @see KookChannelCategory
+     */
+    override val category: KookChannelCategory?
     
     override val bot: KookComponentGuildBot
     override val id: ID get() = source.id
@@ -293,10 +304,21 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     
     @OptIn(Api4J::class)
     @Deprecated("Channel mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean = false
+    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean = false
     
     @OptIn(Api4J::class)
     @Deprecated("Channel mute is not supported", ReplaceWith("false"))
     override fun unmuteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(): Boolean = false
+    
+    @OptIn(Api4J::class)
+    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
+    override fun muteBlocking(duration: JavaDuration): Boolean = false
+    
     // endregion
 }
+
+

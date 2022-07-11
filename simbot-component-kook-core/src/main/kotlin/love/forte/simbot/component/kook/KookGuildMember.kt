@@ -19,6 +19,7 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
+import love.forte.simbot.JavaDuration
 import love.forte.simbot.Timestamp
 import love.forte.simbot.action.UnsupportedActionException
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
@@ -34,7 +35,7 @@ import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.ZERO
 import love.forte.simbot.kook.objects.User as KkUser
 
 
@@ -64,7 +65,7 @@ public interface KookGuildMember :
     override suspend fun unmute(): Boolean = unmute(GuildMuteType.TYPE_MICROPHONE)
     
     /**
-     * 取消禁言。[type] 代表 [love.forte.simbot.kook.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
+     * 取消禁言。[type] 代表 [love.forte.simbot.kook.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 [GuildMuteType.TYPE_MICROPHONE]，即 `1`.
      *
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
@@ -76,38 +77,85 @@ public interface KookGuildMember :
      * 对此用户进行静音操作。
      * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
      *
+     * @throws IllegalArgumentException 如果持续时间小于0
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @JvmSynthetic
-    override suspend fun mute(duration: Duration): Boolean = mute(duration, GuildMuteType.TYPE_MICROPHONE)
+    override suspend fun mute(duration: Duration): Boolean = mute(duration.inWholeMilliseconds)
     
     /**
      * 对此用户进行静音操作。
      *
+     * @throws IllegalArgumentException 如果持续时间小于0
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @JvmSynthetic
-    public suspend fun mute(duration: Duration, type: Int): Boolean
+    public suspend fun mute(duration: Duration, type: Int): Boolean = mute(duration.inWholeMilliseconds, type)
+    
+    
+    /**
+     * 对此用户进行静音操作。
+     *
+     * @throws IllegalArgumentException 如果持续时间小于0
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+     */
+    @JvmSynthetic
+    public suspend fun mute(durationMillis: Long, type: Int = GuildMuteType.TYPE_MICROPHONE): Boolean
     
     
     /**
      * 对此用户进行静音操作。
      * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
      *
+     * @throws IllegalArgumentException 如果持续时间小于0
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @Api4J
-    override fun muteBlocking(duration: Long, unit: TimeUnit): Boolean =
-        runInBlocking { mute(unit.toMillis(duration).milliseconds) }
+    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean =
+        runInBlocking { mute(timeUnit.toMillis(time)) }
     
     /**
      * 对此用户进行静音操作。
      *
+     * @throws IllegalArgumentException 如果持续时间小于0
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
     @Api4J
     public fun muteBlocking(time: Long, unit: TimeUnit, type: Int): Boolean =
-        runInBlocking { mute(unit.toMillis(time).milliseconds, type) }
+        runInBlocking { mute(unit.toMillis(time), type) }
+    
+    /**
+     * 对此用户进行静音操作。
+     *
+     * @throws IllegalArgumentException 如果持续时间小于0
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    override fun muteBlocking(): Boolean {
+        return runInBlocking { mute(ZERO) }
+    }
+    
+    /**
+     * 对此用户进行静音操作。
+     *
+     * @throws IllegalArgumentException 如果持续时间小于0
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    override fun muteBlocking(duration: JavaDuration): Boolean {
+        return runInBlocking { mute(duration.toMillis()) }
+    }
+    
+    /**
+     * 对此用户进行静音操作。
+     *
+     * @throws IllegalArgumentException 如果持续时间小于0
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+     */
+    @Api4J
+    public fun muteBlocking(duration: JavaDuration, type: Int): Boolean {
+        return runInBlocking { mute(duration.toMillis(), type) }
+    }
     
     /**
      * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
@@ -256,7 +304,7 @@ public class KookGuildSystemMember(
      * 系统用户不支持禁言相关操作，永远得到 `false`.
      */
     @JvmSynthetic
-    override suspend fun mute(duration: Duration, type: Int): Boolean = false
+    override suspend fun mute(durationMillis: Long, type: Int): Boolean = false
     
     
     // region send 相关

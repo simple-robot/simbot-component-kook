@@ -20,6 +20,7 @@ package love.forte.simbot.kook.event.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.LongID
 import love.forte.simbot.kook.event.Event
@@ -43,6 +44,7 @@ public interface KMarkdownEventExtra : MessageEventExtra {
     override val isMentionHere: Boolean
 
     override val author: User
+    @ExperimentalSimbotApi
     public val kmarkdown: KMarkdown
 }
 
@@ -53,6 +55,7 @@ public interface KMarkdownEventExtra : MessageEventExtra {
  * @author ForteScarlet
  */
 @Serializable
+@ExperimentalSimbotApi
 internal data class KMarkdownEventExtraImpl(
     override val type: Event.Type = Event.Type.KMD,
     @SerialName("guild_id")
@@ -68,5 +71,6 @@ internal data class KMarkdownEventExtraImpl(
     override val isMentionHere: Boolean = false,
 
     override val author: UserImpl,
+    @ExperimentalSimbotApi
     override val kmarkdown: RawValueKMarkdown,
 ) : KMarkdownEventExtra

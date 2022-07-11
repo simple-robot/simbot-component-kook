@@ -17,6 +17,7 @@
 
 package love.forte.simbot.kook.event.message
 
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventParser
 import love.forte.simbot.kook.event.KookEventParserDefinition
@@ -95,12 +96,14 @@ public object FileEvent : MessageEventDefinition<FileEventExtra>() {
  * KMarkdown消息事件处理器。
  * @see KMarkdownEventExtra
  */
+@ExperimentalSimbotApi
 public val KMarkdownEventParser: MessageEventParser<KMarkdownEventExtra> =
     MessageEventParser(Event.Type.KMD, KMarkdownEventExtraImpl.serializer())
 
 /**
  * KMarkdown消息事件定义
  */
+@ExperimentalSimbotApi
 public object KMarkdownEvent : MessageEventDefinition<KMarkdownEventExtra>() {
     override val parser: EventParser<KMarkdownEventExtra, MessageEvent<KMarkdownEventExtra>>
         get() = KMarkdownEventParser

@@ -17,45 +17,42 @@
 
 package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.component.kook.KookComponentBot
-import love.forte.simbot.component.kook.KookComponentGuildBot
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.ID
+import love.forte.simbot.component.kook.KookChannelCategory
+import love.forte.simbot.component.kook.model.ChannelModel
 
 
-/**
- *
- * @author ForteScarlet
- */
-internal class KookComponentGuildBotImpl private constructor(
-    override val bot: KookComponentBot,
-    private val member: KookGuildMember,
-) : KookComponentGuildBot(), KookComponentBot by bot {
-    override suspend fun asMember(): KookGuildMember = member
+internal class KookChannelCategoryImpl private constructor(
+    override val guild: KookGuildImpl,
+    @Volatile override var source: ChannelModel,
+) : KookChannelCategory, MutableChannelModelContainer {
+    override val id: ID
+        get() = source.id
+    override val name: String
+        get() = source.name
     
-    override fun toMember(): KookGuildMember = member
     
     
     override fun toString(): String {
-        return "KookComponentGuildBotImpl(bot=$bot, member=$member)"
+        return "KookChannelCategoryImpl(id=$id, name=$name, guild=$guild, source=$source)"
     }
     
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is KookComponentGuildBotImpl) return false
+        if (other !is KookChannelCategoryImpl) return false
         
-        return bot == other.bot && member == other.member
+        return guild == other.guild && source == other.source
     }
     
     override fun hashCode(): Int {
-        var result = bot.hashCode()
-        result = 31 * result + member.hashCode()
+        var result = guild.hashCode()
+        result = 31 * result + source.hashCode()
         return result
     }
     
     companion object {
-        internal fun KookComponentBot.toMemberBot(member: KookGuildMember): KookComponentGuildBotImpl =
-            KookComponentGuildBotImpl(this, member)
+        internal fun ChannelModel.toCategory(guild: KookGuildImpl): KookChannelCategoryImpl =
+            KookChannelCategoryImpl(guild, this)
     }
 }
-
 

@@ -20,6 +20,7 @@ package love.forte.simbot.kook.event
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.kook.event.message.*
 import love.forte.simbot.kook.event.system.SimpleSystemEventExtra
 import love.forte.simbot.kook.event.system.SystemEvent
@@ -105,6 +106,7 @@ public class SysEventParser<out B>(
 public object EventSignals {
     private val eventParsers: Array<Map<Any, EventParser<*, *>>> = Array(Event.Type.values().size) { emptyMap() }
 
+    @OptIn(ExperimentalSimbotApi::class)
     private val MESSAGE_EVENT_STANDARD_PARSERS: Map<Any, MessageEventParser<MessageEventExtra>> = mapOf(
         Event.Type.TEXT to TextEventParser,
         Event.Type.IMAGE to ImageEventParser,

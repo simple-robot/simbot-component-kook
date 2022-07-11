@@ -79,7 +79,7 @@ kotlin {
     this.sourceSets.configureEach {
         languageSettings {
             optIn("kotlin.RequiresOptIn")
-            optIn("love.forte.simbot.ExperimentalSimbotApi")
+            // optIn("love.forte.simbot.ExperimentalSimbotApi")
         }
     }
 }

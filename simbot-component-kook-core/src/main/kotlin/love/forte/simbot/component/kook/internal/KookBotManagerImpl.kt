@@ -18,8 +18,8 @@
 package love.forte.simbot.component.kook.internal
 
 import kotlinx.coroutines.*
-import love.forte.simbot.BotAlreadyRegisteredException
 import love.forte.simbot.ID
+import love.forte.simbot.bot.BotAlreadyRegisteredException
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.event.KookBotRegisteredEvent
 import love.forte.simbot.component.kook.internal.event.KookBotRegisteredEventImpl

@@ -36,16 +36,22 @@ import love.forte.simbot.utils.item.Items
 import kotlin.coroutines.CoroutineContext
 
 
+internal interface MutableChannelModelContainer {
+    var source: ChannelModel
+}
+
+
 /**
  *
  * @author ForteScarlet
  */
-internal class KookChannelImpl(
+internal class KookChannelImpl private constructor(
     private val baseBot: KookComponentBotImpl,
     override val guild: KookGuildImpl,
+    @Volatile
+    override var category: KookChannelCategoryImpl?,
     @Volatile override var source: ChannelModel,
-) : KookChannel, CoroutineScope {
-    
+) : KookChannel, CoroutineScope, MutableChannelModelContainer {
     
     override val bot: KookComponentGuildBot
         get() = guild.bot
@@ -119,7 +125,21 @@ internal class KookChannelImpl(
     }
     
     override fun toString(): String {
-        return "KookChannel(source=$source)"
+        return "KookChannelImpl(id=$id, name=$name, source=$source, category=$category)"
     }
     
+    
+    companion object {
+        internal fun ChannelModel.toKookChannel(
+            baseBot: KookComponentBotImpl,
+            guild: KookGuildImpl,
+            category: KookChannelCategoryImpl?,
+        ): KookChannelImpl {
+            return KookChannelImpl(baseBot, guild, category, this)
+        }
+    }
 }
+
+
+
+
