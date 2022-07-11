@@ -59,7 +59,6 @@ import love.forte.simbot.kook.event.system.channel.DeletedChannelExtraBody
 import love.forte.simbot.kook.event.system.channel.UpdatedChannelExtraBody
 import love.forte.simbot.kook.event.system.guild.DeletedGuildExtraBody
 import love.forte.simbot.kook.event.system.guild.UpdatedGuildExtraBody
-import love.forte.simbot.kook.event.system.guild.member.ExitedGuildEventBody
 import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kook.event.system.guild.member.UpdatedGuildMemberEventBody
 import love.forte.simbot.kook.event.system.user.SelfExitedGuildEventBody
@@ -145,10 +144,12 @@ internal class KookComponentBotImpl(
             // register some event processors
             decodedEvent.internalPreProcessor()
             
-            // register standard event processors
             /*
-                事件的验证、准备是(协程下)同步的（借preProcessor的特性），
-                但是事件的触发是异步的。
+             *  事件的验证、准备是(协程下)同步的（借preProcessor的特性），
+             *  但是事件的触发是异步的。
+             *
+             *  存在一小部分事件的准备处理是在 internalProcessor 中进行而不是 internalProProcessor 中。
+             *  这部分事件通常与"删除"有关。
              */
             decodedEvent.internalProcessor()
         }
@@ -410,10 +411,12 @@ internal class KookComponentBotImpl(
                     
                     // region guild members
                     // 某人退出频道服务器
-                    is ExitedGuildEventBody -> {
-                        val guild = internalGuild(this.targetId) ?: return
-                        guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
-                    }
+                    // 在标准事件处理中进行
+                    // is ExitedGuildEventBody -> {
+                        // val guild = internalGuild(this.targetId) ?: return
+                        // guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
+                    // }
+                    
                     // 某人加入频道服务器
                     is JoinedGuildEventBody -> {
                         // query user info.
@@ -464,8 +467,6 @@ internal class KookComponentBotImpl(
                     // region channels
                     // 某服务器新增频道
                     is AddedChannelExtraBody -> {
-                        // TODO
-                        
                         val channelId = body.id
                         val guildId = body.guildId.literal
                         
@@ -476,6 +477,7 @@ internal class KookComponentBotImpl(
                             guild.computeMergeChannelModel(channelModel)
                         }
                     }
+                    
                     // 某服务器更新频道信息
                     is UpdatedChannelExtraBody -> {
                         guild(body.guildId)?.also { guild ->
@@ -518,10 +520,10 @@ internal class KookComponentBotImpl(
                     // 某服务器频道被删除
                     is DeletedChannelExtraBody -> {
                         // TODO check isCategory?
-                        
                         guild(targetId)?.also { guild ->
                             val removedId = body.id.literal
-                            guild.removeInternalChannel(removedId) ?: guild.removeInternalCategory(removedId)
+                            val removed: Any? = guild.removeInternalChannel(removedId) ?: guild.removeInternalCategory(removedId)
+                            logger.debug("Channel(or category) {} is be Deleted", removed)
                         }
                     }
                     // endregion

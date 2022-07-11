@@ -20,6 +20,7 @@
 package love.forte.simbot.component.kook.internal.event
 
 import love.forte.simbot.Api4J
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.internal.KookChannelImpl
 import love.forte.simbot.component.kook.internal.KookComponentBotImpl
@@ -63,7 +64,7 @@ internal data class KookUpdatedChannelChangedEventImpl(
  * 频道删除事件impl
  */
 @Suppress("UnnecessaryOptInAnnotation")
-@OptIn(Api4J::class)
+@OptIn(Api4J::class, ExperimentalSimbotApi::class)
 internal data class KookDeletedChannelChangedEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: KkEvent<Sys<DeletedChannelExtraBody>>,

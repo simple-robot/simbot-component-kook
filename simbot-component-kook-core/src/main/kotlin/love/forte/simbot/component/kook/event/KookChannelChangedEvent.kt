@@ -18,9 +18,11 @@
 package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.Api4J
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookChannel
+import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent.Companion.toContent
@@ -183,8 +185,13 @@ public abstract class KookUpdatedChannelChangedEvent :
 /**
  * 某频道被删除的事件。
  *
+ * ## _ExperimentalSimbotApi_
+ * 此事件未来会细化为区分"类型频道（[KookChannelCategory]）" 和 "普通频道（[KookChannel]）"的相关事件，
+ * 因此目前此事件的定义仅供参考，未来会发生变更，且不保证变更兼容性。
+ *
  * @see DeletedChannelEvent
  */
+@ExperimentalSimbotApi
 public abstract class KookDeletedChannelChangedEvent :
     KookChannelChangedEvent<DeletedChannelExtraBody>(),
     DecreaseEvent {

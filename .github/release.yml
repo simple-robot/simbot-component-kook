@@ -7,6 +7,9 @@ changelog:
     - title: '🔧 Bug Fix'
       labels:
         - 'bug'
+    - title: '⚙️ 修复缺陷'
+      labels:
+        - '缺陷'
     - title: '🎉 新特性'
       labels:
         - '特性'

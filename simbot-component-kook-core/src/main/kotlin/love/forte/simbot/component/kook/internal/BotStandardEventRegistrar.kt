@@ -17,8 +17,10 @@
 
 package love.forte.simbot.component.kook.internal
 
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.event.*
@@ -39,6 +41,7 @@ import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kook.event.system.user.*
 import love.forte.simbot.kook.objects.Channel
 import love.forte.simbot.kook.objects.SystemUser
+import love.forte.simbot.literal
 
 /**
  * 注册各种标准事件。
@@ -115,6 +118,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
 /**
  * 系统事件
  */
+@OptIn(ExperimentalSimbotApi::class)
 private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotImpl) {
     
     // 准备资源
@@ -128,14 +132,22 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
     @Suppress("UNCHECKED_CAST")
     when (val body = extra.body) {
         // region 成员变更相关
-        is UserExitedChannelEventBody -> bot.pushIfProcessable(KookMemberExitedChannelEvent) {
-            val channel = guild.getInternalChannel(body.channelId) ?: return
-            KookMemberExitedChannelEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
-                channel,
-                author
-            )
+        // 某人退出事件
+        is UserExitedChannelEventBody -> {
+            // remove this user.
+            val removedMember = guild.internalMembers.remove(body.userId.literal)
+                ?.also { it.cancel() }
+                ?: return
+            
+            bot.pushIfProcessable(KookMemberExitedChannelEvent) {
+                val channel = guild.getInternalChannel(body.channelId) ?: return
+                KookMemberExitedChannelEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
+                    channel,
+                    removedMember
+                )
+            }
         }
         
         is UserJoinedChannelEventBody -> bot.pushIfProcessable(KookMemberJoinedChannelEvent) {
@@ -148,13 +160,16 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
             )
         }
         
-        is ExitedGuildEventBody -> bot.pushIfProcessable(KookMemberExitedGuildEvent) {
-            KookMemberExitedGuildEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<ExitedGuildEventBody>>,
-                guild,
-                author
-            )
+        is ExitedGuildEventBody -> {
+            
+            bot.pushIfProcessable(KookMemberExitedGuildEvent) {
+                KookMemberExitedGuildEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<ExitedGuildEventBody>>,
+                    guild,
+                    author
+                )
+            }
         }
         
         is JoinedGuildEventBody -> bot.pushIfProcessable(KookMemberJoinedGuildEvent) {
@@ -268,7 +283,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
         // endregion
         
         
-        // TODO other..
+        // other..?
         
         
         // 其他未知事件类型

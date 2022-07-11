@@ -151,7 +151,7 @@ public sealed class KookMessageEvent :
 
 
         public companion object Key :
-            BaseEventKey<Channel>("kook.message_group", KookMessageEvent, MessageEvent) {
+            BaseEventKey<Channel>("kook.base_message_channel", KookMessageEvent, MessageEvent) {
             override fun safeCast(value: Any): Channel? = doSafeCast(value)
         }
     }
@@ -187,7 +187,7 @@ public sealed class KookMessageEvent :
             get() = Key
 
         public companion object Key :
-            BaseEventKey<Person>("kook.message_person", KookMessageEvent, MessageEvent) {
+            BaseEventKey<Person>("kook.base_message_person", KookMessageEvent, MessageEvent) {
             override fun safeCast(value: Any): Person? = doSafeCast(value)
         }
     }
@@ -260,12 +260,12 @@ public abstract class KookChannelMessageEvent : KookMessageEvent.Channel(), Chan
     /**
      * Event Key.
      */
-    override val key: Event.Key<out Channel>
+    override val key: Event.Key<out KookChannelMessageEvent>
         get() = Key
 
     public companion object Key :
-        BaseEventKey<Channel>("kook.normal_group_message", Channel, ChannelMessageEvent) {
-        override fun safeCast(value: Any): Channel? = doSafeCast(value)
+        BaseEventKey<KookChannelMessageEvent>("kook.channel_message", Channel, ChannelMessageEvent) {
+        override fun safeCast(value: Any): KookChannelMessageEvent? = doSafeCast(value)
     }
 }
 
@@ -312,16 +312,16 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
     override suspend fun source(): KookUserChat = user()
 
 
-    override val key: Event.Key<out Person>
+    override val key: Event.Key<out KookContactMessageEvent>
         get() = Key
     //endregion
 
     public companion object Key :
-        BaseEventKey<Person>(
-            "kook.normal_person_message",
+        BaseEventKey<KookContactMessageEvent>(
+            "kook.contact_message",
             Person, ContactMessageEvent
         ) {
-        override fun safeCast(value: Any): Person? = doSafeCast(value)
+        override fun safeCast(value: Any): KookContactMessageEvent? = doSafeCast(value)
     }
 }
 
@@ -400,12 +400,12 @@ public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(
     override suspend fun user(): KookGuildMember = member
 
 
-    override val key: Event.Key<out Channel>
+    override val key: Event.Key<out KookBotSelfChannelMessageEvent>
         get() = Key
 
     public companion object Key :
-        BaseEventKey<Channel>("kook.bot_self_group_message", Channel, ChannelEvent, MemberEvent) {
-        override fun safeCast(value: Any): Channel? = doSafeCast(value)
+        BaseEventKey<KookBotSelfChannelMessageEvent>("kook.bot_self_channel_message", Channel, ChannelEvent, MemberEvent) {
+        override fun safeCast(value: Any): KookBotSelfChannelMessageEvent? = doSafeCast(value)
     }
 }
 
@@ -430,15 +430,15 @@ public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
     abstract override suspend fun source(): KookUserChat
 
 
-    override val key: Event.Key<out Person>
+    override val key: Event.Key<out KookBotSelfMessageEvent>
         get() = Key
 
 
     public companion object Key :
-        BaseEventKey<Person>(
+        BaseEventKey<KookBotSelfMessageEvent>(
             "kook.bot_self_person_message",
             Person
         ) {
-        override fun safeCast(value: Any): Person? = doSafeCast(value)
+        override fun safeCast(value: Any): KookBotSelfMessageEvent? = doSafeCast(value)
     }
 }
