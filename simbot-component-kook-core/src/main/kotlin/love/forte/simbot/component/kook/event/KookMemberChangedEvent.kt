@@ -222,6 +222,9 @@ public abstract class KookMemberChannelChangedEvent<out Body> : KookMemberChange
 /**
  * Kook 成员离开(频道)事件。
  *
+ * 此事件被触发时，相关成员**已经**被移除自对应频道，且终止了内置的所有任务。
+ * 因此 [before] 不可用于执行禁言等操作，[before] 也不会存在于当前频道成员中。
+ *
  * @see UserExitedChannelEvent
  * @author forte
  */
@@ -231,12 +234,18 @@ public abstract class KookMemberExitedChannelEvent :
 
     /**
      * 离开的成员。
+     *
+     * 此成员已经被移除自频道，因此 [before] 不可用于执行禁言等操作，
+     * 也不会存在于当前频道成员中。
      */
     @OptIn(Api4J::class)
     abstract override val before: KookGuildMember
-
+    
     /**
      * 离开的成员。
+     *
+     * 此成员已经被移除自频道，因此 [before] 不可用于执行禁言等操作，
+     * 也不会存在于当前频道成员中。
      */
     @JvmSynthetic
     override suspend fun before(): KookGuildMember = before
