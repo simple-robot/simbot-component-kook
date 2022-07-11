@@ -149,10 +149,10 @@ internal data class GuildListElement @ApiResultType constructor(
     override val welcomeChannelId: ID,
 ) : Guild {
     // TODO
-    override val roles: List<Role> = emptyList()
+    override val roles: List<Role>? = null
 
     // TODO
-    override val channels: List<Channel> = emptyList()
+    override val channels: List<Channel>? = null
 
     // 可选的
     override val maximumChannel: Int = -1

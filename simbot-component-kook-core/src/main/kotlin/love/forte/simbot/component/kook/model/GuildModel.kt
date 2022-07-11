@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -70,7 +70,7 @@ internal fun Guild.toModel(copy: Boolean = false, channelCopy: Boolean = false):
         openId = openId,
         defaultChannelId = defaultChannelId,
         welcomeChannelId = welcomeChannelId,
-        roles = roles,
-        channels = channels.map { it.toModel(channelCopy) },
+        roles = roles ?: emptyList(),
+        channels = channels?.map { it.toModel(channelCopy) } ?: emptyList(),
     )
 }

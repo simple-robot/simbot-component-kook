@@ -464,8 +464,6 @@ internal class KookComponentBotImpl(
                     // region channels
                     // 某服务器新增频道
                     is AddedChannelExtraBody -> {
-                        // TODO
-                        
                         val channelId = body.id
                         val guildId = body.guildId.literal
                         
@@ -476,6 +474,7 @@ internal class KookComponentBotImpl(
                             guild.computeMergeChannelModel(channelModel)
                         }
                     }
+                    
                     // 某服务器更新频道信息
                     is UpdatedChannelExtraBody -> {
                         guild(body.guildId)?.also { guild ->

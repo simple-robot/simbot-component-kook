@@ -268,7 +268,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
         // endregion
         
         
-        // TODO other..
+        // other..?
         
         
         // 其他未知事件类型
