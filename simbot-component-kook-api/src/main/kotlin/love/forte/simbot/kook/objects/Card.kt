@@ -30,6 +30,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.Simbot
 
 
@@ -295,6 +296,7 @@ public sealed class CardElement {
      */
     @Serializable
     @SerialName(KMarkdown.TYPE)
+    @ExperimentalSimbotApi
     public data class KMarkdown(
         /**
          * KMarkDown内容字符串。

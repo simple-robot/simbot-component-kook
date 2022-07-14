@@ -17,7 +17,6 @@
 
 package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookUserChat
@@ -36,27 +35,26 @@ import love.forte.simbot.message.MessageContent
  *
  * @author ForteScarlet
  */
-@ExperimentalSimbotApi
 internal class KookUserChatImpl(
-    override val bot: KookComponentBotImpl, @Volatile override var source: UserChatViewModel
+    override val bot: KookComponentBotImpl, @Volatile override var source: UserChatViewModel,
 ) : KookUserChat {
     override val id: ID
         get() = source.targetInfo.id
-
+    
     override fun toString(): String {
         return "KookUserChat(source=$source, bot=$bot)"
     }
-
+    
     override suspend fun send(text: String): KookMessageCreatedReceipt {
         return DirectMessageCreateRequest.byChatCode(
             source.code, text, MessageType.TEXT, null, null
         ).requestDataBy(bot).asReceipt(true, bot)
     }
-
+    
     override suspend fun send(message: Message): KookMessageReceipt {
         val request = message.toRequest(bot, source.code, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-
+        
         val result = request.requestDataBy(bot)
         return if (result is MessageCreated) {
             result.asReceipt(true, bot)
@@ -64,7 +62,7 @@ internal class KookUserChatImpl(
             KookApiRequestedReceipt(result, true, bot)
         }
     }
-
+    
     override suspend fun send(message: MessageContent): KookMessageReceipt {
         return when (message) {
             is KookReceiveMessageContent -> {

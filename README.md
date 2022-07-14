@@ -9,7 +9,7 @@
 
 已经基本完成。
 
-> ⚠🔧 README 待施工中。。。
+> ⚠️🔧 README 待施工中。。。
 
 
 
@@ -37,5 +37,35 @@ suspend fun KookChannelMessageEvent.onEvent() {
 @Filter("叫我{{name,.+}}")
 suspend fun KookChannelMessageEvent.onEvent(name: String) {
     group.send(At(author.id) + "好的，以后就叫你$name了".toText())
+}
+```
+
+简单的完整示例：
+
+```kotlin
+suspend fun main() {
+    createSimpleApplication {
+        // 注册并使用Kook组件。
+        useKook()
+        
+        // 注册各种监听函数
+        listeners {
+            // 监听联系人(私聊)消息
+            // 此事件的逻辑：收到消息，回复一句"你说的是："，
+            // 然后再复读一遍你说的话。
+            ContactMessageEvent { event ->
+                val contact: Contact = event.source()
+                contact.send("你说的是：")
+                contact.send(event.messageContent)
+            }
+        }
+        
+        // 注册kook的bot
+        kookBots {
+            val bot = register("client_id", "token")
+            // bot需要start才能连接服务器、初始化信息等。
+            bot.start()
+        }
+    }.join() // join, 挂起直到被终止。
 }
 ```

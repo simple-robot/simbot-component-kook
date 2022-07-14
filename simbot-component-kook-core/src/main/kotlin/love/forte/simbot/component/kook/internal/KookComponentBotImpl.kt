@@ -24,11 +24,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.event.KookBotStartedEvent
+import love.forte.simbot.component.kook.internal.KookGuildImpl.Companion.toKookGuild
 import love.forte.simbot.component.kook.internal.event.KookBotStartedEventImpl
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.message.KookAssetMessage
@@ -59,7 +59,6 @@ import love.forte.simbot.kook.event.system.channel.DeletedChannelExtraBody
 import love.forte.simbot.kook.event.system.channel.UpdatedChannelExtraBody
 import love.forte.simbot.kook.event.system.guild.DeletedGuildExtraBody
 import love.forte.simbot.kook.event.system.guild.UpdatedGuildExtraBody
-import love.forte.simbot.kook.event.system.guild.member.ExitedGuildEventBody
 import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kook.event.system.guild.member.UpdatedGuildMemberEventBody
 import love.forte.simbot.kook.event.system.user.SelfExitedGuildEventBody
@@ -74,9 +73,39 @@ import love.forte.simbot.utils.item.itemsByFlow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.event.Event as KkEvent
+
+private class MuteDelayCoroutineDispatcherContainer(name: String) {
+    private val threadGroup = ThreadGroup(name).also {
+        it.isDaemon = true
+    }
+    
+    @Volatile
+    private var threadNum = 1
+    
+    @Synchronized
+    private fun nextThreadNum(): Int {
+        return threadNum++
+    }
+    
+    val muteDelayDispatcher: ExecutorCoroutineDispatcher = ThreadPoolExecutor(
+        0,
+        1,
+        1,
+        TimeUnit.MINUTES,
+        LinkedBlockingQueue(),
+    ) { runnable ->
+        Thread(threadGroup, runnable, "${threadGroup.name}-${nextThreadNum()}").also {
+            it.isDaemon = true
+        }
+    }.asCoroutineDispatcher()
+    
+}
 
 /**
  *
@@ -94,6 +123,11 @@ internal class KookComponentBotImpl(
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
     
+    private val muteDelayCoroutineDispatcherContainer =
+        MuteDelayCoroutineDispatcherContainer("muteDelay-bot-${sourceBot.ticket.clientId}")
+    
+    internal val muteDelayCoroutineDispatcher get() = muteDelayCoroutineDispatcherContainer.muteDelayDispatcher
+    
     private lateinit var internalGuilds: ConcurrentHashMap<String, KookGuildImpl>
     
     @JvmSynthetic
@@ -110,10 +144,12 @@ internal class KookComponentBotImpl(
             // register some event processors
             decodedEvent.internalPreProcessor()
             
-            // register standard event processors
             /*
-                事件的验证、准备是(协程下)同步的（借preProcessor的特性），
-                但是事件的触发是异步的。
+             *  事件的验证、准备是(协程下)同步的（借preProcessor的特性），
+             *  但是事件的触发是异步的。
+             *
+             *  存在一小部分事件的准备处理是在 internalProcessor 中进行而不是 internalProProcessor 中。
+             *  这部分事件通常与"删除"有关。
              */
             decodedEvent.internalProcessor()
         }
@@ -126,7 +162,6 @@ internal class KookComponentBotImpl(
         updateMe(sourceBot.me())
         initGuilds()
         initSyncJob()
-        // clearFriendCache()
     }
     
     /**
@@ -153,10 +188,8 @@ internal class KookComponentBotImpl(
         requestGuilds()
             .buffer(100)
             .map { guild -> guild.toModel() }
-            .map { guild ->
-                KookGuildImpl(this, guild)
-            }.collect {
-                guildsMap[it.id.literal] = it.also { it.init() }
+            .collect { model ->
+                guildsMap[model.id.literal] = model.toKookGuild(this)
             }
         
         bot.logger.debug("Sync guild data, {} guild data have been cached.", guildsMap.size)
@@ -189,7 +222,7 @@ internal class KookComponentBotImpl(
                     val curr = guild(guild.id)
                     val syncNeedGuild = if (curr == null) {
                         // compute it.
-                        val guildImpl = KookGuildImpl(this, guildModel).also { it.init() }
+                        val guildImpl = guildModel.toKookGuild(this)
                         internalGuilds.compute(guildId) { _, cur ->
                             if (cur == null) {
                                 // 不存在旧的，直接添加
@@ -249,7 +282,7 @@ internal class KookComponentBotImpl(
     
     // region me and isMe
     @Volatile
-    private lateinit var me: Me
+    internal lateinit var me: Me
     
     private val meLock = Mutex()
     
@@ -293,18 +326,19 @@ internal class KookComponentBotImpl(
     
     override fun getGuild(id: ID): KookGuildImpl? = internalGuilds[id.literal]
     
+    override val guildList: List<KookGuild>
+        get() = internalGuilds.values.toList()
+    
     override val guilds: Items<KookGuild>
         get() = internalGuilds.values.asItems()
     
     
     // region friend api
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun contact(id: ID): KookUserChatImpl {
         val chat = UserChatCreateRequest(id).requestDataBy(bot)
         return KookUserChatImpl(this, chat.toModel())
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override val contacts: Items<KookUserChatImpl>
         get() {
             return itemsByFlow { prop ->
@@ -377,10 +411,12 @@ internal class KookComponentBotImpl(
                     
                     // region guild members
                     // 某人退出频道服务器
-                    is ExitedGuildEventBody -> {
-                        val guild = internalGuild(this.targetId) ?: return
-                        guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
-                    }
+                    // 在标准事件处理中进行
+                    // is ExitedGuildEventBody -> {
+                        // val guild = internalGuild(this.targetId) ?: return
+                        // guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
+                    // }
+                    
                     // 某人加入频道服务器
                     is JoinedGuildEventBody -> {
                         // query user info.
@@ -389,20 +425,19 @@ internal class KookComponentBotImpl(
                             UserViewRequest(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
-                        guild.internalMembers.compute(body.userId.literal) { _, old ->
-                            if (old == null) {
-                                KookGuildMemberImpl(this@KookComponentBotImpl, guild, userModel)
-                            } else {
-                                old.source = userModel
-                                old
-                            }
+                        guild.internalMembers.compute(body.userId.literal) { _, current ->
+                            current?.also {
+                                it.source = userModel
+                            } ?: KookGuildMemberImpl(this@KookComponentBotImpl, guild, userModel)
                         }
                     }
                     // 信息变更 （昵称变更）
                     is UpdatedGuildMemberEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
                         val member = guild.internalMembers[body.userId.literal] ?: return
-                        member.source.nickname = body.nickname
+                        member.source.also { old ->
+                            member.source = old.copy(nickname = body.nickname)
+                        }
                     }
                     // endregion
                     // region guilds
@@ -413,17 +448,20 @@ internal class KookComponentBotImpl(
                     // 服务器更新
                     is UpdatedGuildExtraBody -> {
                         val guild = internalGuild(body.id) ?: return
-                        guild.source = guild.source.copy(
-                            name = body.name,
-                            icon = body.icon,
-                            masterId = body.userId,
-                            notifyType = body.notifyType,
-                            region = body.region,
-                            enableOpen = body.enableOpen,
-                            openId = body.openId,
-                            defaultChannelId = body.defaultChannelId,
-                            welcomeChannelId = body.welcomeChannelId,
-                        )
+                        guild.source.also { old ->
+                            guild.source = old.copy(
+                                name = body.name,
+                                icon = body.icon,
+                                masterId = body.userId,
+                                notifyType = body.notifyType,
+                                region = body.region,
+                                enableOpen = body.enableOpen,
+                                openId = body.openId,
+                                defaultChannelId = body.defaultChannelId,
+                                welcomeChannelId = body.welcomeChannelId,
+                            )
+                        }
+                        
                     }
                     // endregion
                     // region channels
@@ -436,37 +474,57 @@ internal class KookComponentBotImpl(
                             // query channel info.
                             val channelView = ChannelViewRequest(channelId).requestDataBy(this@KookComponentBotImpl)
                             val channelModel = channelView.toModel()
-                            
-                            // 如果已经存在，覆盖source
-                            guild.internalChannels.compute(channelId.literal) { _, old ->
-                                if (old == null) {
-                                    KookChannelImpl(this@KookComponentBotImpl, guild, channelModel)
-                                } else {
-                                    old.source = channelModel
-                                    old
-                                }
-                            }
+                            guild.computeMergeChannelModel(channelModel)
                         }
                     }
+                    
                     // 某服务器更新频道信息
                     is UpdatedChannelExtraBody -> {
                         guild(body.guildId)?.also { guild ->
-                            val channel = guild.internalChannel(body.id) ?: return@also
-                            channel.source = channel.source.copy(
+                            val channelId = body.id.literal
+                            val mutableChannelModelContainer: MutableChannelModelContainer = if (body.isCategory) {
+                                guild.getInternalCategory(channelId)
+                            } else {
+                                guild.getInternalChannel(channelId)
+                            } ?: return@also
+                            
+                            val oldSource = mutableChannelModelContainer.source
+                            
+                            val newSource = oldSource.copy(
                                 userId = body.masterId,
-                                parentId = body.parentId,
+                                parentId = body.parentId, // update parent -> update category
                                 name = body.name,
                                 topic = body.topic,
                                 type = body.type,
                                 level = body.level,
                                 slowMode = body.slowMode,
-                                isCategory = body.isCategory,
+                                // isCategory = body.isCategory, // changeable?
                             )
+                            
+                            mutableChannelModelContainer.source = newSource
+                            if (mutableChannelModelContainer is KookChannelImpl) {
+                                val newCategoryIdValue = newSource.parentId.literal
+                                if (newCategoryIdValue.isEmpty()) {
+                                    // set null
+                                    mutableChannelModelContainer.category = null
+                                } else if (oldSource.parentId.literal != newCategoryIdValue) {
+                                    val newCategory =
+                                        guild.findOrQueryAndComputeCategory(newSource.parentId.literal) ?: return@also
+                                    // set new category
+                                    mutableChannelModelContainer.category = newCategory
+                                }
+                            }
+                            
                         }
                     }
                     // 某服务器频道被删除
                     is DeletedChannelExtraBody -> {
-                        guild(this.targetId)?.internalChannels?.remove(body.id.literal)?.also { it.cancel() }
+                        // TODO check isCategory?
+                        guild(targetId)?.also { guild ->
+                            val removedId = body.id.literal
+                            val removed: Any? = guild.removeInternalChannel(removedId) ?: guild.removeInternalCategory(removedId)
+                            logger.debug("Channel(or category) {} is be Deleted", removed)
+                        }
                     }
                     // endregion
                     
@@ -486,7 +544,7 @@ internal class KookComponentBotImpl(
                     is SelfJoinedGuildEventBody -> {
                         val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KookComponentBotImpl)
                         val guildModel = guildInfo.toModel()
-                        val newGuild = KookGuildImpl(this@KookComponentBotImpl, guildModel).also { it.init() }
+                        val newGuild = guildModel.toKookGuild(this@KookComponentBotImpl)
                         internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
                             old.cancel()
                             cur

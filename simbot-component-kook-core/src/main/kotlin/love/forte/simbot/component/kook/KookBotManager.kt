@@ -23,6 +23,9 @@ import love.forte.simbot.*
 import love.forte.simbot.application.ApplicationConfiguration
 import love.forte.simbot.application.EventProviderAutoRegistrarFactory
 import love.forte.simbot.application.EventProviderFactory
+import love.forte.simbot.bot.BotManager
+import love.forte.simbot.bot.BotVerifyInfo
+import love.forte.simbot.bot.ComponentMismatchException
 import love.forte.simbot.component.kook.internal.KookBotManagerImpl
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kook.KookBot
@@ -156,12 +159,10 @@ public abstract class KookBotManager : BotManager<KookComponentBot>(), KookBotRe
     }
     
     
-    // TODO Auto registrar
     public companion object Factory : EventProviderFactory<KookBotManager, KookBotManagerConfiguration> {
         override val key: Attribute<KookBotManager> = attribute("simbot.kook")
         private val logger = LoggerFactory.getLogger(KookBotManager::class.java)
-        
-        
+    
         /**
          * 通过各项配置构建 [KookBotManager] 实例。
          */
@@ -227,7 +228,6 @@ public class KookBotManagerAutoRegistrarFactory :
 }
 
 
-// TODO DELETE
 /**
  * 配置并构建一个 [KookBotManager] 实例。
  *
@@ -444,12 +444,12 @@ public data class KookBotVerifyInfoConfiguration(
          * _Note: 尚未使用的属性。_
          */
         val isCompress: Boolean = true,
-    
+        
         /**
          * 缓存对象信息的同步周期
          */
         val syncPeriods: KookComponentBotConfiguration.SyncPeriods = KookComponentBotConfiguration.SyncPeriods(),
-    
+        
         ) {
         public companion object {
             /**

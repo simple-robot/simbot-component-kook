@@ -112,15 +112,15 @@ public interface Guild : KookObjects, GuildInfo {
     public val welcomeChannelId: ID
 
     /** 角色列表 */
-    public val roles: List<Role>
+    public val roles: List<Role>?
 
     /** 频道列表 */
-    public val channels: List<Channel>
+    public val channels: List<Channel>?
 
     //// impls
     override val ownerId: ID get() = masterId
     override val description: String get() = topic
-    override val currentChannel: Int get() = channels.size
+    override val currentChannel: Int get() = channels?.size ?: 0
 
 
     public companion object {

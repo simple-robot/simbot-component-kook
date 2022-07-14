@@ -41,7 +41,7 @@ object P {
         
         val version = Version(
             major = "3", minor = 0, patch = 0,
-            status = preview(18, 0),
+            status = VersionStatus.beta(null, null, "M3"),
             isSnapshot = isSnapshot().also {
                 println("isSnapshot: $it")
             }
@@ -62,7 +62,7 @@ object P {
             major = "${Simbot.version.major}.${Simbot.version.minor}",
             minor = 0,
             patch = 0,
-            status = preview(14, 0),
+            status = VersionStatus.alpha(1, null),
             isSnapshot = isSnapshot
         )
         
@@ -71,99 +71,12 @@ object P {
 }
 
 
-/**
- * **P**roject **V**ersion。
- */
-@Suppress("SpellCheckingInspection")
-data class Version(
-    /**
-     * 主版号
-     */
-    val major: String,
-    /**
-     * 次版号
-     */
-    val minor: Int,
-    /**
-     * 修订号
-     */
-    val patch: Int,
-    
-    /**
-     * 状态号。状态号会追加在 [major].[minor].[patch] 之后，由 `.` 拼接，
-     * 变为 [major].[minor].[patch].[PVS.status].[PVS.minor].[PVS.patch].
-     *
-     * 例如：
-     * ```
-     * 3.0.0.preview.0.1
-     * ```
-     *
-     */
-    val status: PVS? = null,
-    
-    /**
-     * 是否快照。如果是，将会在版本号结尾处拼接 `-SNAPSHOT`。
-     */
-    val isSnapshot: Boolean = false,
-) {
-    companion object {
-        const val SNAPSHOT_SUFFIX = "-SNAPSHOT"
-    }
-    
-    /**
-     * 没有任何后缀的版本号。
-     */
-    val standardVersion: String = "$major.$minor.$patch"
-    
-    
-    /**
-     * 完整的版本号。
-     */
-    fun fullVersion(checkSnapshot: Boolean): String {
-        return buildString {
-            append(major).append('.').append(minor).append('.').append(patch)
-            if (status != null) {
-                append('.').append(status.status).append('.').append(status.minor).append('.').append(status.patch)
-            }
-            if (checkSnapshot && isSnapshot) {
-                append(SNAPSHOT_SUFFIX)
-            }
-        }
-    }
-    
-}
-
-/**
- * **P**roject **V**ersion **S**tatus.
- */
-@Suppress("SpellCheckingInspection")
-data class PVS(
-    val status: String,
-    /**
-     * 次版号
-     */
-    val minor: Int,
-    /**
-     * 修订号
-     */
-    val patch: Int,
-) {
-    companion object {
-        const val PREVIEW_STATUS = "preview"
-        const val BETA_STATUS = "beta"
-    }
-}
-
-
-internal fun preview(minor: Int, patch: Int) = PVS(PVS.PREVIEW_STATUS, minor, patch)
-
-
 private fun isSnapshot(): Boolean {
     println("property: ${System.getProperty("simbot.snapshot")}")
     println("env: ${System.getenv(Env.IS_SNAPSHOT)}")
     
-    return System.getProperty("simbot.snapshot")?.toBoolean()
-        ?: System.getenv(Env.IS_SNAPSHOT)?.toBoolean()
-        ?: false
+    val property = System.getProperty("simbot.snapshot")?.toBoolean() ?: false
+    val env = System.getenv(Env.IS_SNAPSHOT)?.toBoolean() ?: false
     
+    return property || env
 }

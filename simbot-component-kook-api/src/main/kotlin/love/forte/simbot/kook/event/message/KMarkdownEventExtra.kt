@@ -20,6 +20,7 @@ package love.forte.simbot.kook.event.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.LongID
 import love.forte.simbot.kook.event.Event
@@ -43,6 +44,7 @@ public interface KMarkdownEventExtra : MessageEventExtra {
     override val isMentionHere: Boolean
 
     override val author: User
+    @ExperimentalSimbotApi
     public val kmarkdown: KMarkdown
 }
 
@@ -53,6 +55,7 @@ public interface KMarkdownEventExtra : MessageEventExtra {
  * @author ForteScarlet
  */
 @Serializable
+@ExperimentalSimbotApi
 internal data class KMarkdownEventExtraImpl(
     override val type: Event.Type = Event.Type.KMD,
     @SerialName("guild_id")
@@ -68,142 +71,6 @@ internal data class KMarkdownEventExtraImpl(
     override val isMentionHere: Boolean = false,
 
     override val author: UserImpl,
+    @ExperimentalSimbotApi
     override val kmarkdown: RawValueKMarkdown,
 ) : KMarkdownEventExtra
-
-
-// @Serializable
-// internal sealed class KMarkdownEventImpl : AbstractMessageEvent<KMarkdownEventExtra>(), KMarkdownEvent {
-//
-//
-//     override val type: Event.Type
-//         get() = Event.Type.KMD
-//
-//
-//     /**
-//      * 群消息.
-//      */
-//     @Serializable
-//     internal data class Group(
-//         @SerialName("target_id")
-//         override val targetId: String,
-//         @SerialName("author_id")
-//         override val authorId: String,
-//         override val content: String,
-//         @SerialName("msg_id")
-//         override val msgId: String,
-//         @SerialName("msg_timestamp")
-//         override val msgTimestamp: Long,
-//         override val nonce: String,
-//         override val extra: KMarkdownEventExtra,
-//     ) : KMarkdownEventImpl(), GroupMsg, KMarkdownEvent.Group {
-//
-//
-//         override val channelType: Channel.Type get() = Channel.Type.GROUP
-//         override val groupMsgType: GroupMsg.Type = if (authorId == "1") GroupMsg.Type.SYS else GroupMsg.Type.NORMAL
-//
-//         @Transient
-//         override val flag: MessageGet.MessageFlag<GroupMsg.FlagContent> =
-//             MessageFlag(GroupMsgIdFlagContent(msgId))
-//
-//         //region GroupAccountInfo Ins
-//         private inner class ImageEventGroupAccountInfo : GroupAccountInfo, GroupInfo, GroupBotInfo {
-//             override val accountCode: String get() = extra.author.accountCode
-//             override val accountNickname: String get() = extra.author.accountNickname
-//             override val accountRemark: String? get() = extra.author.accountRemark
-//             override val accountAvatar: String get() = extra.author.accountAvatar
-//
-//             @Suppress("DEPRECATION")
-//             override val accountTitle: String?
-//                 get() = extra.author.accountTitle
-//
-//             override val botCode: String get() = bot.botCode
-//             override val botCodeNumber: Long get() = bot.botCodeNumber
-//             override val botName: String get() = bot.botName
-//             override val botAvatar: String? get() = bot.botAvatar
-//
-//             @Suppress("DEPRECATION")
-//             override val permission: Permissions
-//                 get() = extra.author.permission
-//
-//             override val groupAvatar: String?
-//                 get() = null // TODO("Not yet implemented")
-//
-//             override val parentCode: String get() = extra.guildId
-//             override val groupCode: String get() = targetId
-//             override val groupName: String get() = extra.channelName
-//         }
-//
-//         @Transient
-//         private val textEventGroupAccountInfo = ImageEventGroupAccountInfo()
-//
-//         override val permission: Permissions get() = textEventGroupAccountInfo.permission
-//         override val accountInfo: GroupAccountInfo get() = textEventGroupAccountInfo
-//         override val groupInfo: GroupInfo get() = textEventGroupAccountInfo
-//         override val botInfo: GroupBotInfo get() = textEventGroupAccountInfo
-//         //endregion
-//
-//         /**
-//          * Event coordinate.
-//          */
-//         companion object Coordinate : EventLocatorRegistrarCoordinate<Group> {
-//             override val type: Event.Type get() = Event.Type.KMD
-//
-//             override val channelType: Channel.Type get() = Channel.Type.GROUP
-//
-//             override val extraType: String
-//                 get() = type.type.toString()
-//
-//             override fun coordinateSerializer(): KSerializer<Group> = serializer()
-//         }
-//     }
-//
-//     /**
-//      * 私聊消息.
-//      */
-//     @Serializable
-//     public data class Person(
-//         @SerialName("target_id")
-//         override val targetId: String,
-//         @SerialName("author_id")
-//         override val authorId: String,
-//         override val content: String,
-//         @SerialName("msg_id")
-//         override val msgId: String,
-//         @SerialName("msg_timestamp")
-//         override val msgTimestamp: Long,
-//         override val nonce: String,
-//         override val extra: KMarkdownEventExtra,
-//     ) : KMarkdownEventImpl(), PrivateMsg, KMarkdownEvent.Person {
-//         override val channelType: Channel.Type
-//             get() = Channel.Type.PERSON
-//
-//         override val privateMsgType: PrivateMsg.Type
-//             get() = PrivateMsg.Type.FRIEND
-//
-//         override val flag: MessageGet.MessageFlag<PrivateMsg.FlagContent> = MessageFlag(PrivateMsgIdFlagContent(msgId))
-//
-//         companion object : EventLocatorRegistrarCoordinate<Person> {
-//             override val type: Event.Type get() = Event.Type.KMD
-//
-//             override val channelType: Channel.Type get() = Channel.Type.PERSON
-//
-//             override val extraType: String
-//                 get() = type.type.toString()
-//
-//             override fun coordinateSerializer(): KSerializer<Person> = serializer()
-//         }
-//     }
-//
-//
-//     override fun initMessageContent(): MessageContent = CardMessageContent(content)
-//
-//     internal companion object {
-//         internal fun EventLocator.registerCoordinates() {
-//             registerCoordinate(Group)
-//             registerCoordinate(Person)
-//         }
-//     }
-//
-//
-// }

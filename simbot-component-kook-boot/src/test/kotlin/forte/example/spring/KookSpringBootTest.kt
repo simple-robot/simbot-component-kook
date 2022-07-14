@@ -2,7 +2,7 @@ package forte.example.spring
 
 import forte.example.spring.app.TestListener
 import love.forte.simbot.FragileSimbotApi
-import love.forte.simbot.OriginBotManager
+import love.forte.simbot.bot.OriginBotManager
 
 
 /**
