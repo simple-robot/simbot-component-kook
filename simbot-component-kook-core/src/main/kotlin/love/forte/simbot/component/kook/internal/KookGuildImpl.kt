@@ -84,7 +84,7 @@ internal class KookGuildImpl private constructor(
                 return botMember
             }
             
-            return baseBot.toMemberBot(internalMember(baseBot.id)!!).also {
+            return baseBot.toMemberBot(internalMember(baseBot.me.id)!!).also {
                 botMember = it
             }
         }
