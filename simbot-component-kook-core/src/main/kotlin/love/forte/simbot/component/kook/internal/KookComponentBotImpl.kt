@@ -282,7 +282,7 @@ internal class KookComponentBotImpl(
     
     // region me and isMe
     @Volatile
-    private lateinit var me: Me
+    internal lateinit var me: Me
     
     private val meLock = Mutex()
     
