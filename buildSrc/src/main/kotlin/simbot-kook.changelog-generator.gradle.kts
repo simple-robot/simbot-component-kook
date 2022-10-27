@@ -19,7 +19,7 @@
 tasks.create("createChangelog") {
     group = "build"
     doFirst {
-        val realVersion = P.ComponentKook.version.fullVersion(false)
+        val realVersion = P.version.toString()
         val version = "v$realVersion"
         println("Generate change log for $version ...")
         // configurations.runtimeClasspath
@@ -29,7 +29,7 @@ tasks.create("createChangelog") {
         val file = File(changelogDir, "$version.md")
         if (!file.exists()) {
             file.createNewFile()
-            val coreVersion = P.Simbot.version.fullVersion(false)
+            val coreVersion = simbotVersion.toString()
             val autoGenerateText = """
                 > 对应核心版本: [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion)
                 

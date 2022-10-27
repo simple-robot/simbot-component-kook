@@ -23,7 +23,7 @@ plugins {
 
 
 dependencies {
-    api(V.Simbot.Api.NOTATION)
+    api(simbotApi)
     api(kotlin("reflect"))
 
     api(libs.ktor.client.core)

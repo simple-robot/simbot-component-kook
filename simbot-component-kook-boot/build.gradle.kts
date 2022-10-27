@@ -26,11 +26,11 @@ dependencies {
         exclude("love.forte.simbot")
     }
     
-    compileOnly(V.Simbot.BootApi.NOTATION)
+    compileOnly("love.forte.simbot.boot:simboot-api:$simbotVersion")
     
     
     testImplementation(libs.spring.boot.test)
-    testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
+    testImplementation("love.forte.simbot.boot:simboot-core-spring-boot-starter:$simbotVersion")
     testImplementation(libs.ktor.client.cio)
 }
 

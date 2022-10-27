@@ -26,8 +26,8 @@ dependencies {
     api(project(":simbot-component-kook-stdlib")) {
         exclude("love.forte.simbot")
     }
-    compileOnly(V.Simbot.Core.NOTATION)
+    compileOnly(simbotCore)
     compileOnly(libs.jetbrains.annotations)
 
-    testImplementation(V.Simbot.Core.NOTATION)
+    testImplementation(simbotCore)
 }
