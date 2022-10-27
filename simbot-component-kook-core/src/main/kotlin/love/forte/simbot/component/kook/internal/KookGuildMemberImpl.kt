@@ -22,7 +22,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
-import love.forte.simbot.LoggerFactory
 import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.KookUserChat
@@ -32,6 +31,8 @@ import love.forte.simbot.component.kook.model.UserModel
 import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kook.api.guild.GuildMuteDeleteRequest
+import love.forte.simbot.logger.LoggerFactory
+import love.forte.simbot.logger.logger
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import kotlin.coroutines.CoroutineContext
@@ -153,7 +154,7 @@ internal class KookGuildMemberImpl(
     }
     
     companion object {
-        private val logger = LoggerFactory.getLogger<KookGuildMember>()
+        private val logger = LoggerFactory.logger<KookGuildMember>()
     }
     
 }

@@ -15,12 +15,8 @@
  *
  */
 
-@file:Suppress("UnnecessaryOptInAnnotation")
-
 package love.forte.simbot.component.kook.internal.event
 
-import love.forte.simbot.Api4J
-import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.internal.KookChannelImpl
 import love.forte.simbot.component.kook.internal.KookComponentBotImpl
@@ -37,92 +33,96 @@ import love.forte.simbot.kook.event.system.user.SelfJoinedGuildEventBody
 import love.forte.simbot.kook.event.system.user.UserExitedChannelEventBody
 import love.forte.simbot.kook.event.system.user.UserJoinedChannelEventBody
 
-@OptIn(Api4J::class)
 internal data class KookMemberExitedChannelEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserExitedChannelEventBody>>,
-    override val source: KookChannelImpl,
-    override val before: KookGuildMemberImpl,
+    private val _source: KookChannelImpl,
+    private val _before: KookGuildMemberImpl,
 ) : KookMemberExitedChannelEvent() {
-    override val member: KookGuildMember
-        get() = before
+    override suspend fun source() = _source
+    override suspend fun member() = _before
+    override suspend fun before() = _before
 }
 
 
-@OptIn(Api4J::class)
 internal data class KookMemberJoinedChannelEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<UserJoinedChannelEventBody>>,
-    override val source: KookChannelImpl,
-    override val after: KookGuildMemberImpl,
+    private val _source: KookChannelImpl,
+    private val _after: KookGuildMemberImpl,
 ) : KookMemberJoinedChannelEvent() {
-    override val member: KookGuildMember
-        get() = after
+    override suspend fun source() = _source
+    override suspend fun member() = _after
+    override suspend fun after() = _after
 }
 
 
-@OptIn(Api4J::class)
 internal data class KookMemberExitedGuildEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<ExitedGuildEventBody>>,
-    override val source: KookGuildImpl,
-    override val before: KookGuildMemberImpl,
+    private val _source: KookGuildImpl,
+    private val _before: KookGuildMemberImpl,
 ) : KookMemberExitedGuildEvent() {
-    override val member: KookGuildMember
-        get() = before
+    override suspend fun source() = _source
+    override suspend fun member() = _before
+    override suspend fun before() = _before
 }
 
 
-@OptIn(Api4J::class)
 internal data class KookMemberJoinedGuildEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<JoinedGuildEventBody>>,
-    override val source: KookGuildImpl,
-    override val after: KookGuildMemberImpl,
+    private val _source: KookGuildImpl,
+    private val _after: KookGuildMemberImpl,
 ) : KookMemberJoinedGuildEvent() {
-    override val member: KookGuildMember
-        get() = after
+    override suspend fun source() = _source
+    override suspend fun member() = _after
+    override suspend fun after() = _after
 }
 
 
-@OptIn(Api4J::class)
 internal data class KookBotSelfExitedGuildEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
-    override val source: KookGuildImpl,
-    override val before: KookGuildMemberImpl,
+    private val _source: KookGuildImpl,
+    private val _before: KookGuildMemberImpl,
 ) : KookBotSelfExitedGuildEvent() {
-    override val member: KookGuildMember
-        get() = before
+    override suspend fun member() = _before
+    override suspend fun source() = _source
+    override suspend fun before() = _before
 }
 
 
-@OptIn(Api4J::class)
 internal data class KookBotSelfJoinedGuildEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
-    override val source: KookGuildImpl,
-    override val after: KookGuildMemberImpl,
+    private val _source: KookGuildImpl,
+    private val _after: KookGuildMemberImpl,
 ) : KookBotSelfJoinedGuildEvent() {
-    override val member: KookGuildMember
-        get() = after
+    override suspend fun member() = _after
+    override suspend fun source() = _source
+    override suspend fun after() = _after
 }
 
 
 internal data class KookMemberOnlineEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<GuildMemberOnlineEventBody>>,
-    override val source: UserInfo,
+    private val _source: UserInfo,
 ) : KookUserOnlineStatusChangedEvent.Online() {
     override val guilds: Sequence<KookGuildImpl?>
         get() = guildIds.asSequence().map { bot.internalGuild(it) }
+    
+    override suspend fun source() = _source
 }
 
 internal data class KookMemberOfflineEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: Event<Event.Extra.Sys<GuildMemberOfflineEventBody>>,
-    override val source: UserInfo,
+    private val _source: UserInfo,
 ) : KookUserOnlineStatusChangedEvent.Offline() {
     override val guilds: Sequence<KookGuildImpl?>
         get() = guildIds.asSequence().map { bot.internalGuild(it) }
+    
+    override suspend fun source() = _source
 }
