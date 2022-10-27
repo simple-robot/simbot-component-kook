@@ -17,8 +17,8 @@
 
 
 plugins {
-    id("simbot-kook.module-conventions")
-    id("simbot-kook.maven-publish")
+    `simbot-kook-module-conventions`
+    `simbot-kook-maven-publish`
 }
 
 dependencies {
