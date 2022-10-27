@@ -26,7 +26,7 @@ plugins {
 
 dependencies {
     api(project(":simbot-component-kook-api"))
-    api(V.Simbot.Api.NOTATION)
+    api(simbotApi)
     
     api(libs.ktor.client.websockets)
     api(libs.ktor.client.contentNegotiation)

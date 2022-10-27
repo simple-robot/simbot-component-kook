@@ -75,7 +75,7 @@ if (isPublishConfigurable) {
                 groupId = project.group.toString()
                 artifactId = project.name
                 version = project.version.toString()
-                description = project.description?.toString() ?: P.ComponentKook.DESCRIPTION
+                description = project.description?.toString() ?:P.DESCRIPTION
                 
                 pom {
                     show()
