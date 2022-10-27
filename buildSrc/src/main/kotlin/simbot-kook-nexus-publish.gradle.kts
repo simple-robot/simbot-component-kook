@@ -16,7 +16,7 @@
  */
 
 import love.forte.gradle.common.core.project.setup
-import util.systemProp
+import love.forte.gradle.common.core.property.systemProp
 import util.checkPublishConfigurable
 import java.time.Duration
 
