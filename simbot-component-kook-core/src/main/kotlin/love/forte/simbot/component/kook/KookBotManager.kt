@@ -31,6 +31,7 @@ import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kook.KookBot
 import love.forte.simbot.kook.KookBotConfiguration
 import love.forte.simbot.kook.SimpleTicket
+import love.forte.simbot.logger.LoggerFactory
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 

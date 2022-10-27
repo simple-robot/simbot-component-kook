@@ -17,9 +17,10 @@
 
 package love.forte.simbot.component.kook.internal.event
 
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
+import love.forte.simbot.component.kook.KookChannel
+import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.event.KookBotSelfChannelMessageEvent
 import love.forte.simbot.component.kook.event.KookBotSelfMessageEvent
@@ -45,28 +46,33 @@ import love.forte.simbot.utils.lazyValue
 internal class KookChannelMessageEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
-    override val author: KookGuildMemberImpl,
-    override val channel: KookChannelImpl,
+    private val _author: KookGuildMemberImpl,
+    private val _channel: KookChannelImpl,
 ) : KookChannelMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
     
+    override suspend fun author(): KookGuildMember = _author
+    
+    override suspend fun channel(): KookChannel = _channel
+    
     override suspend fun reply(message: Message): KookMessageReceipt {
-        return channel.send(message, sourceEvent.msgId)
+        return _channel.send(message, sourceEvent.msgId)
     }
     
     override suspend fun reply(text: String): KookMessageReceipt {
-        return channel.send(text, sourceEvent.msgId)
+        return _channel.send(text, sourceEvent.msgId)
     }
     
     override suspend fun reply(message: MessageContent): KookMessageReceipt {
-        return channel.send(message, sourceEvent.msgId)
+        return _channel.send(message, sourceEvent.msgId)
     }
+    
     
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
     override val messageContent: KookReceiveMessageContent = sourceEvent.toContent(false, bot)
-
-
+    
+    
 }
 
 
@@ -75,32 +81,27 @@ internal class KookContactMessageEventImpl(
     override val sourceEvent: MessageEvent<MessageEventExtra>,
 ) : KookContactMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
-
     
-    @OptIn(ExperimentalSimbotApi::class)
+    
     private val userChatView = lazyValue {
         val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
         KookUserChatImpl(bot, view.toModel())
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun user(): KookUserChat = userChatView()
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun reply(message: Message): KookMessageReceipt {
         return user().send(message)
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun reply(text: String): KookMessageReceipt {
         return user().send(text)
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun reply(message: MessageContent): KookMessageReceipt {
         return user().send(message)
     }
-
+    
     override val messageContent: KookReceiveMessageContent = sourceEvent.toContent(true, bot)
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
@@ -110,29 +111,32 @@ internal class KookContactMessageEventImpl(
 internal class KookBotSelfChannelMessageEventImpl(
     override val bot: KookComponentBotImpl,
     override val sourceEvent: MessageEvent<MessageEventExtra>,
-    override val channel: KookChannelImpl,
-    override val member: KookGuildMemberImpl,
+    private val _channel: KookChannelImpl,
+    private val _member: KookGuildMemberImpl,
 ) : KookBotSelfChannelMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
     
+    override suspend fun channel(): KookChannel = _channel
+    
+    override suspend fun member(): KookGuildMember = _member
     
     override suspend fun reply(message: Message): KookMessageReceipt {
-        return channel.send(message, sourceEvent.msgId)
+        return _channel.send(message, sourceEvent.msgId)
     }
     
     override suspend fun reply(text: String): KookMessageReceipt {
-        return channel.send(text, sourceEvent.msgId)
+        return _channel.send(text, sourceEvent.msgId)
     }
     
     override suspend fun reply(message: MessageContent): KookMessageReceipt {
-        return channel.send(message, sourceEvent.msgId)
+        return _channel.send(message, sourceEvent.msgId)
     }
     
     override val timestamp: Timestamp
         get() = sourceEvent.msgTimestamp
     override val messageContent: KookReceiveMessageContent = sourceEvent.toContent(false, bot)
-
-
+    
+    
 }
 
 
@@ -141,29 +145,24 @@ internal class KookBotSelfMessageEventImpl(
     override val sourceEvent: MessageEvent<MessageEventExtra>,
 ) : KookBotSelfMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
-
-
-    @OptIn(ExperimentalSimbotApi::class)
+    
+    
     private val userChatView = lazyValue {
         val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
         KookUserChatImpl(bot, view.toModel())
     }
-
-    @OptIn(ExperimentalSimbotApi::class)
+    
     override suspend fun source(): KookUserChat = userChatView()
     
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun reply(message: Message): KookMessageReceipt {
         return source().send(message)
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun reply(text: String): KookMessageReceipt {
         return source().send(text)
     }
     
-    @OptIn(ExperimentalSimbotApi::class)
     override suspend fun reply(message: MessageContent): KookMessageReceipt {
         return source().send(message)
     }
