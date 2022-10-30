@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kook.internal
 
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
@@ -63,7 +62,7 @@ internal suspend fun Event<*>.register(bot: KookComponentBotImpl) {
 
 
 @OptIn(DiscreetSimbotApi::class)
-private fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
+private suspend fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
     bot.pushIfProcessable(UnsupportedKookEvent) {
         UnsupportedKookEvent(bot, this)
     }
@@ -72,7 +71,7 @@ private fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
 /**
  * 消息事件
  */
-private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
+private suspend fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
     when (channelType) {
         Channel.Type.PERSON -> {
             if (bot.isMe(authorId)) {
@@ -95,8 +94,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
                     KookBotSelfChannelMessageEventImpl(
                         bot,
                         this,
-                        _channel = channel,
-                        _member = author
+                        channel,
+                        author
                     )
                 }
             } else {
@@ -310,13 +309,13 @@ private suspend fun KookComponentBotImpl.findUserInGuilds(userId: ID, guildIds: 
 }
 
 
-private inline fun KookComponentBot.pushIfProcessable(
+private suspend inline fun KookComponentBot.pushIfProcessable(
     eventKey: Key<*>,
     block: () -> love.forte.simbot.event.Event?,
 ): Boolean {
     if (eventProcessor.isProcessable(eventKey)) {
         val event = block() ?: return false
-        launch { eventProcessor.push(event) }
+        eventProcessor.push(event)
         return true
     }
     
