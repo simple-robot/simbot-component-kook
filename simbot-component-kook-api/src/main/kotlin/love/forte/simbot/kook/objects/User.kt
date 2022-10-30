@@ -21,10 +21,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
-import love.forte.simbot.LoggerFactory
 import love.forte.simbot.LongID
 import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.logger.LoggerFactory
 import org.slf4j.Logger
 
 

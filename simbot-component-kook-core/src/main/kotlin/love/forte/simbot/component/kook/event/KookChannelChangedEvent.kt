@@ -17,7 +17,8 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
@@ -33,7 +34,6 @@ import love.forte.simbot.kook.api.message.MessageViewRequest
 import love.forte.simbot.kook.event.system.channel.*
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.utils.runInBlocking
 
 /**
  *
@@ -54,27 +54,22 @@ import love.forte.simbot.utils.runInBlocking
 @BaseEvent
 public abstract class KookChannelChangedEvent<out Body : ChannelEventExtraBody> :
     KookSystemEvent<Body>(), ChangedEvent {
-
+    
     /**
      * 此事件涉及的频道所属的频道服务器。
      */
-    @OptIn(Api4J::class)
-    abstract override val source: KookGuild
-
-    /**
-     * 此事件涉及的频道所属的频道服务器。
-     */
-    @JvmSynthetic
-    override suspend fun source(): KookGuild = source
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookGuild
+    
     //// Impl
-
-
+    
+    
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
-
+    
     abstract override val key: Event.Key<out KookChannelChangedEvent<*>>
-
+    
     public companion object Key : BaseEventKey<KookChannelChangedEvent<*>>(
         "kook.channel_changed", KookSystemEvent, ChangedEvent
     ) {
@@ -91,7 +86,7 @@ public abstract class KookChannelChangedEvent<out Body : ChannelEventExtraBody> 
 public abstract class KookAddedChannelChangedEvent :
     KookChannelChangedEvent<AddedChannelExtraBody>(),
     IncreaseEvent {
-
+    
     /**
      * 操作者，即此频道的创建者。
      *
@@ -100,23 +95,18 @@ public abstract class KookAddedChannelChangedEvent :
      *
      */
     public abstract val operator: KookGuildMember?
-
+    
     /**
      * 增加的频道。
      */
-    @OptIn(Api4J::class)
-    abstract override val after: KookChannel
-
-    /**
-     * 增加的频道。
-     */
-    @JvmSynthetic
-    override suspend fun after(): KookChannel = after
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun after(): KookChannel
+    
+    
     override val key: Event.Key<out KookAddedChannelChangedEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookAddedChannelChangedEvent>(
         "kook.added_channel_changed", KookChannelChangedEvent, IncreaseEvent
     ) {
@@ -135,46 +125,31 @@ public abstract class KookUpdatedChannelChangedEvent :
     KookChannelChangedEvent<UpdatedChannelExtraBody>(),
     ChangedEvent,
     ChannelInfoContainer {
-
-
-    @OptIn(Api4J::class)
-    abstract override val channel: KookChannel
-
+    
     /**
      * 频道信息。
      */
-    @JvmSynthetic
-    override suspend fun channel(): KookChannel = channel
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun channel(): KookChannel
+    
     /**
      * 无法获取变更前的信息，[before] 恒为null。
      */
-    @OptIn(Api4J::class)
-    override val before: UpdatedChannelExtraBody?
-        get() = null
-
-    /**
-     * 无法获取变更前的信息，[before] 恒为null。
-     */
-    @JvmSynthetic
-    override suspend fun before(): UpdatedChannelExtraBody? = before
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun before(): UpdatedChannelExtraBody? = null
+    
     /**
      * 信息变更内容。
      */
-    @OptIn(Api4J::class)
-    override val after: UpdatedChannelExtraBody get() = sourceBody
-
-    /**
-     * 信息变更内容。
-     */
-    @JvmSynthetic
-    override suspend fun after(): UpdatedChannelExtraBody = after
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun after(): UpdatedChannelExtraBody = sourceBody
+    
     override val key: Event.Key<out KookUpdatedChannelChangedEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookUpdatedChannelChangedEvent>(
         "kook.updated_channel_changed", KookChannelChangedEvent, ChangedEvent
     ) {
@@ -195,40 +170,30 @@ public abstract class KookUpdatedChannelChangedEvent :
 public abstract class KookDeletedChannelChangedEvent :
     KookChannelChangedEvent<DeletedChannelExtraBody>(),
     DecreaseEvent {
-
+    
     /**
      * 被删除的频道。
      */
-    @OptIn(Api4J::class)
-    abstract override val before: KookChannel
-
-    /**
-     * 被删除的频道。
-     */
-    @JvmSynthetic
-    override suspend fun before(): KookChannel = before
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun before(): KookChannel
+    
+    
     /**
      * 始终为null。
      */
-    @OptIn(Api4J::class)
-    override val after: KookChannel?
-        get() = null
-
-    /**
-     * 始终为null。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun after(): KookChannel? = null
-
-
+    
+    
     override val key: Event.Key<out KookDeletedChannelChangedEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookDeletedChannelChangedEvent>(
         "kook.deleted_channel_changed", KookChannelChangedEvent, DecreaseEvent
     ) {
-
+        
         override fun safeCast(value: Any): KookDeletedChannelChangedEvent? = doSafeCast(value)
     }
 }
@@ -250,94 +215,69 @@ public abstract class KookDeletedChannelChangedEvent :
 public abstract class KookMessagePinEvent<Body : ChannelEventExtraBody> :
     KookChannelChangedEvent<Body>(),
     ChangedEvent, ChannelInfoContainer {
-
+    
     /**
      * 此事件涉及的频道信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val channel: KookChannel
-
-
-    /**
-     * 此事件涉及的频道信息。
-     */
-    @JvmSynthetic
-    override suspend fun channel(): KookChannel = channel
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun channel(): KookChannel
+    
+    
     /**
      * 此事件涉及的操作者。会通过 [operatorId] 获取。
      *
      * 假若在此事件触发前的瞬间此人离开频道，则可能造成无法获取的情况。
      */
     public abstract val operator: KookGuildMember?
-
+    
     /**
      * 涉及消息的ID
      */
     public abstract val msgId: ID
-
+    
     /**
      * 操作人ID
      */
     public abstract val operatorId: ID
-
+    
     /**
      * 涉及频道ID
      */
     public abstract val channelId: ID
-
-
+    
     /**
      * 变更前ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
      * 有值时同 [msgId].
      */
-    @OptIn(Api4J::class)
-    abstract override val before: ID?
-
-    /**
-     * 变更前ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
-     * 有值时同 [msgId].
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun before(): ID?
-
+    
     /**
      * 变更后ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
      * 有值时同 [msgId].
      */
-    @OptIn(Api4J::class)
-    abstract override val after: ID?
-
-    /**
-     * 变更后ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
-     * 有值时同 [msgId].
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun after(): ID?
-
-
+    
+    
     //// Api
-
+    
     /**
      * 通过 [msgId] 查询这条被置顶的消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun queryMsg(): MessageContent {
         val messageView = MessageViewRequest(msgId).requestDataBy(bot)
         return messageView.toContent(bot)
     }
-
-    /**
-     * 通过 [msgId] 查询这条置顶相关的消息。
-     */
-    @Api4J
-    public fun queryMsgBlocking(): MessageContent = runInBlocking { queryMsg() }
-
-
+    
     override val key: Event.Key<out KookMessagePinEvent<*>>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookMessagePinEvent<*>>(
         "kook.message_pin", KookChannelChangedEvent, ChangedEvent
     ) {
@@ -359,60 +299,48 @@ public abstract class KookMessagePinEvent<Body : ChannelEventExtraBody> :
  */
 public abstract class KookPinnedMessageEvent :
     KookMessagePinEvent<PinnedMessageExtraBody>() {
-
+    
     /**
      * 涉及消息的ID。
      *
      */
     override val msgId: ID
         get() = sourceBody.msgId
-
-
+    
+    
     /**
      * 操作者ID。
      */
     override val operatorId: ID
         get() = sourceBody.operatorId
-
+    
     /**
      * 频道ID。
      */
     override val channelId: ID
         get() = sourceBody.channelId
-
-    /**
-     * 始终为null。
-     */
-    override val before: ID?
-        get() = null
-
+    
     /**
      * 始终为null。
      */
     @JvmSynthetic
     override suspend fun before(): ID? = null
-
-    /**
-     * 同 [msgId].
-     */
-    override val after: ID
-        get() = msgId
-
+    
     /**
      * 同 [msgId].
      */
     @JvmSynthetic
-    override suspend fun after(): ID = after
-
+    override suspend fun after(): ID = msgId
+    
     override val key: Event.Key<out KookPinnedMessageEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookPinnedMessageEvent>(
         "kook.pinned_message", KookMessagePinEvent
     ) {
         override fun safeCast(value: Any): KookPinnedMessageEvent? = doSafeCast(value)
     }
-
+    
 }
 
 /**
@@ -428,52 +356,38 @@ public abstract class KookPinnedMessageEvent :
  */
 public abstract class KookUnpinnedMessageEvent :
     KookMessagePinEvent<UnpinnedMessageExtraBody>() {
-
+    
     //// Impl
     override val msgId: ID
         get() = sourceBody.msgId
-
+    
     override val operatorId: ID
         get() = sourceBody.operatorId
-
+    
     override val channelId: ID
         get() = sourceBody.channelId
-
+    
     /**
      * 同 [msgId].
      */
-
-    override val before: ID
-        get() = msgId
-
-    /**
-     * 同 [msgId].
-     */
-
     @JvmSynthetic
-    override suspend fun before(): ID = before
-
-    /**
-     * 始终为null。
-     */
-    override val after: ID?
-        get() = null
-
+    override suspend fun before(): ID = msgId
+    
     /**
      * 始终为null。
      */
     @JvmSynthetic
     override suspend fun after(): ID? = null
-
-
+    
+    
     override val key: Event.Key<out KookUnpinnedMessageEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookUnpinnedMessageEvent>(
         "kook.unpinned_message", KookMessagePinEvent
     ) {
         override fun safeCast(value: Any): KookUnpinnedMessageEvent? = doSafeCast(value)
     }
-
+    
 }
 

@@ -17,7 +17,8 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.KookUserChat
@@ -28,7 +29,6 @@ import love.forte.simbot.kook.event.message.MessageEventExtra
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.utils.runInBlocking
 import love.forte.simbot.kook.event.Event as KkEvent
 import love.forte.simbot.kook.event.message.MessageEvent as KkMessageEvent
 import love.forte.simbot.kook.objects.Channel as KkChannel
@@ -59,7 +59,7 @@ public sealed class KookMessageEvent :
     KookEvent<KkEvent.Extra.Text, KkMessageEvent<MessageEventExtra>>(), MessageEvent {
     override val key: Event.Key<out KookMessageEvent>
         get() = Key
-
+    
     /**
      * 接收到的消息体。
      */
@@ -70,7 +70,8 @@ public sealed class KookMessageEvent :
      *
      * 即向此消息事件的发送者进行**针对性的**消息回复。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     abstract override suspend fun reply(message: Message): KookMessageReceipt
     
     /**
@@ -78,7 +79,8 @@ public sealed class KookMessageEvent :
      *
      * 即向此消息事件的发送者进行**针对性的**消息回复。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     abstract override suspend fun reply(text: String): KookMessageReceipt
     
     /**
@@ -86,33 +88,9 @@ public sealed class KookMessageEvent :
      *
      * 即向此消息事件的发送者进行**针对性的**消息回复。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     abstract override suspend fun reply(message: MessageContent): KookMessageReceipt
-    
-    /**
-     * 回复此事件。
-     *
-     * 即向此消息事件的发送者进行**针对性的**消息回复。
-     */
-    @Api4J
-    override fun replyBlocking(text: String): KookMessageReceipt = runInBlocking { reply(text) }
-    
-    /**
-     * 回复此事件。
-     *
-     * 即向此消息事件的发送者进行**针对性的**消息回复。
-     */
-    @Api4J
-    override fun replyBlocking(message: Message): KookMessageReceipt = runInBlocking { reply(message) }
-    
-    /**
-     * 回复此事件。
-     *
-     * 即向此消息事件的发送者进行**针对性的**消息回复。
-     */
-    @Api4J
-    override fun replyBlocking(message: MessageContent): KookMessageReceipt = runInBlocking { reply(message) }
-    
     
     /**
      * 频道消息事件。
@@ -128,34 +106,28 @@ public sealed class KookMessageEvent :
      *
      */
     public abstract class Channel : KookMessageEvent(), MessageEvent {
-
-
+        
         /**
          * 消息事件发生的频道。
          */
-        @Api4J
-        abstract override val source: KookChannel
-
-        /**
-         * 消息事件发生的频道。
-         */
-        @JvmSynthetic
+        @JvmBlocking(asProperty = true, suffix = "")
+        @JvmAsync(asProperty = true)
         abstract override suspend fun source(): KookChannel
-
-
+        
+        
         /**
          * Event Key.
          */
         override val key: Event.Key<out Channel>
             get() = Key
-
-
+        
+        
         public companion object Key :
             BaseEventKey<Channel>("kook.base_message_channel", KookMessageEvent, MessageEvent) {
             override fun safeCast(value: Any): Channel? = doSafeCast(value)
         }
     }
-
+    
     /**
      * 私聊消息事件。
      *
@@ -169,29 +141,24 @@ public sealed class KookMessageEvent :
      * @see KookBotSelfMessageEvent
      */
     public abstract class Person : KookMessageEvent(), MessageEvent {
-
+        
         /**
          * 消息事件发生的对话。
          */
-        @Api4J
-        abstract override val source: KookUserChat
-
-        /**
-         * 消息事件发生的对话。
-         */
-        @JvmSynthetic
+        @JvmBlocking(asProperty = true, suffix = "")
+        @JvmAsync(asProperty = true)
         abstract override suspend fun source(): KookUserChat
-
-
+        
+        
         override val key: Event.Key<out Person>
             get() = Key
-
+        
         public companion object Key :
             BaseEventKey<Person>("kook.base_message_person", KookMessageEvent, MessageEvent) {
             override fun safeCast(value: Any): Person? = doSafeCast(value)
         }
     }
-
+    
     public companion object Key : BaseEventKey<KookMessageEvent>(
         "kook.message", MessageEvent
     ) {
@@ -206,63 +173,41 @@ public sealed class KookMessageEvent :
  * 此事件只会由 bot 自身以外的人触发。
  */
 public abstract class KookChannelMessageEvent : KookMessageEvent.Channel(), ChannelMessageEvent {
-
+    
     /**
      * 消息的发送者。不会是bot自己。
      */
-    @OptIn(Api4J::class)
-    abstract override val author: KookGuildMember
-
-    /**
-     * 消息的发送者。不会是bot自己。
-     */
-    @JvmSynthetic
-    override suspend fun author(): KookGuildMember = author
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun author(): KookGuildMember
+    
     /**
      * 消息产生的频道。同 [source].
      */
-    @OptIn(Api4J::class)
-    abstract override val channel: KookChannel
-
-    /**
-     * 消息产生的频道。同 [source].
-     */
-    @JvmSynthetic
-    override suspend fun channel(): KookChannel = channel
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun channel(): KookChannel
+    
     /**
      * 消息产生的频道。同 [channel].
      */
-    @OptIn(Api4J::class)
-    override val source: KookChannel
-        get() = channel
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun source(): KookChannel = channel()
+    
     /**
      * 消息产生的频道。同 [channel].
      */
-    @JvmSynthetic
-    override suspend fun source(): KookChannel = channel
-
-    /**
-     * 消息产生的频道。同 [channel].
-     */
-    @OptIn(Api4J::class)
-    override val organization: KookChannel
-        get() = channel
-
-    /**
-     * 消息产生的频道。同 [channel].
-     */
-    @JvmSynthetic
-    override suspend fun organization(): KookChannel = channel
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookChannel = channel()
+    
     /**
      * Event Key.
      */
     override val key: Event.Key<out KookChannelMessageEvent>
         get() = Key
-
+    
     public companion object Key :
         BaseEventKey<KookChannelMessageEvent>("kook.channel_message", Channel, ChannelMessageEvent) {
         override fun safeCast(value: Any): KookChannelMessageEvent? = doSafeCast(value)
@@ -275,47 +220,30 @@ public abstract class KookChannelMessageEvent : KookMessageEvent.Channel(), Chan
  * 此事件只会由 bot 以外的人触发。
  */
 public abstract class KookContactMessageEvent : KookMessageEvent.Person(), ContactMessageEvent {
-
+    
     /**
      * 私聊消息所来自的聊天会话。
      *
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
-    @Api4J
-    override val user: KookUserChat
-        get() = runInBlocking { user() }
-
-    /**
-     * 私聊消息所来自的聊天会话。
-     *
-     * 会在获取的时候通过api进行查询，没有内部缓存。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun user(): KookUserChat
-
+    
     /**
      * 私聊消息所来自的聊天会话。同 [user]。
      *
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
-    @Api4J
-    override val source: KookUserChat
-        get() = user
-
-
-    /**
-     * 私聊消息所来自的聊天会话。同 [user]。
-     *
-     * 会在获取的时候通过api进行查询，没有内部缓存。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun source(): KookUserChat = user()
-
-
+    
+    
     override val key: Event.Key<out KookContactMessageEvent>
         get() = Key
-    //endregion
-
+    // endregion
+    
     public companion object Key :
         BaseEventKey<KookContactMessageEvent>(
             "kook.contact_message",
@@ -332,79 +260,51 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
  * 此事件只会由 bot 自身触发。
  */
 public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(), ChannelEvent, MemberEvent {
-
-
+    
     /**
      * 发生事件的频道。
      */
-    @OptIn(Api4J::class)
-    abstract override val channel: KookChannel
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun channel(): KookChannel
+    
 
-
-    /**
-     * 发生事件的频道。
-     */
-    @JvmSynthetic
-    override suspend fun channel(): KookChannel = channel
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun source(): KookChannel = channel()
+    
     /**
      * 发生事件的频道。同 [channel]。
      */
-    @OptIn(Api4J::class)
-    override val source: KookChannel
-        get() = channel
-
-    /**
-     * 发生事件的频道。同 [channel]。
-     */
-    @JvmSynthetic
-    override suspend fun source(): KookChannel = source
-
-
-    /**
-     * 发生事件的频道。同 [channel]。
-     */
-    @OptIn(Api4J::class)
-    override val organization: KookChannel
-        get() = channel
-
-    /**
-     * 发生事件的频道。同 [channel]。
-     */
-    @JvmSynthetic
-    override suspend fun organization(): KookChannel = channel
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookChannel = channel()
+    
     /**
      * 消息发送者，也就是bot自身的信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val member: KookGuildMember
-
-    /**
-     * 消息发送者，也就是bot自身的信息。
-     */
-    @JvmSynthetic
-    override suspend fun member(): KookGuildMember = member
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun member(): KookGuildMember
+    
     /**
      * 消息发送者，也就是bot自身的信息。同 [member].
      */
-    @OptIn(Api4J::class)
-    override val user: KookGuildMember get() = member
-
-    /**
-     * 消息发送者，也就是bot自身的信息。同 [member].
-     */
-    @JvmSynthetic
-    override suspend fun user(): KookGuildMember = member
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun user(): KookGuildMember = member()
+    
+    
     override val key: Event.Key<out KookBotSelfChannelMessageEvent>
         get() = Key
-
+    
     public companion object Key :
-        BaseEventKey<KookBotSelfChannelMessageEvent>("kook.bot_self_channel_message", Channel, ChannelEvent, MemberEvent) {
+        BaseEventKey<KookBotSelfChannelMessageEvent>(
+            "kook.bot_self_channel_message",
+            Channel,
+            ChannelEvent,
+            MemberEvent
+        ) {
         override fun safeCast(value: Any): KookBotSelfChannelMessageEvent? = doSafeCast(value)
     }
 }
@@ -415,25 +315,18 @@ public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(
  * 此事件只会由 bot 自身触发，代表bot在私聊会话中发出的消息。
  */
 public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
-
     /**
      * 发生事件的私聊会话。
      */
-    @Api4J
-    override val source: KookUserChat
-        get() = runInBlocking { source() }
-
-    /**
-     * 发生事件的私聊会话。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun source(): KookUserChat
-
-
+    
+    
     override val key: Event.Key<out KookBotSelfMessageEvent>
         get() = Key
-
-
+    
+    
     public companion object Key :
         BaseEventKey<KookBotSelfMessageEvent>(
             "kook.bot_self_person_message",

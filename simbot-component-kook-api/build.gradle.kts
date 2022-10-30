@@ -17,13 +17,13 @@
 
 
 plugins {
-    id("simbot-kook.module-conventions")
-    id("simbot-kook.maven-publish")
+    `simbot-kook-module-conventions`
+    `simbot-kook-maven-publish`
 }
 
 
 dependencies {
-    api(V.Simbot.Api.NOTATION)
+    api(simbotApi)
     api(kotlin("reflect"))
 
     api(libs.ktor.client.core)

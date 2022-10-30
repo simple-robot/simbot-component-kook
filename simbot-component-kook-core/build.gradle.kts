@@ -17,8 +17,9 @@
 
 
 plugins {
-    id("simbot-kook.module-conventions")
-    id("simbot-kook.maven-publish")
+    `simbot-kook-module-conventions`
+    `simbot-kook-maven-publish`
+    `simbot-kook-suspend-transform`
 }
 
 
@@ -26,8 +27,8 @@ dependencies {
     api(project(":simbot-component-kook-stdlib")) {
         exclude("love.forte.simbot")
     }
-    compileOnly(V.Simbot.Core.NOTATION)
+    compileOnly(simbotCore)
     compileOnly(libs.jetbrains.annotations)
 
-    testImplementation(V.Simbot.Core.NOTATION)
+    testImplementation(simbotCore)
 }

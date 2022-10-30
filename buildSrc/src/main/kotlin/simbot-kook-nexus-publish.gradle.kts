@@ -15,7 +15,8 @@
  *
  */
 
-import util.systemProp
+import love.forte.gradle.common.core.project.setup
+import love.forte.gradle.common.core.property.systemProp
 import util.checkPublishConfigurable
 import java.time.Duration
 
@@ -40,16 +41,13 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
-group = P.ComponentKook.GROUP
-version = P.ComponentKook.VERSION
-description = P.ComponentKook.DESCRIPTION
-
+setup(P)
 
 val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
 
-println("isSnapshotOnly: $isSnapshotOnly")
-println("isReleaseOnly: $isReleaseOnly")
-println("isPublishConfigurable: $isPublishConfigurable")
+logger.info("isSnapshotOnly: {}", isSnapshotOnly)
+logger.info("isReleaseOnly: {}", isReleaseOnly)
+logger.info("isPublishConfigurable: {}", isPublishConfigurable)
 
 
 if (isPublishConfigurable) {

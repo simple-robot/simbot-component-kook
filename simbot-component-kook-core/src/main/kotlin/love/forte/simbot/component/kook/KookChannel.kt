@@ -76,7 +76,7 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     override val owner: KookGuildMember
     
     @JvmSynthetic
-    override suspend fun owner(): Member = owner
+    override suspend fun owner(): GuildMember = owner
     override val ownerId: ID
     
     /**
