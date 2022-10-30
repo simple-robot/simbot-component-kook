@@ -309,9 +309,9 @@ internal class KookBotImpl(
             }
         }.onEach { event ->
             val nowSn = event.sn
-            val currPreProcessorQueue = preProcessorQueue
-            val currProcessorQueue = processorQueue
-            if (currPreProcessorQueue.isNotEmpty() || currProcessorQueue.isNotEmpty()) {
+            // val currPreProcessorQueue = preProcessorQueue
+            // val currProcessorQueue = processorQueue
+            if (preProcessorQueue.isNotEmpty() || processorQueue.isNotEmpty()) {
                 clientLogger.trace("On event: {}", event)
                 val eventType = event.type
                 val eventExtraType = event.extraType
@@ -337,7 +337,7 @@ internal class KookBotImpl(
                 val lazyDecoded = lazy::value
                 
                 // pre process
-                currPreProcessorQueue.forEach { pre ->
+                preProcessorQueue.forEach { pre ->
                     try {
                         pre(event, decoder, lazyDecoded)
                     } catch (e: Throwable) {
@@ -350,26 +350,22 @@ internal class KookBotImpl(
                     }
                 }
                 
-                if (currProcessorQueue.isNotEmpty()) {
-                    launch {
-                        currProcessorQueue.forEach { p ->
-                            try {
-                                p(event, decoder, lazyDecoded)
-                            } catch (e: Throwable) {
-                                if (clientLogger.isDebugEnabled) {
-                                    clientLogger.debug(
-                                        "Event precess failure. Event: {}, event.data: {}", event, event.data
-                                    )
-                                }
-                                clientLogger.error("Event process failure.", e)
-                            }
+                launch {
+                    processorQueue.forEach { processor ->
+                        try {
+                            processor(event, decoder, lazyDecoded)
+                        } catch (e: Throwable) {
+                            clientLogger.debug(
+                                "Event precess failure. Event: {}, event.data: {}", event, event.data, e
+                            )
                         }
                     }
                 }
             }
             
             // 留下最大值。
-            sn.updateAndGet { prev -> max(prev, nowSn) }
+            val currentSn = sn.updateAndGet { prev -> max(prev, nowSn) }
+            clientLogger.trace("Current sn: {}", currentSn)
         }.onCompletion { cause ->
             clientLogger.debug(
                 "Session flow completion. cause: {}", cause?.localizedMessage, cause

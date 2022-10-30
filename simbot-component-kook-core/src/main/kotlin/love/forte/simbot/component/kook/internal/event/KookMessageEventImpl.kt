@@ -17,6 +17,8 @@
 
 package love.forte.simbot.component.kook.internal.event
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookChannel
@@ -82,13 +84,24 @@ internal class KookContactMessageEventImpl(
 ) : KookContactMessageEvent() {
     override val id: ID get() = sourceEvent.msgId
     
+    //
+    // private val userChatView = lazyValue {
+    //     val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
+    //     KookUserChatImpl(bot, view.toModel())
+    // }
     
-    private val userChatView = lazyValue {
+    private val userChatViewLock = Mutex()
+    
+    private var userChatView: KookUserChatImpl? = null
+    
+    private suspend fun userChatView(): KookUserChatImpl {
         val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
-        KookUserChatImpl(bot, view.toModel())
+        return KookUserChatImpl(bot, view)
     }
     
-    override suspend fun user(): KookUserChat = userChatView()
+    override suspend fun user(): KookUserChat = userChatView ?: userChatViewLock.withLock {
+        userChatView ?: userChatView().also { userChatView = it }
+    }
     
     override suspend fun reply(message: Message): KookMessageReceipt {
         return user().send(message)
