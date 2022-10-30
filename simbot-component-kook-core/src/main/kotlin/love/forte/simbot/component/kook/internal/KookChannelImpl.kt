@@ -79,7 +79,7 @@ internal class KookChannelImpl private constructor(
     
     override suspend fun guild(): KookGuild = _guild
     
-    override suspend fun member(id: ID): KookGuildMember? = _guild.getMember(id)
+    override suspend fun member(id: ID): KookGuildMember? = _guild.member(id)
     
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
         val request = message.toRequest(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
