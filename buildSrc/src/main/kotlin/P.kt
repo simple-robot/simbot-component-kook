@@ -18,6 +18,7 @@
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 import love.forte.gradle.common.core.project.ProjectDetail
+import love.forte.gradle.common.core.project.Version
 import love.forte.gradle.common.core.project.minus
 import love.forte.gradle.common.core.project.version
 
@@ -50,13 +51,17 @@ object P : ProjectDetail() {
     const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
     const val HOMEPAGE = "https://github.com/simple-robot/simbot-component-kook"
     
-    override val version: love.forte.gradle.common.core.project.Version = version(
+    private val baseVersion = version(
         "${simbotVersion.major}.${simbotVersion.minor}",
         0, 0
-    ) - version("alpha", 2)
+    )
     
-    val snapshotVersion: love.forte.gradle.common.core.project.Version =
-        version - love.forte.gradle.common.core.project.Version.SNAPSHOT
+    private val alphaSuffix = version("alpha", 2)
+    
+    override val version: Version = baseVersion - alphaSuffix
+    
+    val snapshotVersion: Version =
+        baseVersion - (alphaSuffix - Version.SNAPSHOT)
     
     override val group: String get() = GROUP
     override val description: String get() = DESCRIPTION
