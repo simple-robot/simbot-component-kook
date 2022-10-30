@@ -50,6 +50,14 @@ object P : ProjectDetail() {
     const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
     const val HOMEPAGE = "https://github.com/simple-robot/simbot-component-kook"
     
+    override val version: love.forte.gradle.common.core.project.Version = version(
+        "${simbotVersion.major}.${simbotVersion.minor}",
+        0, 0
+    ) - version("alpha", 2)
+    
+    val snapshotVersion: love.forte.gradle.common.core.project.Version =
+        version - love.forte.gradle.common.core.project.Version.SNAPSHOT
+    
     override val group: String get() = GROUP
     override val description: String get() = DESCRIPTION
     override val developers: List<Developer> = developers {
@@ -84,13 +92,7 @@ object P : ProjectDetail() {
         developerConnection = "scm:git:ssh://git@github.com/simple-robot/simbot-component-kook.git"
     }
     
-    override val version: love.forte.gradle.common.core.project.Version = version(
-        "${simbotVersion.major}.${simbotVersion.minor}",
-        0, 0
-    ) - version("beta", 2)
     
-    val snapshotVersion: love.forte.gradle.common.core.project.Version =
-        version - love.forte.gradle.common.core.project.Version.SNAPSHOT
 }
 
 

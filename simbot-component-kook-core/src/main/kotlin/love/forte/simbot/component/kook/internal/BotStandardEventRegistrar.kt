@@ -85,6 +85,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
                 }
             }
         }
+        
         Channel.Type.GROUP -> {
             val guild = bot.internalGuild(extra.guildId) ?: return
             val author = guild.getInternalMember(authorId) ?: return
@@ -94,8 +95,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
                     KookBotSelfChannelMessageEventImpl(
                         bot,
                         this,
-                        channel = channel,
-                        member = author
+                        _channel = channel,
+                        _member = author
                     )
                 }
             } else {
@@ -118,6 +119,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
 /**
  * 系统事件
  */
+@Suppress("UnnecessaryOptInAnnotation")
 @OptIn(ExperimentalSimbotApi::class)
 private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotImpl) {
     
@@ -245,6 +247,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
+        
         is UpdatedChannelExtraBody -> bot.pushIfProcessable(KookUpdatedChannelChangedEvent) {
             val channel = guild.getInternalChannel(body.id) ?: return
             KookUpdatedChannelChangedEventImpl(
@@ -253,6 +256,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
+        
         is DeletedChannelExtraBody -> bot.pushIfProcessable(KookDeletedChannelChangedEvent) {
             val channel = guild.getInternalChannel(body.id) ?: return
             KookDeletedChannelChangedEventImpl(
@@ -261,6 +265,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
+        
         is PinnedMessageExtraBody -> bot.pushIfProcessable(KookPinnedMessageEvent) {
             val channel = guild.getInternalChannel(body.channelId) ?: return
             val operator = guild.getInternalMember(body.operatorId)
@@ -270,6 +275,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel, operator
             )
         }
+        
         is UnpinnedMessageExtraBody -> bot.pushIfProcessable(KookUnpinnedMessageEvent) {
             val channel = guild.getInternalChannel(body.channelId) ?: return
             val operator = guild.getInternalMember(body.operatorId)
