@@ -44,6 +44,9 @@ plugins {
 }
 
 setup(P)
+if (isSnapshot()) {
+    version = P.snapshotVersion.toString()
+}
 
 repositories {
     mavenLocal()

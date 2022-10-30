@@ -197,9 +197,9 @@ public class KookBotConfiguration {
  */
 public inline fun KookBotConfiguration.timeout(init: Boolean = true, block: KookBotConfiguration.TimeoutConfiguration.() -> Unit) {
     val timeout = this.timeout
-    if (timeout == null) {
+    if (timeout == null && init) {
         this.timeout = KookBotConfiguration.TimeoutConfiguration().also(block)
     } else {
-        timeout.block()
+        timeout?.block()
     }
 }

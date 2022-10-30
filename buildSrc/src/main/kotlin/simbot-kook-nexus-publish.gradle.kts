@@ -17,6 +17,8 @@
 
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.property.systemProp
+import love.forte.gradle.common.core.repository.Repositories
+import love.forte.gradle.common.core.repository.Repository
 import util.checkPublishConfigurable
 import java.time.Duration
 
@@ -42,6 +44,9 @@ plugins {
 }
 
 setup(P)
+if (isSnapshot()) {
+    version = P.snapshotVersion.toString()
+}
 
 val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
 
@@ -51,8 +56,8 @@ logger.info("isPublishConfigurable: {}", isPublishConfigurable)
 
 
 if (isPublishConfigurable) {
-    val sonatypeUsername: String? = systemProp("OSSRH_USER")
-    val sonatypePassword: String? = systemProp("OSSRH_PASSWORD")
+    val sonatypeUsername: String? = sonatypeUsername
+    val sonatypePassword: String? = sonatypePassword
     
     if (sonatypeUsername == null || sonatypePassword == null) {
         println("[WARN] - sonatype.username or sonatype.password is null, cannot config nexus publishing.")
@@ -72,7 +77,7 @@ if (isPublishConfigurable) {
         
         repositories {
             sonatype {
-                snapshotRepositoryUrl.set(uri(Sonatype.Snapshot.URL))
+                snapshotRepositoryUrl.set(uri(Repositories.Snapshot.URL))
                 username.set(sonatypeUsername)
                 password.set(sonatypePassword)
             }

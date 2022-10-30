@@ -14,8 +14,8 @@ private val sonatypeUserInfo by lazy {
     userInfo
 }
 
-private val sonatypeUsername: String? get() = sonatypeUserInfo?.username
-private val sonatypePassword: String? get() = sonatypeUserInfo?.password
+val sonatypeUsername: String? get() = sonatypeUserInfo?.username
+val sonatypePassword: String? get() = sonatypeUserInfo?.password
 
 val ReleaseRepository by lazy {
     Repositories.Central.Default.copy(SimpleCredentials(sonatypeUsername, sonatypePassword))
