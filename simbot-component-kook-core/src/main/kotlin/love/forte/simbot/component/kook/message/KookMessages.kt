@@ -98,18 +98,18 @@ public suspend fun Message.toRequest(
             // TODO 如果存在at，atAll，atAllRole，
             //  转为kmarkdown消息。
 
-            val content = buildRawKMarkdown {
-
-            }
-
-            MessageCreateRequest(
-                type = MessageType.KMARKDOWN.type,
-                targetId = targetId,
-                content = content,
-                quote = quote,
-                nonce = nonce,
-                tempTargetId = tempTargetId
-            )
+            // val content = buildRawKMarkdown {
+            //
+            // }
+            //
+            // MessageCreateRequest(
+            //     type = MessageType.KMARKDOWN.type,
+            //     targetId = targetId,
+            //     content = content,
+            //     quote = quote,
+            //     nonce = nonce,
+            //     tempTargetId = tempTargetId
+            // )
 
             // for (i in this.indices.reversed()) {
             //
