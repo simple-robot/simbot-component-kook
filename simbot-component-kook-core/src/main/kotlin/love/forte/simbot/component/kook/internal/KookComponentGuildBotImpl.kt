@@ -17,9 +17,17 @@
 
 package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.component.kook.KookComponentBot
-import love.forte.simbot.component.kook.KookComponentGuildBot
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.ID
+import love.forte.simbot.component.kook.*
+import love.forte.simbot.component.kook.message.KookAssetImage
+import love.forte.simbot.component.kook.message.KookSimpleAssetMessage
+import love.forte.simbot.event.EventProcessor
+import love.forte.simbot.kook.KookBot
+import love.forte.simbot.kook.api.message.MessageType
+import love.forte.simbot.resources.Resource
+import love.forte.simbot.utils.item.Items
+import org.slf4j.Logger
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -29,11 +37,65 @@ import love.forte.simbot.component.kook.KookGuildMember
 internal class KookComponentGuildBotImpl private constructor(
     override val bot: KookComponentBot,
     private val member: KookGuildMember,
-) : KookComponentGuildBot(), KookComponentBot by bot {
+) : KookComponentGuildBot() {
     override suspend fun asMember(): KookGuildMember = member
     
-    override fun toMember(): KookGuildMember = member
+    override suspend fun guild(id: ID): KookGuild? = bot.guild(id)
     
+    override suspend fun contact(id: ID): KookUserChat = bot.contact(id)
+    
+    override suspend fun resolveImage(id: ID): KookAssetImage = bot.resolveImage(id)
+    
+    override suspend fun uploadAsset(resource: Resource, type: Int): KookSimpleAssetMessage =
+        bot.uploadAsset(resource, type)
+    
+    override suspend fun uploadAsset(resource: Resource, type: MessageType): KookSimpleAssetMessage =
+        bot.uploadAsset(resource, type)
+    
+    override suspend fun uploadAssetImage(resource: Resource): KookAssetImage = bot.uploadAssetImage(resource)
+    
+    override fun isMe(id: ID): Boolean = bot.isMe(id)
+    
+    override val sourceBot: KookBot
+        get() = bot.sourceBot
+    override val component: KookComponent
+        get() = bot.component
+    override val avatar: String
+        get() = bot.avatar
+    override val coroutineContext: CoroutineContext
+        get() = bot.coroutineContext
+    override val eventProcessor: EventProcessor
+        get() = bot.eventProcessor
+    override val isActive: Boolean
+        get() = bot.isActive
+    override val isCancelled: Boolean
+        get() = bot.isCancelled
+    override val isStarted: Boolean
+        get() = bot.isStarted
+    override val logger: Logger
+        get() = bot.logger
+    override val manager: KookBotManager
+        get() = bot.manager
+    override val username: String
+        get() = bot.username
+    override val guilds: Items<KookGuild>
+        get() = bot.guilds
+    override val guildList: List<KookGuild>
+        get() = bot.guildList
+    override val contacts: Items<KookUserChat>
+        get() = bot.contacts
+    
+    override suspend fun cancel(reason: Throwable?): Boolean {
+        return bot.cancel(reason)
+    }
+    
+    override suspend fun join() {
+        bot.join()
+    }
+    
+    override suspend fun start(): Boolean {
+        return bot.start()
+    }
     
     override fun toString(): String {
         return "KookComponentGuildBotImpl(bot=$bot, member=$member)"

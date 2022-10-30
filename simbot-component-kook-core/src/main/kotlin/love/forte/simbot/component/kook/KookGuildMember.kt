@@ -17,6 +17,8 @@
 
 package love.forte.simbot.component.kook
 
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.JavaDuration
@@ -35,7 +37,6 @@ import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.ZERO
 import love.forte.simbot.kook.objects.User as KkUser
 
 
@@ -45,8 +46,7 @@ import love.forte.simbot.kook.objects.User as KkUser
  *
  * @author ForteScarlet
  */
-public interface KookGuildMember :
-    GuildMember, KookComponentDefinition<KkUser> {
+public interface KookGuildMember : GuildMember, KookComponentDefinition<KkUser> {
     override val bot: KookComponentBot
     override val id: ID
     
@@ -69,9 +69,30 @@ public interface KookGuildMember :
      *
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun unmute(type: Int): Boolean
     
+    /**
+     * 对此用户进行静音操作。
+     * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
+     *
+     * @throws IllegalArgumentException 如果持续时间小于0
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+     */
+    @JvmSynthetic
+    override suspend fun mute(time: Long, timeUnit: TimeUnit): Boolean =
+        mute(time, timeUnit, GuildMuteType.TYPE_MICROPHONE)
+    
+    /**
+     * 对此用户进行静音操作。
+     * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
+     *
+     * @throws IllegalArgumentException 如果持续时间小于0
+     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
+     */
+    @JvmSynthetic
+    public suspend fun mute(time: Long, timeUnit: TimeUnit, type: Int): Boolean = mute(timeUnit.toMillis(time), type)
     
     /**
      * 对此用户进行静音操作。
@@ -89,7 +110,8 @@ public interface KookGuildMember :
      * @throws IllegalArgumentException 如果持续时间小于0
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun mute(duration: Duration, type: Int): Boolean = mute(duration.inWholeMilliseconds, type)
     
     
@@ -99,41 +121,10 @@ public interface KookGuildMember :
      * @throws IllegalArgumentException 如果持续时间小于0
      * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun mute(durationMillis: Long, type: Int = GuildMuteType.TYPE_MICROPHONE): Boolean
     
-    
-    /**
-     * 对此用户进行静音操作。
-     * 默认情况下，[mute] 代表使用类型 `1`: 麦克风静音。
-     *
-     * @throws IllegalArgumentException 如果持续时间小于0
-     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
-     */
-    @Api4J
-    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean =
-        runInBlocking { mute(timeUnit.toMillis(time)) }
-    
-    /**
-     * 对此用户进行静音操作。
-     *
-     * @throws IllegalArgumentException 如果持续时间小于0
-     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
-     */
-    @Api4J
-    public fun muteBlocking(time: Long, unit: TimeUnit, type: Int): Boolean =
-        runInBlocking { mute(unit.toMillis(time), type) }
-    
-    /**
-     * 对此用户进行静音操作。
-     *
-     * @throws IllegalArgumentException 如果持续时间小于0
-     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
-     */
-    @Api4J
-    override fun muteBlocking(): Boolean {
-        return runInBlocking { mute(ZERO) }
-    }
     
     /**
      * 对此用户进行静音操作。
@@ -143,7 +134,7 @@ public interface KookGuildMember :
      */
     @Api4J
     override fun muteBlocking(duration: JavaDuration): Boolean {
-        return runInBlocking { mute(duration.toMillis()) }
+        return muteBlocking(duration, GuildMuteType.TYPE_MICROPHONE)
     }
     
     /**
@@ -156,24 +147,6 @@ public interface KookGuildMember :
     public fun muteBlocking(duration: JavaDuration, type: Int): Boolean {
         return runInBlocking { mute(duration.toMillis(), type) }
     }
-    
-    /**
-     * 取消禁言。没有参数的 [unmute] 默认情况下，代表使用类型 `1`: 麦克风静音。
-     *
-     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
-     */
-    @Api4J
-    override fun unmuteBlocking(): Boolean = runInBlocking { unmute() }
-    
-    
-    /**
-     * 取消禁言。[type] 代表 [love.forte.simbot.kook.api.guild.GuildMuteCreateRequest] 的参数 `type`. 默认使用 `1`.
-     *
-     * @see love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
-     */
-    @Api4J
-    public fun unmuteBlocking(type: Int): Boolean = runInBlocking { unmute(type) }
-    
     // endregion
     
     /**
@@ -183,7 +156,8 @@ public interface KookGuildMember :
      * @throws UnsupportedActionException 如果目标不支持
      *
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(text: String): KookMessageCreatedReceipt
     
     /**
@@ -193,7 +167,8 @@ public interface KookGuildMember :
      * @throws UnsupportedActionException 如果目标不支持
      *
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(message: Message): KookMessageReceipt
     
     /**
@@ -203,57 +178,24 @@ public interface KookGuildMember :
      * @throws UnsupportedActionException 如果目标不支持
      *
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(message: MessageContent): KookMessageReceipt
     
-    /**
-     * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KookGuildSystemMember],
-     * 则会抛出 [UnsupportedActionException] 异常。
-     *
-     * @throws UnsupportedActionException 如果目标不支持
-     *
-     */
-    @Api4J
-    override fun sendBlocking(text: String): KookMessageCreatedReceipt
-    
-    /**
-     * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KookGuildSystemMember],
-     * 则会抛出 [UnsupportedActionException] 异常。
-     *
-     * @throws UnsupportedActionException 如果目标不支持
-     *
-     */
-    @Api4J
-    override fun sendBlocking(message: Message): KookMessageReceipt
-    
-    /**
-     * 阻塞的向当前频道对象发起一个新的聊天会话（私聊）并发送消息。如果当前类型为 [KookGuildSystemMember],
-     * 则会抛出 [UnsupportedActionException] 异常。
-     *
-     * @throws UnsupportedActionException 如果目标不支持
-     *
-     */
-    @Api4J
-    override fun sendBlocking(message: MessageContent): KookMessageReceipt
-    
-    @OptIn(Api4J::class)
-    override val guild: KookGuild
-    
-    @OptIn(Api4J::class)
-    override val organization: KookGuild
-        get() = guild
     
     /**
      * 得到当前成员所在频道服务器。同 [guild].
      */
-    @JvmSynthetic
-    override suspend fun organization(): KookGuild = guild
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun guild(): KookGuild
     
     /**
      * 得到当前成员所在频道服务器。同 [guild].
      */
-    @JvmSynthetic
-    override suspend fun guild(): KookGuild = guild
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookGuild = guild()
     
     
     /**
@@ -262,8 +204,7 @@ public interface KookGuildMember :
      * Deprecated: 尚未实现。
      */
     @Deprecated(
-        "Not support yet.",
-        ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
+        "Not support yet.", ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
     )
     override val roles: Items<Role>
         get() = emptyItems()
@@ -286,13 +227,15 @@ public interface KookGuildMember :
  */
 public class KookGuildSystemMember(
     override val bot: KookComponentBot,
-    override val guild: KookGuild,
+    private val _guild: KookGuild,
 ) : KookGuildMember {
     override val source: SystemUser
         get() = SystemUser
     
     override val id: ID
         get() = source.id
+    
+    override suspend fun guild(): KookGuild = _guild
     
     /**
      * 系统用户不支持禁言相关操作，永远得到 `false`.
@@ -310,7 +253,7 @@ public class KookGuildSystemMember(
     // region send 相关
     // 无法向系统用户发送消息
     private fun notSupport(): Nothing {
-        throw UnsupportedActionException("Send message to system user (bot [$bot] in guild [${guild}]) ")
+        throw UnsupportedActionException("Send message to system user (bot [$bot] in guild [${_guild}]) ")
     }
     
     @JvmSynthetic
@@ -325,21 +268,6 @@ public class KookGuildSystemMember(
     
     @JvmSynthetic
     override suspend fun send(message: MessageContent): KookMessageCreatedReceipt {
-        notSupport()
-    }
-    
-    @OptIn(Api4J::class)
-    override fun sendBlocking(text: String): KookMessageCreatedReceipt {
-        notSupport()
-    }
-    
-    @OptIn(Api4J::class)
-    override fun sendBlocking(message: Message): KookMessageCreatedReceipt {
-        notSupport()
-    }
-    
-    @OptIn(Api4J::class)
-    override fun sendBlocking(message: MessageContent): KookMessageCreatedReceipt {
         notSupport()
     }
     // endregion

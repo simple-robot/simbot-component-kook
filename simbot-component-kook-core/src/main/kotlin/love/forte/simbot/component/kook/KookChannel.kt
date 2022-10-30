@@ -17,9 +17,9 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
-import love.forte.simbot.JavaDuration
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
@@ -31,8 +31,6 @@ import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
-import love.forte.simbot.utils.runInBlocking
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import love.forte.simbot.kook.objects.Channel as KkChannel
 
@@ -72,11 +70,10 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     override val currentMember: Int
     override val maximumMember: Int
     
-    @OptIn(Api4J::class)
-    override val owner: KookGuildMember
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun owner(): KookGuildMember
     
-    @JvmSynthetic
-    override suspend fun owner(): GuildMember = owner
     override val ownerId: ID
     
     /**
@@ -87,29 +84,25 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     /**
      * 寻找当前频道中指定ID的成员。相当于在 guild 中寻找。
      */
-    @OptIn(Api4J::class)
-    override fun getMember(id: ID): KookGuildMember?
-    
-    /**
-     * 寻找当前频道中指定ID的成员。相当于在 guild 中寻找。
-     */
-    @JvmSynthetic
+    @JvmBlocking(baseName = "getMember", suffix = "")
+    @JvmAsync(baseName = "getMember")
     override suspend fun member(id: ID): KookGuildMember?
     
     
     // region guild api
-    @OptIn(Api4J::class)
-    override val guild: KookGuild
+    /**
+     * 子频道所属频道服务器
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun guild(): KookGuild
     
-    @OptIn(Api4J::class)
-    override val previous: KookGuild?
-        get() = guild
-    
-    @JvmSynthetic
-    override suspend fun guild(): KookGuild = guild
-    
-    @JvmSynthetic
-    override suspend fun previous(): KookGuild = guild
+    /**
+     * 子频道所属频道服务器
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun previous(): KookGuild = guild()
     // endregion
     
     
@@ -133,7 +126,8 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     /**
      * 根据 [MessageCreateRequest] api 构建并发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun send(request: MessageCreateRequest): KookMessageReceipt {
         return request.requestDataBy(bot).asReceipt(false, bot)
     }
@@ -141,7 +135,8 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     /**
      * 根据 [MessageCreateRequest] api 构建并发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun send(
         type: Int,
         content: String,
@@ -159,7 +154,8 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
      *
      * @see MessageCreateRequest.tempTargetId
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun send(text: String, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt {
         return send(
             MessageType.TEXT.type,
@@ -174,7 +170,8 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
      * @see MessageCreateRequest.tempTargetId
      * @see MessageCreateRequest.quote
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun send(message: Message, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt
     
     /**
@@ -183,7 +180,8 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
      * @see MessageCreateRequest.tempTargetId
      * @see MessageCreateRequest.quote
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun send(
         message: MessageContent,
         quote: ID? = null,
@@ -194,7 +192,8 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     /**
      * 发送纯文本消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(text: String): KookMessageReceipt {
         return send(
             MessageType.TEXT.type,
@@ -206,92 +205,16 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     /**
      * 发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(message: Message): KookMessageReceipt = send(message, null)
     
     /**
      * 发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(message: MessageContent): KookMessageReceipt = send(message, null)
-    
-    
-    /**
-     * 发送纯文本消息，并指定 [quote].
-     *
-     * @see MessageCreateRequest.quote
-     */
-    @Api4J
-    public fun sendBlocking(text: String, quote: ID?): KookMessageReceipt = runInBlocking {
-        send(text, quote = quote)
-    }
-    
-    /**
-     * 发送消息，并指定 [quote].
-     *
-     * @see MessageCreateRequest.quote
-     */
-    @Api4J
-    public fun sendBlocking(message: Message, quote: ID?): KookMessageReceipt =
-        runInBlocking { send(message, quote = quote) }
-    
-    /**
-     * 发送消息，并指定 [quote].
-     *
-     * @see MessageCreateRequest.quote
-     */
-    @Api4J
-    public fun sendBlocking(message: MessageContent, quote: ID?): KookMessageReceipt =
-        runInBlocking { send(message, quote = quote) }
-    
-    /**
-     * 发送纯文本消息，并指定 [quote] 和 [tempTargetId].
-     *
-     * @see MessageCreateRequest.tempTargetId
-     * @see MessageCreateRequest.quote
-     */
-    @Api4J
-    public fun sendBlocking(text: String, quote: ID?, tempTargetId: ID?): KookMessageReceipt = runInBlocking {
-        send(text, quote = quote, tempTargetId = tempTargetId)
-    }
-    
-    /**
-     * 发送消息，并指定 [quote] 和 [tempTargetId].
-     *
-     * @see MessageCreateRequest.tempTargetId
-     * @see MessageCreateRequest.quote
-     */
-    @Api4J
-    public fun sendBlocking(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt =
-        runInBlocking { send(message, quote = quote, tempTargetId = tempTargetId) }
-    
-    /**
-     * 发送消息，并指定 [quote] 和 [tempTargetId].
-     *
-     * @see MessageCreateRequest.tempTargetId
-     * @see MessageCreateRequest.quote
-     */
-    @Api4J
-    public fun sendBlocking(message: MessageContent, quote: ID?, tempTargetId: ID?): KookMessageReceipt =
-        runInBlocking { send(message, quote = quote, tempTargetId = tempTargetId) }
-    
-    /**
-     * 发送纯文本消息。
-     */
-    @Api4J
-    override fun sendBlocking(text: String): KookMessageReceipt = sendBlocking(text, null)
-    
-    /**
-     * 发送消息。
-     */
-    @Api4J
-    override fun sendBlocking(message: Message): KookMessageReceipt = sendBlocking(message, null)
-    
-    /**
-     * 发送消息。
-     */
-    @Api4J
-    override fun sendBlocking(message: MessageContent): KookMessageReceipt = sendBlocking(message, null)
     
     // endregion
     
@@ -301,23 +224,6 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
     
     @Deprecated("Channel mute is not supported", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
-    override fun unmuteBlocking(): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(duration: JavaDuration): Boolean = false
-    
     // endregion
 }
 

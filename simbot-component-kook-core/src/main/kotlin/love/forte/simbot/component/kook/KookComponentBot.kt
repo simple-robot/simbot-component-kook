@@ -17,7 +17,8 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.message.KookAssetImage
@@ -33,7 +34,6 @@ import love.forte.simbot.kook.api.userchat.UserChatListRequest
 import love.forte.simbot.resources.Resource
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
-import love.forte.simbot.utils.runInBlocking
 import org.slf4j.Logger
 import kotlin.coroutines.CoroutineContext
 
@@ -83,7 +83,7 @@ public interface KookComponentBot : Bot {
     public override val logger: Logger
     public override val manager: KookBotManager
     public override val username: String
-
+    
     /**
      * 获取当前bot存在的频道服务器序列。
      */
@@ -97,15 +97,9 @@ public interface KookComponentBot : Bot {
     /**
      * 根据指定ID寻找频道服务器。
      */
-    @JvmSynthetic
+    @JvmBlocking(baseName = "getGuild", suffix = "")
+    @JvmAsync(baseName = "getGuild")
     public override suspend fun guild(id: ID): KookGuild?
-    
-    
-    /**
-     * 根据指定ID寻找频道服务器。
-     */
-    @OptIn(Api4J::class)
-    public override fun getGuild(id: ID): KookGuild?
     
     
     // region image api
@@ -115,7 +109,8 @@ public interface KookComponentBot : Bot {
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值，即 `2`、`3`、`4`。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun uploadAsset(resource: Resource, type: Int): KookSimpleAssetMessage
     
     /**
@@ -123,7 +118,8 @@ public interface KookComponentBot : Bot {
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值.
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun uploadAsset(resource: Resource, type: MessageType): KookSimpleAssetMessage =
         uploadAsset(resource, type.type)
     
@@ -131,33 +127,19 @@ public interface KookComponentBot : Bot {
     /**
      * 提供一个资源类型并将其上传后作为 [KookAssetImage] 使用。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public suspend fun uploadAssetImage(resource: Resource): KookAssetImage
     
     /**
-     * 提供一个资源类型并将其上传后作为 [KookAssetImage] 使用。
-     */
-    @Api4J
-    public fun uploadAssetImageBlocking(resource: Resource): KookAssetImage = runInBlocking { uploadAssetImage(resource) }
-    
-    
-    /**
      * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
      *
      * 但是需要验证此 [id] 是否为 `https://www.kook.cn` 开头，即是否为 kook 的资源。
      *
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     public override suspend fun resolveImage(id: ID): KookAssetImage
-    
-    /**
-     * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
-     *
-     * 但是需要验证此 [id] 是否为 `https://www.kook.cn` 开头，即是否为 kook 的资源。
-     *
-     */
-    @OptIn(Api4J::class)
-    override fun resolveImageBlocking(id: ID): KookAssetImage
     // endregion
     
     /**
@@ -169,21 +151,9 @@ public interface KookComponentBot : Bot {
      * 但是会抛出任何可能由 [UserChatCreateRequest] 抛出的或者请求过程中产生的任何异常。
      *
      */
-    @JvmSynthetic
+    @JvmBlocking(baseName = "getContact", suffix = "")
+    @JvmAsync(baseName = "getContact")
     override suspend fun contact(id: ID): KookUserChat
-    
-    /**
-     * 通过指定ID **构建** 一个目标用户的[聊天会话][KookUserChat]对象。
-     *
-     * [聊天会话][KookUserChat] 目前不会进行缓存，每次获取都会通过 [UserChatCreateRequest] 请求并构建新的实例。
-     * 由于每次都会通过api请求，因此不存在 "没找到" 的情况，[getContact] 将不会返回非null值。
-     *
-     * 但是会抛出任何可能由 [UserChatCreateRequest] 抛出的或者请求过程中产生的任何异常。
-     *
-     */
-    @Api4J
-    override fun getContact(id: ID): KookUserChat = runInBlocking { contact(id) }
-    
     
     /**
      * 查询当前存在的所有 [聊天会话][KookUserChat]。
@@ -222,11 +192,6 @@ public interface KookComponentBot : Bot {
     override val groups: Items<Group>
         get() = emptyItems()
     
-    @OptIn(Api4J::class)
-    @Deprecated("Does not support the 'group'", ReplaceWith("null"))
-    override fun getGroup(id: ID): Group? = null
-    
-    
     // more ..?
 }
 
@@ -245,11 +210,30 @@ public abstract class KookComponentGuildBot : KookComponentBot, GuildBot {
     /**
      * 得到当前组织中的 Kook bot在当前组织中所扮演的成员对象。
      */
+    @JvmBlocking(baseName = "toMember", suffix = "")
+    @JvmAsync(baseName = "toMember")
     abstract override suspend fun asMember(): KookGuildMember
     
     /**
-     * 得到当前组织中的 Kook bot在当前组织中所扮演的成员对象。
+     * @see KookComponentBot.guild
      */
-    @OptIn(Api4J::class)
-    abstract override fun toMember(): KookGuildMember
+    @JvmBlocking(baseName = "getGuild", suffix = "")
+    @JvmAsync(baseName = "getGuild")
+    override suspend fun guild(id: ID): KookGuild? = bot.guild(id)
+    
+    /**
+     * @see KookComponentBot.contact
+     */
+    @JvmBlocking(baseName = "getContact", suffix = "")
+    @JvmAsync(baseName = "getContact")
+    override suspend fun contact(id: ID): KookUserChat = bot.contact(id)
+    
+    
+    
+    /**
+     * @see KookComponentBot.resolveImage
+     */
+    @JvmBlocking
+    @JvmAsync
+    override suspend fun resolveImage(id: ID): KookAssetImage = bot.resolveImage(id)
 }

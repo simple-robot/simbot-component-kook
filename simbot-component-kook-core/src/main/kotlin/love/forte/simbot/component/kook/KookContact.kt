@@ -30,40 +30,37 @@ import love.forte.simbot.kook.objects.User as KkUser
  * @author ForteScarlet
  */
 public interface KookContact : Contact {
-
+    
     /**
      * id。
      */
     override val id: ID get() = sourceUser.id
-
+    
     /**
      * 用户名。
      */
     override val username: String get() = sourceUser.username
-
+    
     /**
      * Kook 的源用户信息。
      */
     public val sourceUser: KkUser
-
+    
     /**
      * 联系人所属bot。
      */
     override val bot: KookComponentBot
-
+    
+    /**
+     * 头像。
+     */
+    override val avatar: String get() = sourceUser.avatar
+    
     /**
      * 发送消息。
      */
     @JvmSynthetic
     override suspend fun send(message: Message): MessageReceipt
-
-
-    /**
-     * 头像。
-     */
-    override val avatar: String get() = sourceUser.avatar
-
-
-
-
+    
+    
 }

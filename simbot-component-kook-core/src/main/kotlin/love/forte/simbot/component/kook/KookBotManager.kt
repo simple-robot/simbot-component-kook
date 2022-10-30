@@ -233,7 +233,6 @@ public class KookBotManagerAutoRegistrarFactory :
  * 配置并构建一个 [KookBotManager] 实例。
  *
  */
-@Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Use Factory in application")
 public fun kookBotManager(
     eventProcessor: EventProcessor,

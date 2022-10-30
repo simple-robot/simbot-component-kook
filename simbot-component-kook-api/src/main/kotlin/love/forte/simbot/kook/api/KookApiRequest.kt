@@ -156,9 +156,9 @@ public abstract class KookApiRequest<T> {
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
-     * @param postchecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
+     * @param postChecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
      *
-     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postchecker] 进行实现支持。
+     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postChecker] 进行实现支持。
      *
      * @see request
      */
@@ -168,10 +168,10 @@ public abstract class KookApiRequest<T> {
         client: HttpClient,
         authorization: String,
         decoder: Json = DEFAULT_JSON,
-        postchecker: Consumer<HttpResponse> = defaultRequestPostChecker
+        postChecker: Consumer<HttpResponse> = defaultRequestPostChecker
     ): ApiResult = runInBlocking {
         request(client, authorization, decoder) { resp ->
-            runWithInterruptible { postchecker.accept(resp) }
+            runWithInterruptible { postChecker.accept(resp) }
         }
     }
 
