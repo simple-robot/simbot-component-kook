@@ -18,6 +18,7 @@
 package love.forte.simbot.kook.internal
 
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
@@ -78,7 +79,15 @@ internal class KookBotImpl(
     private val job: Job
     override val coroutineContext: CoroutineContext
     
+    /**
+     * api请求的client
+     */
     override val httpClient: HttpClient
+    
+    /**
+     * ws连接用的client
+     */
+    private val wsClient: HttpClient
     
     private val isCompress = configuration.isCompress
     private val gatewayRequest: GatewayRequest = if (isCompress) GatewayRequest.Compress else GatewayRequest.NotCompress
@@ -98,26 +107,45 @@ internal class KookBotImpl(
             }
             
             // install ws
-            install(WebSockets)
-            
+            // install(WebSockets)
+            // http request timeout
+            install(HttpTimeout) {
+                this.connectTimeoutMillis = configuration.connectTimeoutMillis
+                this.requestTimeoutMillis = configuration.requestTimeoutMillis
+            }
             
             // config it.
             configuration.httpClientConfig(this)
         }
         
-        val client = when {
-            engine != null -> HttpClient(engine) {
-                configClient()
+        when {
+            engine != null -> {
+                httpClient = HttpClient(engine) {
+                    configClient()
+                }
+                wsClient = HttpClient(engine) {
+                    WebSockets { }
+                }
             }
-            engineFactory != null -> HttpClient(engineFactory) {
-                configClient()
+            
+            engineFactory != null -> {
+                httpClient = HttpClient(engineFactory) {
+                    configClient()
+                }
+                wsClient = HttpClient(engineFactory) {
+                    WebSockets { }
+                }
             }
-            else -> HttpClient {
-                configClient()
+            
+            else -> {
+                httpClient = HttpClient {
+                    configClient()
+                }
+                wsClient = HttpClient {
+                    WebSockets { }
+                }
             }
         }
-        
-        httpClient = client
         
         
     }
@@ -236,6 +264,7 @@ internal class KookBotImpl(
                     
                     null
                 }
+                
                 Signal.Reconnect.S_CODE -> {
                     this.clientLogger.debug("Reconnect signal received: {}", eventString)
                     val reconnect = decoder.decodeFromJsonElement(Signal.Reconnect.serializer(), jsonElement)
@@ -250,6 +279,7 @@ internal class KookBotImpl(
                     // is dispatch
                     decoder.decodeFromJsonElement(eventSerializer, jsonElement)
                 }
+                
                 else -> null
             }
         }
@@ -263,10 +293,12 @@ internal class KookBotImpl(
                     processEventString(eventString)
                     
                 }
+                
                 is Frame.Binary -> {
                     val eventString = it.readToText()
                     processEventString(eventString)
                 }
+                
                 else -> {
                     clientLogger.trace("Other frame: {}", it)
                     null

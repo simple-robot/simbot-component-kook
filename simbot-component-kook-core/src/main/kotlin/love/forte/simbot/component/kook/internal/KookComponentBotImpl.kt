@@ -85,14 +85,6 @@ private class MuteDelayCoroutineDispatcherContainer(name: String) {
         it.isDaemon = true
     }
     
-    @Volatile
-    private var threadNum = 1
-    
-    @Synchronized
-    private fun nextThreadNum(): Int {
-        return threadNum++
-    }
-    
     val muteDelayDispatcher: ExecutorCoroutineDispatcher = ThreadPoolExecutor(
         0,
         1,
@@ -100,7 +92,7 @@ private class MuteDelayCoroutineDispatcherContainer(name: String) {
         TimeUnit.MINUTES,
         LinkedBlockingQueue(),
     ) { runnable ->
-        Thread(threadGroup, runnable, "${threadGroup.name}-${nextThreadNum()}").also {
+        Thread(threadGroup, runnable, threadGroup.name).also {
             it.isDaemon = true
         }
     }.asCoroutineDispatcher()
