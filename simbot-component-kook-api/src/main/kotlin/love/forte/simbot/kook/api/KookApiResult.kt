@@ -147,7 +147,7 @@ public class ApiResult @ApiResultType constructor(
 ) {
 
     /**
-     * 当前api响应值的 [速率限制][RateLimit] 信息。会在当前类实例化之后在进行初始化。
+     * 当前api响应值的 [速率限制][RateLimit] 信息。会在当前类实例化之后再进行初始化。
      */
     @Transient
     public var rateLimit: RateLimit = RateLimit.DEFAULT

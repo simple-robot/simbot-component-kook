@@ -23,6 +23,7 @@ import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.*
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.model.UserChatViewModel
+import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.message.DirectMessageCreateRequest
 import love.forte.simbot.kook.api.message.MessageCreated
@@ -92,7 +93,6 @@ internal class KookUserChatImpl(
     }
     
     override suspend fun delete(): Boolean {
-        UserChatDeleteRequest(id).requestDataBy(bot)
-        return true
+        return UserChatDeleteRequest(id).requestBy(bot).isSuccess
     }
 }

@@ -26,8 +26,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
@@ -67,12 +65,18 @@ internal class KookBotImpl(
 ) : KookBot {
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.client.${ticket.clientId}")
-    private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
-        ConcurrentLinkedQueue()
     
+    /**
+     * 事件预处理器集。
+     */
     private val preProcessorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
     
+    /**
+     * 事件处理器集。
+     */
+    private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
+        ConcurrentLinkedQueue()
     
     private val decoder = configuration.decoder
     
@@ -102,12 +106,11 @@ internal class KookBotImpl(
         val engineFactory = configuration.clientEngineFactory
         
         fun HttpClientConfig<*>.configClient() {
+            // json decoder
             install(ContentNegotiation) {
                 json(decoder)
             }
             
-            // install ws
-            // install(WebSockets)
             // http request timeout
             install(HttpTimeout) {
                 this.connectTimeoutMillis = configuration.connectTimeoutMillis
@@ -124,7 +127,7 @@ internal class KookBotImpl(
                     configClient()
                 }
                 wsClient = HttpClient(engine) {
-                    WebSockets { }
+                    install(WebSockets)
                 }
             }
             
@@ -133,7 +136,7 @@ internal class KookBotImpl(
                     configClient()
                 }
                 wsClient = HttpClient(engineFactory) {
-                    WebSockets { }
+                    install(WebSockets)
                 }
             }
             
@@ -142,7 +145,7 @@ internal class KookBotImpl(
                     configClient()
                 }
                 wsClient = HttpClient {
-                    WebSockets { }
+                    install(WebSockets)
                 }
             }
         }
@@ -158,8 +161,6 @@ internal class KookBotImpl(
         processorQueue.add(processor)
     }
     
-    private val lifeLock = Mutex()
-    
     @Volatile
     private var client: ClientImpl? = null
     
@@ -170,8 +171,7 @@ internal class KookBotImpl(
     
     override suspend fun start(): Boolean = start { null }
     
-    
-    private suspend inline fun start(reason: () -> Throwable? = { null }): Boolean {
+    private suspend inline fun start(reason: () -> Throwable?): Boolean {
         if (job.isCancelled) {
             throw kotlinx.coroutines.CancellationException("Bot has been cancelled.")
         }
@@ -189,8 +189,8 @@ internal class KookBotImpl(
         
         clientLogger.debug("Creating client by gateway {}", gateway)
         client = createClient(gateway, DEFAULT_CONNECT_TIMEOUT)
-        clientLogger.debug("Client created. client: {}", client)
         
+        clientLogger.debug("Client created. client: {}", client)
         _isStarted.compareAndSet(false, true)
         
         return true
@@ -203,6 +203,7 @@ internal class KookBotImpl(
     private suspend fun createClient(gateway: Gateway, connectTimeout: Long): ClientImpl {
         clientLogger.debug("Creating session...")
         val sessionInfo: SessionInfo = createSession(gateway, connectTimeout)
+        
         clientLogger.debug("Session created: {}", sessionInfo)
         val (session, sn, _, sessionData) = sessionInfo
         
@@ -222,7 +223,7 @@ internal class KookBotImpl(
     private suspend fun createSession(gateway: Gateway, connectTimeout: Long): SessionInfo {
         val sn = AtomicLong(0)
         
-        val session = httpClient.ws(gateway)
+        val session = wsClient.ws(gateway)
         
         kotlin.runCatching {
             val timeoutJob = launch {
@@ -247,7 +248,9 @@ internal class KookBotImpl(
         
     }
     
-    
+    /**
+     * 启动并开始接收事件
+     */
     private suspend fun processEvent(sessionInfo: SessionInfo): Job {
         val eventSerializer = Signal.Event.serializer()
         val sn = sessionInfo.sn
@@ -260,7 +263,7 @@ internal class KookBotImpl(
                 // Pong.
                 Signal.Pong.S_CODE -> {
                     // TODO 6s timeout?
-                    this.clientLogger.debug("Pong signal received.")
+                    this.clientLogger.trace("Pong signal received: {}", s)
                     
                     null
                 }
@@ -284,7 +287,7 @@ internal class KookBotImpl(
             }
         }
         
-        val processJob = SupervisorJob(sessionInfo.session.coroutineContext[Job])
+        // val processJob = SupervisorJob(sessionInfo.session.coroutineContext[Job])
         
         return sessionInfo.session.incoming.receiveAsFlow().mapNotNull {
             when (it) {
@@ -309,7 +312,7 @@ internal class KookBotImpl(
             val currPreProcessorQueue = preProcessorQueue
             val currProcessorQueue = processorQueue
             if (currPreProcessorQueue.isNotEmpty() || currProcessorQueue.isNotEmpty()) {
-                clientLogger.debug("On event: $event")
+                clientLogger.trace("On event: {}", event)
                 val eventType = event.type
                 val eventExtraType = event.extraType
                 
@@ -340,9 +343,7 @@ internal class KookBotImpl(
                     } catch (e: Throwable) {
                         if (clientLogger.isDebugEnabled) {
                             clientLogger.debug(
-                                "Event pre precess failure. Event: {}, event.data: {}",
-                                event,
-                                event.data
+                                "Event pre precess failure. Event: {}, event.data: {}", event, event.data
                             )
                         }
                         clientLogger.error("Event pre precess failure.", e)
@@ -357,9 +358,7 @@ internal class KookBotImpl(
                             } catch (e: Throwable) {
                                 if (clientLogger.isDebugEnabled) {
                                     clientLogger.debug(
-                                        "Event precess failure. Event: {}, event.data: {}",
-                                        event,
-                                        event.data
+                                        "Event precess failure. Event: {}, event.data: {}", event, event.data
                                     )
                                 }
                                 clientLogger.error("Event process failure.", e)
@@ -369,21 +368,17 @@ internal class KookBotImpl(
                 }
             }
             
-            // 留下最大的值。
+            // 留下最大值。
             sn.updateAndGet { prev -> max(prev, nowSn) }
-        }
-            .onCompletion { cause ->
-                clientLogger.debug(
-                    "Session flow completion. cause: ${cause?.localizedMessage}",
-                    cause
-                )
-            }.catch { cause ->
-                clientLogger.error(
-                    "Session flow on error: ${cause.localizedMessage}",
-                    cause
-                )
-            }
-            .launchIn(this + processJob)
+        }.onCompletion { cause ->
+            clientLogger.debug(
+                "Session flow completion. cause: {}", cause?.localizedMessage, cause
+            )
+        }.catch { cause ->
+            clientLogger.error(
+                "Session flow on error: {}", cause.localizedMessage, cause
+            )
+        }.launchIn(this)
     }
     
     
@@ -438,9 +433,9 @@ internal class KookBotImpl(
         job.join()
     }
     
-    override suspend fun cancel(reason: Throwable?) = lifeLock.withLock {
+    override suspend fun cancel(reason: Throwable?) {
         if (job.isCancelled) {
-            return@withLock
+            return
         }
         
         if (reason == null) {
@@ -448,6 +443,7 @@ internal class KookBotImpl(
         } else {
             job.cancel(reason.localizedMessage, reason)
         }
+        
         job.join()
     }
     

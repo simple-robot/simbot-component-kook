@@ -41,7 +41,6 @@ import love.forte.simbot.kook.api.user.UserViewRequest
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
-import love.forte.simbot.utils.runInBlocking
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
@@ -159,27 +158,18 @@ internal class KookGuildImpl private constructor(
         return syncLastOwnerMember(ownerId.literal)
     }
     
-    override val owner: KookGuildMember
-        get() {
-            val ownerId = ownerId
-            if (lastOwnerMember.id == ownerId) {
-                return lastOwnerMember
-            }
-            return runInBlocking { syncLastOwnerMember(ownerId.literal) }
-        }
-    
     override val members: Items<KookGuildMember>
         get() = internalMembers.values.asItems()
     
     override val memberList: List<KookGuildMember>
         get() = internalMembers.values.toList()
     
-    override fun getMember(id: ID): KookGuildMember? = internalMembers[id.literal]
+    override suspend fun member(id: ID): KookGuildMember? = internalMembers[id.literal]
     
     override val channels: Items<KookChannel>
         get() = internalChannels.values.asItems()
     
-    override fun getChannel(id: ID): KookChannel? = internalChannels[id.literal]
+    override suspend fun channel(id: ID): KookChannel? = internalChannels[id.literal]
     
     override val channelList: List<KookChannel>
         get() = internalChannels.values.toList()

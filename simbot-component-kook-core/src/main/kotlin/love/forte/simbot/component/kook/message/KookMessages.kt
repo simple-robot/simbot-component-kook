@@ -193,7 +193,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
 
         // 需要上传的图片
         is ResourceImage -> {
-            val asset = AssetCreateRequest(resource).requestDataBy(bot)
+            val asset = AssetCreateRequest(resource()).requestDataBy(bot)
             request(MessageType.IMAGE.type, asset.url)
         }
 

@@ -20,9 +20,9 @@ package love.forte.simbot.component.kook.internal
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
+import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
@@ -44,11 +44,11 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 internal class KookGuildMemberImpl(
     override val bot: KookComponentBotImpl,
-    override val guild: KookGuildImpl,
+    private val _guild: KookGuildImpl,
     @Volatile override var source: UserModel,
 ) : KookGuildMember, CoroutineScope {
-    private val job = SupervisorJob(guild.job)
-    override val coroutineContext: CoroutineContext = guild.coroutineContext + job
+    private val job = SupervisorJob(_guild.job)
+    override val coroutineContext: CoroutineContext = _guild.coroutineContext + job
     
     private val muteLock = Mutex()
     
@@ -63,10 +63,12 @@ internal class KookGuildMemberImpl(
     override val id: ID
         get() = source.id
     
+    override suspend fun guild(): KookGuild = _guild
+    
     // region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
-        val result = GuildMuteDeleteRequest(guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteDeleteRequest(_guild.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (success) {
                 muteLock.withLock {
@@ -79,26 +81,24 @@ internal class KookGuildMemberImpl(
     }
     
     override suspend fun mute(durationMillis: Long, type: Int): Boolean {
-        Simbot.require(durationMillis >= 0) { "Duration millis must >= 0, but $durationMillis" }
+        Simbot.require(durationMillis > 0) { "Duration millis must > 0, but $durationMillis" }
         // do mute
-        if (durationMillis == 0L) {
-            return unmute(type)
-        }
-        
-        val result = GuildMuteCreateRequest(guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteCreateRequest(_guild.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (durationMillis > 0 && success) {
                 val scope: CoroutineScope = this
                 muteLock.withLock {
                     muteJob.also { oldJob ->
                         oldJob?.cancel()
-                        muteJob = scope.launch(bot.muteDelayCoroutineDispatcher) {
+                        muteJob = scope.launch(bot.muteDelayJob) {
                             delay(durationMillis)
                             unmute(type)
                         }.also { job ->
+                            val memberId = source.id
+                            val botId = bot.id
                             job.invokeOnCompletion { e ->
                                 if (e is CancellationException) {
-                                    logger.debug("Member({}) from Bot({}) unmute job cancelled.", source.id, bot.id)
+                                    logger.debug("Member({}) from Bot({}) unmute job cancelled.", memberId, botId)
                                 }
                             }
                         }
@@ -116,10 +116,6 @@ internal class KookGuildMemberImpl(
     
     private suspend fun asContact(): KookUserChat = bot.contact(id)
     
-    @Api4J
-    private fun asContactBlocking(): KookUserChat = bot.getContact(id)
-    
-    
     override suspend fun send(text: String): KookMessageCreatedReceipt {
         return asContact().send(text)
     }
@@ -130,21 +126,6 @@ internal class KookGuildMemberImpl(
     
     override suspend fun send(message: MessageContent): KookMessageReceipt {
         return asContact().send(message)
-    }
-    
-    @Api4J
-    override fun sendBlocking(text: String): KookMessageCreatedReceipt {
-        return asContactBlocking().sendBlocking(text)
-    }
-    
-    @Api4J
-    override fun sendBlocking(message: Message): KookMessageReceipt {
-        return asContactBlocking().sendBlocking(message)
-    }
-    
-    @Api4J
-    override fun sendBlocking(message: MessageContent): KookMessageReceipt {
-        return asContactBlocking().sendBlocking(message)
     }
     // endregion
     
