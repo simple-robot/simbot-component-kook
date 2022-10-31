@@ -18,6 +18,7 @@
 package love.forte.simbot.component.kook.internal
 
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
@@ -315,7 +316,7 @@ private suspend inline fun KookComponentBot.pushIfProcessable(
 ): Boolean {
     if (eventProcessor.isProcessable(eventKey)) {
         val event = block() ?: return false
-        eventProcessor.push(event)
+        launch { eventProcessor.push(event) }
         return true
     }
     
