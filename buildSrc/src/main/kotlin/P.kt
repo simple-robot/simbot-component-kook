@@ -20,7 +20,7 @@
 import love.forte.gradle.common.core.project.ProjectDetail
 import love.forte.gradle.common.core.project.Version
 import love.forte.gradle.common.core.project.minus
-import love.forte.gradle.common.core.project.version
+import love.forte.gradle.common.core.project.version as v
 
 /*
 *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
@@ -40,7 +40,7 @@ import love.forte.gradle.common.core.project.version
 */
 
 // 3.0.0-M1
-val simbotVersion = version(3, 0, 0) - version("M1")
+val simbotVersion = v(3, 0, 0) - v("M2")
 
 val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
 val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
@@ -51,12 +51,12 @@ object P : ProjectDetail() {
     const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
     const val HOMEPAGE = "https://github.com/simple-robot/simbot-component-kook"
     
-    private val baseVersion = version(
+    private val baseVersion = v(
         "${simbotVersion.major}.${simbotVersion.minor}",
         0, 0
     )
     
-    private val alphaSuffix = version("alpha", 2)
+    private val alphaSuffix = v("alpha", 2)
     
     override val version: Version = baseVersion - alphaSuffix
     
