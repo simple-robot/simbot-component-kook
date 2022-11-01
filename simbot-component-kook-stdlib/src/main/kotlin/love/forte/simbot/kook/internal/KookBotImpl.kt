@@ -66,6 +66,9 @@ internal class KookBotImpl(
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.client.${ticket.clientId}")
     
+    internal val isEventProcessAsync = configuration.isEventProcessAsync
+    private val wsConnectTimeout = configuration.wsConnectTimeout
+    
     /**
      * 事件预处理器集。
      */
@@ -188,7 +191,7 @@ internal class KookBotImpl(
         val gateway = gatewayRequest.requestDataBy(this)
         
         clientLogger.debug("Creating client by gateway {}", gateway)
-        client = createClient(gateway, DEFAULT_CONNECT_TIMEOUT)
+        client = createClient(gateway, wsConnectTimeout)
         
         clientLogger.debug("Client created. client: {}", client)
         _isStarted.compareAndSet(false, true)
@@ -289,6 +292,8 @@ internal class KookBotImpl(
         
         // val processJob = SupervisorJob(sessionInfo.session.coroutineContext[Job])
         
+        clientLogger.debug("Start processing events. isEventProcessAsync={}", isEventProcessAsync)
+    
         return sessionInfo.session.incoming.receiveAsFlow().mapNotNull {
             when (it) {
                 is Frame.Text -> {
@@ -350,7 +355,19 @@ internal class KookBotImpl(
                     }
                 }
                 
-                launch {
+                if (isEventProcessAsync) {
+                    launch {
+                        processorQueue.forEach { processor ->
+                            try {
+                                processor(event, decoder, lazyDecoded)
+                            } catch (e: Throwable) {
+                                clientLogger.debug(
+                                    "Event precess failure. Event: {}, event.data: {}", event, event.data, e
+                                )
+                            }
+                        }
+                    }
+                } else {
                     processorQueue.forEach { processor ->
                         try {
                             processor(event, decoder, lazyDecoded)
@@ -486,9 +503,7 @@ internal class KookBotImpl(
     }
     
     
-    companion object {
-        private const val DEFAULT_CONNECT_TIMEOUT: Long = 6000L
-    }
+    companion object
     
 }
 
