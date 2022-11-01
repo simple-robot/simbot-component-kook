@@ -45,6 +45,7 @@ import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.requestDataBy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -293,7 +294,7 @@ internal class KookBotImpl(
         // val processJob = SupervisorJob(sessionInfo.session.coroutineContext[Job])
         
         clientLogger.debug("Start processing events. isEventProcessAsync={}", isEventProcessAsync)
-    
+        
         return sessionInfo.session.incoming.receiveAsFlow().mapNotNull {
             when (it) {
                 is Frame.Text -> {
@@ -500,6 +501,78 @@ internal class KookBotImpl(
     
     override suspend fun offline() {
         return OfflineRequest.requestDataBy(this)
+    }
+    
+    @Volatile
+    private var client0: Deferred<String>? = null
+    
+    private open inner class Stage {
+        open suspend operator fun invoke(loop: StageLoop) {
+        }
+    
+        inner class RequestGateway : Stage() {
+            override suspend fun invoke(loop: StageLoop) {
+                logger.debug("Requesting for gateway info...")
+                // retry on failure?
+                val gateway = gatewayRequest.requestDataBy(this@KookBotImpl)
+                
+                // next: create session
+                loop.stageDeque.addFirst(CreateWsSession(gateway))
+                
+            }
+        }
+        inner class CreateWsSession(val gateway: Gateway) : Stage() {
+            override suspend fun invoke(loop: StageLoop) {
+                logger.debug("Creating websocket session...")
+                val session = wsClient.ws(gateway)
+                loop.stageDeque.addFirst(WaitingHello(gateway, session))
+                // next: waiting hello?
+                // next: create client
+            }
+        }
+        inner class WaitingHello(val gateway: Gateway, val wsSession: DefaultClientWebSocketSession) : Stage() {
+            override suspend fun invoke(loop: StageLoop) {
+                val hello = try {
+                    withTimeout(wsConnectTimeout) {
+                        wsSession.waitHello()
+                    }
+                } catch (timeoutEx: TimeoutCancellationException) {
+                    // TODO timeout.
+                    wsSession.cancel("'Hello' receive timeout", timeoutEx)
+                    // TODO next: create ws session?
+                    return
+                }
+                
+                // TODO catch err?
+                hello.check()
+                logger.debug("Received 'Hello': {}", hello)
+    
+                // TODO heart beat?
+                
+            }
+        }
+        
+        inner class CreateClient : Stage()
+        
+    }
+    
+    private inner class StageLoop(
+        val currentScope: CoroutineScope?,
+        val stageDeque: ConcurrentLinkedDeque<Stage> = ConcurrentLinkedDeque(),
+        
+        ) {
+        @Volatile
+        var currentStage: Stage? = null
+            private set
+        
+        suspend fun run() {
+            val stage = stageDeque.pollFirst()
+            while (currentScope?.isActive == true && stage != null) {
+                stage(this)
+            }
+            currentStage = null
+        }
+        
     }
     
     
