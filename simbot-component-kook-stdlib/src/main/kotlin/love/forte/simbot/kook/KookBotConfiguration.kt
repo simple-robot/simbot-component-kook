@@ -57,6 +57,7 @@ public class KookBotConfiguration {
     public var coroutineContext: CoroutineContext = EmptyCoroutineContext
     
     
+    // region request client
     /**
      * 配置bot内部要使用的client Engine。
      */
@@ -91,7 +92,9 @@ public class KookBotConfiguration {
     public fun httpClientConfig(block: HttpClientConfig<*>.() -> Unit) {
         this.httpClientConfig = block
     }
+    // endregion
     
+    // region api request timeout
     /**
      * api请求的超时配置。
      * 如果为null则不会在 `httpClient` 中安装 [io.ktor.client.plugins.HttpTimeout]。
@@ -105,7 +108,7 @@ public class KookBotConfiguration {
     
     /**
      * 禁用超时配置。
-      */
+     */
     @KookBotConfigurationDSL
     public fun disableTimeout() {
         timeout = null
@@ -146,11 +149,39 @@ public class KookBotConfiguration {
                 timeout = TimeoutConfiguration(socketTimeoutMillis = value)
             }
         }
+    // endregion
+    
+    /**
+     * ws连接超时时间。默认为 [DEFAULT_WS_CONNECT_TIMEOUT].
+     */
+    @KookBotConfigurationDSL
+    public var wsConnectTimeout: Long = DEFAULT_WS_CONNECT_TIMEOUT
+    
+    /**
+     * 在进行**事件处理**时是否进行异步处理（使用 `launch { ... }` 调度）。
+     *
+     * 此处指的是 **事件处理** 而不是 **事件预处理**。预处理逻辑将始终不是异步的（是'同步'非阻塞的）。
+     *
+     * 默认为 `true`，如果为 `false` 则会根据接收的事件依序调度。在事件频繁而事件调度逻辑较为耗时时这可能会导致事件积压。
+     *
+     */
+    @KookBotConfigurationDSL
+    public var isEventProcessAsync: Boolean = true
+    
+    
+    /**
+     * 禁用事件的异步调度。即 set [isEventProcessAsync] = `false`
+      */
+    @KookBotConfigurationDSL
+    public fun disableEventProcessAsync() {
+        isEventProcessAsync = false
+    }
     
     
     /**
      * 在执行 [KookBot.start] 建立连接成功后、进行事件处理之前执行此函数。
      */
+    @KookBotConfigurationDSL
     public var preEventProcessor: suspend (bot: KookBot, sessionId: String) -> Unit = { _, _ -> }
     
     
@@ -159,11 +190,21 @@ public class KookBotConfiguration {
      */
     @KookBotConfigurationDSL
     public fun preEventProcessor(block: suspend (bot: KookBot, sessionId: String) -> Unit) {
-        this.preEventProcessor = block
+        val old = this.preEventProcessor
+        this.preEventProcessor = { b, s ->
+            old(b, s)
+            block(b, s)
+        }
     }
     
     
     public companion object {
+        /**
+         * 默认的连接超时时间。
+         */
+        public const val DEFAULT_WS_CONNECT_TIMEOUT: Long = 6000L
+    
+        
         /**
          * [KookBotConfiguration] 默认使用的解析器。
          */
@@ -195,7 +236,10 @@ public class KookBotConfiguration {
  * @param init 如果 timeout 为null且 [init] 为true，则会初始化一个 [timeout][KookBotConfiguration.timeout]
  *
  */
-public inline fun KookBotConfiguration.timeout(init: Boolean = true, block: KookBotConfiguration.TimeoutConfiguration.() -> Unit) {
+public inline fun KookBotConfiguration.timeout(
+    init: Boolean = true,
+    block: KookBotConfiguration.TimeoutConfiguration.() -> Unit,
+) {
     val timeout = this.timeout
     if (timeout == null && init) {
         this.timeout = KookBotConfiguration.TimeoutConfiguration().also(block)
