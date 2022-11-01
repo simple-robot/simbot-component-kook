@@ -91,6 +91,8 @@ internal class KookComponentBotImpl(
     internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
     
+    internal val isEventProcessAsync = sourceBot.configuration.isEventProcessAsync
+    
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
     
