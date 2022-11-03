@@ -27,6 +27,7 @@ open class TestListener {
     suspend fun KookContactMessageEvent.onMsg() {
         println(messageContent)
         user().send(messageContent)
+        reply(messageContent)
     }
 
 }
