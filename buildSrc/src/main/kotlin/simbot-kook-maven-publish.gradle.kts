@@ -69,7 +69,7 @@ checkPublishConfigurable {
         isSnapshot = isSnapshot()
         releasesRepository = ReleaseRepository
         snapshotRepository = SnapshotRepository
-        gpg = Gpg.ofSystemPropOrNull()
+        gpg = if (isSnapshot()) null else Gpg.ofSystemPropOrNull()
     }
     
     if (isSnapshot()) {
