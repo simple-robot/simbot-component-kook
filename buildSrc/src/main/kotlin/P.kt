@@ -39,7 +39,6 @@ import love.forte.gradle.common.core.project.version as v
 *
 */
 
-// 3.0.0-M1
 val simbotVersion = v(3, 0, 0) - v("M2")
 
 val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
