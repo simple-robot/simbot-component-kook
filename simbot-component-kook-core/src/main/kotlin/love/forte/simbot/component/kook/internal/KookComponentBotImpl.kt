@@ -73,39 +73,9 @@ import love.forte.simbot.utils.item.itemsByFlow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.event.Event as KkEvent
-
-private class MuteDelayCoroutineDispatcherContainer(name: String) {
-    private val threadGroup = ThreadGroup(name).also {
-        it.isDaemon = true
-    }
-    
-    @Volatile
-    private var threadNum = 1
-    
-    @Synchronized
-    private fun nextThreadNum(): Int {
-        return threadNum++
-    }
-    
-    val muteDelayDispatcher: ExecutorCoroutineDispatcher = ThreadPoolExecutor(
-        0,
-        1,
-        1,
-        TimeUnit.MINUTES,
-        LinkedBlockingQueue(),
-    ) { runnable ->
-        Thread(threadGroup, runnable, "${threadGroup.name}-${nextThreadNum()}").also {
-            it.isDaemon = true
-        }
-    }.asCoroutineDispatcher()
-    
-}
 
 /**
  *
@@ -120,13 +90,15 @@ internal class KookComponentBotImpl(
 ) : KookComponentBot {
     internal val job = SupervisorJob(sourceBot.coroutineContext[Job]!!)
     override val coroutineContext: CoroutineContext = sourceBot.coroutineContext + job
+    
+    internal val isEventProcessAsync = sourceBot.configuration.isEventProcessAsync
+    
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
     
-    private val muteDelayCoroutineDispatcherContainer =
-        MuteDelayCoroutineDispatcherContainer("muteDelay-bot-${sourceBot.ticket.clientId}")
+    internal val muteDelayJob = SupervisorJob(job)
     
-    internal val muteDelayCoroutineDispatcher get() = muteDelayCoroutineDispatcherContainer.muteDelayDispatcher
+    // internal val muteDelayCoroutineDispatcher get() = muteDelayCoroutineDispatcherContainer.muteDelayDispatcher
     
     private lateinit var internalGuilds: ConcurrentHashMap<String, KookGuildImpl>
     
@@ -324,8 +296,6 @@ internal class KookComponentBotImpl(
     
     override suspend fun guild(id: ID): KookGuildImpl? = internalGuilds[id.literal]
     
-    override fun getGuild(id: ID): KookGuildImpl? = internalGuilds[id.literal]
-    
     override val guildList: List<KookGuild>
         get() = internalGuilds.values.toList()
     
@@ -381,18 +351,7 @@ internal class KookComponentBotImpl(
         }
         return KookAssetImage(AssetCreated(id.literal))
     }
-    
-    /**
-     * 由于 Kook 中的资源不存在id，因此会直接将 [id] 视为 url 进行转化。
-     */
-    @OptIn(ApiResultType::class)
-    @JvmSynthetic
-    override fun resolveImageBlocking(id: ID): KookAssetImage {
-        Simbot.require(id.literal.startsWith(ASSET_PREFIX)) {
-            "The id must be the resource id of the kook and must start with $ASSET_PREFIX"
-        }
-        return KookAssetImage(AssetCreated(id.literal))
-    }
+
     
     override suspend fun uploadAssetImage(resource: Resource): KookAssetImage {
         val asset = AssetCreateRequest(resource).requestDataBy(this)
@@ -413,8 +372,8 @@ internal class KookComponentBotImpl(
                     // 某人退出频道服务器
                     // 在标准事件处理中进行
                     // is ExitedGuildEventBody -> {
-                        // val guild = internalGuild(this.targetId) ?: return
-                        // guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
+                    // val guild = internalGuild(this.targetId) ?: return
+                    // guild.internalMembers.remove(body.userId.literal)?.also { it.cancel() }
                     // }
                     
                     // 某人加入频道服务器
@@ -522,7 +481,8 @@ internal class KookComponentBotImpl(
                         // TODO check isCategory?
                         guild(targetId)?.also { guild ->
                             val removedId = body.id.literal
-                            val removed: Any? = guild.removeInternalChannel(removedId) ?: guild.removeInternalCategory(removedId)
+                            val removed: Any? =
+                                guild.removeInternalChannel(removedId) ?: guild.removeInternalCategory(removedId)
                             logger.debug("Channel(or category) {} is be Deleted", removed)
                         }
                     }

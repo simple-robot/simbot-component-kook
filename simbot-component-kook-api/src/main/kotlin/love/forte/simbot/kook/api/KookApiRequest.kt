@@ -34,10 +34,12 @@ import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
 import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
 import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_REMAINING
 import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_RESET
+import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.utils.runInBlocking
 import love.forte.simbot.utils.runWithInterruptible
 import java.util.function.Consumer
 
+private val logger = LoggerFactory.getLogger("KookApiRequest.debug")
 
 /**
  * 代表、包装了一个 Kook api的请求。
@@ -111,12 +113,15 @@ public abstract class KookApiRequest<T> {
         }
 
         postChecker(response)
-
+    
+        logger.trace("api request response.body(), response: {}", response)
+        
         val result: ApiResult = response.body()
-
+    
+        logger.trace("api request result pre rate limit: {}", result)
+        
         // init rate limit info.
         val headers = response.headers
-
 
         val limit = headers[X_RATE_LIMIT_LIMIT]?.toLongOrNull() // ?: RateLimit.DEFAULT.limit
         val remaining = headers[X_RATE_LIMIT_REMAINING]?.toLongOrNull() // ?: RateLimit.DEFAULT.remaining
@@ -137,6 +142,9 @@ public abstract class KookApiRequest<T> {
         }
 
         result.rateLimit = rateLimit
+    
+        logger.trace("api request result: {}", result)
+    
         return result
     }
 
@@ -156,9 +164,9 @@ public abstract class KookApiRequest<T> {
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
-     * @param postchecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
+     * @param postChecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
      *
-     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postchecker] 进行实现支持。
+     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postChecker] 进行实现支持。
      *
      * @see request
      */
@@ -168,10 +176,10 @@ public abstract class KookApiRequest<T> {
         client: HttpClient,
         authorization: String,
         decoder: Json = DEFAULT_JSON,
-        postchecker: Consumer<HttpResponse> = defaultRequestPostChecker
+        postChecker: Consumer<HttpResponse> = defaultRequestPostChecker
     ): ApiResult = runInBlocking {
         request(client, authorization, decoder) { resp ->
-            runWithInterruptible { postchecker.accept(resp) }
+            runWithInterruptible { postChecker.accept(resp) }
         }
     }
 

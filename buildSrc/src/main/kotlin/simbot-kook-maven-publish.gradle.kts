@@ -17,6 +17,7 @@
 
 import love.forte.gradle.common.core.Gpg
 import love.forte.gradle.common.core.property.systemProp
+import love.forte.gradle.common.publication.configure.commonConfigMavenPublication
 import love.forte.gradle.common.publication.configure.jvmConfigPublishing
 import util.checkPublishConfigurable
 
@@ -50,8 +51,6 @@ println("isReleaseOnly: $isReleaseOnly")
 println("isPublishConfigurable: $isPublishConfigurable")
 
 checkPublishConfigurable {
-    val p = project
-    
     jvmConfigPublishing {
         project = P
         publicationName = "kookDist"
@@ -70,135 +69,36 @@ checkPublishConfigurable {
         isSnapshot = isSnapshot()
         releasesRepository = ReleaseRepository
         snapshotRepository = SnapshotRepository
-        gpg = Gpg.ofSystemPropOrNull()
+        gpg = if (isSnapshot()) null else Gpg.ofSystemPropOrNull()
     }
     
-    show()
+    if (isSnapshot()) {
+        publishing {
+            publications.withType<MavenPublication> {
+                version = P.snapshotVersion.toString()
+            }
+        }
+    }
+    
+    publishing {
+        publications.withType<MavenPublication> {
+            show()
+        }
+    }
+    
+    
 }
 
-// if (isPublishConfigurable) {
-//     val sonatypeUsername: String? = systemProp("OSSRH_USER")
-//     val sonatypePassword: String? = systemProp("OSSRH_PASSWORD")
-//
-//     if (sonatypeUsername == null || sonatypePassword == null) {
-//         println("[WARN] - sonatype.username or sonatype.password is null, cannot config nexus publishing.")
-//     }
-//
-//     val jarSources by tasks.registering(Jar::class) {
-//         archiveClassifier.set("sources")
-//         from(sourceSets["main"].allSource)
-//     }
-//
-//     val jarJavadoc by tasks.registering(Jar::class) {
-//         archiveClassifier.set("javadoc")
-//     }
-//
-//     publishing {
-//         publications {
-//             create<MavenPublication>("kookDist") {
-//                 from(components["java"])
-//                 artifact(jarSources)
-//                 artifact(jarJavadoc)
-//
-//                 groupId = project.group.toString()
-//                 artifactId = project.name
-//                 version = project.version.toString()
-//                 description = project.description?.toString() ?:P.DESCRIPTION
-//
-//                 pom {
-//                     show()
-//
-//                     name.set("${project.group}:${project.name}")
-//                     description.set("Simple Robot框架下针对开黑啦(Kook)平台的组件实现")
-//                     url.set("https://github.com/simple-robot/simbot-component-kook")
-//                     licenses {
-//                         license {
-//                             name.set("GNU GENERAL PUBLIC LICENSE, Version 3")
-//                             url.set("https://www.gnu.org/licenses/gpl-3.0-standalone.html")
-//                         }
-//                         license {
-//                             name.set("GNU LESSER GENERAL PUBLIC LICENSE, Version 3")
-//                             url.set("https://www.gnu.org/licenses/lgpl-3.0-standalone.html")
-//                         }
-//                     }
-//                     scm {
-//                         url.set("https://github.com/simple-robot/simbot-component-kook")
-//                         connection.set("scm:git:https://github.com/simple-robot/simbot-component-kook.git")
-//                         developerConnection.set("scm:git:ssh://git@github.com/simple-robot/simbot-component-kook.git")
-//                     }
-//
-//                     setupDevelopers()
-//                 }
-//             }
-//
-//
-//
-//             repositories {
-//                 configMaven(Sonatype.Central, sonatypeUsername, sonatypePassword)
-//                 configMaven(Sonatype.Snapshot, sonatypeUsername, sonatypePassword)
-//             }
-//         }
-//     }
-//
-//     signing {
-//         val keyId = System.getenv("GPG_KEY_ID")
-//         val secretKey = System.getenv("GPG_SECRET_KEY")
-//         val password = System.getenv("GPG_PASSWORD")
-//
-//         setRequired {
-//             !project.version.toString().endsWith("SNAPSHOT")
-//         }
-//
-//         useInMemoryPgpKeys(keyId, secretKey, password)
-//
-//         sign(publishing.publications["kookDist"])
-//     }
-//
-//
-//     println("[publishing-configure] - [$name] configured.")
-// }
 
-
-// fun RepositoryHandler.configMaven(sonatype: Sonatype, username: String?, password: String?) {
-//     maven {
-//         name = sonatype.name
-//         url = uri(sonatype.url)
-//         credentials {
-//             this.username = username
-//             this.password = password
-//         }
-//     }
-// }
-
-
-// /**
-//  * 配置开发者/协作者信息。
-//  *
-//  */
-// fun MavenPom.setupDevelopers() {
-//     developers {
-//         developer {
-//             id.set("forte")
-//             name.set("ForteScarlet")
-//             email.set("ForteScarlet@163.com")
-//             url.set("https://github.com/ForteScarlet")
-//         }
-//         developer {
-//             id.set("forliy")
-//             name.set("ForliyScarlet")
-//             email.set("ForliyScarlet@163.com")
-//             url.set("https://github.com/ForliyScarlet")
-//         }
-//     }
-// }
-
-fun show() {
+fun MavenPublication.show() {
     //// show project info
     println("========================================================")
-    println("== project.group:       $group")
-    println("== project.name:        $name")
-    println("== project.version:     $version")
-    println("== project.description: $description")
+    println("== MavenPublication for ${project.name}")
+    println("== maven.pub.group:       $group")
+    println("== maven.pub.name:        $name")
+    println("== project.verson:        ${project.version}")
+    println("== maven.pub.version:     $version")
+    println("== maven.pub.description: $description")
     println("========================================================")
 }
 

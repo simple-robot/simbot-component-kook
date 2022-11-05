@@ -23,6 +23,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookComponentGuildBot
+import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.message.*
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
@@ -47,39 +48,38 @@ internal interface MutableChannelModelContainer {
  */
 internal class KookChannelImpl private constructor(
     private val baseBot: KookComponentBotImpl,
-    override val guild: KookGuildImpl,
+    private val _guild: KookGuildImpl,
     @Volatile
     override var category: KookChannelCategoryImpl?,
     @Volatile override var source: ChannelModel,
 ) : KookChannel, CoroutineScope, MutableChannelModelContainer {
     
     override val bot: KookComponentGuildBot
-        get() = guild.bot
+        get() = _guild.bot
     
-    private val job = SupervisorJob(guild.job)
-    override val coroutineContext: CoroutineContext = guild.coroutineContext + job
+    private val job = SupervisorJob(_guild.job)
+    override val coroutineContext: CoroutineContext = _guild.coroutineContext + job
     
     override val guildId: ID
-        get() = guild.id
+        get() = _guild.id
     
     override val currentMember: Int
-        get() = guild.currentMember
+        get() = _guild.currentMember
     
     override val maximumMember: Int
-        get() = guild.maximumMember
+        get() = _guild.maximumMember
     
     override val ownerId: ID
-        get() = guild.ownerId
-    
-    override val owner: KookGuildMember
-        get() = guild.owner
+        get() = _guild.ownerId
     
     override val members: Items<KookGuildMember>
-        get() = guild.members
+        get() = _guild.members
     
-    override fun getMember(id: ID): KookGuildMember? = guild.getMember(id)
-    override suspend fun member(id: ID): KookGuildMember? = guild.member(id)
+    override suspend fun owner(): KookGuildMember = _guild.owner()
     
+    override suspend fun guild(): KookGuild = _guild
+    
+    override suspend fun member(id: ID): KookGuildMember? = _guild.member(id)
     
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
         val request = message.toRequest(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
@@ -107,6 +107,7 @@ internal class KookChannelImpl private constructor(
                     tempTargetId = tempTargetId,
                 ).requestDataBy(baseBot).asReceipt(false, baseBot)
             }
+            
             is KookChannelMessageDetailsContent -> {
                 val details = message.details
                 MessageCreateRequest(
@@ -118,6 +119,7 @@ internal class KookChannelImpl private constructor(
                     tempTargetId = tempTargetId,
                 ).requestDataBy(baseBot).asReceipt(false, baseBot)
             }
+            
             else -> {
                 send(message.messages)
             }

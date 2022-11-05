@@ -30,6 +30,8 @@ dependencies {
     
     
     testImplementation(libs.spring.boot.test)
+    testImplementation(libs.spring.boot.webflux)
+    testImplementation("love.forte.simbot:simbot-logger:$simbotVersion")
     testImplementation("love.forte.simbot.boot:simboot-core-spring-boot-starter:$simbotVersion")
     testImplementation(libs.ktor.client.cio)
 }
