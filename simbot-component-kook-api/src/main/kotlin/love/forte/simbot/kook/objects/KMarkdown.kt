@@ -26,7 +26,6 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.kook.objects.AtTarget.*
-import love.forte.simbot.kook.objects.AtTarget.User
 import love.forte.simbot.literal
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
@@ -518,6 +517,7 @@ public interface KookMarkdownGrammar<P> {
      *  (emj)服务器表情(emj)[服务器表情ID]
      * ```
      *
+     * 实际命名应该是 `GuildEmoji`
      */
     public object ServerEmoticons : BaseKaiheilaCustomKookMarkdownGrammar<MdServerEmoticons>() {
         // (emj)服务器表情(emj)[服务器表情ID]
