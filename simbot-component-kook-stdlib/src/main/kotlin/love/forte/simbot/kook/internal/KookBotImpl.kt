@@ -27,6 +27,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -512,7 +513,7 @@ internal class KookBotImpl(
             
             clientLogger.trace("Create event process channel: {}", eventProcessChannel)
             
-            val job = session.eventProcessJob(sn, eventProcessChannel)
+            val job = session.eventProcessJob(eventProcessChannel)
             
             clientLogger.trace("Create event process job: {}", job)
             
@@ -539,7 +540,7 @@ internal class KookBotImpl(
             if (!session.isActive) {
                 val reason = session.closeReason.await()
                 // TODO reconnect?
-                clientLogger.error("Session closed. reason: {}", reason)
+                clientLogger.error("Session is closed. reason: {}.", reason)
                 return
             }
             
@@ -554,15 +555,25 @@ internal class KookBotImpl(
                     is Frame.Binary -> processString(frame.readToText(), loop)
                     else -> {
                         clientLogger.trace("Other frame: {}", frame)
+                        // 下一个还是自己
+                        loop.addLast(this)
                     }
                 }
+            } catch (cancellation: CancellationException) {
+                clientLogger.warn("Session is cancelled: {}, try reconnect.", cancellation.localizedMessage, cancellation)
             } catch (e: Throwable) {
                 // TODO reconnect?
                 clientLogger.error("Session received frame failed: {}", e.localizedMessage, e)
+                // 下一个还是自己
+                loop.addLast(this)
             }
-            
-            // 下一个还是自己
-            loop.addLast(this)
+        }
+        
+        /**
+         * 更新SN的值。
+         */
+        private fun AtomicLong.updateSn(newSn: Long): Long {
+            return updateAndGet { prev -> max(prev, newSn) }
         }
         
         private suspend fun processString(eventString: String, loop: StageLoop) {
@@ -581,49 +592,68 @@ internal class KookBotImpl(
                 // Pong.
                 Signal.Pong.S_CODE -> {
                     client.heartbeatJob.pong(decoder.decodeFromJsonElement(Signal.Pong.serializer(), jsonElement))
+                    // next: self
+                    loop.addLast(this)
                 }
                 
                 // Reconnect.
                 Signal.Reconnect.S_CODE -> {
                     clientLogger.debug("Reconnect signal received: {}", eventString)
+                    // next: reconnect
+                    loop.addLast(Reconnect(client.atomicSn.get(), hello.data.sessionId))
+                    
                     val reconnect = decoder.decodeFromJsonElement(Signal.Reconnect.serializer(), jsonElement)
                     val reconnectData = reconnect.data
                     client.session.closeExceptionally(ReconnectException(reconnectData.code, reconnectData.err ?: ""))
-                    loop.addLast(Reconnect(client.atomicSn.get(), hello.data.sessionId))
                 }
                 
                 // Event
                 Signal.Event.S_CODE -> {
-                    // is dispatch
+                    // next: self
+                    loop.addLast(this)
+                    
                     val event = decode(Signal.Event.serializer())
+                    
                     clientLogger.trace("On event signal: {}", event)
-                    client.eventProcessJob.eventChannel.apply {
-                        var success = false
-                        // try to send 3 times
-                        for (i in 1..3) {
-                            val sendResult = trySend(event)
-                            if (sendResult.isSuccess) {
-                                success = true
-                                break
+                    
+                    // 如果sn比当前小，忽略此事件。
+                    val eventSn = event.sn
+                    val updated = client.atomicSn.updateSn(eventSn)
+                    if (eventSn < updated) {
+                        // just skip.
+                        clientLogger.trace("Event sn ({}) < current sn ({}), ignore and skip this event. The event: {}", eventSn, updated, event)
+                    } else {
+                        // push event
+                        try {
+                            client.eventProcessJob.apply {
+                                var success = false
+                                // try to send 3 times
+                                for (i in 1..3) {
+                                    val sendResult = trySendEvent(event)
+                                    if (sendResult.isSuccess) {
+                                        success = true
+                                        break
+                                    }
+            
+                                    if (sendResult.isFailure && !sendResult.isClosed) {
+                                        // retry
+                                        continue
+                                    }
+            
+                                    if (sendResult.isClosed) {
+                                        return
+                                    }
+                                }
+        
+                                if (!success) {
+                                    sendEvent(event)
+                                }
                             }
-                            
-                            if (sendResult.isFailure && !sendResult.isClosed) {
-                                // retry
-                                continue
-                            }
-                            
-                            if (sendResult.isClosed) {
-                                return
-                            }
-                        }
-                        
-                        if (!success) {
-                            send(event)
+                        } catch (e: Throwable) {
+                            clientLogger.error("Event push on error: {}", e.localizedMessage, e)
                         }
                     }
                 }
-                
-                
             }
         }
     }
@@ -655,9 +685,13 @@ internal class KookBotImpl(
         }
         
         suspend fun run() {
-            var next = nextStage()
+            var next: Stage? = nextStage()
             while (job.isActive && next != null) {
-                invoke(next)
+                try {
+                    invoke(next)
+                } catch (e: Throwable) {
+                    logger.error("Stage invoke failed: {}", e.localizedMessage, e)
+                }
                 next = nextStage()
             }
             logger.debug("Stage loop done. last stage: {}", currentStage)
@@ -716,11 +750,12 @@ internal class KookBotImpl(
     }
     
     private fun DefaultClientWebSocketSession.eventProcessJob(
-        sn: AtomicLong,
         eventChannel: Channel<Signal.Event>,
     ): EventProcessJob {
-        val launchJob = eventChannel.receiveAsFlow().onEach { event ->
-            val nowSn = event.sn
+        val launchJob = eventChannel
+            .receiveAsFlow()
+            .buffer(16)
+            .onEach { event ->
             // val currPreProcessorQueue = preProcessorQueue
             // val currProcessorQueue = processorQueue
             if (preProcessorQueue.isNotEmpty() || processorQueue.isNotEmpty()) {
@@ -785,17 +820,18 @@ internal class KookBotImpl(
                     }
                 }
             }
-            
-            // 留下最大值。
-            val currentSn = sn.updateAndGet { prev -> max(prev, nowSn) }
-            clientLogger.trace("Current sn: {}", currentSn)
         }.onCompletion { cause ->
-            clientLogger.debug(
-                "Session flow completion. cause: {}", cause?.localizedMessage, cause
-            )
+                if (cause == null) {
+                    clientLogger.debug("Event process flow is completed. No cause.")
+                } else {
+                    clientLogger.debug(
+                        "Event process flow is completed. Cause: {}", cause.localizedMessage, cause
+                    )
+                }
+            
         }.catch { cause ->
             clientLogger.error(
-                "Session flow on error: {}", cause.localizedMessage, cause
+                "Event process flow on error: {}", cause.localizedMessage, cause
             )
         }.launchIn(this)
         
@@ -806,6 +842,15 @@ internal class KookBotImpl(
         val job: Job,
         val eventChannel: Channel<Signal.Event>,
     ) {
+        
+        suspend fun sendEvent(event: Signal.Event) {
+            eventChannel.send(event)
+        }
+        
+        fun trySendEvent(event: Signal.Event): ChannelResult<Unit> {
+            return eventChannel.trySend(event)
+        }
+        
         override fun toString(): String {
             return "EventProcessJob(job=$job, eventChannel=$eventChannel)"
         }
