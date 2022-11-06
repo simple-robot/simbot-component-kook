@@ -44,7 +44,7 @@ public suspend fun Message.toRequest0(
     tempTargetId: ID? = null,
 ): KookApiRequest<*>? {
     if (this is Message.Element<*>) {
-        // 直接转化
+        return this.elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
     }
     
     
@@ -63,9 +63,6 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): KookApiRequest<*>? {
-    // 如果是文本消息，发送文本
-    // 如果是普通的媒体消息
-    
     fun request(type: Int, content: String): MessageCreateRequest {
         return MessageCreateRequest(
             type = type,
@@ -145,13 +142,12 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
         }
         
         is Face -> {
-            val kmd = buildRawKMarkdown {
-                val face = this@elementToRequestOrNull
-                // TODO
-                // serverEmoticons("", "")
-                
-            }
-            
+            // guild emoji..?
+            // val kmd = buildRawKMarkdown {
+            //     val face = this@elementToRequestOrNull
+            //     // serverEmoticons("", "")
+            //
+            // }
             // request(MessageType.KMARKDOWN.type, kmd)
             
             null
