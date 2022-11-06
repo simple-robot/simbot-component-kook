@@ -99,13 +99,18 @@ object P : ProjectDetail() {
     
 }
 
+private val _isSnapshot by lazy { initIsSnapshot() }
 
-fun isSnapshot(): Boolean {
-    println("property: ${System.getProperty("simbot.snapshot")}")
-    println("env: ${System.getenv(Env.IS_SNAPSHOT)}")
+private fun initIsSnapshot(): Boolean {
+    val systemProperty = System.getProperty("simbot.snapshot")
+    println("property: $systemProperty")
+    val systemEnv = System.getenv(Env.IS_SNAPSHOT)
+    println("env: $systemEnv")
     
-    val property = System.getProperty("simbot.snapshot")?.toBoolean() ?: false
-    val env = System.getenv(Env.IS_SNAPSHOT)?.toBoolean() ?: false
+    val property = systemProperty.toBoolean()
+    val env = systemEnv.toBoolean()
     
     return property || env
 }
+
+fun isSnapshot(): Boolean = _isSnapshot
