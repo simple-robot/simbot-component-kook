@@ -25,6 +25,7 @@ import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Compan
 import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.message.DirectMessageCreateRequest
+import love.forte.simbot.kook.api.message.MessageCreateRequest
 import love.forte.simbot.kook.api.message.MessageCreated
 import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
@@ -53,8 +54,12 @@ internal class KookUserChatImpl(
     }
     
     override suspend fun send(message: Message): KookMessageReceipt {
-        val request = message.toRequest(bot, source.code, null, null, null)
+        var request = message.toRequest(bot, source.targetInfo.id, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+        
+        if (request is MessageCreateRequest) {
+            request = request.toDirect()
+        }
         
         val result = request.requestDataBy(bot)
         return if (result is MessageCreated) {
