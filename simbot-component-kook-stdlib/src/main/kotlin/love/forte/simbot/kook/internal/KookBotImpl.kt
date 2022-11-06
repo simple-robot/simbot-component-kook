@@ -57,7 +57,6 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.zip.InflaterInputStream
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -265,11 +264,13 @@ internal class KookBotImpl(
         
         // heartbeat Job
         val heartbeatLaunchJob = launch {
-            suspend fun waitForPong(timeout: Duration): Signal.Pong {
+            suspend fun waitForPong(timeout: Long): Signal.Pong {
                 return withTimeout(timeout) {
                     pongChannel.receive()
                 }
             }
+            
+            val pongTimeout = 6.seconds.inWholeMilliseconds
             
             hb@ while (isActive) {
                 val ping = Signal.Ping(sn.get())
@@ -281,7 +282,7 @@ internal class KookBotImpl(
                     // 如果超时:
                     // 在连接中，每隔 30 秒发一次心跳 ping 包，如果 6 秒内，没有收到心跳 pong 包，则超时。进入到指数回退，重试。
                     clientLogger.trace("Waiting for 'Pong'")
-                    val pong = waitForPong(6.seconds)
+                    val pong = waitForPong(pongTimeout)
                     clientLogger.debug("Received pong {} in 6s", pong)
                 } catch (timeout: TimeoutCancellationException) {
                     // timeout for waiting pong!
@@ -290,7 +291,7 @@ internal class KookBotImpl(
                     // retry twice
                     for (i in 1..2) {
                         try {
-                            val pong = waitForPong(6.seconds)
+                            val pong = waitForPong(pongTimeout)
                             clientLogger.debug("Received pong {} in 6s (timeout retry {})", pong, i)
                             continue@hb
                         } catch (timeout0: TimeoutCancellationException) {
