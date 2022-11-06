@@ -555,16 +555,17 @@ internal class KookBotImpl(
                     is Frame.Binary -> processString(frame.readToText(), loop)
                     else -> {
                         clientLogger.trace("Other frame: {}", frame)
-                        // 下一个还是自己
+                        // next: self
                         loop.addLast(this)
                     }
                 }
             } catch (cancellation: CancellationException) {
                 clientLogger.warn("Session is cancelled: {}, try reconnect.", cancellation.localizedMessage, cancellation)
+                // next: self
+                loop.addLast(this)
             } catch (e: Throwable) {
-                // TODO reconnect?
-                clientLogger.error("Session received frame failed: {}", e.localizedMessage, e)
-                // 下一个还是自己
+                clientLogger.error("Session received frame failed: {}, try reconnect.", e.localizedMessage, e)
+                // next: self
                 loop.addLast(this)
             }
         }
@@ -754,7 +755,8 @@ internal class KookBotImpl(
     ): EventProcessJob {
         val launchJob = eventChannel
             .receiveAsFlow()
-            .buffer(16)
+            .cancellable()
+            .buffer()
             .onEach { event ->
             // val currPreProcessorQueue = preProcessorQueue
             // val currProcessorQueue = processorQueue
