@@ -22,6 +22,8 @@ public class GuildEmojiListRequest(
     private val guildId: ID,
     private val pageRequest: PageRequestParameters? = null,
 ) : KookGetRequest<KookApiResult.ListData<GuildEmojiData>>() {
+    public constructor(guildId: ID): this(guildId, null)
+    
     public companion object Key : BaseKookApiRequestKey("guild-emoji", "list") {
         private val serializer = KookApiResult.ListData.serializer(GuildEmojiDataImpl.serializer())
         
