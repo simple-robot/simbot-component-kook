@@ -33,6 +33,12 @@ tasks.create("createChangelog") {
             val autoGenerateText = """
                 > 对应核心版本: [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion)
                 
+                **⚠️注意:**
+
+                当前版本处于 **`ALPHA`**阶段，仍旧有很多[**已知问题**](https://github.com/simple-robot/simbot-component-kook/issues/)和可能存在的**潜在问题**，
+                如有发现问题请积极[反馈](https://github.com/simple-robot/simbot-component-kook/issues/)或 [协助我们解决](https://github.com/simple-robot/simbot-component-kook/pulls)，非常感谢！
+
+                
                 **仓库参考:**
                 
                 | **模块** | **repo1.maven** | **search.maven** |
