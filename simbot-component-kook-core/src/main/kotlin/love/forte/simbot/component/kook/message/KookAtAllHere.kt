@@ -19,7 +19,6 @@ package love.forte.simbot.component.kook.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.message.At
 import love.forte.simbot.message.AtAll
 import love.forte.simbot.message.Message
 
@@ -30,9 +29,7 @@ import love.forte.simbot.message.Message
  *
  * 行为与概念与 [AtAll] 类似。
  *
- * **注意，目前来看，发消息bot无法at他人，
- * 因此目前此参数只能来自于事件，发送时会被忽略。
- * 此情况也适用于 [At] 和 [AtAll]。**
+ * @see love.forte.simbot.kook.objects.AtTarget.Here
  *
  */
 @SerialName("kook.AtAllHere")

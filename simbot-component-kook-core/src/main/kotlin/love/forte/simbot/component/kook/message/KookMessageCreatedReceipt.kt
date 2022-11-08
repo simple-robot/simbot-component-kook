@@ -35,6 +35,7 @@ import java.util.*
  *
  * @see KookMessageCreatedReceipt
  * @see KookApiRequestedReceipt
+ * @see KookAggregationMessageReceipt
  */
 public sealed interface KookMessageReceipt : MessageReceipt, BotContainer {
     /**
@@ -122,9 +123,8 @@ public class KookApiRequestedReceipt(
     override suspend fun delete(): Boolean = false
 }
 
-// TODO
 /**
- * 多条消息发送后的回执。
+ * 多条消息发送后的回执，其中会包含多个 [KookMessageReceipt]。
  * [KookAggregationMessageReceipt] 的元素中不嵌套引用 [KookAggregationMessageReceipt] 类型。
  *
  */
@@ -197,6 +197,7 @@ public class KookAggregationMessageReceipt private constructor(
         /**
          * 将多个 [KookMessageReceipt] 合并为一个聚合的回执。
          *
+         * @param id 当前聚合回执中使用的id。默认为随机ID。
          * @param bot 如果为null，则会使用 receiver 中的第一个元素中的bot。
          * @throws IllegalArgumentException 如果 receiver 中元素为空
          */
@@ -209,8 +210,8 @@ public class KookAggregationMessageReceipt private constructor(
             val iter = iterator()
             Simbot.require(iter.hasNext()) { "Unable to merge empty element iterator" }
             
-            val list = buildList<KookMessageReceipt>(if (this is Collection) size else 16) {
-                for (receipt in this) {
+            val list = buildList(if (this is Collection) size else 16) {
+                for (receipt in this@merge) {
                     if (bot0 == null) {
                         bot0 = receipt.bot
                     }
