@@ -19,10 +19,7 @@
 
 package love.forte.simbot.kook.objects
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.listSerialDescriptor
@@ -88,11 +85,13 @@ public data class CardMessage(private val cards: List<Card>) : List<Card> by car
      */
     @JvmOverloads
     public fun decode(decoder: Json = DEFAULT_DECODER): String {
-        if (decoder.configuration.classDiscriminator == "type") {
+        val configuration = decoder.configuration
+        if (configuration.classDiscriminator == "type" && configuration.encodeDefaults) {
             return decoder.encodeToString(serializer(), this)
         }
         val decoder0 = Json(from = decoder) {
             classDiscriminator = "type"
+            encodeDefaults = true
         }
 
         return decoder0.encodeToString(serializer(), this)
@@ -103,6 +102,7 @@ public data class CardMessage(private val cards: List<Card>) : List<Card> by car
         private val DEFAULT_DECODER: Json = Json {
             isLenient = true
             ignoreUnknownKeys = true
+            encodeDefaults = true
         }
     }
 }
@@ -213,7 +213,6 @@ public enum class Size {
  *
  */
 @Serializable
-@SerialName("card")
 public data class Card @JvmOverloads constructor(
     /**
      * 卡片风格，默认为primary
@@ -237,7 +236,9 @@ public data class Card @JvmOverloads constructor(
      * - color代表卡片边框具体颜色，如果填了，则使用该color，如果未填，则使用theme来渲染卡片颜色。
      */
     val modules: List<CardModule>,
-)
+) {
+    val type: String = "card"
+}
 
 
 /**
@@ -511,7 +512,7 @@ public sealed class CardModule {
             Simbot.require(text is CardElement.Text || text is CardElement.Paragraph) {
                 "The type of 'text' must be one of CardElement.Text(plain-text or kmarkdown) or CardElement.Paragraph"
             }
-            Simbot.require(accessory is CardElement.Image || accessory is CardElement.Button) {
+            Simbot.require(accessory == null || accessory is CardElement.Image || accessory is CardElement.Button) {
                 "The type of 'accessory' must be one of CardElement.Image or CardElement.Button"
             }
         }
