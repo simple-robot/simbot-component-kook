@@ -20,9 +20,7 @@ package love.forte.simbot.kook.api.guild.role
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.ID
-import love.forte.simbot.kook.api.BaseKookApiRequestKey
-import love.forte.simbot.kook.api.KookApiResult
-import love.forte.simbot.kook.api.KookGetRequest
+import love.forte.simbot.kook.api.*
 import love.forte.simbot.kook.objects.Role
 import love.forte.simbot.kook.objects.impl.RoleImpl
 import love.forte.simbot.literal
@@ -38,8 +36,12 @@ import love.forte.simbot.literal
  *
  * @param guildId 服务器的id
  */
-public class GuildRoleListRequest(public val guildId: ID) :
-    KookGetRequest<KookApiResult.ListData<Role>>() {
+public class GuildRoleListRequest(
+    public val guildId: ID,
+    private val pageRequest: PageRequestParameters? = null,
+) : KookGetRequest<KookApiResult.ListData<Role>>() {
+    public constructor(guildId: ID): this(guildId, null)
+    
     public companion object Key : BaseKookApiRequestKey("guild-role", "list") {
         private val serializer = KookApiResult.ListData.serializer(RoleImpl.serializer())
     }
@@ -52,6 +54,7 @@ public class GuildRoleListRequest(public val guildId: ID) :
 
     override fun ParametersBuilder.buildParameters() {
         append("guild_id", guildId.literal)
+        pageRequest?.appendTo(this)
     }
 
 }

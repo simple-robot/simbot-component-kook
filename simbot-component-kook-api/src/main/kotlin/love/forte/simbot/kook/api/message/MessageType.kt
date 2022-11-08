@@ -80,7 +80,7 @@ public sealed class MessageType {
         public val FILE: MessageType = StandardMessageType("FILE", 4)
 
         /**
-         * K Markdown 消息
+         * KMarkdown 消息
          */
         @JvmField
         public val KMARKDOWN: MessageType = StandardMessageType("KMARKDOWN", 9)
@@ -135,10 +135,10 @@ public sealed class MessageType {
     internal class StandardMessageType internal constructor(private val standardName: String, override val type: Int) :
         MessageType() {
         override fun toString(): String = "StandardMessageType(name=$standardName, type=$type)"
+        val name: String = standardName.lowercase()
     }
 
     internal class MixedMessageType(override val type: Int) : MessageType()
-
 
     override fun toString(): String = "MessageType(type=$type)"
 }

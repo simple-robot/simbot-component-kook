@@ -99,5 +99,11 @@ public class MessageCreateRequest(
     public fun toDirect(targetId: ID = this.targetId): DirectMessageCreateRequest {
         return DirectMessageCreateRequest.byTargetId(targetId, content, type, quote, nonce)
     }
+    /**
+     * 将此api转化为 [DirectMessageCreateRequest].
+     */
+    public fun toDirectByChatCode(chatCode: ID): DirectMessageCreateRequest {
+        return DirectMessageCreateRequest.byChatCode(chatCode, content, type, quote, nonce)
+    }
 
 }

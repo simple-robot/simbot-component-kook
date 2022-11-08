@@ -1,3 +1,6 @@
+server:
+  port: 0
+
 logging:
   level:
     love.forte.simbot.kook.bot.client: TRACE

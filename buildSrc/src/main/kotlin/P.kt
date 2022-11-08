@@ -43,6 +43,8 @@ val simbotVersion = v(3, 0, 0) - v("M2")
 
 val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
 val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
+val simbotLogger = "love.forte.simbot:simbot-logger:$simbotVersion"
+val simbotLoggerSlf4j = "love.forte.simbot:simbot-logger-slf4j-impl:$simbotVersion"
 
 
 object P : ProjectDetail() {

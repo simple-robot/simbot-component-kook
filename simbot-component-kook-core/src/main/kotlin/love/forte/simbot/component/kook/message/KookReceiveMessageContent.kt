@@ -40,7 +40,7 @@ import kotlin.experimental.or
  * 在 Kook 中，一个完整的接收消息所得到 [messages] 中的元素可能是经过拆解/解析/冗余、扩展的。
  * 如果你希望直接根据真实消息进行**复读**，则请直接使用 [KookReceiveMessageContent]
  * 本身作为消息发送的实体而不是获取其中的 [messages]；同样的原因，如果你需要先对消息进行处理，
- * 请注意消息链中的冗余消息，比如当 []
+ * 请注意消息链中的冗余消息。
  *
  * @author ForteScarlet
  */
@@ -110,6 +110,10 @@ public class KookReceiveMessageContent(
      *
      */
     override val messages: Messages = source.toMessages()
+    
+    // TODO -> 内容转化：移除部分冗余文本
+    override val plainText: String
+        get() = super.plainText
     
     /**
      * 通过 [MessageDeleteRequest] 删除当前消息。

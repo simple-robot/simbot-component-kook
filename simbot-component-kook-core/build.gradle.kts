@@ -31,4 +31,5 @@ dependencies {
     compileOnly(libs.jetbrains.annotations)
 
     testImplementation(simbotCore)
+    testImplementation(simbotLoggerSlf4j)
 }
