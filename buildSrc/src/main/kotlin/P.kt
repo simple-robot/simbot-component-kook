@@ -52,6 +52,9 @@ object P : ProjectDetail() {
     const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
     const val HOMEPAGE = "https://github.com/simple-robot/simbot-component-kook"
     
+    override val homepage: String
+        get() = HOMEPAGE
+    
     private val baseVersion = v(
         "${simbotVersion.major}.${simbotVersion.minor}",
         0, 0
