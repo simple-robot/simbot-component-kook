@@ -17,8 +17,7 @@
 
 package love.forte.simbot.component.kook.message
 
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.ID
+import love.forte.simbot.*
 import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.KookApiRequest
@@ -28,10 +27,10 @@ import love.forte.simbot.kook.api.message.MessageCreateRequest
 import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.objects.AtTarget
 import love.forte.simbot.kook.objects.KMarkdown
-import love.forte.simbot.kook.objects.KMarkdownBuilder
 import love.forte.simbot.kook.objects.buildRawKMarkdown
-import love.forte.simbot.literal
 import love.forte.simbot.message.*
+import love.forte.simbot.resources.Resource.Companion.toResource
+import java.net.URL
 
 /**
  * 提供 Kook 组件中一些会用到的信息。
@@ -40,42 +39,42 @@ import love.forte.simbot.message.*
  */
 @Suppress("MemberVisibilityCanBePrivate")
 public object KookMessages {
-
+    
     /**
      * 当at(mention)的目标为用户时，[At.atType] 所使用的值。[AT_TYPE_USER] 也是 [At.atType] 的默认值。
      */
     public const val AT_TYPE_USER: String = "user"
-
+    
     /**
      * 当at(mention)的目标为角色时，[At.atType] 所使用的值。
      */
     public const val AT_TYPE_ROLE: String = "role"
-
+    
     /**
      * 当at(mention)的目标为频道时。用于使用 [KMarkdown] 类型发送的时候。
      */
     public const val AT_TYPE_CHANNEL: String = "channel"
-
-
+    
+    
     /**
      * 构建一个 at(mention) 用户的 [At] 消息对象。
      */
     @JvmStatic
     public fun atUser(id: ID): At = At(target = id, type = AT_TYPE_USER, originContent = "(met)$id(met)")
-
+    
     /**
      * 构建一个 at(mention) 整个角色的 [At] 消息对象。
      */
     @JvmStatic
     public fun atRole(id: ID): At = At(target = id, type = AT_TYPE_ROLE, originContent = "(rol)$id(rol)")
-
+    
     /**
      * 构建一个 at(mention) 频道的 [At] 消息对象。
      */
     @JvmStatic
     public fun atChannel(id: ID): At = At(target = id, type = AT_TYPE_CHANNEL, originContent = "(chn)$id(chn)")
-
-
+    
+    
 }
 
 /**
@@ -84,6 +83,12 @@ public object KookMessages {
  * 如果当前 [Message] 是一个消息链，则可能会根据消息类型的情况将消息转化为 `KMarkdown` 类型的消息。
  *
  */
+@Deprecated(
+    "Use Message.sendToChannel", ReplaceWith(
+        "sendToChannel(bot, targetId, quote, nonce, tempTargetId)",
+        "love.forte.simbot.component.kook.message.KookMessageReceipt"
+    )
+)
 @OptIn(ExperimentalSimbotApi::class)
 public suspend fun Message.toRequest(
     bot: KookComponentBot,
@@ -95,30 +100,31 @@ public suspend fun Message.toRequest(
     when (this) {
         is Message.Element<*> -> return elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
         is Messages -> {
+            // 只要不是纯文本消息，就使用Kmarkdown？
             // TODO 如果存在at，atAll，atAllRole，
             //  转为kmarkdown消息。
-
-            val content = buildRawKMarkdown {
-
-            }
-
-            MessageCreateRequest(
-                type = MessageType.KMARKDOWN.type,
-                targetId = targetId,
-                content = content,
-                quote = quote,
-                nonce = nonce,
-                tempTargetId = tempTargetId
-            )
-
+            
+            // val content = buildRawKMarkdown {
+            //
+            // }
+            //
+            // MessageCreateRequest(
+            //     type = MessageType.KMARKDOWN.type,
+            //     targetId = targetId,
+            //     content = content,
+            //     quote = quote,
+            //     nonce = nonce,
+            //     tempTargetId = tempTargetId
+            // )
+            
             // for (i in this.indices.reversed()) {
             //
             // }
-
+            
             // buildKMarkdown {
             //
             // }
-
+            
             for (i in this.indices.reversed()) {
                 val element = this[i]
                 val request = element.elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
@@ -151,14 +157,14 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
             quote = quote,
             nonce = nonce,
             tempTargetId = tempTargetId,
-
+            
             )
     }
     
     return when (this) {
         // 文本消息
         is PlainText<*> -> request(MessageType.TEXT.type, text)
-
+        
         is KookMessageElement<*> -> when (this) {
             // 媒体资源
             is KookAssetMessage<*> -> request(type, asset.url)
@@ -166,40 +172,47 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
             is KookKMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
             // card message
             is KookCardMessage -> request(MessageType.CARD.type, cards.decode())
-
+            
             // request message
             is KookRequestMessage -> this.request
-
+            
             is KookAtAllHere -> {
                 val content = buildRawKMarkdown {
                     at(AtTarget.Here)
                 }
-
+                
                 request(MessageType.KMARKDOWN.type, content)
             }
-
+            
             is KookAttachmentMessage -> {
-                // TODO
-                // buildRawKMarkdown {
-                //
-                // }
-                null
+                val attachmentType = attachment.type.lowercase()
+                val type = when (attachment.type.lowercase()) {
+                    "file" -> MessageType.FILE.type
+                    "image" -> MessageType.IMAGE.type
+                    "video" -> MessageType.VIDEO.type
+                    else -> throw SimbotIllegalArgumentException("Unknown attachment type: $attachmentType")
+                }
+                
+                val createRequest = AssetCreateRequest(URL(attachment.url).toResource(attachment.name))
+                val asset = createRequest.requestDataBy(bot)
+                
+                request(type, asset.url)
             }
-
-
+            
+            
             // other, ignore.
             else -> null
         }
-
+        
         // 需要上传的图片
         is ResourceImage -> {
-            val asset = AssetCreateRequest(resource).requestDataBy(bot)
+            val asset = AssetCreateRequest(resource()).requestDataBy(bot)
             request(MessageType.IMAGE.type, asset.url)
         }
-
+        
         // 其他任意图片类型
         is Image<*> -> request(MessageType.IMAGE.type, id.literal)
-
+        
         is At -> {
             // buildRawKMarkdown {
             //     // TODO
@@ -207,29 +220,20 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
             // TODO
             null
         }
-
+        
         is Face -> {
             // TODO
             null
         }
-
+        
         is Emoji -> {
             // TODO
             null
         }
-
-
+        
+        
         else -> null
     }
-}
-
-
-/**
- * 尝试将一个 [Message.Element] 拼接进目标的 KMarkdown 消息。
- */
-@ExperimentalSimbotApi
-private fun Message.Element<*>.appendToKMarkdownMessage(builder: KMarkdownBuilder): KMarkdownBuilder {
-    TODO()
 }
 
 
@@ -237,6 +241,12 @@ private fun Message.Element<*>.appendToKMarkdownMessage(builder: KMarkdownBuilde
  * 将一个 [Message] 转化为用于发送消息的请求api。
  *
  */
+@Deprecated(
+    "Use Message.sendToDirectByTargetId", ReplaceWith(
+        "sendToDirectByTargetId(bot, targetId, quote, nonce, tempTargetId)",
+        "love.forte.simbot.component.kook.message.KookMessageReceipt"
+    )
+)
 public suspend fun Message.toDirectRequest(
     bot: KookComponentBot,
     targetId: ID,
@@ -244,5 +254,5 @@ public suspend fun Message.toDirectRequest(
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): DirectMessageCreateRequest? {
-    return (toRequest(bot, targetId, quote, nonce, tempTargetId) as? MessageCreateRequest)?.toDirect()
+    return (sendToChannel(bot, targetId, quote, nonce, tempTargetId) as? MessageCreateRequest)?.toDirect()
 }

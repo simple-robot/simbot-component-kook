@@ -16,8 +16,8 @@
  */
 
 plugins {
-    id("simbot-kook.nexus-publish")
-    id("simbot-kook.changelog-generator")
-    id("simbot-kook.dokka-multi-module")
+    `simbot-kook-nexus-publish`
+    `simbot-kook-changelog-generator`
+    `simbot-kook-dokka-multi-module`
 }
 

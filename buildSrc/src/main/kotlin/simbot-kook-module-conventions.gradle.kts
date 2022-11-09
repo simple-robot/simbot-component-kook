@@ -15,8 +15,8 @@
  *
  */
 
-import org.gradle.internal.impldep.org.apache.http.client.methods.RequestBuilder.options
-import org.gradle.internal.impldep.org.eclipse.jgit.lib.ObjectChecker.encoding
+import love.forte.gradle.common.core.project.setup
+import love.forte.gradle.common.core.repository.Repositories
 
 /*
  *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
@@ -40,17 +40,19 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
+    idea
 }
 
-group = P.ComponentKook.GROUP
-version = P.ComponentKook.VERSION
-description = rootProject.description ?: P.ComponentKook.DESCRIPTION
+setup(P)
+if (isSnapshot()) {
+    version = P.snapshotVersion.toString()
+}
 
 repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url = uri(Sonatype.Snapshot.URL)
+        url = uri(Repositories.Snapshot.URL)
         mavenContent {
             snapshotsOnly()
         }
@@ -102,3 +104,10 @@ println("== project.group:   ${group}")
 println("== project.name:    ${name}")
 println("== project.version: ${version}")
 println("========================================================")
+
+idea {
+    module {
+        isDownloadSources = true
+        isDownloadJavadoc = true
+    }
+}

@@ -17,6 +17,8 @@
 
 package love.forte.simbot.component.kook.event
 
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
@@ -75,147 +77,102 @@ import love.forte.simbot.kook.event.Event as KkEvent
 public abstract class KookMemberChangedEvent<out Body> :
     KookSystemEvent<Body>(),
     MemberChangedEvent {
-
+    
     /**
      * 本次变更涉及的频道成员信息。同 [user]
      */
-    @OptIn(Api4J::class)
-    abstract override val member: KookGuildMember
-
-    /**
-     * 本次变更涉及的频道成员信息。同 [user]
-     */
-    @JvmSynthetic
-    override suspend fun member(): KookGuildMember = member
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun member(): KookGuildMember
+    
     /**
      * 本次变更涉及的频道成员信息。同 [member]
      */
-    @OptIn(Api4J::class)
-    override val user: KookGuildMember get() = member
-
-    /**
-     * 本次变更涉及的频道成员信息。同 [member]
-     */
-    @JvmSynthetic
-    override suspend fun user(): KookGuildMember = user
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun user(): KookGuildMember = member()
+    
     /**
      * 可能存在的变更前成员信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val before: KookGuildMember?
-
-    /**
-     * 可能存在的变更前成员信息。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun before(): KookGuildMember?
-
+    
     /**
      * 可能存在的变更后成员信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val after: KookGuildMember?
-
-    /**
-     * 可能存在的变更后成员信息。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun after(): KookGuildMember?
-
+    
     /**
      * 变更成员所处组织。
      */
-    @OptIn(Api4J::class)
-    abstract override val source: Organization
-
-    /**
-     * 变更成员所处组织。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     abstract override suspend fun source(): Organization
-
-
+    
     /**
      * 变更成员所处组织。同 [source].
      */
-    @OptIn(Api4J::class)
-    abstract override val organization: Organization
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): Organization = source()
+    
     /**
-     * 变更成员所处组织。同 [source].
+     * 可能存在的变更操作者。
      */
-    @JvmSynthetic
-    abstract override suspend fun organization(): Organization
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun operator(): KookGuildMember?
+    
     /**
      * 变更时间。
      */
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
-
-
-    /**
-     * 可能存在的变更操作者。
-     */
-    @OptIn(Api4J::class)
-    abstract override val operator: KookGuildMember?
-
-    /**
-     * 可能存在的变更操作者。
-     */
-    @JvmSynthetic
-    override suspend fun operator(): KookGuildMember? = operator
-
+    
     public companion object Key : BaseEventKey<KookMemberChangedEvent<*>>(
         "kook.member_changed", KookEvent, MemberChangedEvent
     ) {
         override fun safeCast(value: Any): KookMemberChangedEvent<*>? = doSafeCast(value)
     }
-
+    
 }
 
-//region member相关
+// region member相关
 
-//region 频道进出相关
+// region 频道进出相关
 /**
  * Kook  [成员变更事件][KookMemberChangedEvent] 中与**频道进出**相关的变更事件。
  * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
 @BaseEvent
 public abstract class KookMemberChannelChangedEvent<out Body> : KookMemberChangedEvent<Body>() {
-
+    
     /**
      * 事件涉及的频道信息。同 [organization].
      */
-    abstract override val source: KookChannel
-
-    /**
-     * 事件涉及的频道信息。同 [organization].
-     */
-    @JvmSynthetic
-    override suspend fun source(): KookChannel = source
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookChannel
+    
+    
     /**
      * 事件涉及的频道信息。同 [source].
      */
-    override val organization: KookChannel get() = source
-
-    /**
-     * 事件涉及的频道信息。同 [source].
-     */
-    @JvmSynthetic
-    override suspend fun organization(): KookChannel = organization
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookChannel = source()
+    
+    
     public companion object Key : BaseEventKey<KookMemberChannelChangedEvent<*>>(
         "kook.member_channel_changed", KookMemberChangedEvent
     ) {
         override fun safeCast(value: Any): KookMemberChannelChangedEvent<*>? = doSafeCast(value)
     }
-
+    
 }
 
 
@@ -231,15 +188,6 @@ public abstract class KookMemberChannelChangedEvent<out Body> : KookMemberChange
 public abstract class KookMemberExitedChannelEvent :
     KookMemberChannelChangedEvent<UserExitedChannelEventBody>(),
     MemberDecreaseEvent {
-
-    /**
-     * 离开的成员。
-     *
-     * 此成员已经被移除自频道，因此 [before] 不可用于执行禁言等操作，
-     * 也不会存在于当前频道成员中。
-     */
-    @OptIn(Api4J::class)
-    abstract override val before: KookGuildMember
     
     /**
      * 离开的成员。
@@ -247,44 +195,33 @@ public abstract class KookMemberExitedChannelEvent :
      * 此成员已经被移除自频道，因此 [before] 不可用于执行禁言等操作，
      * 也不会存在于当前频道成员中。
      */
-    @JvmSynthetic
-    override suspend fun before(): KookGuildMember = before
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun before(): KookGuildMember
+    
     /**
      * 成员离开后。始终为null。
      */
-    @OptIn(Api4J::class)
-    override val after: KookGuildMember? get() = null
-
-    /**
-     * 成员离开后。始终为null。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun after(): KookGuildMember? = null
-
-
+    
+    /**
+     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun operator(): KookGuildMember? = null
+    
     /**
      * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
-
-    /**
-     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(Api4J::class)
-    override val operator: KookGuildMember? get() = null
-
-    /**
-     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @JvmSynthetic
-    override suspend fun operator(): KookGuildMember? = null
-
-
+    
+    
     override val key: Event.Key<out KookMemberExitedChannelEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookMemberExitedChannelEvent>(
         "kook.member_exited_channel", KookMemberChannelChangedEvent, MemberDecreaseEvent
     ) {
@@ -301,66 +238,54 @@ public abstract class KookMemberExitedChannelEvent :
 public abstract class KookMemberJoinedChannelEvent :
     KookMemberChannelChangedEvent<UserJoinedChannelEventBody>(),
     MemberIncreaseEvent {
-
+    
+    /**
+     * 事件涉及的频道信息。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookChannel
+    
     /**
      * 增加的成员。
      */
-    @OptIn(Api4J::class)
-    abstract override val after: KookGuildMember
-
-    /**
-     * 增加的成员。
-     */
-    @JvmSynthetic
-    override suspend fun after(): KookGuildMember = after
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun after(): KookGuildMember
+    
     /**
      * 始终为null。
      */
-    @OptIn(Api4J::class)
-    override val before: KookGuildMember? get() = null
-
-    /**
-     * 始终为null。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun before(): KookGuildMember? = null
-
-
+    
+    /**
+     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun operator(): KookGuildMember? = null
+    
     /**
      * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
-    /**
-     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(Api4J::class)
-    override val operator: KookGuildMember? get() = null
-
-    /**
-     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @JvmSynthetic
-    override suspend fun operator(): KookGuildMember? = null
-
-
+    
+    
     override val key: Event.Key<out KookMemberJoinedChannelEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookMemberJoinedChannelEvent>(
         "kook.member_joined_channel", KookMemberChannelChangedEvent, MemberIncreaseEvent
     ) {
         override fun safeCast(value: Any): KookMemberJoinedChannelEvent? = doSafeCast(value)
     }
 }
-//endregion
+// endregion
 
 
-//region 频道服务器进出
+// region 频道服务器进出
 /**
  * Kook  [成员变更事件][KookMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
@@ -368,30 +293,22 @@ public abstract class KookMemberJoinedChannelEvent :
 @BaseEvent
 public abstract class KookMemberGuildChangedEvent<out Body> :
     KookMemberChangedEvent<Body>() {
-
+    
     /**
      * 涉及的相关频道服务器。同 [organization].
      */
-    abstract override val source: KookGuild
-
-    /**
-     * 涉及的相关频道服务器。同 [organization].
-     */
-    @JvmSynthetic
-    override suspend fun source(): KookGuild = source
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookGuild
+    
     /**
      * 涉及的相关频道服务器。同 [source].
      */
-    override val organization: KookGuild get() = source
-
-    /**
-     * 涉及的相关频道服务器。同 [source].
-     */
-    @JvmSynthetic
-    override suspend fun organization(): KookGuild = organization
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookGuild = source()
+    
+    
     public companion object Key : BaseEventKey<KookMemberGuildChangedEvent<*>>(
         "kook.member_guild_changed", KookMemberChangedEvent
     ) {
@@ -409,56 +326,37 @@ public abstract class KookMemberGuildChangedEvent<out Body> :
 public abstract class KookMemberExitedGuildEvent :
     KookMemberGuildChangedEvent<ExitedGuildEventBody>(),
     MemberDecreaseEvent {
-
-
+    
     /**
      * 离开的成员。
      */
-    @OptIn(Api4J::class)
-    abstract override val before: KookGuildMember
-
-    /**
-     * 离开的成员。
-     */
-    @JvmSynthetic
-    override suspend fun before(): KookGuildMember = before
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun before(): KookGuildMember
+    
     /**
      * 成员离开后，始终为null。
      */
-    @OptIn(Api4J::class)
-    override val after: KookGuildMember? get() = null
-
-    /**
-     * 成员离开后，始终为null。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun after(): KookGuildMember? = null
-
+    
+    /**
+     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun operator(): KookGuildMember? = null
+    
     /**
      * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
-
-    /**
-     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(Api4J::class)
-    override val operator: KookGuildMember?
-        get() = null
-
-    /**
-     * Kook 群员离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @JvmSynthetic
-    override suspend fun operator(): KookGuildMember? = null
-
-
+    
+    
     override val key: Event.Key<out KookMemberExitedChannelEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookMemberExitedChannelEvent>(
         "kook.member_exited_channel", KookMemberChannelChangedEvent, MemberDecreaseEvent
     ) {
@@ -475,55 +373,43 @@ public abstract class KookMemberExitedGuildEvent :
 public abstract class KookMemberJoinedGuildEvent :
     KookMemberGuildChangedEvent<JoinedGuildEventBody>(),
     MemberIncreaseEvent {
-
+    
+    /**
+     * 涉及的相关频道服务器。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookGuild
+    
     /**
      * 加入的成员。
      */
-    @OptIn(Api4J::class)
-    abstract override val after: KookGuildMember
-
-    /**
-     * 加入的成员。
-     */
-    @JvmSynthetic
-    override suspend fun after(): KookGuildMember = after
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun after(): KookGuildMember
+    
     /**
      * 成员加入前，始终为null。
      */
-    @OptIn(Api4J::class)
-    override val before: KookGuildMember?
-        get() = null
-
-    /**
-     * 成员加入前，始终为null。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun before(): KookGuildMember? = null
-
+    
+    /**
+     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun operator(): KookGuildMember? = null
+    
     /**
      * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
-    /**
-     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(Api4J::class)
-    override val operator: KookGuildMember? get() = null
-
-    /**
-     * Kook 群员进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @JvmSynthetic
-    override suspend fun operator(): KookGuildMember? = null
-
+    
     override val key: Event.Key<out KookMemberJoinedGuildEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookMemberJoinedGuildEvent>(
         "kook.member_joined_guild", KookMemberGuildChangedEvent, MemberIncreaseEvent
     ) {
@@ -531,13 +417,13 @@ public abstract class KookMemberJoinedGuildEvent :
     }
 }
 
-//endregion
+// endregion
 
 
-//endregion
+// endregion
 
 
-//region bot相关
+// region bot相关
 /**
  * 频道成员的变动事件中，变动本体为bot自身时的事件。对应 Kook 原始事件的 [SelfExitedGuildEvent] 和 [SelfJoinedGuildEvent]。
  *
@@ -548,31 +434,22 @@ public abstract class KookMemberJoinedGuildEvent :
 @BaseEvent
 public abstract class KookBotMemberChangedEvent<out Body> :
     KookMemberChangedEvent<Body>() {
-
-
+    
     /**
      * 涉及的相关频道服务器。同 [organization].
      */
-    abstract override val source: KookGuild
-
-    /**
-     * 涉及的相关频道服务器。同 [organization].
-     */
-    @JvmSynthetic
-    override suspend fun source(): KookGuild = source
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookGuild
+    
     /**
      * 涉及的相关频道服务器。同 [source].
      */
-    override val organization: KookGuild get() = source
-
-    /**
-     * 涉及的相关频道服务器。同 [source].
-     */
-    @JvmSynthetic
-    override suspend fun organization(): KookGuild = organization
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookGuild = source()
+    
+    
     public companion object Key : BaseEventKey<KookBotMemberChangedEvent<*>>(
         "kook.bot_member_changed", KookMemberChangedEvent
     ) {
@@ -590,55 +467,39 @@ public abstract class KookBotMemberChangedEvent<out Body> :
 public abstract class KookBotSelfExitedGuildEvent :
     KookBotMemberChangedEvent<SelfExitedGuildEventBody>(),
     MemberDecreaseEvent {
-
+    
     /**
      * 即bot自身在频道服务器内的信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val before: KookGuildMember
-
-    /**
-     * 即bot自身在频道服务器内的信息。
-     */
-    @JvmSynthetic
-    override suspend fun before(): KookGuildMember = before
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun before(): KookGuildMember
+    
     /**
      * 始终为null。
      */
-    @OptIn(Api4J::class)
-    override val after: KookGuildMember? get() = null
-
-    /**
-     * 始终为null。
-     */
-    @JvmSynthetic
-    override suspend fun after(): KookGuildMember? = after
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun after(): KookGuildMember? = null
+    
     /**
      * Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(Api4J::class)
-    override val operator: KookGuildMember? get() = null
-
-    /**
-     * Kook bot离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun operator(): KookGuildMember? = null
-
-
+    
+    
     /**
      * Kook 群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
+    
+    
     override val key: Event.Key<out KookBotSelfExitedGuildEvent>
         get() = Key
-
-
+    
+    
     public companion object Key : BaseEventKey<KookBotSelfExitedGuildEvent>(
         "kook.bot_self_exited", KookBotMemberChangedEvent, MemberDecreaseEvent
     ) {
@@ -655,61 +516,52 @@ public abstract class KookBotSelfExitedGuildEvent :
 public abstract class KookBotSelfJoinedGuildEvent :
     KookBotMemberChangedEvent<SelfJoinedGuildEventBody>(),
     MemberIncreaseEvent {
+    
+    /**
+     * 涉及的相关频道服务器。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): KookGuild
+    
     /**
      * 即bot自身在频道服务器内的信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val after: KookGuildMember
-
-    /**
-     * 即bot自身在频道服务器内的信息。
-     */
-    @JvmSynthetic
-    override suspend fun after(): KookGuildMember = after
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun after(): KookGuildMember
+    
     /**
      * 始终为null。
      */
-    @OptIn(Api4J::class)
-    override val before: KookGuildMember? get() = null
-
-    /**
-     * 始终为null。
-     */
-    @JvmSynthetic
-    override suspend fun before(): KookGuildMember? = before
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun before(): KookGuildMember? = null
+    
     /**
      * Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(Api4J::class)
-    override val operator: KookGuildMember? get() = null
-
-    /**
-     * Kook bot进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @JvmSynthetic
-    override
-    suspend fun operator(): KookGuildMember? = null
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun operator(): KookGuildMember? = null
+    
+    
     /**
      * Kook 群员离开频道事件的行为类型始终为主动的。
      */
     override val actionType: ActionType
         get() = ActionType.PROACTIVE
-
+    
     override val key: Event.Key<out KookBotSelfJoinedGuildEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookBotSelfJoinedGuildEvent>(
         "kook.bot_self_joined", KookBotMemberChangedEvent, MemberIncreaseEvent
     ) {
         override fun safeCast(value: Any): KookBotSelfJoinedGuildEvent? = doSafeCast(value)
     }
 }
-//endregion
+// endregion
 
 /**
  * Kook 用户在线状态变更相关事件的抽象父类。
@@ -738,25 +590,20 @@ public abstract class KookBotSelfJoinedGuildEvent :
 public sealed class KookUserOnlineStatusChangedEvent :
     KookSystemEvent<GuildMemberEventExtraBody>(),
     ChangedEvent {
-
+    
     /**
      * 发生变化的用户信息。
      */
-    @OptIn(Api4J::class)
-    abstract override val source: UserInfo
-
-    /**
-     * 发生变化的用户信息。
-     */
-    @JvmSynthetic
-    override suspend fun source(): UserInfo = source
-
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun source(): UserInfo
+    
+    
     /**
      * 状态变化后，此用户是否为_在线_状态。
      */
     public abstract val isOnline: Boolean
-
+    
     /**
      * 此用户与当前bot所同处的频道服务器的id列表。
      *
@@ -764,7 +611,9 @@ public sealed class KookUserOnlineStatusChangedEvent :
      * @see GuildMemberOfflineEventBody.guilds
      */
     public abstract val guildIds: List<ID>
-
+    
+    // TODO guilds 返回值类型变更为 Items<T>
+    
     /**
      * 通过 [guildIds] 信息获取各个ID对应的 [KookGuild] 实例。
      *
@@ -780,8 +629,8 @@ public sealed class KookUserOnlineStatusChangedEvent :
      */
     @get:JvmSynthetic
     public abstract val guilds: Sequence<KookGuild?>
-
-
+    
+    
     /**
      * 通过 [guildIds] 信息获取各个ID对应的 [KookGuild] 实例。
      *
@@ -798,111 +647,100 @@ public sealed class KookUserOnlineStatusChangedEvent :
     @Api4J
     @get:JvmName("getGuilds")
     public val guildStream: Stream<KookGuild?> get() = guilds.asStream()
-
-
+    
     /**
      * 变更前的在线状态。相当于 `!isOnline`.
      */
-    @OptIn(Api4J::class)
-    override val before: Boolean get() = !isOnline
-
-    /**
-     * 变更前的在线状态。相当于 `!isOnline`.
-     */
-    @JvmSynthetic
-    override suspend fun before(): Boolean = before
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun before(): Boolean = !isOnline
+    
     /**
      * 变更后的在线状态。同 [isOnline].
      */
-    @OptIn(Api4J::class)
-    override val after: Boolean get() = isOnline
-
-    /**
-     * 变更后的在线状态。同 [isOnline].
-     */
-    @JvmSynthetic
-    override suspend fun after(): Boolean = after
-
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun after(): Boolean = isOnline
+    
     /**
      * 变更时间。
      */
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
-
-
+    
+    
     override val key: Event.Key<out KookUserOnlineStatusChangedEvent>
         get() = Key
-
+    
     public companion object Key : BaseEventKey<KookUserOnlineStatusChangedEvent>(
         "kook.guild_member_online_status_changed", KookSystemEvent, ChangedEvent
     ) {
         override fun safeCast(value: Any): KookUserOnlineStatusChangedEvent? = doSafeCast(value)
     }
-
-
+    
+    
     /**
      * [KookUserOnlineStatusChangedEvent] 对于用户上线的事件子类型。
      *
      */
     public abstract class Online : KookUserOnlineStatusChangedEvent() {
         abstract override val sourceEvent: KkEvent<Sys<GuildMemberOnlineEventBody>>
-
+        
         /**
          * 此事件代表上线，[isOnline] == true.
          */
         override val isOnline: Boolean
             get() = true
-
+        
         override val sourceBody: GuildMemberOnlineEventBody
             get() = sourceEvent.extra.body
-
+        
         public val userId: ID
             get() = sourceBody.userId
-
+        
         override val changedTime: Timestamp
             get() = sourceBody.eventTime
-
+        
         override val guildIds: List<ID>
             get() = sourceBody.guilds
-
-
+        
+        
         public companion object Key :
             BaseEventKey<Online>("kook.member_online", KookUserOnlineStatusChangedEvent) {
             override fun safeCast(value: Any): Online? = doSafeCast(value)
         }
     }
-
+    
     /**
      * [KookUserOnlineStatusChangedEvent] 对于用户离线的事件子类型。
      *
      */
     public abstract class Offline : KookUserOnlineStatusChangedEvent() {
         abstract override val sourceEvent: KkEvent<Sys<GuildMemberOfflineEventBody>>
-
+        
         /**
          * 此事件代表下线，[isOnline] == false.
          */
         override val isOnline: Boolean
             get() = false
-
+        
         override val sourceBody: GuildMemberOfflineEventBody
             get() = sourceEvent.extra.body
-
+        
         public val userId: ID
             get() = sourceBody.userId
-
+        
         override val changedTime: Timestamp
             get() = sourceBody.eventTime
-
+        
         override val guildIds: List<ID>
             get() = sourceBody.guilds
-
+        
         public companion object Key :
             BaseEventKey<Offline>("kook.member_offline", KookUserOnlineStatusChangedEvent) {
             override fun safeCast(value: Any): Offline? = doSafeCast(value)
         }
     }
-
-
+    
+    
 }

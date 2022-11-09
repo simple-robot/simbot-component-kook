@@ -17,7 +17,8 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.event.BaseEventKey
@@ -44,46 +45,26 @@ public abstract class KookUserUpdatedEvent :
     override val changedTime: Timestamp
         get() = sourceEvent.msgTimestamp
 
-
     /**
      * 变化源。为发生变更的用户的id。
      */
-    @OptIn(Api4J::class)
-    override val source: ID
-        get() = sourceBody.userId
-
-    /**
-     * 变化源。为发生变更的用户的id。
-     */
-    @JvmSynthetic
-    override suspend fun source(): ID = source
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun source(): ID = sourceBody.userId
 
     /**
      * before 无法确定，始终为null。
      */
-    @OptIn(Api4J::class)
-    override val before: Any?
-        get() = null
-
-    /**
-     * before 无法确定，始终为null。
-     */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun before(): Any? = null
 
-
     /**
      * 变化事件的主要内容。
      */
-    @OptIn(Api4J::class)
-    override val after: UserUpdatedEventBody
-        get() = sourceBody
-
-    /**
-     * 变化事件的主要内容。
-     */
-    @JvmSynthetic
-    override suspend fun after(): UserUpdatedEventBody = after
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun after(): UserUpdatedEventBody = sourceBody
 
 
     override val key: Event.Key<out KookUserUpdatedEvent>

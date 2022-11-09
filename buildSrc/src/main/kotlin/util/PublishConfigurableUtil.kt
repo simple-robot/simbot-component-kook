@@ -17,20 +17,29 @@
 
 package util
 
+import isSnapshot
+
 data class PublishConfigurableResult(
     val isSnapshotOnly: Boolean,
     val isReleaseOnly: Boolean,
     val isPublishConfigurable: Boolean = when {
-        isSnapshotOnly -> P.Simbot.isSnapshot
-        isReleaseOnly -> !P.Simbot.isSnapshot
+        isSnapshotOnly -> isSnapshot()
+        isReleaseOnly -> !isSnapshot()
         else -> true
     }
 )
 
 
 fun checkPublishConfigurable(): PublishConfigurableResult {
-    val isSnapshotOnly = (System.getProperty("snapshotOnly") ?: System.getenv(Env.SNAPSHOT_ONLY))?.equals("true", true) == true
-    val isReleaseOnly = (System.getProperty("releaseOnly") ?: System.getenv(Env.RELEASES_ONLY))?.equals("true", true) == true
+    val isSnapshotOnly = (System.getProperty("snapshotOnly") ?: System.getenv(Env.SNAPSHOT_ONLY)).toBoolean()
+    val isReleaseOnly = (System.getProperty("releaseOnly") ?: System.getenv(Env.RELEASES_ONLY)).toBoolean()
     
     return PublishConfigurableResult(isSnapshotOnly, isReleaseOnly)
+}
+
+inline fun checkPublishConfigurable(block: PublishConfigurableResult.() -> Unit) {
+    val v = checkPublishConfigurable()
+    if (v.isPublishConfigurable) {
+        v.block()
+    }
 }

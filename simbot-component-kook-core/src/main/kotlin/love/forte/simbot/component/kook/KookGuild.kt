@@ -17,13 +17,12 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
-import love.forte.simbot.JavaDuration
 import love.forte.simbot.definition.*
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import love.forte.simbot.kook.objects.Guild as KkGuild
 
@@ -56,10 +55,11 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     // region owner api
     override val ownerId: ID
     
-    @OptIn(Api4J::class)
-    override val owner: KookGuildMember
-    
-    @JvmSynthetic
+    /**
+     * 频道服务器的创建人。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun owner(): KookGuildMember
     // endregion
     
@@ -67,14 +67,9 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     /**
      * 根据指定ID查询对应用户信息，或得到null。
      */
-    @OptIn(Api4J::class)
-    override fun getMember(id: ID): KookGuildMember?
-    
-    /**
-     * 根据指定ID查询对应用户信息，或得到null。
-     */
-    @JvmSynthetic
-    override suspend fun member(id: ID): KookGuildMember? = getMember(id)
+    @JvmBlocking(baseName = "getMember", suffix = "")
+    @JvmAsync(baseName = "getMember")
+    override suspend fun member(id: ID): KookGuildMember?
     
     /**
      * 直接获取用户列表的副本。
@@ -109,16 +104,9 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
      *
      * 未找到时得到null。
      */
-    @OptIn(Api4J::class)
-    override fun getChannel(id: ID): KookChannel?
-    
-    /**
-     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
-     *
-     * 未找到时得到null。
-     */
-    @JvmSynthetic
-    override suspend fun channel(id: ID): KookChannel? = getChannel(id)
+    @JvmBlocking(baseName = "getChannel", suffix = "")
+    @JvmAsync(baseName = "getChannel")
+    override suspend fun channel(id: ID): KookChannel?
     
     /**
      * 获取当前频道服务器下的子频道序列。
@@ -135,22 +123,15 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
      *
      * 未找到时得到null。
      */
-    @JvmSynthetic
+    @JvmBlocking(baseName = "getChild", suffix = "")
+    @JvmAsync(baseName = "getChild")
     override suspend fun child(id: ID): KookChannel? = channel(id)
-    
-    /**
-     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
-     *
-     * 未找到时得到null。
-     */
-    @OptIn(Api4J::class)
-    override fun getChild(id: ID): KookChannel? = getChannel(id)
     
     /**
      * 得到当前频道下所有的分组型频道。
      */
     public val categories: List<KookChannelCategory>
-   
+    
     
     /**
      * 尝试根据ID获取匹配的分类对象。
@@ -164,8 +145,7 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
      * Deprecated: 尚未支持
      */
     @Deprecated(
-        "Not support yet.",
-        ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
+        "Not support yet.", ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
     )
     override val roles: Items<Role>
         get() = emptyItems()
@@ -177,38 +157,15 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun mute(duration: Duration): Boolean = false
     
-    @OptIn(Api4J::class)
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(time: Long, timeUnit: TimeUnit): Boolean = false
-    
     @Deprecated("Guild mute is not supported", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
-    override fun unmuteBlocking(): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(): Boolean = false
-    
-    @OptIn(Api4J::class)
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
-    override fun muteBlocking(duration: JavaDuration): Boolean = false
-    
     // endregion
     
     
     /**
      * 频道服务器没有上层。
      */
-    @JvmSynthetic
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
     override suspend fun previous(): Organization? = null
-    
-    /**
-     * 频道服务器没有上层。
-     */
-    @OptIn(Api4J::class)
-    override val previous: Organization?
-        get() = null
 }

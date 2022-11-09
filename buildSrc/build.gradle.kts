@@ -24,8 +24,10 @@ repositories {
     gradlePluginPortal()
 }
 
-val kotlinVersion = "1.6.21"
-val dokkaVersion = "1.6.21"
+val kotlinVersion = "1.7.20"
+val dokkaVersion = "1.7.20"
+val suspendTransformVersion = "0.0.5"
+val gradleCommon = "0.0.11"
 
 dependencies {
     // kotlin("jvm") apply false
@@ -35,4 +37,15 @@ dependencies {
  
     // see https://github.com/gradle-nexus/publish-plugin
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
+    
+    implementation("love.forte.plugin.suspend-transform:suspend-transform-plugin-gradle:$suspendTransformVersion")
+    implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
+    implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
+    implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
+}
+
+val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+
+compileKotlin.kotlinOptions {
+    freeCompilerArgs = listOf("-Xinline-classes")
 }

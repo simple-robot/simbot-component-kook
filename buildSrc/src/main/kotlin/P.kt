@@ -17,6 +17,11 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
+import love.forte.gradle.common.core.project.ProjectDetail
+import love.forte.gradle.common.core.project.Version
+import love.forte.gradle.common.core.project.minus
+import love.forte.gradle.common.core.project.version as v
+
 /*
 *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
 *
@@ -34,49 +39,83 @@
 *
 */
 
+val simbotVersion = v(3, 0, 0) - v("M2")
 
-object P {
-    object Simbot {
-        const val GROUP = "love.forte.simbot"
-        
-        val version = Version(
-            major = "3", minor = 0, patch = 0,
-            status = VersionStatus.beta(null, null, "M3"),
-            isSnapshot = isSnapshot().also {
-                println("isSnapshot: $it")
-            }
-        )
-        
-        
-        val isSnapshot: Boolean get() = version.isSnapshot
-        
-        val VERSION: String get() = version.fullVersion(true)
+val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
+val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
+val simbotLogger = "love.forte.simbot:simbot-logger:$simbotVersion"
+val simbotLoggerSlf4j = "love.forte.simbot:simbot-logger-slf4j-impl:$simbotVersion"
+
+
+object P : ProjectDetail() {
+    const val GROUP = "love.forte.simbot.component"
+    const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
+    const val HOMEPAGE = "https://github.com/simple-robot/simbot-component-kook"
+    
+    override val homepage: String
+        get() = HOMEPAGE
+    
+    private val baseVersion = v(
+        "${simbotVersion.major}.${simbotVersion.minor}",
+        0, 0
+    )
+    
+    private val alphaSuffix = v("alpha", 3)
+    
+    override val version: Version = baseVersion - alphaSuffix
+    
+    val snapshotVersion: Version =
+        baseVersion - (alphaSuffix - Version.SNAPSHOT)
+    
+    override val group: String get() = GROUP
+    override val description: String get() = DESCRIPTION
+    override val developers: List<Developer> = developers {
+        developer {
+            id = "forte"
+            name = "ForteScarlet"
+            email = "ForteScarlet@163.com"
+            url = "https://github.com/ForteScarlet"
+        }
+        developer {
+            id = "forliy"
+            name = "ForliyScarlet"
+            email = "ForliyScarlet@163.com"
+            url = "https://github.com/ForliyScarlet"
+        }
     }
     
-    object ComponentKook {
-        val isSnapshot: Boolean get() = Simbot.isSnapshot
-        const val GROUP = "${Simbot.GROUP}.component"
-        const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
-        
-        val version = Version(
-            major = "${Simbot.version.major}.${Simbot.version.minor}",
-            minor = 0,
-            patch = 0,
-            status = VersionStatus.alpha(1, null),
-            isSnapshot = isSnapshot
-        )
-        
-        val VERSION get() = version.fullVersion(true)
+    override val licenses: List<License> = licenses {
+        license {
+            name = "GNU GENERAL PUBLIC LICENSE, Version 3"
+            url = "https://www.gnu.org/licenses/gpl-3.0-standalone.html"
+        }
+        license {
+            name = "GNU LESSER GENERAL PUBLIC LICENSE, Version 3"
+            url = "https://www.gnu.org/licenses/lgpl-3.0-standalone.html"
+        }
     }
+    
+    override val scm: Scm = scm {
+        url = HOMEPAGE
+        connection = "scm:git:$HOMEPAGE.git"
+        developerConnection = "scm:git:ssh://git@github.com/simple-robot/simbot-component-kook.git"
+    }
+    
+    
 }
 
+private val _isSnapshot by lazy { initIsSnapshot() }
 
-private fun isSnapshot(): Boolean {
-    println("property: ${System.getProperty("simbot.snapshot")}")
-    println("env: ${System.getenv(Env.IS_SNAPSHOT)}")
+private fun initIsSnapshot(): Boolean {
+    val systemProperty = System.getProperty("simbot.snapshot")
+    println("property: $systemProperty")
+    val systemEnv = System.getenv(Env.IS_SNAPSHOT)
+    println("env: $systemEnv")
     
-    val property = System.getProperty("simbot.snapshot")?.toBoolean() ?: false
-    val env = System.getenv(Env.IS_SNAPSHOT)?.toBoolean() ?: false
+    val property = systemProperty.toBoolean()
+    val env = systemEnv.toBoolean()
     
     return property || env
 }
+
+fun isSnapshot(): Boolean = _isSnapshot

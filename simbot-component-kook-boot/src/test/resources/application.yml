@@ -1,8 +1,13 @@
+server:
+  port: 0
+
 logging:
   level:
-    love.forte.simboot: debug
-    love.forte.simbot: debug
-    forte.example: debug
+    love.forte.simbot.kook.bot.client: TRACE
+    love.forte.simboot: trace
+    love.forte.simbot: trace
+    forte.example: trace
+    forliy.bot: debug
 
 simbot:
   bot-configuration-resources:

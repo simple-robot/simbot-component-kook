@@ -17,7 +17,8 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.simbot.Api4J
+import love.forte.plugin.suspendtrans.annotation.JvmAsync
+import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
@@ -28,7 +29,6 @@ import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
 import love.forte.simbot.kook.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
-import love.forte.simbot.utils.runInBlocking
 
 /**
  * Kook 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
@@ -56,45 +56,25 @@ public interface KookUserChat : Stranger, Contact, KookComponentDefinition<UserC
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(message: Message): KookMessageReceipt
     
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(text: String): KookMessageCreatedReceipt
     
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JvmSynthetic
+    @JvmBlocking
+    @JvmAsync
     override suspend fun send(message: MessageContent): KookMessageReceipt
     
-    /**
-     * 向当前好友（私聊会话）发送消息。
-     */
-    @Api4J
-    override fun sendBlocking(text: String): KookMessageCreatedReceipt = runInBlocking {
-        send(text)
-    }
-    
-    /**
-     * 向当前好友（私聊会话）发送消息。
-     */
-    @Api4J
-    override fun sendBlocking(message: Message): KookMessageReceipt = runInBlocking {
-        send(message)
-    }
-    
-    /**
-     * 向当前好友（私聊会话）发送消息。
-     */
-    @Api4J
-    override fun sendBlocking(message: MessageContent): KookMessageReceipt = runInBlocking {
-        send(message)
-    }
-    
+    // TODO Doc update.
     /**
      * 删除当前 [聊天会话][KookUserChat].
      *
@@ -102,17 +82,6 @@ public interface KookUserChat : Stranger, Contact, KookComponentDefinition<UserC
      * 在删除的过程中会直接抛出请求 [UserChatDeleteRequest] 过程中可能产生的任何异常。
      *
      */
+    @JvmSynthetic
     override suspend fun delete(): Boolean
-    
-    /**
-     * 阻塞地删除当前 [聊天会话][KookUserChat].
-     *
-     * 通过 [UserChatDeleteRequest] 删除当前聊天会话。
-     *
-     */
-    @Api4J
-    override fun deleteBlocking(): Boolean {
-        return runInBlocking { delete() }
-    }
-    
 }

@@ -177,13 +177,15 @@ public sealed class Signal<T> {
      */
     @Serializable
     public data class Ping(public val sn: Long) : Signal<Unit>() {
-        override val s: Int get() = S_CODE
+        override val s: Int = S_CODE
         override val d: Unit get() = Unit
+        
+        public fun jsonValue(): String = """{"s":$S_CODE,"sn":$sn}"""
 
         public companion object : JsonValueFactory<Ping> {
             public const val S_CODE: Int = 2
             @JvmStatic
-            override fun jsonValue(value: Ping): String = """{"s":$S_CODE,"sn":${value.sn}}"""
+            override fun jsonValue(value: Ping): String = value.jsonValue()
 
         }
     }
@@ -209,6 +211,9 @@ public sealed class Signal<T> {
         override val s: Int get() = S_CODE
         override val d: Unit get() = Unit
         public const val S_CODE : Int = 3
+        override fun toString(): String {
+            return "Signal.Pong(s=$S_CODE)"
+        }
     }
     //endregion
 

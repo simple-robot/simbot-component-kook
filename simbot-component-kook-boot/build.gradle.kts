@@ -17,8 +17,8 @@
 
 
 plugins {
-    id("simbot-kook.module-conventions")
-    id("simbot-kook.maven-publish")
+    `simbot-kook-module-conventions`
+    `simbot-kook-maven-publish`
 }
 
 dependencies {
@@ -26,11 +26,13 @@ dependencies {
         exclude("love.forte.simbot")
     }
     
-    compileOnly(V.Simbot.BootApi.NOTATION)
+    compileOnly("love.forte.simbot.boot:simboot-api:$simbotVersion")
     
     
     testImplementation(libs.spring.boot.test)
-    testImplementation(V.Simbot.BootCoreSpringBootStarter.NOTATION)
+    testImplementation(libs.spring.boot.webflux)
+    testImplementation(simbotLogger)
+    testImplementation("love.forte.simbot.boot:simboot-core-spring-boot-starter:$simbotVersion")
     testImplementation(libs.ktor.client.cio)
 }
 

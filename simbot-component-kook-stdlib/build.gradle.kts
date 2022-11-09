@@ -17,8 +17,9 @@
 
 
 plugins {
-    id("simbot-kook.module-conventions")
-    id("simbot-kook.maven-publish")
+    `simbot-kook-module-conventions`
+    `simbot-kook-maven-publish`
+    `simbot-kook-suspend-transform`
 }
 
 
@@ -26,7 +27,7 @@ plugins {
 
 dependencies {
     api(project(":simbot-component-kook-api"))
-    api(V.Simbot.Api.NOTATION)
+    api(simbotApi)
     
     api(libs.ktor.client.websockets)
     api(libs.ktor.client.contentNegotiation)

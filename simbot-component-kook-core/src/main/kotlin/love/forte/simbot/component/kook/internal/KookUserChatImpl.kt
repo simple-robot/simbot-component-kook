@@ -22,12 +22,12 @@ import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.*
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kook.model.UserChatViewModel
+import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.message.DirectMessageCreateRequest
-import love.forte.simbot.kook.api.message.MessageCreated
 import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
+import love.forte.simbot.kook.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 
@@ -36,7 +36,7 @@ import love.forte.simbot.message.MessageContent
  * @author ForteScarlet
  */
 internal class KookUserChatImpl(
-    override val bot: KookComponentBotImpl, @Volatile override var source: UserChatViewModel,
+    override val bot: KookComponentBotImpl, override val source: UserChatView,
 ) : KookUserChat {
     override val id: ID
         get() = source.targetInfo.id
@@ -46,21 +46,27 @@ internal class KookUserChatImpl(
     }
     
     override suspend fun send(text: String): KookMessageCreatedReceipt {
-        return DirectMessageCreateRequest.byChatCode(
-            source.code, text, MessageType.TEXT, null, null
+        return DirectMessageCreateRequest.byTargetId(
+            source.targetInfo.id, text, MessageType.TEXT, null, null
         ).requestDataBy(bot).asReceipt(true, bot)
     }
     
     override suspend fun send(message: Message): KookMessageReceipt {
-        val request = message.toRequest(bot, source.code, null, null, null)
+        return message.sendToDirectByTargetId(bot, source.targetInfo.id, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-        
-        val result = request.requestDataBy(bot)
-        return if (result is MessageCreated) {
-            result.asReceipt(true, bot)
-        } else {
-            KookApiRequestedReceipt(result, true, bot)
-        }
+        // var request = message.toRequest(bot, source.targetInfo.id, null, null, null)
+        //     ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+        //
+        // if (request is MessageCreateRequest) {
+        //     request = request.toDirect()
+        // }
+        //
+        // val result = request.requestDataBy(bot)
+        // return if (result is MessageCreated) {
+        //     result.asReceipt(true, bot)
+        // } else {
+        //     KookApiRequestedReceipt(result, true, bot)
+        // }
     }
     
     override suspend fun send(message: MessageContent): KookMessageReceipt {
@@ -73,7 +79,7 @@ internal class KookUserChatImpl(
                     type = source.type.type,
                     quote = null,
                     nonce = null,
-                ).requestDataBy(bot).asReceipt(false, bot)
+                ).requestDataBy(bot).asReceipt(true, bot)
             }
             is KookChannelMessageDetailsContent -> {
                 val details = message.details
@@ -83,7 +89,7 @@ internal class KookUserChatImpl(
                     type = details.type,
                     quote = details.quote?.id,
                     nonce = null,
-                ).requestDataBy(bot).asReceipt(false, bot)
+                ).requestDataBy(bot).asReceipt(true, bot)
             }
             else -> {
                 send(message.messages)
@@ -92,7 +98,6 @@ internal class KookUserChatImpl(
     }
     
     override suspend fun delete(): Boolean {
-        UserChatDeleteRequest(id).requestDataBy(bot)
-        return true
+        return UserChatDeleteRequest(id).requestBy(bot).isSuccess
     }
 }

@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.internal.event.*
 import love.forte.simbot.component.kook.model.toModel
@@ -63,7 +62,7 @@ internal suspend fun Event<*>.register(bot: KookComponentBotImpl) {
 
 
 @OptIn(DiscreetSimbotApi::class)
-private fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
+private suspend fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
     bot.pushIfProcessable(UnsupportedKookEvent) {
         UnsupportedKookEvent(bot, this)
     }
@@ -72,7 +71,7 @@ private fun Event<*>.pushUnsupported(bot: KookComponentBotImpl) {
 /**
  * 消息事件
  */
-private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
+private suspend fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
     when (channelType) {
         Channel.Type.PERSON -> {
             if (bot.isMe(authorId)) {
@@ -85,6 +84,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
                 }
             }
         }
+        
         Channel.Type.GROUP -> {
             val guild = bot.internalGuild(extra.guildId) ?: return
             val author = guild.getInternalMember(authorId) ?: return
@@ -94,8 +94,8 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
                     KookBotSelfChannelMessageEventImpl(
                         bot,
                         this,
-                        channel = channel,
-                        member = author
+                        channel,
+                        author
                     )
                 }
             } else {
@@ -118,6 +118,7 @@ private fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotImpl) {
 /**
  * 系统事件
  */
+@Suppress("UnnecessaryOptInAnnotation")
 @OptIn(ExperimentalSimbotApi::class)
 private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotImpl) {
     
@@ -245,6 +246,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
+        
         is UpdatedChannelExtraBody -> bot.pushIfProcessable(KookUpdatedChannelChangedEvent) {
             val channel = guild.getInternalChannel(body.id) ?: return
             KookUpdatedChannelChangedEventImpl(
@@ -253,6 +255,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
+        
         is DeletedChannelExtraBody -> bot.pushIfProcessable(KookDeletedChannelChangedEvent) {
             val channel = guild.getInternalChannel(body.id) ?: return
             KookDeletedChannelChangedEventImpl(
@@ -261,6 +264,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
+        
         is PinnedMessageExtraBody -> bot.pushIfProcessable(KookPinnedMessageEvent) {
             val channel = guild.getInternalChannel(body.channelId) ?: return
             val operator = guild.getInternalMember(body.operatorId)
@@ -270,6 +274,7 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel, operator
             )
         }
+        
         is UnpinnedMessageExtraBody -> bot.pushIfProcessable(KookUnpinnedMessageEvent) {
             val channel = guild.getInternalChannel(body.channelId) ?: return
             val operator = guild.getInternalMember(body.operatorId)
@@ -304,13 +309,17 @@ private suspend fun KookComponentBotImpl.findUserInGuilds(userId: ID, guildIds: 
 }
 
 
-private inline fun KookComponentBot.pushIfProcessable(
+private suspend inline fun KookComponentBotImpl.pushIfProcessable(
     eventKey: Key<*>,
     block: () -> love.forte.simbot.event.Event?,
 ): Boolean {
     if (eventProcessor.isProcessable(eventKey)) {
         val event = block() ?: return false
-        launch { eventProcessor.push(event) }
+        if (isEventProcessAsync) {
+            launch { eventProcessor.push(event) }
+        } else {
+            eventProcessor.push(event)
+        }
         return true
     }
     
