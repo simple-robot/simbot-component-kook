@@ -44,7 +44,7 @@ class MessageSerializerTest {
             +KookAtAllHere
             +KookKMarkdownMessage(buildKMarkdown {
                 at("1234")
-                link("Simbot Home", "http://simbot.forte.love")
+                link("Simbot Home", "https://simbot.forte.love")
             })
             +KookAssetImage(AssetCreated("https://baidu.com"))
         }
