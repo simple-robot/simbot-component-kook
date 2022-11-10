@@ -19,12 +19,15 @@ package love.forte.simbot.component.kook.message
 
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.KookComponentBot
+import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMessage
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.message.ChannelMessageDetails
 import love.forte.simbot.kook.api.message.MessageDeleteRequest
+import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.api.message.MessageViewRequest
 import love.forte.simbot.message.Messages
 import love.forte.simbot.message.ReceivedMessageContent
+import love.forte.simbot.message.toText
 
 /**
  * 将 [ChannelMessageDetails] 作为消息正文实现。
@@ -67,12 +70,24 @@ public data class KookChannelMessageDetailsContent(
          */
         @JvmStatic
         public fun ChannelMessageDetails.toMessages(): Messages {
-            val metAll = this.isMentionAll
-            val metHere = this.isMentionHere
-            val metMap = this.mention.toMentionCount()
-            val metRoleMap = this.mentionRoles.toMentionCount()
+            val initialList = when (type) {
+                MessageType.IMAGE.type, MessageType.VIDEO.type, MessageType.FILE.type -> {
+                    listOf(attachments.asMessage())
+                }
+                MessageType.KMARKDOWN.type -> {
+                    val metAll = this.isMentionAll
+                    val metHere = this.isMentionHere
+                    val metMap = this.mention.toMentionCount()
+                    val metRoleMap = this.mentionRoles.toMentionCount()
+                    listOf(content.toTextResolvedByTextEvent(metAll, metHere, metMap, metRoleMap))
+                }
+                
+                else -> listOf(content.toText())
+            }
+            
+            
             return toMessages(
-                listOf(content.toTextResolvedByTextEvent(metAll, metHere, metMap, metRoleMap)),
+                initialList,
                 mention, mentionRoles, isMentionAll, isMentionHere
             )
         }

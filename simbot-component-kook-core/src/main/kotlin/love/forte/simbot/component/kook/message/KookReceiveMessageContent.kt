@@ -195,6 +195,11 @@ public fun Event<Event.Extra.Text>.toMessages(): Messages {
     }
 }
 
+public fun toMessages(type: Int, ) {
+
+}
+
+
 private inline fun Event.Extra.Text.toMessages(contentElement: () -> List<Message.Element<*>>): Messages {
     return toMessages(
         contentElement(),

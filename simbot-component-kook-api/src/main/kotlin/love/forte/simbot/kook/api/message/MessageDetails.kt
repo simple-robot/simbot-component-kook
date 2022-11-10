@@ -23,10 +23,7 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
 import love.forte.simbot.LongID
 import love.forte.simbot.kook.api.ApiResultType
-import love.forte.simbot.kook.objects.MentionPart
-import love.forte.simbot.kook.objects.Quote
-import love.forte.simbot.kook.objects.Role
-import love.forte.simbot.kook.objects.User
+import love.forte.simbot.kook.objects.*
 
 
 /**
@@ -63,7 +60,7 @@ public interface MessageDetails {
     /**
      * 附加的多媒体数据
      */
-    public val attachments: List<Map<String, String>>
+    public val attachments: Attachments
 
     /**
      * 消息回应数据
@@ -133,7 +130,7 @@ public interface ChannelMessageDetails : MessageDetails {
     /**
      * 附加的多媒体数据
      */
-    override val attachments: List<Map<String, String>>
+    override val attachments: Attachments
 
 
     /**
@@ -182,7 +179,7 @@ public interface DirectMessageDetails : MessageDetails {
     override val authorId: ID
     override val content: String
     override val embeds: List<Map<String, String>>
-    override val attachments: List<Map<String, String>>
+    override val attachments: Attachments
     override val reactions: List<Reaction>
     override val quote: Quote?
     public val readStatus: Boolean
