@@ -171,7 +171,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
             // KMarkdown
             is KookKMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
             // card message
-            is KookCardMessage -> request(MessageType.CARD.type, cards.decode())
+            is KookCardMessage -> request(MessageType.CARD.type, cards.encode())
             
             // request message
             is KookRequestMessage -> this.request

@@ -77,14 +77,15 @@ public data class CardMessage(private val cards: List<Card>) : List<Card> by car
     }
 
     /**
-     * 将当前的cardMessage序列化为所需json数据字符串。
+     * 将当前的 [CardMessage] 序列化为所需JSON数据字符串。
      *
-     * 如果 json configuration 中的 [JsonConfiguration.classDiscriminator] != 'type',
-     * 则会重构一个新的 [Json] 使用。
+     * 当下述条件之一成立时，将会重构一个新的 [Json] 对象使用：
+     * - [configuration][Json.configuration] 中的 [JsonConfiguration.classDiscriminator] != `'type'`
+     * - [configuration][Json.configuration] 中的 [JsonConfiguration.encodeDefaults] != `true`
      *
      */
     @JvmOverloads
-    public fun decode(decoder: Json = DEFAULT_DECODER): String {
+    public fun encode(decoder: Json = DEFAULT_DECODER): String {
         val configuration = decoder.configuration
         if (configuration.classDiscriminator == "type" && configuration.encodeDefaults) {
             return decoder.encodeToString(serializer(), this)
@@ -95,14 +96,43 @@ public data class CardMessage(private val cards: List<Card>) : List<Card> by car
         }
 
         return decoder0.encodeToString(serializer(), this)
-
     }
+    /**
+     * 此函数命名错误，未来将会删除。其本意为将当前 [CardMessage] 序列化为 JSON字符串，请使用 [encode]。
+     *
+     * @see encode
+     */
+    @JvmOverloads
+    @Deprecated("Use 'encode'", ReplaceWith("encode(decoder)"))
+    public fun decode(decoder: Json = DEFAULT_DECODER): String = encode(decoder)
+
 
     public companion object {
         private val DEFAULT_DECODER: Json = Json {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
+        }
+    
+        /**
+         * 将当前的cardMessage序列化为所需json数据字符串。
+         *
+         * 如果 json configuration 中的 [JsonConfiguration.classDiscriminator] != 'type',
+         * 则会重构一个新的 [Json] 使用。
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun decode(value: String, decoder: Json = DEFAULT_DECODER): CardMessage {
+            val configuration = decoder.configuration
+            if (configuration.classDiscriminator == "type") {
+                return decoder.decodeFromString(serializer(), value)
+            }
+            val decoder0 = Json(from = decoder) {
+                classDiscriminator = "type"
+            }
+        
+            return decoder0.decodeFromString(serializer(), value)
         }
     }
 }

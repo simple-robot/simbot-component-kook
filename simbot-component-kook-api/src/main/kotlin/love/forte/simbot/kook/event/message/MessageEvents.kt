@@ -39,6 +39,10 @@ public interface MessageEventExtra : Event.Extra.Text
 /**
  * 与资源相关的extra.
  *
+ * @see ImageEventExtra
+ * @see FileEventExtra
+ * @see VideoEventExtra
+ *
  */
 public interface AttachmentsMessageEventExtra<A : Attachments> : MessageEventExtra {
     public val attachments: A
