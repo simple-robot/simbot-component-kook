@@ -25,7 +25,6 @@ import love.forte.simbot.kook.api.message.MessageDeleteRequest
 import love.forte.simbot.kook.api.message.MessageViewRequest
 import love.forte.simbot.message.Messages
 import love.forte.simbot.message.ReceivedMessageContent
-import love.forte.simbot.message.toText
 
 /**
  * 将 [ChannelMessageDetails] 作为消息正文实现。
@@ -34,14 +33,17 @@ import love.forte.simbot.message.toText
  * @see MessageViewRequest
  * @author ForteScarlet
  */
-public data class KookChannelMessageDetailsContent(internal val details: ChannelMessageDetails, private val bot: KookComponentBot) :
+public data class KookChannelMessageDetailsContent(
+    internal val details: ChannelMessageDetails,
+    private val bot: KookComponentBot,
+) :
     ReceivedMessageContent() {
-
+    
     /**
      * 消息ID。
      */
     override val messageId: ID = details.id
-
+    
     /**
      * Kook 消息事件中所收到的消息列表。
      */
@@ -65,17 +67,24 @@ public data class KookChannelMessageDetailsContent(internal val details: Channel
          */
         @JvmStatic
         public fun ChannelMessageDetails.toMessages(): Messages {
-            return toMessages(listOf(content.toText()), mention, mentionRoles, isMentionAll, isMentionHere)
+            val metAll = this.isMentionAll
+            val metHere = this.isMentionHere
+            val metMap = this.mention.toMentionCount()
+            val metRoleMap = this.mentionRoles.toMentionCount()
+            return toMessages(
+                listOf(content.toTextResolvedByTextEvent(metAll, metHere, metMap, metRoleMap)),
+                mention, mentionRoles, isMentionAll, isMentionHere
+            )
         }
-
+        
         /**
          * 使用消息事件并将其中的消息内容转化为 [KookChannelMessageDetailsContent].
          */
         @JvmStatic
         public fun ChannelMessageDetails.toContent(bot: KookComponentBot): KookChannelMessageDetailsContent =
             KookChannelMessageDetailsContent(this, bot)
-
+        
     }
-
+    
 }
 

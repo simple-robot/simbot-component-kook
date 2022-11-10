@@ -55,7 +55,13 @@ public class KookReceiveMessageContent(
      */
     override val messageId: ID = source.msgId
     
+    /**
+     * 消息接收到的原始消息内容。
+     */
+    public val sourceEvent: Event<Event.Extra.Text> get() = source
     
+    
+    // TODO 描述更新
     /**
      * Kook 消息事件中所收到的消息列表。
      *
@@ -130,7 +136,7 @@ public class KookReceiveMessageContent(
     }
     
     override fun toString(): String {
-        return "KookReceiveMessageContent(sourceEvent=$source)"
+        return "KookReceiveMessageContent(sourceEvent=$sourceEvent)"
     }
     
 }
@@ -159,24 +165,30 @@ public fun Event<Event.Extra.Text>.toMessages(): Messages {
         is TextEventExtra -> {
             extra.toMessages { listOf(content.toText()) }
         }
+        
         is ImageEventExtra -> {
             extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
+        
         is FileEventExtra -> {
             extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
+        
         is VideoEventExtra -> {
             extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
+        
         is KMarkdownEventExtra -> {
             @OptIn(ExperimentalSimbotApi::class)
             extra.toMessages {
                 listOf(extra.kmarkdown.asMessage(), content.toTextResolvedByTextEvent(extra))
             }
         }
+        
         is CardEventExtra -> {
             extra.toMessages { listOf(content.toText()) }
         }
+        
         else -> {
             extra.toMessages { listOf(content.toText()) }
         }
@@ -204,6 +216,19 @@ private const val ROL_REGEX_VALUE = "\\(rol\\)(?<$ROL_NAME>[a-zA-Z\\d]+)\\(rol\\
 private val matchRegex = Regex("($MET_REGEX_VALUE)|($ROL_REGEX_VALUE)")
 
 
+internal data class MentionCount(val id: String, var count: Int)
+
+internal fun Collection<ID>.toMentionCount(): MutableMap<String, MentionCount> {
+    val map = mutableMapOf<String, MentionCount>()
+    this.forEach { id ->
+        val idValue = id.literal
+        map.compute(idValue) { k, current ->
+            current?.also { it.count++ } ?: MentionCount(k, 1)
+        }
+    }
+    return map
+}
+
 /**
  *
  * 处理目标：
@@ -214,18 +239,18 @@ private val matchRegex = Regex("($MET_REGEX_VALUE)|($ROL_REGEX_VALUE)")
 internal fun String.toTextResolvedByTextEvent(event: Event.Extra.Text): Text {
     val metAll = event.isMentionAll
     val metHere = event.isMentionHere
-    val metSet = event.mention.mapTo(mutableSetOf()) { it.literal }
-    val metRoleSet = event.mentionRoles.mapTo(mutableSetOf()) { it.literal }
+    val metMap = event.mention.toMentionCount()
+    val metRoleMap = event.mentionRoles.toMentionCount()
     
-    return toTextResolvedByTextEvent0(metAll, metHere, metSet, metRoleSet)
+    return toTextResolvedByTextEvent(metAll, metHere, metMap, metRoleMap)
 }
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun String.toTextResolvedByTextEvent0(
+internal inline fun String.toTextResolvedByTextEvent(
     metAll0: Boolean,
     metHere0: Boolean,
-    metSet: MutableSet<String>,
-    metRoleSet: MutableSet<String>,
+    metMap: MutableMap<String, MentionCount>,
+    metRoleList: MutableMap<String, MentionCount>,
 ): Text {
     var metAll = metAll0
     var metHere = metHere0
@@ -238,10 +263,10 @@ internal inline fun String.toTextResolvedByTextEvent0(
     if (metHere) {
         status = status or 0b0100
     }
-    if (metSet.isNotEmpty()) {
+    if (metMap.isNotEmpty()) {
         status = status or 0b0010
     }
-    if (metRoleSet.isNotEmpty()) {
+    if (metRoleList.isNotEmpty()) {
         status = status or 0b0001
     }
     
@@ -264,17 +289,26 @@ internal inline fun String.toTextResolvedByTextEvent0(
                         status = status and 0b0111
                         return@replace ""
                     }
+                    
                     metHere && id == "here" -> {
                         metHere = false
                         status = status and 0b1011
                         return@replace ""
                     }
+                    
                     else -> {
-                        if (metSet.isEmpty()) {
+                        if (metMap.isEmpty()) {
                             status = status and 0b1101
-                        } else if (metSet.remove(id)) {
-                            // the id, try remove.
-                            return@replace ""
+                        } else {
+                            val met = metMap[id]
+                            if (met != null) {
+                                met.count--
+                                if (met.count <= 0) {
+                                    metMap.remove(id)
+                                }
+                                // the id, try remove.
+                                return@replace ""
+                            }
                         }
                     }
                 }
@@ -288,11 +322,18 @@ internal inline fun String.toTextResolvedByTextEvent0(
             val roleId = result.groups[ROL_NAME]
             if (roleId != null) {
                 val id = roleId.value
-                if (metRoleSet.isEmpty()) {
+                if (metRoleList.isEmpty()) {
                     status = status and 0b1110
-                } else if (metRoleSet.remove(id)) {
-                    // the id, try remove.
-                    return@replace ""
+                } else {
+                    val met = metRoleList[id]
+                    if (met != null) {
+                        met.count--
+                        if (met.count <= 0) {
+                            metRoleList.remove(id)
+                        }
+                        // the id, try remove.
+                        return@replace ""
+                    }
                 }
                 return@replace result.value
             }
@@ -313,10 +354,8 @@ internal fun toMessages(
     if (mention.isEmpty() && mentionRoles.isEmpty() && !isMentionAll && !isMentionHere) {
         return contentMessage.toMessages()
     }
-    val messages = buildList(mention.size + mentionRoles.size + 3) {
-        if (contentMessage.isNotEmpty()) {
-            addAll(contentMessage)
-        }
+    val messages = buildList(contentMessage.size + mention.size + mentionRoles.size + 3) {
+        addAll(contentMessage)
         
         if (isMentionAll) {
             add(AtAll)
