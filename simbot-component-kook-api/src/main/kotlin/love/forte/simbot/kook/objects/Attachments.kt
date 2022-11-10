@@ -26,7 +26,11 @@ import love.forte.simbot.kook.objects.impl.AttachmentsImpl
  */
 public interface Attachments {
     /**
-     * Type 多媒体类型
+     * Type 多媒体类型.
+     * - `file` -> 文件/附件
+     * - `image` -> 图片
+     * - `video` -> 视频
+     * - 可能还有其他？
      */
     public val type: String
 
