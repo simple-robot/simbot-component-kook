@@ -22,6 +22,7 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.LongID
 import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.objects.impl.AttachmentsImpl
 import love.forte.simbot.kook.objects.impl.QuoteImpl
 
 
@@ -36,68 +37,68 @@ internal data class ChannelMessageDetailsImpl @ApiResultType constructor(
      * 	消息 id
      */
     override val id: CharSequenceID,
-
+    
     /**
      * 消息类型
      * @see MessageType
      */
     override val type: Int,
-
+    
     /**
      * 	作者的用户信息
      */
     override val author: AuthorImpl,
-
+    
     /**
      * 消息内容
      */
     override val content: String,
-
+    
     /**
      * at特定用户 的用户ID数组，与 mention_info 中的数据对应
      */
     override val mention: List<CharSequenceID> = emptyList(),
-
+    
     /**
      * 是否含有 @全体人员
      */
     @SerialName("mention_all")
     override val isMentionAll: Boolean,
-
+    
     /**
      * at特定角色 的角色ID数组，与 mention_info 中的数据对应
      */
     @SerialName("mention_roles")
     override val mentionRoles: List<CharSequenceID> = emptyList(),
-
+    
     /**
      * 是否含有 @在线人员
      */
     @SerialName("mention_here")
     override val isMentionHere: Boolean,
-
+    
     /**
      * 超链接解析数据
      */
     override val embeds: List<Map<String, String>>,
-
+    
     /**
      * 附加的多媒体数据
      */
-    override val attachments: List<Map<String, String>>,
-
-
+    override val attachments: AttachmentsImpl,
+    
+    
     /**
      * 回应信息
      */
     override val reactions: List<ReactionImpl>,
-
-
+    
+    
     /**
      * 引用消息
      */
     override val quote: QuoteImpl? = null,
-
+    
     @SerialName("mention_info")
     override val mentionInfo: MentionInfo,
 ) : ChannelMessageDetails {
@@ -114,7 +115,7 @@ internal data class DirectMessageDetailsImpl(
     override val authorId: CharSequenceID,
     override val content: String,
     override val embeds: List<Map<String, String>>,
-    override val attachments: List<Map<String, String>>,
+    override val attachments: AttachmentsImpl,
     override val reactions: List<ReactionImpl>,
     override val quote: QuoteImpl?,
     @SerialName("read_status")
@@ -132,7 +133,7 @@ internal data class AuthorImpl @ApiResultType constructor(
     @SerialName("online")
     override val isOnline: Boolean,
     override val avatar: String,
-
+    
     @SerialName("vip_avatar")
     override val vipAvatar: String? = null,
     // maybe miss

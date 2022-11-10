@@ -285,7 +285,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
             // KMarkdown
             is KookKMarkdownMessage -> doRequest(MessageType.KMARKDOWN.type, message.kMarkdown.rawContent)
             // card message
-            is KookCardMessage -> doRequest(MessageType.CARD.type, message.cards.decode())
+            is KookCardMessage -> doRequest(MessageType.CARD.type, message.cards.encode())
             
             // is KookRequestMessage -> {
             //     this.request
