@@ -72,6 +72,7 @@ public sealed class KookAttachmentMessage<M : KookAttachmentMessage<M>> :
          */
         @OptIn(ExperimentalSimbotApi::class)
         @JvmStatic
+        @JvmName("of")
         public fun Attachments.asMessage(): KookAttachmentMessage<*> = when (type.lowercase()) {
             "image" -> KookAttachmentImage(this)
             "file" -> KookAttachmentFile(this)
