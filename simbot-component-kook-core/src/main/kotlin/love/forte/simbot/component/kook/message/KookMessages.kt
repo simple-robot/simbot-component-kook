@@ -31,6 +31,8 @@ import love.forte.simbot.kook.objects.buildRawKMarkdown
 import love.forte.simbot.message.*
 import love.forte.simbot.resources.Resource.Companion.toResource
 import java.net.URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * 提供 Kook 组件中一些会用到的信息。
@@ -124,8 +126,7 @@ public suspend fun Message.toRequest(
             // buildKMarkdown {
             //
             // }
-            
-            for (i in this.indices.reversed()) {
+            for (i in 0 until size) {
                 val element = this[i]
                 val request = element.elementToRequestOrNull(bot, targetId, quote, nonce, tempTargetId)
                 if (request != null) return request
@@ -171,7 +172,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
             // KMarkdown
             is KookKMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
             // card message
-            is KookCardMessage -> request(MessageType.CARD.type, cards.decode())
+            is KookCardMessage -> request(MessageType.CARD.type, cards.encode())
             
             // request message
             is KookRequestMessage -> this.request
@@ -254,5 +255,7 @@ public suspend fun Message.toDirectRequest(
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): DirectMessageCreateRequest? {
-    return (sendToChannel(bot, targetId, quote, nonce, tempTargetId) as? MessageCreateRequest)?.toDirect()
+    return suspendCoroutine {
+        it.resume(null)
+    }
 }

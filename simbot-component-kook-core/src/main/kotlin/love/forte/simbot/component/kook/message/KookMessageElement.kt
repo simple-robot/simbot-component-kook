@@ -44,7 +44,7 @@ public annotation class KookSendOnlyMessage
  *
  * @author ForteScarlet
  */
-public interface KookMessageElement<E : KookMessageElement<E>> : Message.Element<E> {
+public interface KookMessageElement<out E : KookMessageElement<E>> : Message.Element<E> {
 
     public companion object Key : Message.Key<KookMessageElement<*>> {
         override fun safeCast(value: Any): KookMessageElement<*>? = doSafeCast(value)

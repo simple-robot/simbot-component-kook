@@ -98,7 +98,12 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
                 subclass(KookSimpleAssetMessage::class, KookSimpleAssetMessage.serializer())
                 subclass(KookAssetImage::class, KookAssetImage.serializer())
                 subclass(KookAtAllHere::class, KookAtAllHere.serializer())
-                subclass(KookAttachmentMessage::class, KookAttachmentMessage.serializer())
+                // KookAttachmentMessage
+                subclass(SimpleKookAttachmentMessage::class, SimpleKookAttachmentMessage.serializer())
+                subclass(KookAttachmentImage::class, KookAttachmentImage.serializer())
+                subclass(KookAttachmentFile::class, KookAttachmentFile.serializer())
+                subclass(KookAttachmentVideo::class, KookAttachmentVideo.serializer())
+                
                 subclass(KookCardMessage::class, KookCardMessage.serializer())
                 subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer())
             }
@@ -127,13 +132,20 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
         @FragileSimbotApi
         @OptIn(ExperimentalSimbotApi::class)
         public val khlCompatibleMessageSerializersModule: SerializersModule = SerializersModule {
+            fun <T> KSerializer<T>.r(): KSerializer<T> {
+                return rename { it.replaceFirst("kook.", "khl.") }
+            }
+            
             fun PolymorphicModuleBuilder<KookMessageElement<*>>.include() {
-                subclass(KookSimpleAssetMessage::class, KookSimpleAssetMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
-                subclass(KookAssetImage::class, KookAssetImage.serializer().rename { it.replaceFirst("kook.", "khl.") })
-                subclass(KookAtAllHere::class, KookAtAllHere.serializer().rename { it.replaceFirst("kook.", "khl.") })
-                subclass(KookAttachmentMessage::class, KookAttachmentMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
-                subclass(KookCardMessage::class, KookCardMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
-                subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer().rename { it.replaceFirst("kook.", "khl.") })
+                subclass(KookSimpleAssetMessage::class, KookSimpleAssetMessage.serializer().r())
+                subclass(KookAssetImage::class, KookAssetImage.serializer().r())
+                subclass(KookAtAllHere::class, KookAtAllHere.serializer().r())
+                subclass(SimpleKookAttachmentMessage::class, SimpleKookAttachmentMessage.serializer().r())
+                subclass(KookAttachmentImage::class, KookAttachmentImage.serializer().r())
+                subclass(KookAttachmentFile::class, KookAttachmentFile.serializer().r())
+                subclass(KookAttachmentVideo::class, KookAttachmentVideo.serializer().r())
+                subclass(KookCardMessage::class, KookCardMessage.serializer().r())
+                subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer().r())
             }
             polymorphic(KMarkdown::class) {
                 subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer().rename { "RAW_V_K_MD" }) // 曾经的序列化name为此。
