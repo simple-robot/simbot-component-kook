@@ -19,7 +19,7 @@ package love.forte.simbot.component.kook.message
 
 import love.forte.simbot.*
 import love.forte.simbot.component.kook.KookComponentBot
-import love.forte.simbot.component.kook.message.KookAggregationMessageReceipt.Companion.merge
+import love.forte.simbot.component.kook.message.KookAggregatedMessageReceipt.Companion.merge
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.KookApiRequest
@@ -32,6 +32,7 @@ import love.forte.simbot.kook.objects.AtTarget
 import love.forte.simbot.kook.objects.KMarkdownBuilder
 import love.forte.simbot.message.*
 import love.forte.simbot.resources.Resource.Companion.toResource
+import love.forte.simbot.utils.view.isNotEmpty
 import java.net.URL
 
 
@@ -59,7 +60,7 @@ private const val DIRECT_TYPE_BY_CODE = 2
 
 /**
  * 将消息发送给目标。此消息如果是个消息链，则有可能会被拆分为多条消息发送，
- * 届时将会返回 [KookAggregationMessageReceipt].
+ * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
  * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
@@ -78,7 +79,7 @@ public suspend fun Message.sendToChannel(
 
 /**
  * 将消息发送给目标。此消息如果是个消息链，则有可能会被拆分为多条消息发送，
- * 届时将会返回 [KookAggregationMessageReceipt].
+ * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
  * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
@@ -96,7 +97,7 @@ public suspend fun Message.sendToDirectByTargetId(
 
 /**
  * 将消息发送给目标。此消息如果是个消息链，则有可能会被拆分为多条消息发送，
- * 届时将会返回 [KookAggregationMessageReceipt].
+ * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
  * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
@@ -115,7 +116,7 @@ public suspend fun Message.sendToDirectByChatCode(
 
 /**
  * 将消息发送给目标。此消息如果是个消息链，则有可能会被拆分为多条消息发送，
- * 届时将会返回 [KookAggregationMessageReceipt].
+ * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
  * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
@@ -208,7 +209,7 @@ private suspend fun Message.send0(
             }
      */
     
-    fun Any?.toReceipt(): KookMessageReceipt {
+    fun Any?.toReceipt(): SingleKookMessageReceipt {
         return if (this is MessageCreated) {
             this.asReceipt(false, bot)
         } else {
@@ -265,9 +266,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
      */
     withinKmd: (KMarkdownBuilder.() -> Unit) -> Unit,
 ) {
-    val message = this
-    
-    when (message) {
+    when (val message = this) {
         // 文本消息
         is PlainText<*> -> {
             if (isSingleElement) {
@@ -298,19 +297,26 @@ private suspend inline fun Message.Element<*>.elementToRequest(
             }
             
             is KookAttachmentMessage -> {
-                val type = when (val attachmentType = message.attachment.type.lowercase()) {
-                    "file" -> MessageType.FILE.type
-                    "image" -> MessageType.IMAGE.type
-                    "video" -> MessageType.VIDEO.type
-                    else -> throw SimbotIllegalArgumentException("Unknown attachment type: $attachmentType")
+                val type: MessageType = when (message) {
+                    is SimpleKookAttachmentMessage -> when(val attType = message.attachment.type.lowercase()) {
+                        "file" -> MessageType.FILE
+                        "image" -> MessageType.IMAGE
+                        "video" -> MessageType.VIDEO
+                        else -> throw IllegalArgumentException("Unknown attachment type: $attType")
+                    }
+        
+                    is KookAttachmentFile -> MessageType.FILE
+                    is KookAttachmentImage -> MessageType.IMAGE
+                    is KookAttachmentVideo -> MessageType.VIDEO
                 }
                 
-                // TODO just send, waiting for fix.
+                // TODO just re-upload and send, waiting for fix.
+                //  see https://github.com/simple-robot/simbot-component-kook/issues/75
                 
                 val createRequest = AssetCreateRequest(URL(message.attachment.url).toResource(message.attachment.name))
                 val asset = createRequest.requestDataBy(bot)
                 
-                doRequest(type, asset.url)
+                doRequest(type.type, asset.url)
             }
             
             else -> {

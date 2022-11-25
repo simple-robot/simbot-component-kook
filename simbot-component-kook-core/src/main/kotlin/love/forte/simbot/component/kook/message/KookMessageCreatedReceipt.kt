@@ -20,24 +20,25 @@ package love.forte.simbot.component.kook.message
 import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.*
-import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.definition.BotContainer
 import love.forte.simbot.kook.api.message.DirectMessageDeleteRequest
 import love.forte.simbot.kook.api.message.MessageCreated
 import love.forte.simbot.kook.api.message.MessageDeleteRequest
+import love.forte.simbot.message.AggregatedMessageReceipt
 import love.forte.simbot.message.MessageReceipt
+import love.forte.simbot.message.SingleMessageReceipt
+import love.forte.simbot.message.aggregation
 import java.util.*
 
 /**
  * Kook 进行消息回复、发送后得到的回执。
  *
- * @see KookMessageCreatedReceipt
- * @see KookApiRequestedReceipt
- * @see KookAggregationMessageReceipt
+ * @see SingleKookMessageReceipt
+ * @see KookAggregatedMessageReceipt
  */
-public sealed interface KookMessageReceipt : MessageReceipt, BotContainer {
+public interface KookMessageReceipt : MessageReceipt, BotContainer {
     /**
      * 此次消息发送的回执内容。
      *
@@ -55,6 +56,13 @@ public sealed interface KookMessageReceipt : MessageReceipt, BotContainer {
     override val bot: KookComponentBot
 }
 
+/**
+ * 用于表示 [SingleMessageReceipt] 的 [KookMessageReceipt] 实现。
+ *
+ * @see KookMessageCreatedReceipt
+ * @see KookApiRequestedReceipt
+ */
+public abstract class SingleKookMessageReceipt : SingleMessageReceipt(), KookMessageReceipt
 
 /**
  * 消息创建后的回执实例。
@@ -65,11 +73,13 @@ public class KookMessageCreatedReceipt(
     override val result: MessageCreated,
     override val isDirect: Boolean,
     override val bot: KookComponentBot,
-) : KookMessageReceipt, DeleteSupport {
+) : SingleKookMessageReceipt() {
     override val id: ID
         get() = result.msgId
     
-    
+    /**
+     * 实例存在即成功。
+     */
     override val isSuccess: Boolean
         get() = true
     
@@ -112,8 +122,21 @@ public class KookApiRequestedReceipt(
     override val result: Any?,
     override val isDirect: Boolean,
     override val bot: KookComponentBot,
-) : KookMessageReceipt {
-    override val id: ID = randomID()
+) : SingleKookMessageReceipt() {
+    private var _id: ID? = null
+    
+    override val id: ID
+        get() {
+            return _id ?: synchronized(this) {
+                _id ?: randomID().also {
+                    _id = it
+                }
+            }
+        }
+    
+    /**
+     * 实例存在即成功。
+     */
     override val isSuccess: Boolean get() = true
     
     /**
@@ -125,29 +148,20 @@ public class KookApiRequestedReceipt(
 
 /**
  * 多条消息发送后的回执，其中会包含多个 [KookMessageReceipt]。
- * [KookAggregationMessageReceipt] 的元素中不嵌套引用 [KookAggregationMessageReceipt] 类型。
- *
  */
 @JvmBlocking
 @JvmAsync
 @ExperimentalSimbotApi
-public class KookAggregationMessageReceipt private constructor(
-    /**
-     * id. 默认为一个无实际含义的随机ID。
-     */
-    override val id: ID,
+public class KookAggregatedMessageReceipt private constructor(
     override val bot: KookComponentBot,
-    private val receipts: List<KookMessageReceipt>,
-) : KookMessageReceipt, Iterable<KookMessageReceipt> {
-    /*
-        这种'复数回执'未来有可能会被考虑合并至核心库，参考 https://github.com/simple-robot/simpler-robot/issues/497
-     */
+    private val aggregatedMessageReceipt: AggregatedMessageReceipt,
+) : AggregatedMessageReceipt(), KookMessageReceipt {
     
     /**
-     * 是否成功。当内部持有的所有回执全部成功才视为成功。
+     * @see AggregatedMessageReceipt.isSuccess
      */
     override val isSuccess: Boolean
-        get() = receipts.all { it.isSuccess }
+        get() = aggregatedMessageReceipt.isSuccess
     
     /**
      * 复数回执不存在结果。
@@ -161,39 +175,21 @@ public class KookAggregationMessageReceipt private constructor(
     override val isDirect: Boolean
         get() = false
     
-    override fun iterator(): Iterator<KookMessageReceipt> = receipts.iterator()
-    override fun spliterator(): Spliterator<KookMessageReceipt> = receipts.spliterator()
-    public operator fun get(index: Int): KookMessageReceipt = receipts[index]
+    override val size: Int
+        get() = aggregatedMessageReceipt.size
     
-    @get:JvmName("size")
-    public val size: Int get() = receipts.size
-    
-    /**
-     * 删除当前回执中的全部回执, 实际为使用 [deleteAll]
-     *
-     * @see deleteAll
-     * @return 是否存在删除成功的结果。即 [deleteAll] 的结果 > 0
-     *
-     */
-    override suspend fun delete(): Boolean {
-        return deleteAll() > 0
+    override fun get(index: Int): SingleKookMessageReceipt {
+        return aggregatedMessageReceipt.get(index) as SingleKookMessageReceipt
     }
     
-    /**
-     * 删除全部回执。
-     */
-    public suspend fun deleteAll(): Int {
-        var count = 0
-        for (receipt in receipts) {
-            if (receipt.delete()) {
-                count++
-            }
-        }
-        return count
+    override fun iterator(): Iterator<SingleKookMessageReceipt> {
+        // Collection.merge 保证了迭代器内部的元素类型
+        @Suppress("UNCHECKED_CAST")
+        return aggregatedMessageReceipt.iterator() as Iterator<SingleKookMessageReceipt>
     }
     
     public companion object {
-    
+        
         /**
          * 将多个 [KookMessageReceipt] 合并为一个聚合的回执。
          *
@@ -203,29 +199,9 @@ public class KookAggregationMessageReceipt private constructor(
          */
         @JvmStatic
         @JvmOverloads
-        public fun Iterable<KookMessageReceipt>.merge(
-            id: ID = randomID(), bot: KookComponentBot? = null,
-        ): KookMessageReceipt {
-            var bot0: KookComponentBot? = bot
-            val iter = iterator()
-            Simbot.require(iter.hasNext()) { "Unable to merge empty element iterator" }
-            
-            val list = buildList(if (this is Collection) size else 16) {
-                for (receipt in this@merge) {
-                    if (bot0 == null) {
-                        bot0 = receipt.bot
-                    }
-                    if (receipt is KookAggregationMessageReceipt) {
-                        addAll(receipt.receipts)
-                    } else {
-                        add(receipt)
-                    }
-                }
-            }
-            
-            Simbot.require(list.isNotEmpty()) { "Unable to merge empty element iterator" }
-            
-            return KookAggregationMessageReceipt(id, bot!!, list)
+        public fun Collection<SingleKookMessageReceipt>.merge(bot: KookComponentBot? = null): KookMessageReceipt {
+            Simbot.require(isNotEmpty()) { "Unable to merge empty element iterator" }
+            return KookAggregatedMessageReceipt(bot ?: first().bot, aggregation())
         }
     }
     
