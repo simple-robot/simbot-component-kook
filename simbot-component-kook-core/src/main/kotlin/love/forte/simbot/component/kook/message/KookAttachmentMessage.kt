@@ -82,13 +82,28 @@ public sealed class KookAttachmentMessage<M : KookAttachmentMessage<M>> :
     }
 }
 
+@Serializable
+private data class MessageAttachments(
+    override val type: String,
+    override val url: String,
+    override val name: String,
+    override val size: Long
+) : Attachments
+
+private fun Attachments.toMessageAttachment(): MessageAttachments = if (this is MessageAttachments) this else MessageAttachments(type, url, name, size)
+
 /**
  * 普通的 [KookAttachmentMessage] 实现。
  */
 @Serializable
 @SerialName("kook.attachment.simple")
-public class SimpleKookAttachmentMessage internal constructor(override val attachment: Attachments) :
+public class SimpleKookAttachmentMessage private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<SimpleKookAttachmentMessage>() {
+    internal constructor(attachments: Attachments): this(attachments.toMessageAttachment())
+    
+    override val attachment: Attachments
+        get() = _attachment
+    
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is SimpleKookAttachmentMessage) return false
@@ -113,8 +128,13 @@ public class SimpleKookAttachmentMessage internal constructor(override val attac
 @Serializable
 @SerialName("kook.attachment.image")
 @ExperimentalSimbotApi
-public class KookAttachmentImage internal constructor(override val attachment: Attachments) :
+public class KookAttachmentImage private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<KookAttachmentImage>(), Image<KookAttachmentImage> {
+    internal constructor(attachments: Attachments): this(attachments.toMessageAttachment())
+    
+    override val attachment: Attachments
+        get() = _attachment
+    
     override val id: ID = attachment.url.ID
     
     override fun equals(other: Any?): Boolean {
@@ -141,8 +161,13 @@ public class KookAttachmentImage internal constructor(override val attachment: A
 @Serializable
 @SerialName("kook.attachment.file")
 @ExperimentalSimbotApi
-public class KookAttachmentFile internal constructor(override val attachment: Attachments) :
+public class KookAttachmentFile private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<KookAttachmentFile>() {
+    internal constructor(attachments: Attachments): this(attachments.toMessageAttachment())
+    
+    override val attachment: Attachments
+        get() = _attachment
+    
     override val key: Message.Key<KookAttachmentFile>
         get() = Key
     
@@ -167,8 +192,13 @@ public class KookAttachmentFile internal constructor(override val attachment: At
 @Serializable
 @SerialName("kook.attachment.video")
 @ExperimentalSimbotApi
-public class KookAttachmentVideo internal constructor(override val attachment: Attachments) :
+public class KookAttachmentVideo private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<KookAttachmentVideo>() {
+    internal constructor(attachments: Attachments): this(attachments.toMessageAttachment())
+    
+    override val attachment: Attachments
+        get() = _attachment
+    
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is KookAttachmentVideo) return false
