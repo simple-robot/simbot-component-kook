@@ -46,11 +46,10 @@ tasks.create("createChangelog") {
                 ${repoRow("simbot-kook-api", "love.forte.simbot.component", "simbot-component-kook-api", realVersion)}
                 ${repoRow("simbot-kook-stdlib", "love.forte.simbot.component", "simbot-component-kook-stdlib", realVersion)}
                 ${repoRow("simbot-kook-core", "love.forte.simbot.component", "simbot-component-kook-core", realVersion)}
-                ${repoRow("simbot-kook-boot", "love.forte.simbot.component", "simbot-component-kook-boot", realVersion)}
                 
             """.trimIndent()
-            
-            
+
+
             file.writeText(autoGenerateText)
         }
     }

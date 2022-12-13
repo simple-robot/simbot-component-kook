@@ -49,7 +49,6 @@ if (isSnapshot()) {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         url = uri(Repositories.Snapshot.URL)
@@ -99,11 +98,11 @@ configurations.all {
 
 
 //// show project info
-println("========================================================")
-println("== project.group:   ${group}")
-println("== project.name:    ${name}")
-println("== project.version: ${version}")
-println("========================================================")
+logger.info("========================================================")
+logger.info("== project.group:   ${group}")
+logger.info("== project.name:    ${name}")
+logger.info("== project.version: ${version}")
+logger.info("========================================================")
 
 idea {
     module {
