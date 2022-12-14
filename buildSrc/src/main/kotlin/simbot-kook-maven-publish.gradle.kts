@@ -46,9 +46,9 @@ plugins {
 val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
 
 
-println("isSnapshotOnly: $isSnapshotOnly")
-println("isReleaseOnly: $isReleaseOnly")
-println("isPublishConfigurable: $isPublishConfigurable")
+logger.info("isSnapshotOnly: $isSnapshotOnly")
+logger.info("isReleaseOnly: $isReleaseOnly")
+logger.info("isPublishConfigurable: $isPublishConfigurable")
 
 checkPublishConfigurable {
     jvmConfigPublishing {
@@ -58,20 +58,20 @@ checkPublishConfigurable {
             archiveClassifier.set("sources")
             from(sourceSets["main"].allSource)
         }
-        
+
         val jarJavadoc by tasks.registering(Jar::class) {
             archiveClassifier.set("javadoc")
         }
-        
+
         artifact(jarSources)
         artifact(jarJavadoc)
-        
+
         isSnapshot = isSnapshot()
         releasesRepository = ReleaseRepository
         snapshotRepository = SnapshotRepository
         gpg = if (isSnapshot()) null else Gpg.ofSystemPropOrNull()
     }
-    
+
     if (isSnapshot()) {
         publishing {
             publications.withType<MavenPublication> {
@@ -79,14 +79,14 @@ checkPublishConfigurable {
             }
         }
     }
-    
+
     publishing {
         publications.withType<MavenPublication> {
             show()
         }
     }
-    
-    
+
+
 }
 
 
