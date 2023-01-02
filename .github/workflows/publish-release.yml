@@ -154,7 +154,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.PUSH_TOKEN }}
-          external_repository: simple-robot-library/simbot3-component-kaiheila-apiDoc
+          external_repository: simple-robot-library/simbot3-component-kook-apiDoc
           publish_branch: gh-pages  # default: gh-pages
           publish_dir: ./dokka/html
           # full_commit_message: Publish ${{ github.ref_name }} documentation
