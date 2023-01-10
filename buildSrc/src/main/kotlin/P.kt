@@ -39,7 +39,7 @@ import love.forte.gradle.common.core.project.version as v
 *
 */
 
-val simbotVersion = v(3, 0, 0) - v("M4")
+val simbotVersion = v(3, 0, 0) - v("RC")
 
 val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
 val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
@@ -60,7 +60,7 @@ object P : ProjectDetail() {
         0, 0
     )
 
-    private val alphaSuffix = v("alpha", 3)
+    private val alphaSuffix = v("alpha", 4)
 
     override val version: Version = baseVersion - alphaSuffix
 
