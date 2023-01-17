@@ -68,7 +68,7 @@ internal class KookGuildMemberImpl(
     // region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
-        val result = GuildMuteDeleteRequest(_guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteDeleteRequest.create(_guild.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (success) {
                 muteLock.withLock {

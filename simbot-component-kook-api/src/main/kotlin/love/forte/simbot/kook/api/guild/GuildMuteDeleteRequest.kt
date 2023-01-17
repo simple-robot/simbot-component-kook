@@ -33,7 +33,7 @@ import love.forte.simbot.kook.api.KookPostRequest
  * request method: POST
  *
  */
-public class GuildMuteDeleteRequest(
+public class GuildMuteDeleteRequest internal constructor(
     guildId: ID, userId: ID, type: Int
 ) : KookPostRequest<Unit>() {
     public companion object Key : BaseKookApiRequestKey("guild-mute", "delete") {
