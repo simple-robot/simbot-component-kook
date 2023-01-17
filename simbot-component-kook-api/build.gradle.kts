@@ -25,6 +25,8 @@ plugins {
 
 dependencies {
     api(simbotApi)
+    api(simbotRequestorCore)
+    api(simbotRequestorKtor)
     api(kotlin("reflect"))
 
     api(libs.ktor.client.core)
