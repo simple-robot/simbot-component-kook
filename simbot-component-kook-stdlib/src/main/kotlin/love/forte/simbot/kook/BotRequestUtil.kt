@@ -22,7 +22,7 @@ package love.forte.simbot.kook
 import love.forte.simbot.Api4J
 import love.forte.simbot.kook.api.ApiResult
 import love.forte.simbot.kook.api.KookApiRequest
-import love.forte.simbot.utils.runInBlocking
+import love.forte.simbot.utils.runInNoScopeBlocking
 
 
 /**
@@ -34,11 +34,10 @@ import love.forte.simbot.utils.runInBlocking
  * @see requestDataBy
  */
 @JvmSynthetic
-public suspend inline fun KookApiRequest<*>.requestBy(bot: KookBot): ApiResult {
+public suspend inline fun KookApiRequest<*>.requestForResultBy(bot: KookBot): ApiResult {
     return request(
         bot.httpClient,
         bot.ticket.authorization,
-        bot.configuration.decoder,
     )
 }
 
@@ -65,7 +64,7 @@ public suspend inline fun <T> KookApiRequest<T>.requestDataBy(bot: KookBot): T {
  */
 @JvmSynthetic
 public suspend inline fun KookBot.request(api: KookApiRequest<*>): ApiResult {
-    return api.requestBy(this)
+    return api.requestForResultBy(this)
 }
 
 /**
@@ -88,7 +87,7 @@ public suspend inline fun <T> KookBot.requestData(api: KookApiRequest<T>): T {
  */
 @Api4J
 public fun KookBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
-    return runInBlocking { api.requestBy(this@requestBlocking) }
+    return runInNoScopeBlocking(coroutineContext) { api.requestForResultBy(this@requestBlocking) }
 }
 
 /**
@@ -96,7 +95,7 @@ public fun KookBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
  */
 @Api4J
 public fun <T> KookBot.requestDataBlocking(api: KookApiRequest<T>): T {
-    return runInBlocking { api.requestDataBy(this@requestDataBlocking) }
+    return runInNoScopeBlocking(coroutineContext) { api.requestDataBy(this@requestDataBlocking) }
 }
 
 
