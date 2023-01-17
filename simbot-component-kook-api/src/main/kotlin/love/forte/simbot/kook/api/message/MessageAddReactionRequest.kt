@@ -29,30 +29,59 @@ import love.forte.simbot.kook.api.KookPostRequest
  * [给某个消息添加回应](https://developer.kaiheila.cn/doc/http/message#%E7%BB%99%E6%9F%90%E4%B8%AA%E6%B6%88%E6%81%AF%E6%B7%BB%E5%8A%A0%E5%9B%9E%E5%BA%94)
  *
  */
-public class MessageAddReactionRequest(
+public class MessageAddReactionRequest internal constructor(
     /**
      * 	频道消息的id
      */
     private val msgId: ID,
     /**
-     *	emoji的id, 可以为 `Guild Emoji` 或者 `Emoji`
+     * emoji的id. 可以为 `Guild Emoji` 或者 `Emoji`
      */
     private val emoji: ID,
 ) : KookPostRequest<Unit>() {
+    @Deprecated("Use create(...)", ReplaceWith("MessageAddReactionRequest.create(msgId, emoji)"))
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
+    
+    @Deprecated("Use create(...)", ReplaceWith("MessageAddReactionRequest.create(msgId, emoji)"))
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
-
-    public companion object Key : BaseKookApiRequestKey("message", "add-reaction")
-
+    
+    public companion object Key : BaseKookApiRequestKey("message", "add-reaction") {
+        
+        /**
+         * 构造 [MessageAddReactionRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji的id
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: ID): MessageAddReactionRequest = MessageAddReactionRequest(msgId, emoji)
+        
+        /**
+         * 构造 [MessageAddReactionRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: love.forte.simbot.message.Emoji): MessageAddReactionRequest =
+            create(msgId, emoji.id)
+        
+        /**
+         * 构造 [MessageAddReactionRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: Emoji): MessageAddReactionRequest = create(msgId, emoji.id)
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(msgId, emoji)
-
+    
     @Serializable
     private data class Body(
         @SerialName("msg_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val msgId: ID,
         @Serializable(ID.AsCharSequenceIDSerializer::class) val emoji: ID
     )
-
-
+    
+    
 }
