@@ -121,7 +121,7 @@ public class KookReceiveMessageContent(
      */
     override suspend fun delete(): Boolean {
         val api = if (isDirect) {
-            DirectMessageDeleteRequest(messageId)
+            DirectMessageDeleteRequest.create(messageId)
         } else {
             MessageDeleteRequest(messageId)
         }
