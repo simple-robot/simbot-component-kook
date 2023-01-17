@@ -43,12 +43,12 @@ import kotlin.coroutines.suspendCoroutine
 public object KookMessages {
     
     /**
-     * 当at(mention)的目标为用户时，[At.atType] 所使用的值。[AT_TYPE_USER] 也是 [At.atType] 的默认值。
+     * 当at(mention)的目标为用户时，[At.type] 所使用的值。[AT_TYPE_USER] 也是 [At.atType] 的默认值。
      */
     public const val AT_TYPE_USER: String = "user"
     
     /**
-     * 当at(mention)的目标为角色时，[At.atType] 所使用的值。
+     * 当at(mention)的目标为角色时，[At.type] 所使用的值。
      */
     public const val AT_TYPE_ROLE: String = "role"
     
@@ -194,7 +194,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
                     else -> throw SimbotIllegalArgumentException("Unknown attachment type: $attachmentType")
                 }
                 
-                val createRequest = AssetCreateRequest(URL(attachment.url).toResource(attachment.name))
+                val createRequest = AssetCreateRequest.create(URL(attachment.url).toResource(attachment.name))
                 val asset = createRequest.requestDataBy(bot)
                 
                 request(type, asset.url)
@@ -207,7 +207,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
         
         // 需要上传的图片
         is ResourceImage -> {
-            val asset = AssetCreateRequest(resource()).requestDataBy(bot)
+            val asset = AssetCreateRequest.create(resource()).requestDataBy(bot)
             request(MessageType.IMAGE.type, asset.url)
         }
         

@@ -335,7 +335,7 @@ internal class KookComponentBotImpl(
      */
     @JvmSynthetic
     override suspend fun uploadAsset(resource: Resource, type: Int): KookSimpleAssetMessage {
-        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        val asset = AssetCreateRequest.create(resource).requestDataBy(this)
         return asset.asMessage(type)
     }
     
@@ -354,7 +354,7 @@ internal class KookComponentBotImpl(
 
     
     override suspend fun uploadAssetImage(resource: Resource): KookAssetImage {
-        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        val asset = AssetCreateRequest.create(resource).requestDataBy(this)
         return asset.asImage()
     }
     

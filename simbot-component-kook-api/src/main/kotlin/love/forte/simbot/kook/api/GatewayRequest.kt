@@ -91,7 +91,7 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetReq
          * @see Resume
          */
         @JvmStatic
-        public fun create(isCompress: Boolean, sn: Long, sessionId: String): GatewayRequest {
+        public fun create(isCompress: Boolean, sn: Long, sessionId: String): Resume {
             return Resume(isCompress, sn, sessionId)
         }
         
@@ -99,7 +99,10 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetReq
     
 }
 
-
+/**
+ * 将一个 [GatewayRequest] 根据重连参数重构为用于重新连接的 [Resume].
+ *
+ */
 @Suppress("unused")
 public fun GatewayRequest.resume(sn: Long, sessionId: String): Resume {
     return when (this) {

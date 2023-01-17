@@ -36,29 +36,43 @@ import java.net.URL
 
 
 /**
- *
  * [上传媒体文件](https://developer.kaiheila.cn/doc/http/asset).
  *
  * 创建（上传）文件资源，例如图片等。
  *
  *
- * @param resource 资源对象。
- * @param name 需要能够体现出文件的扩展名（例如 `mov`, `jpg`），否则尽可能提供 `resourceContentType` 参数。
- * @param resourceContentType 资源的content类型。
  * @author ForteScarlet
  */
-public class AssetCreateRequest(
+public class AssetCreateRequest internal constructor(
     private val resource: Resource,
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
 ) : KookPostRequest<AssetCreated>(false) {
     public companion object Key : BaseKookApiRequestKey("asset", "create") {
         private val logger = LoggerFactory.getLogger("love.forte.simbot.kook.api.asset.AssetCreateRequest")
+        
+        /**
+         * 构造一个 [AssetCreateRequest].
+         *
+         * @param resource 资源对象。
+         * @param name 需要能够体现出文件的扩展名（例如 `mov`, `jpg`），否则尽可能提供 `resourceContentType` 参数。
+         * @param resourceContentType 资源的content类型。
+         
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            resource: Resource,
+            name: String? = resource.name,
+            resourceContentType: ContentType? = null
+        ): AssetCreateRequest {
+            return AssetCreateRequest(resource, name, resourceContentType)
+        }
     }
-
+    
     private val contentType: ContentType
     private val inputProvider = InputProvider { resource.openStream().asInput() }
-
+    
     init {
         contentType = resourceContentType ?: run {
             val index = name?.lastIndexOf('.') ?: -1
@@ -76,15 +90,15 @@ public class AssetCreateRequest(
                 }
             }
         }
-
-
+        
+        
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out AssetCreated>
         get() = AssetCreated.serializer()
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun HttpRequestBuilder.requestFinishingAction() {
         setBody(this@AssetCreateRequest.body ?: EmptyContent)
         onUpload { bytesSentTotal, contentLength ->
@@ -97,17 +111,12 @@ public class AssetCreateRequest(
                 )
             }
         }
-        // headers {
-        //     //remove(HttpHeaders.ContentType)
-        //     this[HttpHeaders.ContentType] // = ContentType.Application
-        // }
     }
-
+    
     override fun createBody(): Any {
-
         return MultiPartFormDataContent(
             formData {
-
+                
                 val headers = headersOf(
                     if (name != null) {
                         HttpHeaders.ContentDisposition to listOf("filename=$name")
@@ -115,7 +124,7 @@ public class AssetCreateRequest(
                         HttpHeaders.ContentDisposition to listOf("filename=simbot-${RandomIDUtil.randomID()}")
                     }
                 )
-
+                
                 append(
                     "file",
                     inputProvider,
@@ -124,8 +133,8 @@ public class AssetCreateRequest(
             }
         )
     }
-
-
+    
+    
 }
 
 /**
@@ -133,7 +142,7 @@ public class AssetCreateRequest(
  */
 @Serializable
 public data class AssetCreated @ApiResultType constructor(val url: String) {
-
+    
     /**
      * 通过 [url] 构建一个 [URLResource].
      */
