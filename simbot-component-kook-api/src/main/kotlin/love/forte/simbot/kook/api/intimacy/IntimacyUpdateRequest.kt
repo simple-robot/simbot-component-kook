@@ -32,7 +32,7 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * method POST
  */
-public class IntimacyUpdateRequest @JvmOverloads constructor(
+public class IntimacyUpdateRequest internal constructor(
     /**
      * 用户 id
      */
@@ -50,20 +50,39 @@ public class IntimacyUpdateRequest @JvmOverloads constructor(
      */
     private val imgId: ID? = null
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("intimacy", "update")
-
+    public companion object Key : BaseKookApiRequestKey("intimacy", "update") {
+    
+        /**
+         * 构造 [IntimacyUpdateRequest].
+         *
+         * @param userId 用户 id
+         * @param score 亲密度，0-2200
+         * @param socialInfo 机器人与用户的社交信息，500 字以内
+         * @param imgId 表情ID
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            userId: ID,
+            score: Int? = null,
+            socialInfo: String? = null,
+            imgId: ID? = null
+        ): IntimacyUpdateRequest = IntimacyUpdateRequest(userId, score, socialInfo, imgId)
+    }
+    
     init {
         Simbot.require(score == null || score in 0..2200) { "Score must in 0 .. 2200" }
         Simbot.require(socialInfo?.length?.let { it <= 500 } ?: true) { "Social info must <= 500." }
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun createBody(): Any = Body(userId, score, socialInfo, imgId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("user_id")
