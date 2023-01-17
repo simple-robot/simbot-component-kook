@@ -34,11 +34,8 @@ import love.forte.simbot.kook.api.KookPostRequest
  * `/api/v3/guild-role/grant`
  */
 public class GuildRoleGrantRequest internal constructor(
-    /** 服务器id */
     private val guildId: ID,
-    /** 用户id */
     private val userId: ID,
-    /** 角色id */
     private val roleId: ID,
 ) : KookPostRequest<UserRoleOperated>() {
     public companion object Key : BaseKookApiRequestKey("guild-role", "grant") {

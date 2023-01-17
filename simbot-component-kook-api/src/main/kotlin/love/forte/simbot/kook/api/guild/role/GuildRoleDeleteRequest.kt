@@ -40,26 +40,25 @@ public class GuildRoleDeleteRequest internal constructor(
     private val roleId: ID,
 ) : KookPostRequest<Unit>() {
     public companion object Key : BaseKookApiRequestKey("guild-role", "delete") {
-    
+        
         /**
          * 构建 [GuildRoleDeleteRequest]
          * @param guildId 频道ID
          * @param roleId 角色ID
          */
         @JvmStatic
-        public fun create(guildId: ID, roleId: ID): GuildRoleDeleteRequest
-            = GuildRoleDeleteRequest(guildId, roleId)
+        public fun create(guildId: ID, roleId: ID): GuildRoleDeleteRequest = GuildRoleDeleteRequest(guildId, roleId)
         
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun createBody(): Any = Body(guildId, roleId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("guild_id")
@@ -69,5 +68,5 @@ public class GuildRoleDeleteRequest internal constructor(
         @Serializable(ID.AsCharSequenceIDSerializer::class)
         val roleId: ID,
     )
-
+    
 }

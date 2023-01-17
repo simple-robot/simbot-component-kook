@@ -34,24 +34,33 @@ import love.forte.simbot.kook.api.KookPostRequest
  * `/api/v3/guild-role/revoke`
  *
  */
-public class GuildRoleRevokeRequest(
-    /** 服务器ID */
+public class GuildRoleRevokeRequest internal constructor(
     private val guildId: ID,
-    /** 角色ID */
     private val roleId: ID,
-    /** 用户ID */
     private val userId: ID,
 ) : KookPostRequest<UserRoleOperated>() {
-    public companion object Key : BaseKookApiRequestKey("guild-role", "revoke")
-
+    public companion object Key : BaseKookApiRequestKey("guild-role", "revoke") {
+        
+        /**
+         * 构造 [GuildRoleRevokeRequest]
+         * @param guildId 服务器ID
+         * @param roleId 角色ID
+         * @param userId 用户ID
+         */
+        @JvmStatic
+        public fun create(guildId: ID, roleId: ID, userId: ID): GuildRoleRevokeRequest =
+            GuildRoleRevokeRequest(guildId, roleId, userId)
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out UserRoleOperated>
         get() = UserRoleOperated.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun createBody(): Any = Body(guildId, roleId, userId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("guild_id")
