@@ -39,9 +39,17 @@ import love.forte.simbot.literal
  *
  * @author ForteScarlet
  */
-public class ChannelViewRequest(private val targetId: ID) : KookGetRequest<ChannelView>() {
+public class ChannelViewRequest internal constructor(private val targetId: ID) : KookGetRequest<ChannelView>() {
 
-    public companion object Key : BaseKookApiRequestKey("channel", "view")
+    public companion object Key : BaseKookApiRequestKey("channel", "view") {
+    
+        /**
+         * 构建 [ChannelViewRequest]
+         * @param targetId 目标频道ID
+         */
+        @JvmStatic
+        public fun create(targetId: ID): ChannelViewRequest = ChannelViewRequest(targetId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out ChannelView>
         get() = ChannelView.serializer()

@@ -431,7 +431,7 @@ internal class KookComponentBotImpl(
                         
                         internalGuilds[guildId]?.also { guild ->
                             // query channel info.
-                            val channelView = ChannelViewRequest(channelId).requestDataBy(this@KookComponentBotImpl)
+                            val channelView = ChannelViewRequest.create(channelId).requestDataBy(this@KookComponentBotImpl)
                             val channelModel = channelView.toModel()
                             guild.computeMergeChannelModel(channelModel)
                         }

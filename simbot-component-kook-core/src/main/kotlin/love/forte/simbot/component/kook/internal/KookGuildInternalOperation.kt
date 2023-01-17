@@ -107,7 +107,7 @@ internal suspend fun KookGuildImpl.computeMergeChannelModel(
 
 
 internal suspend fun KookGuildImpl.queryChannelModel(channelId: ID): ChannelModel? {
-    val model = ChannelViewRequest(channelId).let { req ->
+    val model = ChannelViewRequest.create(channelId).let { req ->
         val result = req.requestBy(baseBot).takeIf { it.isSuccess }
         result?.parseData(baseBot.sourceBot.configuration.decoder, req.resultDeserializer)
     }
