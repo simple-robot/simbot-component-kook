@@ -30,11 +30,23 @@ import love.forte.simbot.literal
  * 查询用户信息
  * @author ForteScarlet
  */
-public class UserViewRequest(
+public class UserViewRequest internal constructor(
     private val userId: ID,
     private val guildId: ID,
 ) : KookGetRequest<User>() {
-    public companion object Key : BaseKookApiRequestKey("user", "view")
+    public companion object Key : BaseKookApiRequestKey("user", "view") {
+    
+        /**
+         * 构造 [UserViewRequest].
+         *
+         * @param userId 用户id
+         * @param guildId 频道服务器id
+         *
+         */
+        @JvmStatic
+        public fun create(userId: ID, guildId: ID): UserViewRequest = UserViewRequest(userId, guildId)
+        
+    }
 
     override val resultDeserializer: DeserializationStrategy<out User>
         get() = UserImpl.serializer()

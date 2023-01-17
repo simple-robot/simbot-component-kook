@@ -381,7 +381,7 @@ internal class KookComponentBotImpl(
                         // query user info.
                         val guild = internalGuild(this.targetId) ?: return
                         val userInfo =
-                            UserViewRequest(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
+                            UserViewRequest.create(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
                         guild.internalMembers.compute(body.userId.literal) { _, current ->

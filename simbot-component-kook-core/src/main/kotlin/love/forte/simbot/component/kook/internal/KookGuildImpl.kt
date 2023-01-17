@@ -121,7 +121,7 @@ internal class KookGuildImpl private constructor(
         this.lastOwnerMember = owner ?: KookGuildMemberImpl(
             baseBot,
             this,
-            UserViewRequest(ownerId, guildId).requestDataBy(baseBot).toModel()
+            UserViewRequest.create(ownerId, guildId).requestDataBy(baseBot).toModel()
         )
         initTimestamp = System.currentTimeMillis()
     }
@@ -141,7 +141,7 @@ internal class KookGuildImpl private constructor(
                 val member = KookGuildMemberImpl(
                     baseBot,
                     this@KookGuildImpl,
-                    UserViewRequest(ownerId, source.id).requestDataBy(baseBot).toModel()
+                    UserViewRequest.create(ownerId, source.id).requestDataBy(baseBot).toModel()
                 )
                 internalMembers.merge(id, member) { _, cur -> cur }!!
             }
