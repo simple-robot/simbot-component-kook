@@ -44,7 +44,7 @@ private fun createRequest(
     nonce: String?,
     tempTargetId: ID?,
 ): KookApiRequest<*> {
-    return MessageCreateRequest(
+    return MessageCreateRequest.create(
         type = type,
         targetId = targetId,
         content = content,
@@ -136,7 +136,7 @@ private suspend fun Message.send0(
     var quote0 = quote
     fun doRequest(type: Int, content: String): KookApiRequest<*> {
         return when (directType) {
-            NOT_DIRECT -> MessageCreateRequest(
+            NOT_DIRECT -> MessageCreateRequest.create(
                 type = type,
                 targetId = targetId,
                 content = content,

@@ -102,7 +102,7 @@ internal class KookChannelImpl private constructor(
         return when (message) {
             is KookReceiveMessageContent -> {
                 val source = message.source
-                MessageCreateRequest(
+                MessageCreateRequest.create(
                     type = source.type.type,
                     targetId = this.id,
                     content = source.content,
@@ -114,7 +114,7 @@ internal class KookChannelImpl private constructor(
             
             is KookChannelMessageDetailsContent -> {
                 val details = message.details
-                MessageCreateRequest(
+                MessageCreateRequest.create(
                     type = details.type,
                     targetId = this.id,
                     content = details.content,

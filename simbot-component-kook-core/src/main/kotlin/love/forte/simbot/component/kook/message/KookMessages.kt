@@ -151,7 +151,7 @@ private suspend fun Message.Element<*>.elementToRequestOrNull(
     tempTargetId: ID? = null,
 ): KookApiRequest<*>? {
     fun request(type: Int, content: String): MessageCreateRequest {
-        return MessageCreateRequest(
+        return MessageCreateRequest.create(
             type = type,
             targetId = targetId,
             content = content,
