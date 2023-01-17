@@ -68,6 +68,7 @@ public class MessageCreateRequest internal constructor(
     public companion object Key : BaseKookApiRequestKey("message", "create") {
         
         /**
+         * 构造 [MessageCreateRequest]
          * @param type 消息类型, 见[type], 不传默认为1, 代表文本类型。9代表 kmarkdown 消息, 10代表卡片消息。
          * @param targetId 目标频道 id
          * @param content 消息内容
