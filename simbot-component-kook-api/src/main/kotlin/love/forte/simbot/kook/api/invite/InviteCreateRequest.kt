@@ -55,7 +55,7 @@ import love.forte.simbot.kook.api.invite.InviteCreateRequest.Key.SETTING_TIMES_U
  *
  * method POST
  */
-public class InviteCreateRequest @JvmOverloads constructor(
+public class InviteCreateRequest internal constructor(
     /**
      * 服务器 id. 服务器 id 或者频道 id 必须填一个
      */
@@ -74,181 +74,218 @@ public class InviteCreateRequest @JvmOverloads constructor(
      * - 43200 => 12 个小时; see [DURATION_NEVER].
      * - 86400 => 1 天; see [DURATION_NEVER].
      * - 604800 => 7 天; see [DURATION_NEVER].
-     *
-     * 你可以参考 [InviteCreateRequest] 中以 `DURATION_` 开头的常量，例如 [DURATION_NEVER].
-     *
-     * @see DURATION_NEVER
-     * @see DURATION_HALF_HOUR
-     * @see DURATION_ONE_HOUR
-     * @see DURATION_SIX_HOURS
-     * @see DURATION_TWELVE_HOURS
-     * @see DURATION_HALF_DAY
-     * @see DURATION_ONE_DAY
-     * @see DURATION_SEVEN_DAYS
-     * @see DURATION_ONE_WEEK
-     *
      */
     private val duration: Int = DURATION_ONE_WEEK,
-
+    
     /**
      * 设置的次数，默认-1。可选值：
-     * -1 => 无限制；
-     * 1 => 1 次使用；
-     * 5 => 5 次使用；
-     * 10 => 10 次使用；
-     * 25 => 25 次使用；
-     * 50 => 50 次使用；
-     * 100 => 100 次使用；
-     *
-     * 你可以参考 [InviteCreateRequest] 中以 `SETTING_TIMES_` 开头的常量，例如 [SETTING_TIMES_UNLIMITED].
-     *
-     * @see SETTING_TIMES_UNLIMITED
-     * @see SETTING_TIMES_ONE
-     * @see SETTING_TIMES_1
-     * @see SETTING_TIMES_FIVE
-     * @see SETTING_TIMES_5
-     * @see SETTING_TIMES_TEN
-     * @see SETTING_TIMES_10
-     * @see SETTING_TIMES_TWENTY_FIVE
-     * @see SETTING_TIMES_25
-     * @see SETTING_TIMES_FIFTY
-     * @see SETTING_TIMES_50
-     * @see SETTING_TIMES_ONE_HUNDRED
-     * @see SETTING_TIMES_100
+     * - -1 => 无限制；
+     * - 1 => 1 次使用；
+     * - 5 => 5 次使用；
+     * - 10 => 10 次使用；
+     * - 25 => 25 次使用；
+     * - 50 => 50 次使用；
+     * - 100 => 100 次使用；
      */
     private val settingTimes: Int = SETTING_TIMES_UNLIMITED
 
 ) : KookPostRequest<InviteCreated>() {
-
-
+    
+    
     @Suppress("MemberVisibilityCanBePrivate")
     public companion object Key : BaseKookApiRequestKey("invite", "create") {
-
+        
         //region duration常量
         /** 0 => 永不 */
         public const val DURATION_NEVER: Int = 0
-
+        
         /** 1800 => 0.5 小时 => 半个小时 */
         public const val DURATION_HALF_HOUR: Int = 1800
-
+        
         /** 3600 => 1 个小时 */
         public const val DURATION_ONE_HOUR: Int = 3600
-
+        
         /** 21600 => 6 个小时 */
         public const val DURATION_SIX_HOURS: Int = 21600
-
+        
         /** 43200 => 12 个小时 => 半天 */
         public const val DURATION_TWELVE_HOURS: Int = 43200
-
+        
         /**
          * 43200 => 12 个小时 => 半天
          * @see DURATION_TWELVE_HOURS
          * */
         public const val DURATION_HALF_DAY: Int = DURATION_TWELVE_HOURS
-
+        
         /** 86400 => 1 天; */
         public const val DURATION_ONE_DAY: Int = 86400
-
+        
         /** 604800 => 7 天 */
         public const val DURATION_SEVEN_DAYS: Int = 604800
-
+        
         /**
          * 604800 => 7 天;
          * @see DURATION_SEVEN_DAYS
          */
         public const val DURATION_ONE_WEEK: Int = DURATION_SEVEN_DAYS
         //endregion
-
+        
         //region settingTimes常量
         /** -1 => 无限制 */
         public const val SETTING_TIMES_UNLIMITED: Int = -1
-
+        
         /** 1 => 1 次使用 */
         public const val SETTING_TIMES_ONE: Int = 1
-
+        
         /** 1 => 1 次使用 */
         public const val SETTING_TIMES_1: Int = SETTING_TIMES_ONE
-
+        
         /** 5 => 5 次使用 */
         public const val SETTING_TIMES_FIVE: Int = 5
-
+        
         /** 5 => 5 次使用 */
         public const val SETTING_TIMES_5: Int = SETTING_TIMES_FIVE
-
+        
         /** -10 => 10 次使用 */
         public const val SETTING_TIMES_TEN: Int = 10
-
+        
         /** -10 => 10 次使用 */
         public const val SETTING_TIMES_10: Int = SETTING_TIMES_TEN
-
+        
         /** 25 => 25 次使用 */
         public const val SETTING_TIMES_TWENTY_FIVE: Int = 25
-
+        
         /** 25 => 25 次使用 */
         public const val SETTING_TIMES_25: Int = SETTING_TIMES_TWENTY_FIVE
-
+        
         /** 50 => 50 次使用 */
         public const val SETTING_TIMES_FIFTY: Int = 50
-
+        
         /** 50 => 50 次使用 */
         public const val SETTING_TIMES_50: Int = SETTING_TIMES_FIFTY
-
+        
         /** 100 => 100 次使用 */
         public const val SETTING_TIMES_ONE_HUNDRED: Int = 100
-
+        
         /** 100 => 100 次使用 */
         public const val SETTING_TIMES_100: Int = SETTING_TIMES_ONE_HUNDRED
         //endregion
-
-
+        
         /**
-         * 通过 channelId 构建请求。
-         * @see InviteCreateRequest
+         * 根据完整参数构造 [InviteCreateRequest]. 也可参考 [byGuild] 或 [byChannel] 来避免手误。
+         *
+         * @see byGuild
+         * @see byChannel
+         *
+         * @param guildId 服务器 id. [服务器 id][guildId] 或者 [频道 id][channelId] 必须填一个
+         * @param channelId 频道 id. [服务器 id][guildId] 或者 [频道 id][channelId] 必须填一个
+         * @param duration 邀请链接有效时长（秒），默认 [7天][DURATION_ONE_WEEK]。
+         * 可选值：
+         * - 0 => 永不; see [DURATION_NEVER].
+         * - 1800 => 0.5 小时; see [DURATION_HALF_HOUR].
+         * - 3600 => 1 个小时; see [DURATION_ONE_HOUR].
+         * - 21600 => 6 个小时; see [DURATION_SIX_HOURS].
+         * - 43200 => 12 个小时; see [DURATION_TWELVE_HOURS].
+         * - 86400 => 1 天; see [DURATION_ONE_DAY].
+         * - 604800 => 7 天; see [DURATION_SEVEN_DAYS].
+         *
+         * 你可以参考 [InviteCreateRequest] 中以 `DURATION_` 开头的常量，例如 [DURATION_NEVER].
+         *
+         *
+         * @see DURATION_NEVER
+         * @see DURATION_HALF_HOUR
+         * @see DURATION_ONE_HOUR
+         * @see DURATION_SIX_HOURS
+         * @see DURATION_TWELVE_HOURS
+         * @see DURATION_HALF_DAY
+         * @see DURATION_ONE_DAY
+         * @see DURATION_SEVEN_DAYS
+         * @see DURATION_ONE_WEEK
+         *
+         * @param settingTimes 设置的次数，默认[-1][SETTING_TIMES_UNLIMITED]。可选值：
+         * - -1 => 无限制；
+         * - 1 => 1 次使用；
+         * - 5 => 5 次使用；
+         * - 10 => 10 次使用；
+         * - 25 => 25 次使用；
+         * - 50 => 50 次使用；
+         * - 100 => 100 次使用；
+         *
+         * 你可以参考 [InviteCreateRequest] 中以 `SETTING_TIMES_` 开头的常量，例如 [SETTING_TIMES_UNLIMITED].
+         *
+         * @see SETTING_TIMES_UNLIMITED
+         * @see SETTING_TIMES_ONE
+         * @see SETTING_TIMES_1
+         * @see SETTING_TIMES_FIVE
+         * @see SETTING_TIMES_5
+         * @see SETTING_TIMES_TEN
+         * @see SETTING_TIMES_10
+         * @see SETTING_TIMES_TWENTY_FIVE
+         * @see SETTING_TIMES_25
+         * @see SETTING_TIMES_FIFTY
+         * @see SETTING_TIMES_50
+         * @see SETTING_TIMES_ONE_HUNDRED
+         * @see SETTING_TIMES_100
          */
         @JvmStatic
         @JvmOverloads
-        public fun byChannel(channelId: ID, duration: Int = DURATION_ONE_WEEK, settingTimes: Int = SETTING_TIMES_UNLIMITED): InviteCreateRequest {
-            return InviteCreateRequest(
-                guildId = null,
-                channelId = channelId,
-                duration, settingTimes
-            )
-        }
-
+        public fun create(
+            guildId: ID? = null,
+            channelId: ID? = null,
+            duration: Int = DURATION_ONE_WEEK,
+            settingTimes: Int = SETTING_TIMES_UNLIMITED
+        ): InviteCreateRequest =
+            InviteCreateRequest(guildId, channelId, duration, settingTimes)
+        
+        
         /**
-         * 通过 guildId 构建请求。
-         * @see InviteCreateRequest
+         * 通过 channelId 构建请求。参数含义描述参考 [create]
+         * @see create
          */
         @JvmStatic
         @JvmOverloads
-        public fun byGuild(guildId: ID, duration: Int = DURATION_ONE_WEEK, settingTimes: Int = SETTING_TIMES_UNLIMITED): InviteCreateRequest {
-            return InviteCreateRequest(
-                guildId = guildId,
-                channelId = null,
-                duration, settingTimes
-            )
+        public fun byChannel(
+            channelId: ID,
+            duration: Int = DURATION_ONE_WEEK,
+            settingTimes: Int = SETTING_TIMES_UNLIMITED
+        ): InviteCreateRequest {
+            return create(null, channelId, duration, settingTimes)
         }
-
+        
+        /**
+         * 通过 guildId 构建请求。参数含义描述参考 [create]
+         * @see create
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun byGuild(
+            guildId: ID,
+            duration: Int = DURATION_ONE_WEEK,
+            settingTimes: Int = SETTING_TIMES_UNLIMITED
+        ): InviteCreateRequest {
+            return create(guildId, null, duration, settingTimes)
+        }
+        
     }
-
+    
     init {
         Simbot.require(guildId != null || channelId != null) {
             "A guild id or channel id must exist"
         }
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out InviteCreated>
         get() = InviteCreated.serializer()
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun createBody(): Any = Body(
         guildId,
         channelId,
         duration,
         settingTimes
     )
-
+    
     @Serializable
     private data class Body(
         @SerialName("guild_id") @Serializable(ID.AsCharSequenceIDSerializer::class)
@@ -258,10 +295,10 @@ public class InviteCreateRequest @JvmOverloads constructor(
         val duration: Int,
         @SerialName("setting_times")
         val settingTimes: Int
-
+    
     )
-
-
+    
+    
 }
 
 

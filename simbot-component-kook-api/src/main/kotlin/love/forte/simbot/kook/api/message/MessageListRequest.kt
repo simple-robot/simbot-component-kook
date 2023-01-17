@@ -30,29 +30,29 @@ import love.forte.simbot.kook.api.appendIfNotnull
  *
  * @author ForteScarlet
  */
-public class MessageListRequest(
+public class MessageListRequest internal constructor(
     /**
      * 频道 id
      */
     private val targetId: ID,
-
+    
     /**
      * 参考消息 id，不传则默认为最新的消息 id
      */
     private val msgId: ID? = null,
-
+    
     /**
      * 是否查询置顶消息（置顶消息只支持查询最新的消息）。
      */
     private val pin: Boolean = false,
-
+    
     /**
      * 查询模式，有三种模式可以选择。不传则默认查询最新的消息.
      *
      * @see MessageListFlag
      */
     private val flag: MessageListFlag? = null,
-
+    
     /**
      * 当前分页消息数量, 如果小于等于零则不提供此参数。服务器此参数默认 50
      */
@@ -60,14 +60,33 @@ public class MessageListRequest(
 ) : KookGetRequest<KookApiResult.ListData<ChannelMessageDetails>>() {
     public companion object Key : BaseKookApiRequestKey("message", "list") {
         private val serializer = KookApiResult.ListData.serializer(ChannelMessageDetailsImpl.serializer())
+        
+        /**
+         * 构造 [MessageListRequest]
+         * @param targetId 频道 id
+         * @param msgId 参考消息 id，不传则默认为最新的消息 id
+         * @param pin 是否查询置顶消息（置顶消息只支持查询最新的消息）。
+         * @param flag 查询模式，有三种模式可以选择。不传则默认查询最新的消息.
+         * @param pageSize 当前分页消息数量, 如果小于等于零则不提供此参数。服务器此参数默认 50
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            targetId: ID,
+            msgId: ID? = null,
+            pin: Boolean = false,
+            flag: MessageListFlag? = null,
+            pageSize: Int = -1
+        ): MessageListRequest =
+            MessageListRequest(targetId, msgId, pin, flag, pageSize)
     }
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelMessageDetails>>
         get() = serializer
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("target_id", targetId.toString())
         appendIfNotnull("msgId", msgId)

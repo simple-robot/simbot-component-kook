@@ -30,8 +30,17 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @author ForteScarlet
  */
-public class DirectMessageDeleteRequest(private val msgId: ID) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("direct-message", "delete")
+public class DirectMessageDeleteRequest internal constructor(private val msgId: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("direct-message", "delete") {
+    
+        /**
+         * 构造 [DirectMessageDeleteRequest].
+         * @param msgId 消息ID
+         */
+        @JvmStatic
+        public fun create(msgId: ID): DirectMessageDeleteRequest =
+            DirectMessageDeleteRequest(msgId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

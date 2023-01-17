@@ -37,20 +37,32 @@ import love.forte.simbot.kook.objects.Permissions
  *
  * @author ForteScarlet
  */
-public class GuildRoleCreateRequest(
+public class GuildRoleCreateRequest internal constructor(
     private val guildId: ID,
     private val name: String? = null,
 ) : KookPostRequest<GuildRoleCreated>() {
-    public companion object Key : BaseKookApiRequestKey("guild-role", "create")
-
+    public companion object Key : BaseKookApiRequestKey("guild-role", "create") {
+        
+        /**
+         * 构建 [GuildRoleCreateRequest]
+         * @param guildId 目标频道
+         * @param name 角色名
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(guildId: ID, name: String? = null): GuildRoleCreateRequest =
+            GuildRoleCreateRequest(guildId, name)
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out GuildRoleCreated>
         get() = GuildRoleCreated.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun createBody(): Any = Body(guildId, name)
-
+    
     @Serializable
     private data class Body(
         @SerialName("guild_id")
@@ -93,25 +105,25 @@ public data class GuildRoleCreated @ApiResultType constructor(
      * 只能为0或者1，该角色是否可以被提及
      */
     public val mentionable: Int,
-
+    
     /**
      * 权限信息。Java中可以通过 [permissionsValue] 得到int类型的字面值。
      */
     @SerialName("permissions")
     public val permissions: Permissions,
 ) : Role, Comparable<GuildRoleCreated> {
-
+    
     override fun compareTo(other: GuildRoleCreated): Int {
         return position.compareTo(other.position)
     }
-
+    
     /**
      * 此处的管理员权限判断为完全的 [管理员][PermissionType], 如果你想要更细致的判断，请通过 [PermissionType] 自行处理。
      */
     override val isAdmin: Boolean
         get() = PermissionType.ADMIN in permissions
-
-
+    
+    
     public val permissionsValue: Int get() = permissions.perm.toInt()
-
+    
 }

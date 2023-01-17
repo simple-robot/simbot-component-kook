@@ -98,6 +98,6 @@ internal class KookUserChatImpl(
     }
     
     override suspend fun delete(): Boolean {
-        return UserChatDeleteRequest(id).requestBy(bot).isSuccess
+        return UserChatDeleteRequest.create(id).requestBy(bot).isSuccess
     }
 }

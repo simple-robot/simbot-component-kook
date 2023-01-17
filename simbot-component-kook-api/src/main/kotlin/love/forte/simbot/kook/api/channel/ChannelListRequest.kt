@@ -39,23 +39,31 @@ import love.forte.simbot.literal
  * request method: GET
  *
  */
-public class ChannelListRequest(
+public class ChannelListRequest internal constructor(
     private val guildId: ID,
-    /**
-     * 目标页数
-     */
     private val page: Int? = null,
-    /**
-     * 每页数据数量
-     */
     private val pageSize: Int? = null,
-    /**
-     * 频道类型, `1`为文字，`2`为语音, 默认为`1`.
-     */
     private val type: Int? = null,
 ) : KookGetRequest<KookApiResult.ListData<ChannelInfo>>() {
     public companion object Key : BaseKookApiRequestKey("channel", "list") {
         private val serializer = KookApiResult.ListData.serializer(ChannelInfoImpl.serializer())
+    
+        /**
+         * 构建 [ChannelListRequest]
+         * @param guildId 频道服务器ID
+         * @param page 目标页数
+         * @param pageSize 每页数据数量
+         * @param type 频道类型, `1`为文字，`2`为语音, 默认为`1`.
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            guildId: ID,
+            page: Int? = null,
+            pageSize: Int? = null,
+            type: Int? = null,
+        ): ChannelListRequest = ChannelListRequest(guildId, page, pageSize, type)
     }
     
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelInfo>>

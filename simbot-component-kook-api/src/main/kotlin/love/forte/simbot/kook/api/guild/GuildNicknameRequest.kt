@@ -34,12 +34,36 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @author ForteScarlet
  */
-public class GuildNicknameRequest(
+public class GuildNicknameRequest internal constructor(
     guildId: ID,
-    nickname: String? = null,
     userId: ID? = null,
+    nickname: String? = null,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("guild", "nickname")
+    public companion object Key : BaseKookApiRequestKey("guild", "nickname") {
+    
+        /**
+         * 构造 [GuildNicknameRequest].
+         * @param guildId 频道服务器ID
+         * @param userId 要修改昵称的目标用户 ID，不传则修改当前登陆用户的昵称
+         * @param nickname 昵称，2 - 64 长度，不传则清空昵称
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(guildId: ID, userId: ID? = null, nickname: String? = null): GuildNicknameRequest =
+            GuildNicknameRequest(guildId, userId, nickname)
+        
+        /**
+         * 构造 [GuildNicknameRequest], 修改当前登录用户的昵称
+         * @param guildId 频道服务器ID
+         * @param nickname 昵称，2 - 64 长度，不传则清空昵称
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(guildId: ID, nickname: String? = null): GuildNicknameRequest =
+            GuildNicknameRequest(guildId, null, nickname)
+    }
 
     init {
         if (nickname != null) {

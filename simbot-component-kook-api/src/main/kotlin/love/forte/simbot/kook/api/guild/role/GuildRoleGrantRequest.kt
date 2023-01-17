@@ -33,24 +33,33 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * `/api/v3/guild-role/grant`
  */
-public class GuildRoleGrantRequest(
-    /** 服务器id */
+public class GuildRoleGrantRequest internal constructor(
     private val guildId: ID,
-    /** 用户id */
     private val userId: ID,
-    /** 角色id */
     private val roleId: ID,
 ) : KookPostRequest<UserRoleOperated>() {
-    public companion object Key : BaseKookApiRequestKey("guild-role", "grant")
-
+    public companion object Key : BaseKookApiRequestKey("guild-role", "grant") {
+        
+        /**
+         * 构建 [GuildRoleGrantRequest]
+         * @param guildId 频道ID
+         * @param userId 用户ID
+         * @param roleId 角色ID
+         */
+        @JvmStatic
+        public fun create(guildId: ID, userId: ID, roleId: ID): GuildRoleGrantRequest =
+            GuildRoleGrantRequest(guildId, userId, roleId)
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out UserRoleOperated>
         get() = UserRoleOperated.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     protected override fun createBody(): Any = Body(guildId, userId, roleId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("guild_id")

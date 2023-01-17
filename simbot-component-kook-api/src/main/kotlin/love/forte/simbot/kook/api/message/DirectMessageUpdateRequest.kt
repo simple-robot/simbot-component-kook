@@ -30,7 +30,7 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @author ForteScarlet
  */
-public class DirectMessageUpdateRequest(
+public class DirectMessageUpdateRequest internal constructor(
 
     /**
      * 消息 id
@@ -47,7 +47,19 @@ public class DirectMessageUpdateRequest(
      */
     private val quote: ID?,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("direct-message", "update")
+    public companion object Key : BaseKookApiRequestKey("direct-message", "update") {
+    
+        /**
+         * 构建 [DirectMessageUpdateRequest]
+         * @param msgId 消息 id
+         * @param content 消息内容
+         * @param quote 回复某条消息的 msgId。如果为空，则代表删除回复，不传则无影响。
+         *
+         */
+        @JvmStatic
+        public fun create(msgId: ID, content: String, quote: ID?): DirectMessageUpdateRequest =
+            DirectMessageUpdateRequest(msgId, content, quote)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
@@ -75,4 +87,4 @@ public fun MessageCreated.toDirectUpdate(
     content: String,
     quote: ID? = null
 ): DirectMessageUpdateRequest =
-    DirectMessageUpdateRequest(msgId, content, quote)
+    DirectMessageUpdateRequest.create(msgId, content, quote)

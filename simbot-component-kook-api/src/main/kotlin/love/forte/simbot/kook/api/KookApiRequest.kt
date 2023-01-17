@@ -29,13 +29,9 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
 import love.forte.simbot.kook.Kook
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_REMAINING
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_RESET
 import love.forte.simbot.logger.LoggerFactory
-import love.forte.simbot.utils.runInBlocking
+import love.forte.simbot.util.api.requestor.API
+import love.forte.simbot.utils.runInNoScopeBlocking
 import love.forte.simbot.utils.runWithInterruptible
 import java.util.function.Consumer
 
@@ -53,46 +49,51 @@ private val logger = LoggerFactory.getLogger("KookApiRequest.debug")
  * ### 不可变
  * 此接口的实现类应当是不可变、可复用的。
  */
-public abstract class KookApiRequest<T> {
-
+public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
+    
     /**
      * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [Kook].
      */
     public abstract val url: Url
-
-
+    
+    
     /**
      * 此请求的 method.
      */
     public abstract val method: HttpMethod
-
-
+    
+    
     /**
      * 得到响应值的反序列化器.
      */
     public abstract val resultDeserializer: DeserializationStrategy<out T>
-
-
+    
+    
     /**
      * 可以为 [request] 提供更多行为的函数，例如提供body、重置contentType等。
      */
     protected open fun HttpRequestBuilder.requestFinishingAction() {
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
     }
-
-
+    
+    
+    @JvmSynthetic
+    override suspend fun requestBy(requestor: KookApiRequestor): T {
+        return requestData(
+            requestor.client,
+            requestor.authorization,
+            DEFAULT_JSON
+        )
+    }
+    
+    @Api4J
+    public fun requestBlockingBy(requestor: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requestor) }
+    
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
      * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
-     * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
-     * ```kotlin
-     * Json {
-     *      isLenient = true
-     *      ignoreUnknownKeys = true
-     *  }
-     * ```
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
@@ -105,30 +106,31 @@ public abstract class KookApiRequest<T> {
     public open suspend fun request(
         client: HttpClient,
         authorization: String,
-        decoder: Json = DEFAULT_JSON,
         postChecker: suspend (HttpResponse) -> Unit = {}
     ): ApiResult {
         val response = requestForResponse(client, authorization) {
             requestFinishingAction()
         }
-
+        
         postChecker(response)
-    
+        
         logger.trace("api request response.body(), response: {}", response)
         
         val result: ApiResult = response.body()
-    
+        
         logger.trace("api request result pre rate limit: {}", result)
         
         // init rate limit info.
         val headers = response.headers
-
-        val limit = headers[X_RATE_LIMIT_LIMIT]?.toLongOrNull() // ?: RateLimit.DEFAULT.limit
-        val remaining = headers[X_RATE_LIMIT_REMAINING]?.toLongOrNull() // ?: RateLimit.DEFAULT.remaining
-        val reset = headers[X_RATE_LIMIT_RESET]?.toLongOrNull() // ?: RateLimit.DEFAULT.reset
-        val bucket = headers[X_RATE_LIMIT_BUCKET] // ?: RateLimit.DEFAULT.bucket
-        val global = headers[X_RATE_LIMIT_GLOBAL] != null
-
+        
+        
+        
+        val limit = headers.rateLimit
+        val remaining = headers.rateRemaining
+        val reset = headers.rateReset
+        val bucket = headers.rateBucket
+        val global = headers.isRateGlobal
+        
         val rateLimit = if (limit != null || remaining != null || reset != null || bucket != null || global) {
             RateLimit(
                 limit ?: RateLimit.DEFAULT.limit,
@@ -140,27 +142,20 @@ public abstract class KookApiRequest<T> {
         } else {
             RateLimit.DEFAULT
         }
-
+        
         result.rateLimit = rateLimit
-    
+        
         logger.trace("api request result: {}", result)
-    
+        
         return result
     }
-
-
+    
+    
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
      * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
-     * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
-     * ```kotlin
-     * Json {
-     *      isLenient = true
-     *      ignoreUnknownKeys = true
-     *  }
-     * ```
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
@@ -175,15 +170,14 @@ public abstract class KookApiRequest<T> {
     public open fun requestBlocking(
         client: HttpClient,
         authorization: String,
-        decoder: Json = DEFAULT_JSON,
         postChecker: Consumer<HttpResponse> = defaultRequestPostChecker
-    ): ApiResult = runInBlocking {
-        request(client, authorization, decoder) { resp ->
+    ): ApiResult = runInNoScopeBlocking {
+        request(client, authorization) { resp ->
             runWithInterruptible { postChecker.accept(resp) }
         }
     }
-
-
+    
+    
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
@@ -194,19 +188,22 @@ public abstract class KookApiRequest<T> {
      * Json {
      *      isLenient = true
      *      ignoreUnknownKeys = true
+     *      encodeDefaults = true
      *  }
      * ```
      *
      */
     @JvmSynthetic
     public open suspend fun requestData(
-        client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
+        client: HttpClient,
+        authorization: String,
+        decoder: Json = DEFAULT_JSON
     ): T {
-        val result = request(client, authorization, decoder)
+        val result = request(client, authorization)
         return result.parseDataOrThrow(decoder, resultDeserializer)
     }
-
-
+    
+    
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
@@ -225,18 +222,19 @@ public abstract class KookApiRequest<T> {
     @JvmOverloads
     public open fun requestDataBlocking(
         client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
-    ): T = runInBlocking { requestData(client, authorization, decoder) }
-
-
+    ): T = runInNoScopeBlocking { requestData(client, authorization, decoder) }
+    
+    
     public companion object {
         internal val DEFAULT_JSON = Json {
             isLenient = true
             ignoreUnknownKeys = true
+            encodeDefaults = true
         }
-
+        
         internal val defaultRequestPostChecker: Consumer<HttpResponse> = Consumer {}
     }
-
+    
 }
 
 /**
@@ -249,12 +247,12 @@ private suspend inline fun KookApiRequest<*>.requestForResponse(
 ): HttpResponse {
     return client.request {
         this.method = this@requestForResponse.method
-
+        
         // set url
         url(this@requestForResponse.url)
-
+        
         headers[HttpHeaders.Authorization] = authorization
-
+        
         // 收尾动作
         finishingAction()
     }
@@ -266,14 +264,14 @@ public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
      * api 路径。
      */
     protected abstract val apiPaths: List<String>
-
+    
     /**
      * 参数构建器。
      */
     protected open fun ParametersBuilder.buildParameters() {}
-
+    
     private lateinit var _url: Url
-
+    
     /**
      * 通过 [apiPaths] 和 [buildParameters] 懒构建 [url] 属性。
      */
@@ -288,7 +286,7 @@ public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
                 buildUrl.also { _url = it }
             }
         }
-
+    
 }
 
 
@@ -315,10 +313,10 @@ public abstract class KookPostRequest<T>(
 ) : BaseKookApiRequest<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
-
+    
     private lateinit var _body: Any
-
-
+    
+    
     /**
      * 可以提供一个body实例。
      */
@@ -342,15 +340,15 @@ public abstract class KookPostRequest<T>(
                         }
                     }
                 }
-
+                
             } else createBody()
         }
-
+    
     /**
      * 构建一个新的 [body] 所使用的函数。用于简化懒加载逻辑。
      */
     protected open fun createBody(): Any? = null
-
+    
     /**
      * 通过 [body] 构建提供 body 属性。
      */
@@ -358,8 +356,8 @@ public abstract class KookPostRequest<T>(
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
         setBody(this@KookPostRequest.body ?: EmptyContent)
     }
-
-
+    
+    
     private object NULL
 }
 

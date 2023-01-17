@@ -95,7 +95,7 @@ public class KookMessageCreatedReceipt(
      */
     @JvmSynthetic
     override suspend fun delete(): Boolean {
-        val request = if (isDirect) DirectMessageDeleteRequest(id) else MessageDeleteRequest(id)
+        val request = if (isDirect) DirectMessageDeleteRequest.create(id) else MessageDeleteRequest.create(id)
         return request.requestBy(bot).isSuccess
     }
     

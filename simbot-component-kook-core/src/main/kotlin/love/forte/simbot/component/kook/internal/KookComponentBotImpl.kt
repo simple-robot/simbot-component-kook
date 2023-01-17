@@ -144,7 +144,7 @@ internal class KookComponentBotImpl(
             var page = 1
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
-                val guildsResult = GuildListRequest(page = page).requestDataBy(this@KookComponentBotImpl)
+                val guildsResult = GuildListRequest.create(page = page).requestDataBy(this@KookComponentBotImpl)
                 val guilds = guildsResult.items
                 bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page)
                 guilds.forEach {
@@ -305,7 +305,7 @@ internal class KookComponentBotImpl(
     
     // region friend api
     override suspend fun contact(id: ID): KookUserChatImpl {
-        val chat = UserChatCreateRequest(id).requestDataBy(bot)
+        val chat = UserChatCreateRequest.create(id).requestDataBy(bot)
         return KookUserChatImpl(this, chat.toModel())
     }
     
@@ -335,7 +335,7 @@ internal class KookComponentBotImpl(
      */
     @JvmSynthetic
     override suspend fun uploadAsset(resource: Resource, type: Int): KookSimpleAssetMessage {
-        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        val asset = AssetCreateRequest.create(resource).requestDataBy(this)
         return asset.asMessage(type)
     }
     
@@ -354,7 +354,7 @@ internal class KookComponentBotImpl(
 
     
     override suspend fun uploadAssetImage(resource: Resource): KookAssetImage {
-        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        val asset = AssetCreateRequest.create(resource).requestDataBy(this)
         return asset.asImage()
     }
     
@@ -381,7 +381,7 @@ internal class KookComponentBotImpl(
                         // query user info.
                         val guild = internalGuild(this.targetId) ?: return
                         val userInfo =
-                            UserViewRequest(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
+                            UserViewRequest.create(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
                         guild.internalMembers.compute(body.userId.literal) { _, current ->
@@ -431,7 +431,7 @@ internal class KookComponentBotImpl(
                         
                         internalGuilds[guildId]?.also { guild ->
                             // query channel info.
-                            val channelView = ChannelViewRequest(channelId).requestDataBy(this@KookComponentBotImpl)
+                            val channelView = ChannelViewRequest.create(channelId).requestDataBy(this@KookComponentBotImpl)
                             val channelModel = channelView.toModel()
                             guild.computeMergeChannelModel(channelModel)
                         }
@@ -502,7 +502,7 @@ internal class KookComponentBotImpl(
                     }
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
-                        val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KookComponentBotImpl)
+                        val guildInfo = GuildViewRequest.create(body.guildId).requestDataBy(this@KookComponentBotImpl)
                         val guildModel = guildInfo.toModel()
                         val newGuild = guildModel.toKookGuild(this@KookComponentBotImpl)
                         internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->

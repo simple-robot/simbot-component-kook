@@ -36,10 +36,17 @@ import love.forte.simbot.literal
  * request method: GET
  *
  */
-public sealed class GuildMuteListRequest(
-    private val guildId: ID
-) : KookGetRequest<GuildMuteList>() {
-    public companion object Key : BaseKookApiRequestKey("guild-mute", "list")
+public class GuildMuteListRequest(private val guildId: ID) : KookGetRequest<GuildMuteList>() {
+    public companion object Key : BaseKookApiRequestKey("guild-mute", "list") {
+    
+        /**
+         * 构造 [GuildMuteListRequest].
+         * @param guildId 频道服务器id
+         */
+        @JvmStatic
+        public fun create(guildId: ID): GuildMuteListRequest =
+            GuildMuteListRequest(guildId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out GuildMuteList>
         get() = GuildMuteList.serializer()

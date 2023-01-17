@@ -304,7 +304,7 @@ private suspend fun KookComponentBotImpl.findUserInGuilds(userId: ID, guildIds: 
         .mapNotNull { id -> internalGuild(id) }
         .mapNotNull { g -> g.getInternalMember(userId) }
         .firstOrNull() ?: userId.let {
-        UserViewRequest(userId, guildIds.first()).requestDataBy(bot)
+        UserViewRequest.create(userId, guildIds.first()).requestDataBy(bot)
     }
 }
 

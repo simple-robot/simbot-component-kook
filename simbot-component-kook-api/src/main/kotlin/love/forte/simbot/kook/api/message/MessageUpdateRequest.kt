@@ -30,35 +30,55 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * *无返回参数*
  */
-public class MessageUpdateRequest(
+public class MessageUpdateRequest internal constructor(
     /**
      * 消息 id
      */
     private val msgId: ID,
-
+    
     /**
      * 消息内容
      */
     private val content: String,
-
+    
     /**
      * 回复某条消息的 msgId。如果为空
      * （为空大概指空字符串：`""`，可以使用 [CharSequenceID.EMPTY] 或者 `"".ID` ），
      * 则代表删除回复，不传则无影响。
      */
     private val quote: ID? = null,
-
+    
     /**
      * 用户 id，针对特定用户临时更新消息，必须是正常消息才能更新。与发送临时消息概念不同，但同样不保存数据库。
      */
     private val tempTargetId: ID? = null,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("message", "update")
-
+    public companion object Key : BaseKookApiRequestKey("message", "update") {
+    
+        /**
+         *
+         * @param msgId 消息 id
+         * @param content 消息内容
+         * @param quote 回复某条消息的 msgId。如果为空
+         * （为空大概指空字符串：`""`，可以使用 [CharSequenceID.EMPTY] 或者 `"".ID` ）
+         * 则代表删除回复，不传则无影响。
+         * @param tempTargetId 用户 id，针对特定用户临时更新消息，必须是正常消息才能更新。与发送临时消息概念不同，但同样不保存数据库。
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            msgId: ID,
+            content: String,
+            quote: ID? = null,
+            tempTargetId: ID? = null,
+        ): MessageUpdateRequest =
+            MessageUpdateRequest(msgId, content, quote, tempTargetId)
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(msgId, content, quote, tempTargetId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("msg_id")
@@ -83,4 +103,4 @@ public fun MessageCreated.toUpdate(
     content: String,
     quote: ID? = null
 ): MessageUpdateRequest =
-    MessageUpdateRequest(msgId, content, quote)
+    MessageUpdateRequest.create(msgId, content, quote)

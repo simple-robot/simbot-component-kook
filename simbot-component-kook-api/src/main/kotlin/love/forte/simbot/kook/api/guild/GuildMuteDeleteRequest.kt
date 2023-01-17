@@ -33,38 +33,39 @@ import love.forte.simbot.kook.api.KookPostRequest
  * request method: POST
  *
  */
-public class GuildMuteDeleteRequest(
-    /** 服务器id */
-    guildId: ID,
-    /** 用户id */
-    userId: ID,
-    /**
-     * 1代表麦克风闭麦，2代表耳机静音
-     *
-     * @see GuildMuteType.TYPE_MICROPHONE
-     * @see GuildMuteType.TYPE_EARPHONE
-     */
-    type: Int
+public class GuildMuteDeleteRequest internal constructor(
+    guildId: ID, userId: ID, type: Int
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("guild-mute", "delete")
-
+    public companion object Key : BaseKookApiRequestKey("guild-mute", "delete") {
+        
+        /**
+         * 构造 [GuildMuteDeleteRequest].
+         * @param guildId 服务器id
+         * @param userId 用户id
+         * @param type 静音类型
+         * - 麦克风闭麦: 1 ([GuildMuteType.TYPE_MICROPHONE])
+         * - 耳机静音: 2 ([GuildMuteType.TYPE_EARPHONE])
+         *
+         * @see GuildMuteType
+         */
+        @JvmStatic
+        public fun create(guildId: ID, userId: ID, type: Int): GuildMuteDeleteRequest =
+            GuildMuteDeleteRequest(guildId, userId, type)
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override val body: Any = Body(guildId, userId, type)
-
+    
     @Serializable
     private data class Body(
         /** 服务器id */
-        @SerialName("guild_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val guildId: ID,
+        @SerialName("guild_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val guildId: ID,
         /** 用户id */
-        @SerialName("user_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val userId: ID,
+        @SerialName("user_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val userId: ID,
         /** 1代表麦克风闭麦，2代表耳机静音 */
         val type: Int
     )

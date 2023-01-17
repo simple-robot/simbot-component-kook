@@ -68,7 +68,7 @@ internal class KookGuildMemberImpl(
     // region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
-        val result = GuildMuteDeleteRequest(_guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteDeleteRequest.create(_guild.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (success) {
                 muteLock.withLock {
@@ -83,7 +83,7 @@ internal class KookGuildMemberImpl(
     override suspend fun mute(durationMillis: Long, type: Int): Boolean {
         Simbot.require(durationMillis > 0) { "Duration millis must > 0, but $durationMillis" }
         // do mute
-        val result = GuildMuteCreateRequest(_guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteCreateRequest.create(_guild.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (durationMillis > 0 && success) {
                 val scope: CoroutineScope = this

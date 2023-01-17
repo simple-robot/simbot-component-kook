@@ -32,8 +32,18 @@ import love.forte.simbot.kook.api.KookPostRequest
  * @param chatCode 删除目标会话的ID
  * @author ForteScarlet
  */
-public class UserChatDeleteRequest(private val chatCode: ID) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("user-chat", "delete")
+public class UserChatDeleteRequest internal constructor(private val chatCode: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("user-chat", "delete") {
+    
+        /**
+         * 构造 [UserChatDeleteRequest].
+         *
+         * @param chatCode 目标会话id
+         *
+         */
+        @JvmStatic
+        public fun create(chatCode: ID): UserChatDeleteRequest = UserChatDeleteRequest(chatCode)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList

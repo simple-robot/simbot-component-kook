@@ -39,32 +39,52 @@ import love.forte.simbot.kook.objects.Role
  *
  *
  */
-public class GuildListRequest @JvmOverloads constructor(
-    /**
-     * 目标页数
-     */
-    private val page: Int = -1,
-    /**
-     * 每页数据数量
-     */
-    private val pageSize: Int = -1,
-    /**
-     * 代表排序的字段, 比如-id代表id按DESC排序，id代表id按ASC排序。不一定有, 如果有，接口中会声明支持的排序字段。
-     */
-    private val sort: String? = null
-) :
-    KookGetRequest<KookApiResult.ListData<Guild>>() {
+public class GuildListRequest internal constructor(
+    private val page: Int, private val pageSize: Int, private val sort: String?
+) : KookGetRequest<KookApiResult.ListData<Guild>>() {
     public companion object Key : BaseKookApiRequestKey("guild", "list") {
         private val serializer = KookApiResult.ListData.serializer(GuildListElement.serializer())
-        public val DEFAULT: GuildListRequest = GuildListRequest()
+        
+        /**
+         * 全部使用默认值的 [GuildListRequest].
+         *
+         */
+        @JvmField
+        public val DEFAULT: GuildListRequest = GuildListRequest(-1, -1, null)
+        
+        /**
+         * 全部使用默认值的 [GuildListRequest].
+         * @see DEFAULT
+         */
+        @JvmStatic
+        public fun create(): GuildListRequest = DEFAULT
+        
+        /**
+         * 构造 [GuildListRequest].
+         * @param page 目标页数
+         * @param pageSize 每页数据数量
+         * @param sort 代表排序的字段, 比如-id代表id按DESC排序，id代表id按ASC排序。不一定有, 如果有，接口中会声明支持的排序字段。
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            page: Int = DEFAULT.page, pageSize: Int = DEFAULT.pageSize, sort: String? = DEFAULT.sort
+        ): GuildListRequest {
+            if (page == DEFAULT.page && pageSize == DEFAULT.pageSize && sort == DEFAULT.sort) {
+                return DEFAULT
+            }
+            
+            return GuildListRequest(page, pageSize, sort)
+        }
+        
     }
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<Guild>>
         get() = serializer
-
+    
     override fun ParametersBuilder.buildParameters() {
         if (page > 0) {
             append("page", page.toString())
@@ -74,7 +94,7 @@ public class GuildListRequest @JvmOverloads constructor(
         }
         appendIfNotnull("sort", sort)
     }
-
+    
 }
 
 
@@ -89,8 +109,7 @@ internal data class GuildListElement @ApiResultType constructor(
     /**
      * 服务器id
      */
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    override val id: ID,
+    @Serializable(ID.AsCharSequenceIDSerializer::class) override val id: ID,
     /**
      * 服务器名称
      */
@@ -102,14 +121,12 @@ internal data class GuildListElement @ApiResultType constructor(
     /**
      * 服务器主的id
      */
-    @SerialName("master_id")
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    override val masterId: ID,
+    @SerialName("master_id") @Serializable(ID.AsCharSequenceIDSerializer::class) override val masterId: ID,
     /**
      * 	服务器icon的地址
      */
     override val icon: String,
-
+    
     /**
      * 通知类型,
      * - `0` 代表默认使用服务器通知设置
@@ -117,9 +134,8 @@ internal data class GuildListElement @ApiResultType constructor(
      * - `2` 代表仅@被提及
      * - `3` 代表不接收通知
      */
-    @SerialName("notify_type")
-    override val notifyType: Int,
-
+    @SerialName("notify_type") override val notifyType: Int,
+    
     /**
      * 服务器默认使用语音区域
      */
@@ -127,30 +143,23 @@ internal data class GuildListElement @ApiResultType constructor(
     /**
      * 是否为公开服务器
      */
-    @SerialName("enable_open")
-    override val enableOpen: Boolean,
+    @SerialName("enable_open") override val enableOpen: Boolean,
     /**
      * 公开服务器id
      */
-    @SerialName("open_id")
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    override val openId: ID,
+    @SerialName("open_id") @Serializable(ID.AsCharSequenceIDSerializer::class) override val openId: ID,
     /**
      * 	默认频道id
      */
-    @SerialName("default_channel_id")
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    override val defaultChannelId: ID,
+    @SerialName("default_channel_id") @Serializable(ID.AsCharSequenceIDSerializer::class) override val defaultChannelId: ID,
     /**
      * 欢迎频道id
      */
-    @SerialName("welcome_channel_id")
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    override val welcomeChannelId: ID,
+    @SerialName("welcome_channel_id") @Serializable(ID.AsCharSequenceIDSerializer::class) override val welcomeChannelId: ID,
 ) : Guild {
     override val roles: List<Role>? = null
     override val channels: List<Channel>? = null
-
+    
     // 可选的
     override val maximumChannel: Int = -1
     override val createTime: Timestamp = Timestamp.NotSupport

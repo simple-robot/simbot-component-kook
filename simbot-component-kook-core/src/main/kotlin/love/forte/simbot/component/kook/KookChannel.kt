@@ -144,7 +144,7 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
         nonce: String?,
         tempTargetId: ID?,
     ): KookMessageReceipt {
-        val request = MessageCreateRequest(type, source.id, content, quote, nonce, tempTargetId)
+        val request = MessageCreateRequest.create(type, source.id, content, quote, nonce, tempTargetId)
         return send(request)
     }
     

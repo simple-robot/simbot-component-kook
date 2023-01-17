@@ -32,8 +32,16 @@ import love.forte.simbot.kook.api.KookPostRequest
  * request method: POST
  *
  */
-public class GuildLeaveRequest(private val guildId: ID) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("guild", "leave")
+public class GuildLeaveRequest internal constructor(private val guildId: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("guild", "leave") {
+    
+        /**
+         * 构造 [GuildLeaveRequest].
+         * @param guildId 目标频道服务器
+         */
+        @JvmStatic
+        public fun create(guildId: ID): GuildLeaveRequest = GuildLeaveRequest(guildId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()

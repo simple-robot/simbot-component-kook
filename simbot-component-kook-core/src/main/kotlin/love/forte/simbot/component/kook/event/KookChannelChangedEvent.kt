@@ -271,7 +271,7 @@ public abstract class KookMessagePinEvent<Body : ChannelEventExtraBody> :
     @JvmBlocking
     @JvmAsync
     public suspend fun queryMsg(): MessageContent {
-        val messageView = MessageViewRequest(msgId).requestDataBy(bot)
+        val messageView = MessageViewRequest.create(msgId).requestDataBy(bot)
         return messageView.toContent(bot)
     }
     

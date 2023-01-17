@@ -29,8 +29,16 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @param msgId 消息 id
  */
-public class MessageDeleteRequest(private val msgId: ID) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("message", "delete")
+public class MessageDeleteRequest internal constructor(private val msgId: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("message", "delete") {
+    
+        /**
+         * 构建 [MessageDeleteRequest]
+         * @param msgId 消息ID
+         */
+        @JvmStatic
+        public fun create(msgId: ID): MessageDeleteRequest = MessageDeleteRequest(msgId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
 

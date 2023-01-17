@@ -33,29 +33,33 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * method POST
  */
-public class InviteDeleteRequest(
-    /**
-     * 邀请码
-     */
+public class InviteDeleteRequest internal constructor(
     private val urlCode: String,
-
-    /**
-     * 服务器 id
-     */
     private val guildId: ID? = null,
-
-    /**
-     * 	服务器频道 ID
-     */
     private val channelId: ID? = null,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("invite", "delete")
-
+    public companion object Key : BaseKookApiRequestKey("invite", "delete") {
+        
+        /**
+         * 构造 [InviteDeleteRequest].
+         *
+         * @param urlCode 邀请码
+         * @param guildId 服务器 id
+         * @param channelId 服务器频道 id
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(urlCode: String, guildId: ID? = null, channelId: ID? = null): InviteDeleteRequest =
+            InviteDeleteRequest(urlCode, guildId, channelId)
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun createBody(): Any = Body(urlCode, guildId, channelId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("url_code") val urlCode: String,
@@ -66,5 +70,5 @@ public class InviteDeleteRequest(
         @Serializable(ID.AsCharSequenceIDSerializer::class)
         val channelId: ID?,
     )
-
+    
 }

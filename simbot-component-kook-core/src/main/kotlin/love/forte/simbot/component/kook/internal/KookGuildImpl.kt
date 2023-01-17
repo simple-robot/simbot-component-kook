@@ -121,7 +121,7 @@ internal class KookGuildImpl private constructor(
         this.lastOwnerMember = owner ?: KookGuildMemberImpl(
             baseBot,
             this,
-            UserViewRequest(ownerId, guildId).requestDataBy(baseBot).toModel()
+            UserViewRequest.create(ownerId, guildId).requestDataBy(baseBot).toModel()
         )
         initTimestamp = System.currentTimeMillis()
     }
@@ -141,7 +141,7 @@ internal class KookGuildImpl private constructor(
                 val member = KookGuildMemberImpl(
                     baseBot,
                     this@KookGuildImpl,
-                    UserViewRequest(ownerId, source.id).requestDataBy(baseBot).toModel()
+                    UserViewRequest.create(ownerId, source.id).requestDataBy(baseBot).toModel()
                 )
                 internalMembers.merge(id, member) { _, cur -> cur }!!
             }
@@ -230,7 +230,7 @@ internal class KookGuildImpl private constructor(
                 delay(batchDelay)
             }
             baseBot.logger.debug("Sync channel data ... page {}", page)
-            val result = ChannelListRequest(guildId = guildId, type = type, page = page).requestDataBy(baseBot)
+            val result = ChannelListRequest.create(guildId = guildId, type = type, page = page).requestDataBy(baseBot)
             val channels = result.items
             baseBot.logger.debug("{} channel data synced in page {}", channels.size, page)
             channels.forEach {
@@ -249,7 +249,7 @@ internal class KookGuildImpl private constructor(
                 delay(batchDelay)
             }
             baseBot.logger.debug("Sync member data ... page {}", page)
-            val usersResult = GuildUserListRequest(guildId = guildId, page = page).requestDataBy(baseBot)
+            val usersResult = GuildUserListRequest.create(guildId = guildId, page = page).requestDataBy(baseBot)
             val users = usersResult.items
             baseBot.logger.debug("{} member data synced in page {}", users.size, page)
             users.forEach {

@@ -35,8 +35,18 @@ import love.forte.simbot.literal
  * @param chatCode 会话ID
  * @author ForteScarlet
  */
-public class UserChatViewRequest(private val chatCode: ID) : KookGetRequest<UserChatView>() {
-    public companion object Key : BaseKookApiRequestKey("user-chat", "view")
+public class UserChatViewRequest internal constructor(private val chatCode: ID) : KookGetRequest<UserChatView>() {
+    public companion object Key : BaseKookApiRequestKey("user-chat", "view") {
+    
+        /**
+         * 构造 [UserChatViewRequest].
+         *
+         * @param chatCode 目标会话id
+         *
+         */
+        @JvmStatic
+        public fun create(chatCode: ID): UserChatViewRequest = UserChatViewRequest(chatCode)
+    }
     
     override val resultDeserializer: DeserializationStrategy<out UserChatView>
         get() = UserChatViewImpl.serializer()

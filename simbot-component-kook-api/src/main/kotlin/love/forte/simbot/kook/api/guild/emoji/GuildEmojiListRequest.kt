@@ -18,15 +18,22 @@ import love.forte.simbot.literal
  *
  * @author ForteScarlet
  */
-public class GuildEmojiListRequest(
+public class GuildEmojiListRequest internal constructor(
     private val guildId: ID,
-    private val pageRequest: PageRequestParameters? = null,
+    private val pageRequest: PageRequestParameters?,
 ) : KookGetRequest<KookApiResult.ListData<GuildEmojiData>>() {
-    public constructor(guildId: ID): this(guildId, null)
-    
     public companion object Key : BaseKookApiRequestKey("guild-emoji", "list") {
         private val serializer = KookApiResult.ListData.serializer(GuildEmojiDataImpl.serializer())
-        
+    
+        /**
+         * 构建 [GuildEmojiListRequest].
+         * @param guildId 频道服务器ID
+         * @param pageRequest 分页信息
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(guildId: ID, pageRequest: PageRequestParameters? = null): GuildEmojiListRequest
+            = GuildEmojiListRequest(guildId, pageRequest)
     }
     
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<GuildEmojiData>>

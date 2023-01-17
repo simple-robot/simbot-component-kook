@@ -35,13 +35,19 @@ import love.forte.simbot.kook.api.KookGetRequest
  * method GET
  *
  */
-public class IntimacyIndexRequest(
-    /**
-     * 用户ID
-     */
+public class IntimacyIndexRequest internal constructor(
     private val userId: ID,
 ) : KookGetRequest<IntimacyIndex>() {
-    public companion object Key : BaseKookApiRequestKey("intimacy", "index")
+    public companion object Key : BaseKookApiRequestKey("intimacy", "index") {
+    
+        /**
+         * 构造 [IntimacyIndexRequest].
+         * @param userId 用户ID
+         *
+         */
+        @JvmStatic
+        public fun create(userId: ID): IntimacyIndexRequest = IntimacyIndexRequest(userId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out IntimacyIndex>
         get() = IntimacyIndex.serializer()

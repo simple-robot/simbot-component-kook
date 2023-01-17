@@ -238,11 +238,11 @@ public data class RateLimit(
 
     ) {
     public companion object {
-        public const val X_RATE_LIMIT_LIMIT: String = "X-Rate-Limit-Limit"
-        public const val X_RATE_LIMIT_REMAINING: String = "X-Rate-Limit-Remaining"
-        public const val X_RATE_LIMIT_RESET: String = "X-Rate-Limit-Reset"
-        public const val X_RATE_LIMIT_BUCKET: String = "X-Rate-Limit-Bucket"
-        public const val X_RATE_LIMIT_GLOBAL: String = "X-Rate-Limit-Global"
+        public const val X_RATE_LIMIT_LIMIT: String = ApiRateLimits.RATE_LIMIT_LIMIT_HEAD // "X-Rate-Limit-Limit"
+        public const val X_RATE_LIMIT_REMAINING: String = ApiRateLimits.RATE_LIMIT_REMAINING_HEAD // "X-Rate-Limit-Remaining"
+        public const val X_RATE_LIMIT_RESET: String = ApiRateLimits.RATE_LIMIT_RESET_HEAD // "X-Rate-Limit-Reset"
+        public const val X_RATE_LIMIT_BUCKET: String = ApiRateLimits.RATE_LIMIT_BUCKET_HEAD // "X-Rate-Limit-Bucket"
+        public const val X_RATE_LIMIT_GLOBAL: String = ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD // "X-Rate-Limit-Global"
 
         public val DEFAULT: RateLimit = RateLimit(99999, 99999, 0, "default/not-init", false)
     }

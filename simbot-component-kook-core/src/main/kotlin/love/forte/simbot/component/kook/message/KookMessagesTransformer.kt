@@ -44,7 +44,7 @@ private fun createRequest(
     nonce: String?,
     tempTargetId: ID?,
 ): KookApiRequest<*> {
-    return MessageCreateRequest(
+    return MessageCreateRequest.create(
         type = type,
         targetId = targetId,
         content = content,
@@ -136,7 +136,7 @@ private suspend fun Message.send0(
     var quote0 = quote
     fun doRequest(type: Int, content: String): KookApiRequest<*> {
         return when (directType) {
-            NOT_DIRECT -> MessageCreateRequest(
+            NOT_DIRECT -> MessageCreateRequest.create(
                 type = type,
                 targetId = targetId,
                 content = content,
@@ -313,7 +313,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
                 // TODO just re-upload and send, waiting for fix.
                 //  see https://github.com/simple-robot/simbot-component-kook/issues/75
                 
-                val createRequest = AssetCreateRequest(URL(message.attachment.url).toResource(message.attachment.name))
+                val createRequest = AssetCreateRequest.create(URL(message.attachment.url).toResource(message.attachment.name))
                 val asset = createRequest.requestDataBy(bot)
                 
                 doRequest(type.type, asset.url)
@@ -326,7 +326,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
         
         // 需要上传的图片
         is ResourceImage -> {
-            val asset = AssetCreateRequest(message.resource()).requestDataBy(bot)
+            val asset = AssetCreateRequest.create(message.resource()).requestDataBy(bot)
             doRequest(MessageType.IMAGE.type, asset.url)
         }
         
