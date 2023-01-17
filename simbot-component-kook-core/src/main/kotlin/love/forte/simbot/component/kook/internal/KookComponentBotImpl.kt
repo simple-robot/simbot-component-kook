@@ -305,7 +305,7 @@ internal class KookComponentBotImpl(
     
     // region friend api
     override suspend fun contact(id: ID): KookUserChatImpl {
-        val chat = UserChatCreateRequest(id).requestDataBy(bot)
+        val chat = UserChatCreateRequest.create(id).requestDataBy(bot)
         return KookUserChatImpl(this, chat.toModel())
     }
     

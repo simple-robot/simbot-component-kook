@@ -95,7 +95,7 @@ internal class KookContactMessageEventImpl(
     private var userChatView: KookUserChatImpl? = null
     
     private suspend fun userChatView(): KookUserChatImpl {
-        val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
+        val view = UserChatCreateRequest.create(sourceEvent.authorId).requestDataBy(bot)
         return KookUserChatImpl(bot, view)
     }
     
@@ -161,7 +161,7 @@ internal class KookBotSelfMessageEventImpl(
     
     
     private val userChatView = lazyValue {
-        val view = UserChatCreateRequest(sourceEvent.authorId).requestDataBy(bot)
+        val view = UserChatCreateRequest.create(sourceEvent.authorId).requestDataBy(bot)
         KookUserChatImpl(bot, view.toModel())
     }
     

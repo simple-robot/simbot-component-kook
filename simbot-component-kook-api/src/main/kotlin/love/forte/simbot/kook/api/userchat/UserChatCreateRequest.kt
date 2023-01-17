@@ -30,8 +30,17 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @author ForteScarlet
  */
-public class UserChatCreateRequest(private val targetId: ID) : KookPostRequest<UserChatView>() {
-    public companion object Key : BaseKookApiRequestKey("user-chat", "create")
+public class UserChatCreateRequest internal constructor(private val targetId: ID) : KookPostRequest<UserChatView>() {
+    public companion object Key : BaseKookApiRequestKey("user-chat", "create") {
+    
+        /**
+         * 构造 [UserChatCreateRequest].
+         *
+         * @param targetId 目标id
+         */
+        @JvmStatic
+        public fun create(targetId: ID): UserChatCreateRequest = UserChatCreateRequest(targetId)
+    }
 
     override val resultDeserializer: DeserializationStrategy<out UserChatView> get() = UserChatViewImpl.serializer()
     override val apiPaths: List<String> get() = apiPathList
