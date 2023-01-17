@@ -46,6 +46,9 @@ val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
 val simbotLogger = "love.forte.simbot:simbot-logger:$simbotVersion"
 val simbotLoggerSlf4j = "love.forte.simbot:simbot-logger-slf4j-impl:$simbotVersion"
 
+val simbotRequestorCore = "love.forte.simbot.util:simbot-util-api-requestor-core:$simbotVersion"
+val simbotRequestorKtor = "love.forte.simbot.util:simbot-util-api-requestor-ktor:$simbotVersion"
+
 
 object P : ProjectDetail() {
     const val GROUP = "love.forte.simbot.component"
