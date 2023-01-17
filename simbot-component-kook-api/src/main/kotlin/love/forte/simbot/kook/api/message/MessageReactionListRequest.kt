@@ -41,19 +41,44 @@ public class MessageReactionListRequest(
 ) : KookGetRequest<List<MessageReactor>>() {
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
-
+    
     public companion object Key : BaseKookApiRequestKey("message", "reaction-list") {
         private val serializer = ListSerializer(MessageReactor.serializer())
+        
+        /**
+         * 构建 [MessageReactionListRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji的id
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: ID): MessageReactionListRequest = MessageReactionListRequest(msgId, emoji)
+        
+        /**
+         * 构建 [MessageReactionListRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: love.forte.simbot.message.Emoji): MessageReactionListRequest =
+            create(msgId, emoji.id)
+        
+        /**
+         * 构建 [MessageReactionListRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: Emoji): MessageReactionListRequest = create(msgId, emoji.id)
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out List<MessageReactor>> get() = serializer
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("msg_id", msgId.toString())
         append("emoji", emoji.toString())
     }
-
+    
 }
 
 
@@ -62,22 +87,22 @@ public class MessageReactionListRequest(
  */
 @Serializable
 public class MessageReactor @ApiResultType constructor(
-
+    
     /**
      * 用户的id
      */
     public val id: CharSequenceID,
-
+    
     /**
      * 用户的名称
      */
     public val username: String,
-
+    
     /**
      * 用户在服务器内的呢称
      */
     public val nickname: String,
-
+    
     /**
      * 用户名的认证数字，用户名正常为：user_name#identify_num
      */
@@ -91,12 +116,12 @@ public class MessageReactor @ApiResultType constructor(
      * 用户的状态, 0代表正常，10代表被封禁
      */
     public val status: Int,
-
+    
     /**
      * 用户的头像的url地址
      */
     public val avatar: String,
-
+    
     /**
      * 	用户是否为机器人
      */
@@ -112,7 +137,7 @@ public class MessageReactor @ApiResultType constructor(
         public const val STATUS_NORMAL: Int = 0
         public const val STATUS_BAN: Int = 10
     }
-
+    
 }
 
 
