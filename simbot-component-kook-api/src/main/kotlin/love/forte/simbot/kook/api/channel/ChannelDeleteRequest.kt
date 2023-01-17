@@ -35,8 +35,19 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @author ForteScarlet
  */
-public class ChannelDeleteRequest(private val channelId: ID) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("channel", "delete")
+public class ChannelDeleteRequest internal constructor(private val channelId: ID) : KookPostRequest<Unit>() {
+    public companion object Key : BaseKookApiRequestKey("channel", "delete") {
+    
+        /**
+         * 构建 [ChannelDeleteRequest].
+         * @param channelId 要删除的频道的ID
+         */
+        @JvmStatic
+        public fun create(channelId: ID): ChannelDeleteRequest {
+            return ChannelDeleteRequest(channelId)
+        }
+        
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
