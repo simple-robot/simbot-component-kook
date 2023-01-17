@@ -249,7 +249,7 @@ internal class KookGuildImpl private constructor(
                 delay(batchDelay)
             }
             baseBot.logger.debug("Sync member data ... page {}", page)
-            val usersResult = GuildUserListRequest(guildId = guildId, page = page).requestDataBy(baseBot)
+            val usersResult = GuildUserListRequest.create(guildId = guildId, page = page).requestDataBy(baseBot)
             val users = usersResult.items
             baseBot.logger.debug("{} member data synced in page {}", users.size, page)
             users.forEach {
