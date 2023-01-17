@@ -33,13 +33,12 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  */
 public class GuildMuteCreateRequest internal constructor(
-    private val guildId: ID,
-    private val userId: ID,
-    private val type: Int
+    private val guildId: ID, private val userId: ID, private val type: Int
 ) : KookPostRequest<Unit>() {
     public companion object Key : BaseKookApiRequestKey("guild-mute", "create") {
         
         /**
+         * 构造 [GuildMuteCreateRequest].
          * @param guildId 服务器id
          * @param userId 用户id
          * @param type 静音类型
@@ -64,14 +63,10 @@ public class GuildMuteCreateRequest internal constructor(
     private data class Body(
         
         /** 服务器id */
-        @SerialName("guild_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val guildId: ID,
+        @SerialName("guild_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val guildId: ID,
         
         /** 用户id */
-        @SerialName("user_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val userId: ID,
+        @SerialName("user_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val userId: ID,
         
         /** 1代表麦克风闭麦，2代表耳机静音 */
         val type: Int
