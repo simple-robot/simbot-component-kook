@@ -144,7 +144,7 @@ internal class KookComponentBotImpl(
             var page = 1
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
-                val guildsResult = GuildListRequest(page = page).requestDataBy(this@KookComponentBotImpl)
+                val guildsResult = GuildListRequest.create(page = page).requestDataBy(this@KookComponentBotImpl)
                 val guilds = guildsResult.items
                 bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page)
                 guilds.forEach {
