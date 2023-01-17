@@ -177,7 +177,7 @@ internal class KookBotImpl(
     }
     
     @Volatile
-    private var client: ClientImpl? = null
+    private var _client: ClientImpl? = null
     
     @Volatile
     private var stageLoop: StageLoop? = null
@@ -192,11 +192,11 @@ internal class KookBotImpl(
             throw kotlinx.coroutines.CancellationException("Bot has been cancelled.")
         }
         
-        clientLogger.debug("Closing the current client: {}", client)
+        clientLogger.debug("Closing the current client: {}", _client)
         stageLoop?.job?.cancel()
-        client?.session?.cancel()
+        _client?.session?.cancel()
         stageLoop = null
-        client = null
+        _client = null
         
         val loopJob = SupervisorJob(job)
         

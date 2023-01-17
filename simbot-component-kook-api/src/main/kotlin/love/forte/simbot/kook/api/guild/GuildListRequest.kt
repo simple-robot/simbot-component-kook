@@ -53,13 +53,6 @@ public class GuildListRequest internal constructor(
         public val DEFAULT: GuildListRequest = GuildListRequest(-1, -1, null)
         
         /**
-         * 全部使用默认值的 [GuildListRequest].
-         * @see DEFAULT
-         */
-        @JvmStatic
-        public fun create(): GuildListRequest = DEFAULT
-        
-        /**
          * 构造 [GuildListRequest].
          * @param page 目标页数
          * @param pageSize 每页数据数量

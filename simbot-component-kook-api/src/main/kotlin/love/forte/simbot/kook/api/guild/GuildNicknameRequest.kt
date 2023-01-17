@@ -60,7 +60,6 @@ public class GuildNicknameRequest internal constructor(
          *
          */
         @JvmStatic
-        @JvmOverloads
         public fun create(guildId: ID, nickname: String? = null): GuildNicknameRequest =
             GuildNicknameRequest(guildId, null, nickname)
     }
