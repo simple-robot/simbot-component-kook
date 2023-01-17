@@ -39,63 +39,116 @@ import love.forte.simbot.kook.util.BooleanToIntSerializer
  * `/api/v3/guild-role/update`
  *
  */
-public class GuildRoleUpdateRequest(override val body: Body) : KookPostRequest<Role>() {
+public class GuildRoleUpdateRequest internal constructor(override val body: Body) : KookPostRequest<Role>() {
+    @Deprecated(
+        "Use GuildRoleUpdateRequest.create(...)",
+        ReplaceWith("GuildRoleUpdateRequest.create(roleId, name, color, position, isHoist, isMentionable, permissions)")
+    )
     public constructor(
-        /** 角色的id */
         roleId: ID,
-        /** 角色的名称 */
         name: String,
-        /** 角色的色值0x000000 - 0xFFFFFF */
         color: Int,
-        /** 顺序，值越小载靠前 */
         position: Int,
-        /** 只能为0或者1，是否把该角色的用户在用户列表排到前面 */
         isHoist: Boolean,
-        /** 只能为0或者1，该角色是否可以被提及 */
         isMentionable: Boolean,
-        /** 权限,参见 [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明) */
         permissions: Int,
     ) : this(Body(roleId, name, color, position, isHoist, isMentionable, permissions))
-
-    public companion object Key : BaseKookApiRequestKey("guild-role", "update")
-
+    
+    public companion object Key : BaseKookApiRequestKey("guild-role", "update") {
+        
+        /**
+         * 使用最基础的 [Body] 参数构造 [GuildRoleUpdateRequest].
+         *
+         * @param body 构造参数
+         */
+        @JvmStatic
+        public fun create(body: Body): GuildRoleUpdateRequest = GuildRoleUpdateRequest(body)
+        
+        /**
+         *
+         * 使用与 [Body] 基本一致的参数构造 [GuildRoleUpdateRequest].
+         *
+         * @param roleId 角色的id
+         * @param name 角色的名称
+         * @param color 角色的色值0x000000 - 0xFFFFFF
+         * @param position 顺序，值越小载靠前
+         * @param isHoist 是否把该角色的用户在用户列表排到前面
+         * @param isMentionable 该角色是否可以被提及
+         * @param permissions 权限,参见 [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明)
+         *
+         *
+         */
+        @JvmStatic
+        public fun create(
+            roleId: ID,
+            name: String,
+            color: Int,
+            position: Int,
+            isHoist: Boolean,
+            isMentionable: Boolean,
+            permissions: Int,
+        ): GuildRoleUpdateRequest =
+            GuildRoleUpdateRequest(Body(roleId, name, color, position, isHoist, isMentionable, permissions))
+        
+        /**
+         *
+         * 使用与 [Body] 基本一致的参数构造 [GuildRoleUpdateRequest].
+         *
+         * @param roleId 角色的id
+         * @param name 角色的名称
+         * @param color 角色的色值0x000000 - 0xFFFFFF
+         * @param position 顺序，值越小载靠前
+         * @param isHoist 是否把该角色的用户在用户列表排到前面
+         * @param isMentionable 该角色是否可以被提及
+         * @param permissions 权限,参见 [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明)
+         *
+         */
+        @JvmStatic
+        public fun create(
+            roleId: ID,
+            name: String,
+            color: Int,
+            position: Int,
+            isHoist: Boolean,
+            isMentionable: Boolean,
+            permissions: Permissions,
+        ): GuildRoleUpdateRequest =
+            create(roleId, name, color, position, isHoist, isMentionable, permissions.perm.toInt())
+        
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Role>
         get() = RoleImpl.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun createBody(): Body = body
-
-
+    
+    
     /**
      * 用于 [GuildRoleUpdateRequest] 的请求体类型。
      */
     @Serializable
     public data class Body(
         /** 角色的id */
-        @SerialName("role_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val roleId: ID,
-
+        @SerialName("role_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val roleId: ID,
+        
         /** 角色的名称 */
         val name: String,
-
+        
         /** 角色的色值0x000000 - 0xFFFFFF */
         val color: Int,
-
+        
         /** 顺序，值越小载靠前 */
         val position: Int,
-
+        
         /** 只能为0或者1，是否把该角色的用户在用户列表排到前面 */
-        @SerialName("hoist")
-        @Serializable(BooleanToIntSerializer::class)
-        val isHoist: Boolean,
-
+        @SerialName("hoist") @Serializable(BooleanToIntSerializer::class) val isHoist: Boolean,
+        
         /** 只能为0或者1，该角色是否可以被提及 */
-        @SerialName("mentionable")
-        @Serializable(BooleanToIntSerializer::class)
-        val isMentionable: Boolean,
+        @SerialName("mentionable") @Serializable(BooleanToIntSerializer::class) val isMentionable: Boolean,
         /**
          * 权限,参见 [权限说明](https://developer.kaiheila.cn/doc/http/guild-role#权限说明)
          *
@@ -104,7 +157,7 @@ public class GuildRoleUpdateRequest(override val body: Body) : KookPostRequest<R
          */
         val permissions: Int,
     )
-
+    
 }
 
 
