@@ -36,27 +36,36 @@ import love.forte.simbot.literal
  *
  * @param guildId 服务器的id
  */
-public class GuildRoleListRequest(
+public class GuildRoleListRequest internal constructor(
     public val guildId: ID,
     private val pageRequest: PageRequestParameters? = null,
 ) : KookGetRequest<KookApiResult.ListData<Role>>() {
-    public constructor(guildId: ID): this(guildId, null)
-    
     public companion object Key : BaseKookApiRequestKey("guild-role", "list") {
         private val serializer = KookApiResult.ListData.serializer(RoleImpl.serializer())
+        
+        /**
+         * 构建 [GuildRoleListRequest]
+         * @param guildId 频道服务器ID
+         * @param pageRequest 分页查询参数
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(guildId: ID, pageRequest: PageRequestParameters? = null): GuildRoleListRequest =
+            GuildRoleListRequest(guildId, pageRequest)
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<Role>>
         get() = serializer
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("guild_id", guildId.literal)
         pageRequest?.appendTo(this)
     }
-
+    
 }
 
 
