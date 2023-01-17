@@ -54,9 +54,14 @@ public class DirectMessageListRequest private constructor(
     private val flag: MessageListFlag? = null,
 ) : KookGetRequest<KookApiResult.ListData<DirectMessageDetails>>() {
     public companion object Key : BaseKookApiRequestKey("direct-message", "list") {
+        /**
+         * 构造 [DirectMessageListRequest]
+         * @param chatCode 私信会话 Code。
+         * @param msgId 参考消息 id，不传则默认为最新的消息 id
+         * @param flag 查询模式，有三种模式可以选择。不传则默认查询最新的消息
+         */
         @JvmStatic
         @JvmOverloads
-        @JvmName("getInstanceByChatCode")
         public fun byChatCode(
             chatCode: ID,
             msgId: ID? = null,
@@ -66,10 +71,32 @@ public class DirectMessageListRequest private constructor(
                 chatCode = chatCode, targetId = null, msgId = msgId, flag = flag
             )
         }
-
+        
+        /**
+         * @suppress just use [byChatCode]
+         * @see byChatCode
+         */
+        @Deprecated(
+            "Just use byChatCode(...)", ReplaceWith(
+                "byChatCode(chatCode, msgId, flag)",
+                "love.forte.simbot.kook.api.message.DirectMessageListRequest.Key.byChatCode"
+            )
+        )
         @JvmStatic
         @JvmOverloads
-        @JvmName("getInstanceByTargetId")
+        public fun getInstanceByChatCode(
+            chatCode: ID, msgId: ID? = null, flag: MessageListFlag? = null
+        ): DirectMessageListRequest = byChatCode(chatCode, msgId, flag)
+    
+        /**
+         * 构造 [DirectMessageListRequest]
+         *
+         * @param targetId 目标用户 id，后端会自动创建会话。
+         * @param msgId 参考消息 id，不传则默认为最新的消息 id
+         * @param flag 查询模式，有三种模式可以选择。不传则默认查询最新的消息
+         */
+        @JvmStatic
+        @JvmOverloads
         public fun byTargetId(
             targetId: ID,
             msgId: ID? = null,
@@ -79,13 +106,33 @@ public class DirectMessageListRequest private constructor(
                 chatCode = null, targetId = targetId, msgId = msgId, flag = flag
             )
         }
+    
+        /**
+         * @suppress just use [byTargetId]
+         * @see byTargetId
+         */
+        @Deprecated(
+            "Just use byTargetId(...)",
+            ReplaceWith(
+                "byTargetId(targetId, msgId, flag)",
+                "love.forte.simbot.kook.api.message.DirectMessageListRequest.Key.byTargetId"
+            ),
+        )
+        @JvmStatic
+        @JvmOverloads
+        public fun getInstanceByTargetId(
+            targetId: ID,
+            msgId: ID? = null,
+            flag: MessageListFlag? = null,
+        ): DirectMessageListRequest = byTargetId(targetId, msgId, flag)
+        
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<DirectMessageDetails>>
         get() = KookApiResult.ListData.serializer(DirectMessageDetails.serializer)
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         appendIfNotnull("chat_code", chatCode)
         appendIfNotnull("target_id", targetId)
