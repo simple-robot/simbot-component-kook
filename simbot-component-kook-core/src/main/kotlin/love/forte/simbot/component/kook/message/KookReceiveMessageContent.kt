@@ -123,7 +123,7 @@ public class KookReceiveMessageContent(
         val api = if (isDirect) {
             DirectMessageDeleteRequest.create(messageId)
         } else {
-            MessageDeleteRequest(messageId)
+            MessageDeleteRequest.create(messageId)
         }
         api.requestDataBy(bot)
         

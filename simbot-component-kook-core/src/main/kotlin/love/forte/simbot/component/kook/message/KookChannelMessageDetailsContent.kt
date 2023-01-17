@@ -76,7 +76,7 @@ public data class KookChannelMessageDetailsContent(
      *
      */
     override suspend fun delete(): Boolean {
-        MessageDeleteRequest(messageId).requestDataBy(bot)
+        MessageDeleteRequest.create(messageId).requestDataBy(bot)
         return true
     }
     
