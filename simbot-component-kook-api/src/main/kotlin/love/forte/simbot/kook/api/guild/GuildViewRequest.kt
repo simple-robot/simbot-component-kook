@@ -40,8 +40,16 @@ import love.forte.simbot.literal
  * request method: GET
  *
  */
-public class GuildViewRequest(private val guildId: ID) : KookGetRequest<Guild>() {
-    public companion object Key : BaseKookApiRequestKey("guild", "view")
+public class GuildViewRequest internal constructor(private val guildId: ID) : KookGetRequest<Guild>() {
+    public companion object Key : BaseKookApiRequestKey("guild", "view") {
+        /**
+         * 构造 [GuildViewRequest].
+         *
+         * @param guildId 频道服务器ID
+         */
+        @JvmStatic
+        public fun create(guildId: ID): GuildViewRequest = GuildViewRequest(guildId)
+    }
 
     override val apiPaths: List<String>
         get() = apiPathList

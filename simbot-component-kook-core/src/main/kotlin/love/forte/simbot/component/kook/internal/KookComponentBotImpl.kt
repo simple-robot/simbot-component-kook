@@ -502,7 +502,7 @@ internal class KookComponentBotImpl(
                     }
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
-                        val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KookComponentBotImpl)
+                        val guildInfo = GuildViewRequest.create(body.guildId).requestDataBy(this@KookComponentBotImpl)
                         val guildModel = guildInfo.toModel()
                         val newGuild = guildModel.toKookGuild(this@KookComponentBotImpl)
                         internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
