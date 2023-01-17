@@ -35,13 +35,22 @@ import love.forte.simbot.kook.api.KookPostRequest
  * `/api/v3/guild-role/delete`
  *
  */
-public class GuildRoleDeleteRequest(
-    /** 服务器id */
+public class GuildRoleDeleteRequest internal constructor(
     private val guildId: ID,
-    /** 角色id */
     private val roleId: ID,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("guild-role", "delete")
+    public companion object Key : BaseKookApiRequestKey("guild-role", "delete") {
+    
+        /**
+         * 构建 [GuildRoleDeleteRequest]
+         * @param guildId 频道ID
+         * @param roleId 角色ID
+         */
+        @JvmStatic
+        public fun create(guildId: ID, roleId: ID): GuildRoleDeleteRequest
+            = GuildRoleDeleteRequest(guildId, roleId)
+        
+    }
 
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
