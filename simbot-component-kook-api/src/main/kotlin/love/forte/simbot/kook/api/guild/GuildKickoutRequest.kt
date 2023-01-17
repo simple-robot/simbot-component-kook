@@ -32,27 +32,33 @@ import love.forte.simbot.kook.api.KookPostRequest
  * request method: POST
  *
  */
-public class GuildKickoutRequest(
+public class GuildKickoutRequest internal constructor(
     guildId: ID,
     targetId: ID,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("guild", "kickout")
-
+    public companion object Key : BaseKookApiRequestKey("guild", "kickout") {
+        
+        /**
+         * 构造 [GuildKickoutRequest]
+         *
+         * @param guildId 频道服务器ID
+         * @param targetId 目标用户ID
+         */
+        @JvmStatic
+        public fun create(guildId: ID, targetId: ID): GuildKickoutRequest = GuildKickoutRequest(guildId, targetId)
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override val body: Any = Body(guildId, targetId)
-
+    
     @Serializable
     private data class Body(
-        @SerialName("guild_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val guildId: ID,
-        @SerialName("target_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val targetId: ID,
+        @SerialName("guild_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val guildId: ID,
+        @SerialName("target_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val targetId: ID,
     )
-
+    
 }
