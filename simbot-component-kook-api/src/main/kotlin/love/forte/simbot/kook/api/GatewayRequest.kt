@@ -36,8 +36,6 @@ import love.forte.simbot.kook.api.GatewayRequest.*
  * @author ForteScarlet
  */
 public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetRequest<Gateway>() {
-    public companion object Key : BaseKookApiRequestKey("gateway", "index")
-
 
     override fun ParametersBuilder.buildParameters() {
         append("compress", if (isCompress) "1" else "0")
@@ -66,7 +64,7 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetReq
     /**
      * 重连获取路由时使用的api。
      */
-    public class Resume(internal val isCompress: Boolean, private val sn: Long, private val sessionId: String) :
+    public class Resume internal constructor(internal val isCompress: Boolean, private val sn: Long, private val sessionId: String) :
         GatewayRequest(isCompress) {
         override fun ParametersBuilder.buildParameters0() {
             append("resume", "1")
@@ -74,6 +72,31 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetReq
             append("session_id", sessionId)
         }
     }
+    
+    public companion object Key : BaseKookApiRequestKey("gateway", "index") {
+    
+        /**
+         * 根据 [isCompress] 的值选择 [Compress] 或 [NotCompress].
+         * @param isCompress 是否进行数据压缩
+         * @see Compress
+         * @see NotCompress
+         */
+        @JvmStatic
+        public fun create(isCompress: Boolean): GatewayRequest {
+            return if (isCompress) Compress else NotCompress
+        }
+    
+        /**
+         * 构建一个用于重新连接的 [Resume] 实例。
+         * @see Resume
+         */
+        @JvmStatic
+        public fun create(isCompress: Boolean, sn: Long, sessionId: String): GatewayRequest {
+            return Resume(isCompress, sn, sessionId)
+        }
+        
+    }
+    
 }
 
 
@@ -81,7 +104,7 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetReq
 public fun GatewayRequest.resume(sn: Long, sessionId: String): Resume {
     return when (this) {
         is Compress -> Resume(true, sn, sessionId)
-        is NotCompress -> Resume(true, sn, sessionId)
+        is NotCompress -> Resume(false, sn, sessionId)
         is Resume -> Resume(isCompress, sn, sessionId)
     }
 }

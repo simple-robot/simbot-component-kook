@@ -24,6 +24,7 @@ import love.forte.simbot.Api4J
 import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.LoggerContainer
+import love.forte.simbot.kook.api.KookApiRequestor
 import love.forte.simbot.kook.api.user.Me
 import love.forte.simbot.kook.api.user.MeRequest
 import love.forte.simbot.kook.api.user.OfflineRequest
@@ -38,7 +39,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author ForteScarlet
  */
-public interface KookBot : CoroutineScope, LoggerContainer {
+public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
     override val coroutineContext: CoroutineContext
     override val logger: Logger
 
@@ -61,8 +62,19 @@ public interface KookBot : CoroutineScope, LoggerContainer {
      * 此实例代表的用于进行API请求（xxxRequest）的http client。
      */
     public val httpClient: HttpClient
-
-
+    
+    /**
+     * @see httpClient
+     */
+    override val client: HttpClient
+        get() = httpClient
+    
+    /**
+     * @see ticket
+     */
+    override val authorization: String
+        get() = ticket.authorization
+    
     /**
      * 添加一个事件的前置处理器。
      *
