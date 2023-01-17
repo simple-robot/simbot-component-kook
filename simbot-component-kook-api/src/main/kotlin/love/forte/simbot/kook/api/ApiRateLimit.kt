@@ -18,6 +18,7 @@
 package love.forte.simbot.kook.api
 
 import io.ktor.client.statement.*
+import io.ktor.http.*
 
 
 // TODO
@@ -71,27 +72,54 @@ public object ApiRateLimits {
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_LIMIT_HEAD] 信息。
  */
-public val HttpResponse.rateLimit: Int? get() = headers[ApiRateLimits.RATE_LIMIT_LIMIT_HEAD]?.toIntOrNull()
+public inline val HttpResponse.rateLimit: Long? get() = headers.rateLimit
 
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_REMAINING_HEAD] 信息。
  */
-public val HttpResponse.rateRemaining: Int? get() = headers[ApiRateLimits.RATE_LIMIT_REMAINING_HEAD]?.toIntOrNull()
+public inline val HttpResponse.rateRemaining: Long? get() = headers.rateRemaining
 
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_RESET_HEAD] 信息。
  */
-public val HttpResponse.rateReset: Int? get() = headers[ApiRateLimits.RATE_LIMIT_RESET_HEAD]?.toIntOrNull()
+public inline val HttpResponse.rateReset: Long? get() = headers.rateReset
 
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_BUCKET_HEAD] 信息。
  */
-public val HttpResponse.rateBucket: String? get() = headers[ApiRateLimits.RATE_LIMIT_BUCKET_HEAD]
+public inline val HttpResponse.rateBucket: String? get() = headers.rateBucket
 
 /**
  * [HttpResponse] 中是否存在 [ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD]。
  */
-public val HttpResponse.isRateGlobal: Boolean get() = headers[ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD] != null
+public inline val HttpResponse.isRateGlobal: Boolean get() = headers.isRateGlobal
+
+
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_LIMIT_HEAD] 信息。
+ */
+public inline val Headers.rateLimit: Long? get() = this[ApiRateLimits.RATE_LIMIT_LIMIT_HEAD]?.toLongOrNull()
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_REMAINING_HEAD] 信息。
+ */
+public inline val Headers.rateRemaining: Long? get() = this[ApiRateLimits.RATE_LIMIT_REMAINING_HEAD]?.toLongOrNull()
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_RESET_HEAD] 信息。
+ */
+public inline val Headers.rateReset: Long? get() = this[ApiRateLimits.RATE_LIMIT_RESET_HEAD]?.toLongOrNull()
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_BUCKET_HEAD] 信息。
+ */
+public inline val Headers.rateBucket: String? get() = this[ApiRateLimits.RATE_LIMIT_BUCKET_HEAD]
+
+/**
+ * [Headers] 中是否存在 [ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD]。
+ */
+public inline val Headers.isRateGlobal: Boolean get() = this[ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD] != null
 
 
 

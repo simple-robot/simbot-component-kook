@@ -29,11 +29,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
 import love.forte.simbot.kook.Kook
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_REMAINING
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_RESET
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.util.api.requestor.API
 import love.forte.simbot.utils.runInNoScopeBlocking
@@ -128,11 +123,13 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         // init rate limit info.
         val headers = response.headers
         
-        val limit = headers[X_RATE_LIMIT_LIMIT]?.toLongOrNull() // ?: RateLimit.DEFAULT.limit
-        val remaining = headers[X_RATE_LIMIT_REMAINING]?.toLongOrNull() // ?: RateLimit.DEFAULT.remaining
-        val reset = headers[X_RATE_LIMIT_RESET]?.toLongOrNull() // ?: RateLimit.DEFAULT.reset
-        val bucket = headers[X_RATE_LIMIT_BUCKET] // ?: RateLimit.DEFAULT.bucket
-        val global = headers[X_RATE_LIMIT_GLOBAL] != null
+        
+        
+        val limit = headers.rateLimit
+        val remaining = headers.rateRemaining
+        val reset = headers.rateReset
+        val bucket = headers.rateBucket
+        val global = headers.isRateGlobal
         
         val rateLimit = if (limit != null || remaining != null || reset != null || bucket != null || global) {
             RateLimit(
