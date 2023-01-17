@@ -43,7 +43,7 @@ import kotlin.coroutines.suspendCoroutine
 public object KookMessages {
     
     /**
-     * 当at(mention)的目标为用户时，[At.type] 所使用的值。[AT_TYPE_USER] 也是 [At.atType] 的默认值。
+     * 当at(mention)的目标为用户时，[At.type] 所使用的值。[AT_TYPE_USER] 也是 [At.type] 的默认值。
      */
     public const val AT_TYPE_USER: String = "user"
     

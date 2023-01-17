@@ -23,10 +23,10 @@ import love.forte.simbot.Api4J
 import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.kook.api.ApiResult
 import love.forte.simbot.kook.api.KookApiRequest
-import love.forte.simbot.kook.requestBy
 import love.forte.simbot.kook.requestData
 import love.forte.simbot.kook.requestDataBlocking
 import love.forte.simbot.kook.requestDataBy
+import love.forte.simbot.kook.requestForResultBy
 import love.forte.simbot.utils.runInBlocking
 
 
@@ -40,7 +40,7 @@ import love.forte.simbot.utils.runInBlocking
  */
 @JvmSynthetic
 public suspend inline fun KookApiRequest<*>.requestBy(bot: KookComponentBot): ApiResult {
-    return requestBy(bot.sourceBot)
+    return requestForResultBy(bot.sourceBot)
 }
 
 /**
