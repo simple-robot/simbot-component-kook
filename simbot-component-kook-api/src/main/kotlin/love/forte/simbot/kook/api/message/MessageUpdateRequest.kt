@@ -30,7 +30,7 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * *无返回参数*
  */
-public class MessageUpdateRequest(
+public class MessageUpdateRequest internal constructor(
     /**
      * 消息 id
      */
@@ -103,4 +103,4 @@ public fun MessageCreated.toUpdate(
     content: String,
     quote: ID? = null
 ): MessageUpdateRequest =
-    MessageUpdateRequest(msgId, content, quote)
+    MessageUpdateRequest.create(msgId, content, quote)
