@@ -308,6 +308,7 @@ public abstract class KookMemberGuildChangedEvent<out Body> :
     @JvmAsync(asProperty = true)
     override suspend fun organization(): KookGuild = source()
     
+    abstract override val key: Event.Key<out KookMemberGuildChangedEvent<*>>
     
     public companion object Key : BaseEventKey<KookMemberGuildChangedEvent<*>>(
         "kook.member_guild_changed", KookMemberChangedEvent
@@ -325,14 +326,30 @@ public abstract class KookMemberGuildChangedEvent<out Body> :
  */
 public abstract class KookMemberExitedGuildEvent :
     KookMemberGuildChangedEvent<ExitedGuildEventBody>(),
-    MemberDecreaseEvent {
+    GuildMemberDecreaseEvent {
     
     /**
      * 离开的成员。
      */
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
-    abstract override suspend fun before(): KookGuildMember
+    abstract override suspend fun member(): KookGuildMember
+    
+    /**
+     * 离开的成员。同 [member].
+     *
+     * @see member
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun before(): KookGuildMember = member()
+    
+    /**
+     * 涉及的频道服务器。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    abstract override suspend fun guild(): KookGuild
     
     /**
      * 成员离开后，始终为null。
@@ -349,18 +366,26 @@ public abstract class KookMemberExitedGuildEvent :
     override suspend fun operator(): KookGuildMember? = null
     
     /**
+     * 涉及的频道服务器。同 [guild]
+     * @see guild
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun source(): KookGuild = guild()
+    
+    /**
      * Kook 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
      */
     override val actionType: ActionType get() = ActionType.PROACTIVE
     
     
-    override val key: Event.Key<out KookMemberExitedChannelEvent>
+    override val key: Event.Key<out KookMemberExitedGuildEvent>
         get() = Key
     
-    public companion object Key : BaseEventKey<KookMemberExitedChannelEvent>(
-        "kook.member_exited_channel", KookMemberChannelChangedEvent, MemberDecreaseEvent
+    public companion object Key : BaseEventKey<KookMemberExitedGuildEvent>(
+        "kook.member_exited_guild", KookMemberGuildChangedEvent, GuildMemberDecreaseEvent
     ) {
-        override fun safeCast(value: Any): KookMemberExitedChannelEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KookMemberExitedGuildEvent? = doSafeCast(value)
     }
 }
 
@@ -372,21 +397,37 @@ public abstract class KookMemberExitedGuildEvent :
  */
 public abstract class KookMemberJoinedGuildEvent :
     KookMemberGuildChangedEvent<JoinedGuildEventBody>(),
-    MemberIncreaseEvent {
+    GuildMemberIncreaseEvent {
     
     /**
      * 涉及的相关频道服务器。
      */
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
-    abstract override suspend fun source(): KookGuild
+    abstract override suspend fun guild(): KookGuild
+    
+    /**
+     * 涉及的相关频道服务器。同 [guild]
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun source(): KookGuild = guild()
     
     /**
      * 加入的成员。
      */
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
-    abstract override suspend fun after(): KookGuildMember
+    abstract override suspend fun member(): KookGuildMember
+    
+    /**
+     * 加入的成员。同 [member].
+     *
+     * @see member
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun after(): KookGuildMember = member()
     
     /**
      * 成员加入前，始终为null。
@@ -411,7 +452,7 @@ public abstract class KookMemberJoinedGuildEvent :
         get() = Key
     
     public companion object Key : BaseEventKey<KookMemberJoinedGuildEvent>(
-        "kook.member_joined_guild", KookMemberGuildChangedEvent, MemberIncreaseEvent
+        "kook.member_joined_guild", KookMemberGuildChangedEvent, GuildMemberIncreaseEvent
     ) {
         override fun safeCast(value: Any): KookMemberJoinedGuildEvent? = doSafeCast(value)
     }
