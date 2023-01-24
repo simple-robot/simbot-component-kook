@@ -63,9 +63,8 @@ internal data class KookMemberExitedGuildEventImpl(
     private val _source: KookGuildImpl,
     private val _before: KookGuildMemberImpl,
 ) : KookMemberExitedGuildEvent() {
-    override suspend fun source() = _source
+    override suspend fun guild() = _source
     override suspend fun member() = _before
-    override suspend fun before() = _before
 }
 
 
@@ -75,9 +74,8 @@ internal data class KookMemberJoinedGuildEventImpl(
     private val _source: KookGuildImpl,
     private val _after: KookGuildMemberImpl,
 ) : KookMemberJoinedGuildEvent() {
-    override suspend fun source() = _source
+    override suspend fun guild() = _source
     override suspend fun member() = _after
-    override suspend fun after() = _after
 }
 
 
