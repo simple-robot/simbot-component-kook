@@ -42,6 +42,9 @@ fun org.jetbrains.dokka.gradle.AbstractDokkaTask.configOutput(format: String) {
 tasks.named<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
     configOutput("html")
     
+//    includes.from(rootProject.file("docs/DocHome.md"))
+    includes.from(rootProject.file("README.md"))
+    
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
         customAssets = listOf(rootProject.file(".simbot/dokka-assets/logo-icon.svg"))
         customStyleSheets = listOf(rootProject.file(".simbot/dokka-assets/css/kdoc-style.css"))
