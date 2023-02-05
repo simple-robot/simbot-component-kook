@@ -34,6 +34,7 @@ dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation(kotlin("serialization", kotlinVersion))
     implementation("org.jetbrains.dokka", "dokka-gradle-plugin", dokkaVersion)
+    implementation("org.jetbrains.dokka", "dokka-base", dokkaVersion)
  
     // see https://github.com/gradle-nexus/publish-plugin
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")

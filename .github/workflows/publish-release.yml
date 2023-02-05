@@ -26,14 +26,14 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
       # setup Gradle
       - name: Gradle Run Test
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.5.1
+          gradle-version: 7.6
           arguments: clean build test
 
 
@@ -51,14 +51,14 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
       # setup Gradle
       - name: Gradle Publish Release
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.5.1
+          gradle-version: 7.6
           arguments: | 
             publishToSonatype
             closeAndReleaseStagingRepository
@@ -106,14 +106,14 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
       # setup Gradle
       - name: Gradle publish snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.5.1
+          gradle-version: 7.6
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
         env:
           SIMBOT_IS_SNAPSHOT: true
@@ -134,27 +134,29 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
-
-      - name: Create gradle.properties
-        run: |
-          echo "org.gradle.workers.max=16" > gradle.properties
-          echo "org.gradle.parallel=true" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx8G -Xms4G -XX:MaxMetaspaceSize=1G -Dfile.encoding=UTF-8" >> gradle.properties
 
       # setup Gradle
       - name: Gradle generate documentation
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.5.1
-          arguments: clean build dokkaHtmlMultiModuleAndPost
+          gradle-version: 7.6
+          arguments: |
+            -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8" 
+            -Porg.gradle.daemon=false
+            --info 
+            --warning-mode all
+            -x test
+            --build-cache
+            dokkaHtmlMultiModule
 
       - name: Push to doc repository
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.PUSH_TOKEN }}
-          external_repository: simple-robot-library/simbot3-component-kook-apiDoc
-          publish_branch: gh-pages  # default: gh-pages
-          publish_dir: ./dokka/html
-          # full_commit_message: Publish ${{ github.ref_name }} documentation
+          external_repository: simple-robot-library/simbot3-api-docs
+          publish_branch: gh-pages
+          publish_dir: ./build/dokka/html
+          # deploy to sub dir
+          destination_dir: components/kook

@@ -5,8 +5,6 @@
 # Log file
 *.log
 
-gradle.properties
-
 # BlueJ files
 *.ctxt
 

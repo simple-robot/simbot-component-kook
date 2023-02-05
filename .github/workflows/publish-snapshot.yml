@@ -34,13 +34,13 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
       # setup Gradle
       - name: Gradle publish snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.5.1
+          gradle-version: 7.6
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
 
