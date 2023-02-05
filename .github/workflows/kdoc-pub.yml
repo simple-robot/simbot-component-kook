@@ -10,7 +10,6 @@ jobs:
   deploy-doc:
     name: Deploy-doc
     runs-on: ubuntu-latest
-    needs: publish-release
     steps:
       # 检出仓库代码
       - name: Check out repo
