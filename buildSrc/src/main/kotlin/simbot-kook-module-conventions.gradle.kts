@@ -121,8 +121,8 @@ tasks.withType<DokkaTaskPartial>().configureEach {
         version = P.version.toString()
         documentedVisibilities.set(listOf(DokkaConfiguration.Visibility.PUBLIC, DokkaConfiguration.Visibility.PROTECTED))
         reportUndocumented.set(true)
-        if (project.file("Module.md").exists()) {
-            includes.from("Module.md")
+        if (project.file("README.md").exists()) {
+            includes.from("README.md")
         }
         
         

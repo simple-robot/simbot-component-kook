@@ -1,6 +1,6 @@
 # Simple Robot Kook 组件
 
-此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [Kook](https://www.kookapp.cn/) 的组件支持。
+此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK](https://www.kookapp.cn/) 的组件支持。
 
 更多详情请参考 [simbot3][simbot3] 或者 [simbot3官网](https://simbot.forte.love)。
 
@@ -16,7 +16,7 @@
 当前版本处于 **`ALPHA`** 版本阶段，即代表：
 - 可能存在诸多[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)和未知问题，
 - 不保证API的稳定与兼容（可能随时发布存在不兼容内容的更新）
-- 需要[反馈](https://github.com/simple-robot/simbot-component-kook/issues)或[PR](https://github.com/simple-robot/simbot-component-kook/pulls)协助
+- 需要[**反馈**](https://github.com/simple-robot/simbot-component-kook/issues)或[**PR协助**](https://github.com/simple-robot/simbot-component-kook/pulls)
 
 ## 使用
 
