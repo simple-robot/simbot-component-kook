@@ -156,7 +156,7 @@ jobs:
         with:
           personal_token: ${{ secrets.PUSH_TOKEN }}
           external_repository: simple-robot-library/simbot3-api-docs
-          publish_branch: gh-pages
+          publish_branch: kdoc-deploy/component-kook
           publish_dir: ./build/dokka/html
           # deploy to sub dir
           destination_dir: components/kook
