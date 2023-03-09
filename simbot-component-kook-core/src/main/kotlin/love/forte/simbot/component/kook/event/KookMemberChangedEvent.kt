@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -327,14 +327,14 @@ public abstract class KookMemberGuildChangedEvent<out Body> :
 public abstract class KookMemberExitedGuildEvent :
     KookMemberGuildChangedEvent<ExitedGuildEventBody>(),
     GuildMemberDecreaseEvent {
-    
+
     /**
      * 离开的成员。
      */
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
     abstract override suspend fun member(): KookGuildMember
-    
+
     /**
      * 离开的成员。同 [member].
      *
@@ -343,14 +343,21 @@ public abstract class KookMemberExitedGuildEvent :
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
     override suspend fun before(): KookGuildMember = member()
-    
+
     /**
      * 涉及的频道服务器。
      */
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
     abstract override suspend fun guild(): KookGuild
-    
+
+    /**
+     * 涉及的相关频道服务器。同 [source].
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookGuild = guild()
+
     /**
      * 成员离开后，始终为null。
      */
@@ -398,14 +405,21 @@ public abstract class KookMemberExitedGuildEvent :
 public abstract class KookMemberJoinedGuildEvent :
     KookMemberGuildChangedEvent<JoinedGuildEventBody>(),
     GuildMemberIncreaseEvent {
-    
+
     /**
      * 涉及的相关频道服务器。
      */
     @JvmBlocking(asProperty = true, suffix = "")
     @JvmAsync(asProperty = true)
     abstract override suspend fun guild(): KookGuild
-    
+
+    /**
+     * 涉及的相关频道服务器。
+     */
+    @JvmBlocking(asProperty = true, suffix = "")
+    @JvmAsync(asProperty = true)
+    override suspend fun organization(): KookGuild = guild()
+
     /**
      * 涉及的相关频道服务器。同 [guild]
      */

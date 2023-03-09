@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2021-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -29,14 +29,18 @@ package love.forte.simbot.kook.objects
  * @author ForteScarlet
  *
  * @property bitValue 比特位。
+ * @property isAdmin 是否为一个可能被视为拥有某种管理权限的权限值。
  */
 @Suppress("EnumEntryName", "MemberVisibilityCanBePrivate", "NonAsciiCharacters")
-public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
+public enum class PermissionType(
+    @get:JvmSynthetic public val bitValue: UInt,
+    public val isAdmin: Boolean = false
+) {
     /**
      * 拥有此权限会获得完整的管理权，包括绕开所有其他权限（包括频道权限）限制，属于危险权限。
      * `管理员`
      */
-    ADMIN(0u),
+    ADMIN(0u, true),
     // 管理员(0u),
 
 
@@ -44,7 +48,7 @@ public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
      * 拥有此权限的成员可以修改服务器名称和更换区域。
      * `管理服务器`
      */
-    GUILD_MANAGEMENT(1u),
+    GUILD_MANAGEMENT(1u, true),
     // 管理服务器(1u),
 
 
@@ -52,7 +56,7 @@ public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
      * 拥有此权限的成员可以查看服务器的管理日志。
      * `查看管理日志`
      */
-    VIEW_MANAGEMENT_LOG(2u),
+    VIEW_MANAGEMENT_LOG(2u, true),
     // 查看管理日志(2u),
 
 
@@ -68,49 +72,49 @@ public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
      * 拥有该权限可以管理服务器的邀请
      * `管理邀请`
      */
-    INVITATIONS_MANAGEMENT(4u),
+    INVITATIONS_MANAGEMENT(4u, true),
     // 管理邀请(4u),
 
     /**
      * 拥有此权限的成员可以创建新的频道以及编辑或删除已存在的频道。
      * `频道管理`
      */
-    CHANNEL_MANAGEMENT(5u),
+    CHANNEL_MANAGEMENT(5u, true),
     // 频道管理(5u),
 
     /**
      *
      * `踢出用户`
      */
-    KICK_USER(6u),
+    KICK_USER(6u, true),
     // 踢出用户(6u),
 
     /**
      *
      * `封禁用户`
      */
-    BAN_USER(7u),
+    BAN_USER(7u, true),
     // 封禁用户(7u),
 
     /**
      *
      * `管理自定义表情`
      */
-    CUSTOM_EMOTICONS_MANAGEMENT(8u),
+    CUSTOM_EMOTICONS_MANAGEMENT(8u, true),
     // 管理自定义表情(8u),
 
     /**
      * 拥有此权限的用户可以更改他们的昵称。
      * `修改服务器昵称`
      */
-    EDIT_GUILD_NICKNAME(9u),
+    EDIT_GUILD_NICKNAME(9u, true),
     // 修改服务器昵称(9u),
 
     /**
      * 拥有此权限成员可以创建新的角色和编辑删除低于该角色的身份。
      * `管理角色权限`
      */
-    ROLE_PERMISSIONS_MANAGEMENT(10u),
+    ROLE_PERMISSIONS_MANAGEMENT(10u, true),
     // 管理角色权限(10u),
 
     /**
@@ -131,7 +135,7 @@ public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
      * 拥有此权限的成员可以删除其他成员发出的消息和置顶消息。
      * `管理消息`
      */
-    MESSAGE_MANAGEMENT(13u),
+    MESSAGE_MANAGEMENT(13u, true),
     // 管理消息(13u),
 
     /**
@@ -152,7 +156,7 @@ public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
      * 拥有此权限的成员可以把其他成员移动和踢出频道；但此类移动仅限于在该成员和被移动成员均有权限的频道之间进行。
      * `语音管理`
      */
-    VOICE_MANAGEMENT(16u),
+    VOICE_MANAGEMENT(16u, true),
     // 语音管理(16u),
 
     /**
@@ -222,7 +226,7 @@ public enum class PermissionType(@get:JvmSynthetic public val bitValue: UInt) {
      * 拥有此权限的用户可以更改他人的昵称
      * `修改他人昵称`
      */
-    EDIT_ANOTHER_PERSON_NICKNAME(26u),
+    EDIT_ANOTHER_PERSON_NICKNAME(26u, true),
     // 修改他人昵称(26u),
 
     /**

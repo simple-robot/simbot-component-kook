@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -19,10 +19,12 @@ package love.forte.simbot.component.kook
 
 import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.component.kook.role.KookGuildRole
+import love.forte.simbot.component.kook.role.KookRole
 import love.forte.simbot.definition.*
 import love.forte.simbot.utils.item.Items
-import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import kotlin.time.Duration
 import love.forte.simbot.kook.objects.Guild as KkGuild
 
@@ -142,14 +144,13 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     /**
      * 获取当前频道服务器中配置的所有角色信息。
      *
-     * Deprecated: 尚未支持
+     * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
+     *
+     * @see KookRole
      */
-    @Deprecated(
-        "Not support yet.", ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
-    )
-    override val roles: Items<Role>
-        get() = emptyItems()
-    
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRole>
+
     // endregion
     
     // region mute api

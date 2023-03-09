@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2021-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -19,7 +19,6 @@
 
 package love.forte.simbot.kook.objects
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.CharSequenceID
@@ -78,7 +77,7 @@ public interface Role : KookObjects, Comparable<Role> {
     override fun compareTo(other: Role): Int = position.compareTo(other.position)
 
     public companion object {
-        public val serializer: KSerializer<out Role> = RoleImpl.serializer()
+        //public val serializer: KSerializer<out Role> = RoleImpl.serializer()
     }
 
 }

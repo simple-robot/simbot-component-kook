@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -44,11 +44,11 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 internal class KookGuildMemberImpl(
     override val bot: KookComponentBotImpl,
-    private val _guild: KookGuildImpl,
+    internal val guildInternal: KookGuildImpl,
     @Volatile override var source: UserModel,
 ) : KookGuildMember, CoroutineScope {
-    private val job = SupervisorJob(_guild.job)
-    override val coroutineContext: CoroutineContext = _guild.coroutineContext + job
+    private val job = SupervisorJob(guildInternal.job)
+    override val coroutineContext: CoroutineContext = guildInternal.coroutineContext + job
     
     private val muteLock = Mutex()
     
@@ -63,12 +63,12 @@ internal class KookGuildMemberImpl(
     override val id: ID
         get() = source.id
     
-    override suspend fun guild(): KookGuild = _guild
+    override suspend fun guild(): KookGuild = guildInternal
     
     // region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
-        val result = GuildMuteDeleteRequest.create(_guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteDeleteRequest.create(guildInternal.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (success) {
                 muteLock.withLock {
@@ -83,7 +83,7 @@ internal class KookGuildMemberImpl(
     override suspend fun mute(durationMillis: Long, type: Int): Boolean {
         Simbot.require(durationMillis > 0) { "Duration millis must > 0, but $durationMillis" }
         // do mute
-        val result = GuildMuteCreateRequest.create(_guild.id, source.id, type).requestBy(bot)
+        val result = GuildMuteCreateRequest.create(guildInternal.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (durationMillis > 0 && success) {
                 val scope: CoroutineScope = this

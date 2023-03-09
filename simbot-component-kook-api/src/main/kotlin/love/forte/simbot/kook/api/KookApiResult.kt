@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -151,11 +151,31 @@ public class ApiResult @ApiResultType constructor(
      */
     @Transient
     public var rateLimit: RateLimit = RateLimit.DEFAULT
+        internal set
+
+    /**
+     * http响应状态码
+     */
+    @Transient
+    public var httpStatusCode: Int = -1
+        internal set
+
+    /**
+     * http响应状态描述
+     */
+    @Transient
+    public var httpStatusDescription: String = ""
+        internal set
 
     /**
      * 此接口的响应码是否为成功的响应码.
      */
     public val isSuccess: Boolean get() = code == KookApiResult.SUCCESS_CODE
+
+    /**
+     * 判断 [httpStatusCode] 是否在 200 .. 300(不含) 之间。
+     */
+    public val isHttpSuccess: Boolean get() = httpStatusCode in 200 until 300
 
     /**
      * 提供解析参数来使用当前result中的data内容解析为目标结果。

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2021-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -87,7 +87,7 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
     }
     
     @Api4J
-    public fun requestBlockingBy(requestor: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requestor) }
+    public fun requestBlockingBy(requester: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requester) }
     
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
@@ -115,15 +115,17 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         postChecker(response)
         
         logger.trace("api request response.body(), response: {}", response)
-        
-        val result: ApiResult = response.body()
-        
+
+
+        val result: ApiResult = response.body<ApiResult>().also {
+            it.httpStatusCode = response.status.value
+            it.httpStatusDescription = response.status.description
+        }
+
         logger.trace("api request result pre rate limit: {}", result)
         
         // init rate limit info.
         val headers = response.headers
-        
-        
         
         val limit = headers.rateLimit
         val remaining = headers.rateRemaining
@@ -145,7 +147,7 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         
         result.rateLimit = rateLimit
         
-        logger.trace("api request result: {}", result)
+        logger.debug("api request result: {}", result)
         
         return result
     }

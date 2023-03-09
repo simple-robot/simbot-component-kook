@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -35,7 +35,7 @@ import kotlin.coroutines.CoroutineContext
  * @author ForteScarlet
  */
 internal class KookComponentGuildBotImpl private constructor(
-    override val bot: KookComponentBot,
+    override val bot: KookComponentBotImpl,
     private val member: KookGuildMember,
 ) : KookComponentGuildBot() {
     override suspend fun asMember(): KookGuildMember = member
@@ -115,7 +115,7 @@ internal class KookComponentGuildBotImpl private constructor(
     }
     
     companion object {
-        internal fun KookComponentBot.toMemberBot(member: KookGuildMember): KookComponentGuildBotImpl =
+        internal fun KookComponentBotImpl.toMemberBot(member: KookGuildMember): KookComponentGuildBotImpl =
             KookComponentGuildBotImpl(this, member)
     }
 }
