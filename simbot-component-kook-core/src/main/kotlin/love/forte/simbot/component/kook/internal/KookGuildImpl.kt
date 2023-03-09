@@ -43,7 +43,6 @@ import love.forte.simbot.kook.api.guild.GuildUser
 import love.forte.simbot.kook.api.guild.GuildUserListRequest
 import love.forte.simbot.kook.api.guild.role.GuildRoleListRequest
 import love.forte.simbot.kook.api.user.UserViewRequest
-import love.forte.simbot.kook.objects.Role
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
@@ -192,42 +191,29 @@ internal class KookGuildImpl private constructor(
             val pageSize = prop.batch.takeIf { it > 0 } ?: PageRequestParameters.DEFAULT_MAX_PAGE_SIZE
             val limit = prop.limit.takeIf { it > 0 }
             val offset = prop.offset.takeIf { it > 0 }
-            val startPage = offset?.div(pageSize) ?: 0
+            val startPage = offset?.div(pageSize) ?: PageRequestParameters.START_PAGE
             val drop = offset?.mod(pageSize) ?: 0
 
-            val flow = flow<Role> {
+            flow {
                 var page = startPage
-                while (true) {
-                    val roleListData = GuildRoleListRequest
+                do {
+                    val result = GuildRoleListRequest
                         .create(source.id, PageRequestParameters(page, pageSize))
                         .requestDataBy(bot)
-
-//                    println(roleListDataRes)
-
-//                    break
-                    val items = roleListData.items
-                    if (items.isEmpty()) {
-                        break
+                    val items = result.items
+                    items.forEach {
+                        emit(it)
                     }
+                    page = result.meta.page + 1
 
-                    items.forEach { emit(it) }
-
-                    if (roleListData.meta.page != page) {
-                        break
-                    }
-
-                    page++
-                }
+                } while (items.isNotEmpty() && result.meta.page < result.meta.pageTotal)
             }.drop(drop).let { flow ->
                 if (limit != null) {
                     flow.take(limit)
                 } else {
                     flow
                 }
-            }
-
-
-            flow.map { r ->
+            }.map { r ->
                 KookGuildRoleImpl(this, r)
             }
         }
@@ -277,7 +263,7 @@ internal class KookGuildImpl private constructor(
     }
 
     private fun requestChannels(guildId: ID, type: Int? = null, batchDelay: Long = 0L): Flow<ChannelInfo> = flow {
-        var page = 1
+        var page = PageRequestParameters.START_PAGE
         do {
             if (page > 1) {
                 delay(batchDelay)

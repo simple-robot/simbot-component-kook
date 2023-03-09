@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -734,6 +734,11 @@ internal class KookBotImpl(
          */
         val eventProcessJob: EventProcessJob,
     ) : KookBot.Client {
+        /*
+            TODO
+            sn 在到达 65535 后会重新从 1 开始计算。
+            see https://developer.kookapp.cn/doc/reference
+         */
         override val sn: Long
             get() = atomicSn.get()
         override val isCompress: Boolean

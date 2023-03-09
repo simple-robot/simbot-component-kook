@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2023-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -44,7 +44,7 @@ public class PageRequestParameters(
         /**
          * 起始页码
          */
-        public const val START_PAGE: Int = 0
+        public const val START_PAGE: Int = 1
     }
 }
 
