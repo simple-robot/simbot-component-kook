@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook.internal
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.KookGuild
@@ -28,6 +29,7 @@ import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.model.UserModel
+import love.forte.simbot.component.kook.role.KookMemberRole
 import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kook.api.guild.GuildMuteDeleteRequest
@@ -35,6 +37,7 @@ import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.logger.logger
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
+import love.forte.simbot.utils.item.Items
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -62,7 +65,20 @@ internal class KookGuildMemberImpl(
     
     override val id: ID
         get() = source.id
-    
+
+
+    /**
+     * 获取当前角色在频道服务器中的全部角色。
+     *
+     * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
+     */
+    @OptIn(ExperimentalSimbotApi::class)
+    override val roles: Items<KookMemberRole>
+        get() {
+
+            TODO()
+        }
+
     override suspend fun guild(): KookGuild = guildInternal
     
     // region mute相关
