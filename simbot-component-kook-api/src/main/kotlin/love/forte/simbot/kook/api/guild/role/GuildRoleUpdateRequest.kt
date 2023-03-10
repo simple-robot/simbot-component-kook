@@ -77,8 +77,8 @@ public class GuildRoleUpdateRequest internal constructor(override val body: Body
         ): GuildRoleUpdateRequest =
             GuildRoleUpdateRequest(
                 Body(
-                    guildId,
-                    roleId,
+                    guildId = guildId,
+                    roleId = roleId,
                     name,
                     color,
                     position,
@@ -112,7 +112,7 @@ public class GuildRoleUpdateRequest internal constructor(override val body: Body
             isMentionable: Boolean? = null,
             permissions: Permissions? = null,
         ): GuildRoleUpdateRequest =
-            create(Body(guildId, roleId, name, color, position, isHoist, isMentionable, permissions))
+            create(Body(guildId = guildId, roleId = roleId, name, color, position, isHoist, isMentionable, permissions))
 
 
     }
@@ -131,11 +131,10 @@ public class GuildRoleUpdateRequest internal constructor(override val body: Body
      */
     @Serializable
     public data class Body(
-        /** 角色的id */
-        @SerialName("role_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val roleId: ID,
-
         /** 频道服务器的id */
         @SerialName("guild_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val guildId: ID,
+        /** 角色的id */
+        @SerialName("role_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val roleId: ID,
 
         /** 角色的名称 */
         val name: String? = null,
@@ -161,26 +160,26 @@ public class GuildRoleUpdateRequest internal constructor(override val body: Body
     ) {
 
         /**
-         * @param permissions 权限值
+         * @param permissionsValue 权限值
          */
         public constructor(
-            roleId: ID,
             guildId: ID,
+            roleId: ID,
             name: String? = null,
             color: Int? = null,
             position: Int? = null,
             isHoist: Boolean? = null,
             isMentionable: Boolean? = null,
-            permissions: Int? = null,
+            permissionsValue: Int? = null,
         ) : this(
-            roleId,
             guildId,
+            roleId,
             name,
             color,
             position,
             isHoist,
             isMentionable,
-            permissions?.let { Permissions(it.toUInt()) }
+            permissionsValue?.let { Permissions(it.toUInt()) }
         )
     }
 

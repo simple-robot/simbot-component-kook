@@ -33,8 +33,9 @@ import love.forte.simbot.kook.objects.Role
 @OptIn(ExperimentalSimbotApi::class)
 internal class KookMemberRoleImpl(
     override val member: KookGuildMemberImpl,
-    override val sourceRole: Role
+    private val _role: KookGuildRoleImpl,
 ) : KookMemberRole {
+    override val sourceRole: Role get() = _role.sourceRole
     override val id: ID get() = sourceRole.roleId
     override val name: String get() = sourceRole.name
     override val permissions: Permissions get() = sourceRole.permissions

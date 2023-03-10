@@ -18,6 +18,7 @@
 package love.forte.simbot.component.kook.internal
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ExperimentalSimbotApi
@@ -26,18 +27,25 @@ import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.KookUserChat
+import love.forte.simbot.component.kook.internal.role.KookGuildRoleImpl
+import love.forte.simbot.component.kook.internal.role.KookMemberRoleImpl
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.model.UserModel
 import love.forte.simbot.component.kook.role.KookMemberRole
 import love.forte.simbot.component.kook.util.requestBy
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.guild.GuildMuteCreateRequest
 import love.forte.simbot.kook.api.guild.GuildMuteDeleteRequest
+import love.forte.simbot.kook.api.user.UserViewRequest
+import love.forte.simbot.literal
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.logger.logger
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.effectedItemsByFlow
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -52,17 +60,17 @@ internal class KookGuildMemberImpl(
 ) : KookGuildMember, CoroutineScope {
     private val job = SupervisorJob(guildInternal.job)
     override val coroutineContext: CoroutineContext = guildInternal.coroutineContext + job
-    
+
     private val muteLock = Mutex()
-    
+
     @Volatile
     private var muteJob: Job? = null
-    
-    
+
+
     override val nickname: String get() = source.nickname ?: ""
     override val username: String = source.username
     override val avatar: String = source.avatar
-    
+
     override val id: ID
         get() = source.id
 
@@ -74,13 +82,25 @@ internal class KookGuildMemberImpl(
      */
     @OptIn(ExperimentalSimbotApi::class)
     override val roles: Items<KookMemberRole>
-        get() {
+        get() = effectedItemsByFlow {
+            flow {
+                val view = UserViewRequest
+                    .create(source.id, guildInternal.id)
+                    .requestDataBy(bot)
+                val guildRoleMap = ConcurrentHashMap<String, KookGuildRoleImpl>()
+                guildInternal.roles.collect { r ->
+                    guildRoleMap[r.id.literal] = r
+                }
 
-            TODO()
+                view.roles.forEach { rid ->
+                    val role = guildRoleMap[rid.literal] ?: return@forEach
+                    emit(KookMemberRoleImpl(this@KookGuildMemberImpl, role))
+                }
+            }
         }
 
     override suspend fun guild(): KookGuild = guildInternal
-    
+
     // region mute相关
     override suspend fun unmute(type: Int): Boolean {
         // do unmute
@@ -95,7 +115,7 @@ internal class KookGuildMemberImpl(
             }
         }
     }
-    
+
     override suspend fun mute(durationMillis: Long, type: Int): Boolean {
         Simbot.require(durationMillis > 0) { "Duration millis must > 0, but $durationMillis" }
         // do mute
@@ -123,35 +143,35 @@ internal class KookGuildMemberImpl(
             }
         }
     }
-    
-    
+
+
     // endregion
-    
-    
+
+
     // region send 相关
-    
+
     private suspend fun asContact(): KookUserChat = bot.contact(id)
-    
+
     override suspend fun send(text: String): KookMessageCreatedReceipt {
         return asContact().send(text)
     }
-    
+
     override suspend fun send(message: Message): KookMessageReceipt {
         return asContact().send(message)
     }
-    
+
     override suspend fun send(message: MessageContent): KookMessageReceipt {
         return asContact().send(message)
     }
     // endregion
-    
-    
+
+
     override fun toString(): String {
         return "KookGuildMemberImpl(id=$id, username=$username, source=$source)"
     }
-    
+
     companion object {
         private val logger = LoggerFactory.logger<KookGuildMember>()
     }
-    
+
 }

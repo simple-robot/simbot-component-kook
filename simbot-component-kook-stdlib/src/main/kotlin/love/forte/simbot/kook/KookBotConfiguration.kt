@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ *  Copyright (c) 2022-2023 ForteScarlet <ForteScarlet@163.com>
  *
  *  本文件是 simbot-component-kook 的一部分。
  *
@@ -19,6 +19,7 @@ package love.forte.simbot.kook
 
 import io.ktor.client.*
 import io.ktor.client.engine.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -208,10 +209,12 @@ public class KookBotConfiguration {
         /**
          * [KookBotConfiguration] 默认使用的解析器。
          */
+        @OptIn(ExperimentalSerializationApi::class)
         public val defaultDecoder: Json = Json {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
+            explicitNulls = false
         }
     }
     

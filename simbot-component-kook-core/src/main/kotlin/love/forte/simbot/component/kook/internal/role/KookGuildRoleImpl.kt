@@ -20,8 +20,10 @@ package love.forte.simbot.component.kook.internal.role
 import io.ktor.http.*
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.component.kook.KookGuildMember
 import love.forte.simbot.component.kook.internal.KookComponentGuildBotImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
+import love.forte.simbot.component.kook.internal.KookGuildMemberImpl
 import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleUpdater
 import love.forte.simbot.component.kook.role.KookMemberRole
@@ -64,15 +66,24 @@ internal class KookGuildRoleImpl(
         val guildId = guild.id
         val member =
             guild.internalMember(memberId) ?: throw NoSuchElementException("member(id=$memberId) in guild(id=$guildId)")
-        // 赋予
+
+        return grantTo(member)
+    }
+
+    override suspend fun grantTo(member: KookGuildMember): KookMemberRole {
+        val guildId = guild.id
+        val impl = member as? KookGuildMemberImpl ?: kotlin.run {
+            val memberId = member.id
+            guild.internalMember(memberId) ?: throw NoSuchElementException("member(id=$memberId) in guild(id=$guildId)")
+        }
         val role = sourceRole
         GuildRoleGrantRequest.create(
             guildId,
-            member.id,
+            impl.id,
             role.roleId
         ).requestDataBy(_bot)
 
-        return KookMemberRoleImpl(member, role)
+        return KookMemberRoleImpl(impl, this)
     }
 
     /**
@@ -118,6 +129,13 @@ private class KookGuildRoleUpdaterImpl(
     override var permissions: Permissions? = null
 
     override suspend fun update() {
+        fun ifAllNull(vararg values: Any?): Boolean {
+            return values.all { it == null }
+        }
+        if (ifAllNull(name, color, isHoist, isMentionable, permissions)) {
+            // all null
+            return
+        }
         val updated = GuildRoleUpdateRequest.create(
             guildId = role.guild.id,
             roleId = role.id,

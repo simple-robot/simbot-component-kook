@@ -26,10 +26,7 @@ import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookChannelCategory
-import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.internal.KookComponentGuildBotImpl.Companion.toMemberBot
 import love.forte.simbot.component.kook.internal.role.KookGuildRoleImpl
 import love.forte.simbot.component.kook.model.GuildModel
@@ -41,6 +38,7 @@ import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.channel.ChannelListRequest
 import love.forte.simbot.kook.api.guild.GuildUser
 import love.forte.simbot.kook.api.guild.GuildUserListRequest
+import love.forte.simbot.kook.api.guild.role.GuildRoleCreateRequest
 import love.forte.simbot.kook.api.guild.role.GuildRoleListRequest
 import love.forte.simbot.kook.api.user.UserViewRequest
 import love.forte.simbot.literal
@@ -186,7 +184,7 @@ internal class KookGuildImpl private constructor(
     override fun getCategory(id: ID): KookChannelCategory? = internalChannelCategories[id.literal]
 
     @ExperimentalSimbotApi
-    override val roles: Items<KookGuildRole>
+    override val roles: Items<KookGuildRoleImpl>
         get() = itemsByFlow { prop ->
             val pageSize = prop.batch.takeIf { it > 0 } ?: PageRequestParameters.DEFAULT_MAX_PAGE_SIZE
             val limit = prop.limit.takeIf { it > 0 }
@@ -298,7 +296,13 @@ internal class KookGuildImpl private constructor(
             delay(batchDelay)
         } while (users.isNotEmpty() && usersResult.meta.page < usersResult.meta.pageTotal)
 
+
+
+
     }
+
+    @ExperimentalSimbotApi
+    override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(this)
 
 
     companion object {
@@ -311,3 +315,14 @@ internal class KookGuildImpl private constructor(
 }
 
 
+@OptIn(ExperimentalSimbotApi::class)
+private class KookGuildRoleCreatorImpl(
+    private val guild: KookGuildImpl,
+) : KookGuildRoleCreator {
+    override var name: String? = null
+
+    override suspend fun create(): KookGuildRole {
+        val role = GuildRoleCreateRequest.create(guild.id, name).requestDataBy(guild.bot)
+        return KookGuildRoleImpl(guild, role)
+    }
+}

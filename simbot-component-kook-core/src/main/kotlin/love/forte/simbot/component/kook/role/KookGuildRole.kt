@@ -22,6 +22,8 @@ import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.KookGuild
+import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.kook.api.KookApiException
 import love.forte.simbot.kook.objects.PermissionType
 import love.forte.simbot.kook.objects.Permissions
@@ -49,6 +51,26 @@ public interface KookGuildRole : KookRole {
     public suspend fun grantTo(memberId: ID): KookMemberRole
 
     /**
+     * 将当前角色赋予给指定用户 [member] 。
+     *
+     * @throws KookApiException API请求过程中产生的任何异常
+     */
+    public suspend fun grantTo(member: KookGuildMember): KookMemberRole
+
+
+    /**
+     * 将当前角色赋予给指定用户 [member] 。
+     *
+     * @throws KookApiException API请求过程中产生的任何异常
+     * @throws ClassCastException [member] 的类型不是 [KookGuildMember] 时
+     */
+    public suspend fun grantTo(member: GuildMember): KookMemberRole {
+        // KookGuildRole.grantTo 只支持 KookGuildMember 类型的 member
+        val kookMember = member as? KookGuildMember ?: throw ClassCastException("KookGuildRole.grantTo only support member of type KookGuildMember, but ${member::class}")
+        return grantTo(kookMember)
+    }
+
+    /**
      * 删除当前频道中对应的角色。
      *
      * 删除一个 [KookGuildRole] 后不应再进行其他操作。组件目前不会进行过多判断，但是可能会造成任何预期外的异常。
@@ -65,6 +87,18 @@ public interface KookGuildRole : KookRole {
 
 }
 
+/**
+ * 使用 Kotlin DSL 更新当前服务器角色信息。
+ *
+ * @see KookGuildRole.updater
+ *
+ * @return receiver 自身
+ */
+@ExperimentalSimbotApi
+public suspend inline fun <R : KookGuildRole> R.update(block: KookGuildRoleUpdater.() -> Unit): R {
+    updater().also(block).update()
+    return this
+}
 
 /**
  * 用于修改 [KookGuildRole] 的更新器，提供Kotlin DSL风格的API和Java的惯用API。
@@ -143,6 +177,7 @@ public interface KookGuildRoleUpdater {
      *
      * 如果更新成功，更新后的信息将会生效并刷新到当前对象中。
      *
+     * 如果没有配置任何属性，则 [update] 不会产生请求。
      */
     @JvmAsync
     @JvmBlocking
