@@ -32,6 +32,7 @@ import love.forte.simbot.component.kook.internal.role.KookGuildRoleImpl
 import love.forte.simbot.component.kook.model.GuildModel
 import love.forte.simbot.component.kook.model.toModel
 import love.forte.simbot.component.kook.role.KookGuildRole
+import love.forte.simbot.component.kook.role.KookGuildRoleCreator
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.PageRequestParameters
 import love.forte.simbot.kook.api.channel.ChannelInfo

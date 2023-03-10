@@ -214,6 +214,7 @@ public class KookBotConfiguration {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
+            // see https://github.com/kaiheila/api-docs/issues/174
             explicitNulls = false
         }
     }

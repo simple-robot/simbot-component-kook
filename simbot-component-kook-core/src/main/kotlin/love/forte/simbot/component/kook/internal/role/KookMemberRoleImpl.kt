@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook.internal.role
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.internal.KookGuildMemberImpl
+import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookMemberRole
 import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.kook.api.guild.role.GuildRoleRevokeRequest
@@ -39,6 +40,7 @@ internal class KookMemberRoleImpl(
     override val id: ID get() = sourceRole.roleId
     override val name: String get() = sourceRole.name
     override val permissions: Permissions get() = sourceRole.permissions
+    override val guildRole: KookGuildRole get() = _role
 
     override suspend fun delete(): Boolean {
         val api = GuildRoleRevokeRequest.create(

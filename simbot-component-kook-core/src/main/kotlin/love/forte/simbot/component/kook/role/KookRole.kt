@@ -32,10 +32,11 @@ import love.forte.simbot.kook.objects.Permissions
  * ### 可删除
  *
  * 实现 [DeleteSupport], 权限满足时可以对指定Role进行删除。
- * 根据实现类型的不同分别代表删除服务器中的角色与删除某用户当前拥有的角色。
+ * 根据实现类型的不同分别代表「删除服务器中的角色」与「删除某用户当前拥有的角色」。
  *
  * [KookRole] 是 [KookGuildRole] 和 [KookMemberRole] 的标准接口，更多内容参考它们的说明。
-
+ *
+ *
  * @see KookGuildRole
  * @see KookMemberRole
  *

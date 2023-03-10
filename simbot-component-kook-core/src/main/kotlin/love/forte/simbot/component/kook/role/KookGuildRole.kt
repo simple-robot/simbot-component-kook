@@ -31,11 +31,81 @@ import love.forte.simbot.kook.objects.Permissions
 /**
  * 代表一个频道服务器所拥有的角色。
  *
+ * ## 查询
+ *
+ * [KookGuildRole] 通过 [KookGuild.roles] 进行列表查询。
+ *
+ * ## 删除
+ *
+ * 当权限足够时，可以通过 [delete] 对某个角色进行删除。
+ *
+ * ## 更新
+ *
+ * 当权限足够时，可通过 [updater] 获取更新器进行更新。
+ * 当通过 [updater] 更新信息成功后，**当前** [KookGuildRole] 内部的信息会随之改变。
+ *
+ * 对Java来讲可以使用惯用的链式API：
+ *
+ * ```java
+ * role.updater()
+ *         .name("文丑")
+ *         .isHoist(true)
+ *         .permissions(123)
+ *         // other...
+ *         .updateBlocking(); // or updateAsync
+ * ```
+ *
+ * Kotlin则可以选择通过 [`update { ... }`][KookGuildRole.update]
+ * 使用DSL风格的API
+ *
+ * ```kotlin
+ * val updated = role.update { // suspend
+ *     name = "老生"
+ *     isHoist = true
+ *     color = 123
+ *     // other...
+ * }
+ * ```
+ *
+ * ## 赋予
+ *
+ * 一个 [KookGuildRole] 可以通过 [grantTo] 赋予给一个指定的成员，
+ * 并得到一个赋予后的 [KookMemberRole] 实例。
+ *
+ * ## 创建
+ *
+ * 通过 [KookGuild.roleCreator] 可以得到一个角色的构造器，
+ * 并在通过API创建角色成功后得到一个 [KookGuildRole] 实例。
+ *
+ * Java可以使用惯用的链式API:
+ *
+ * ```java
+ * KookGuildRole newRole = guild.roleCreator()
+ *         .name("青衣")
+ *         // other...
+ *         .createBlocking(); // or createAsync
+ * ```
+ *
+ * Kotlin可以通过 [`createRole { ... }`][KookGuild.createRole] 使用 DSL 风格的API:
+ *
+ * ```kotlin
+ * val newRole = role.createRole {
+ *     name = "花旦"
+ *     // other...
+ * }
+ * ```
+ *
+ * <hr />
+ *
+ * > 统一性说明参考 [KookRole]
+ *
  * @see KookRole
  *
  * @author ForteScarlet
  */
 @ExperimentalSimbotApi
+@JvmBlocking
+@JvmAsync
 public interface KookGuildRole : KookRole {
 
     /**
@@ -82,6 +152,8 @@ public interface KookGuildRole : KookRole {
 
     /**
      * 构建一个用于更新当前角色信息的 [KookGuildRoleUpdater].
+     *
+     * @see update
      */
     public fun updater(): KookGuildRoleUpdater
 
@@ -89,6 +161,15 @@ public interface KookGuildRole : KookRole {
 
 /**
  * 使用 Kotlin DSL 更新当前服务器角色信息。
+ *
+ * ```kotlin
+ * val updated = role.update { // suspend
+ *     name = "老生"
+ *     isHoist = true
+ *     color = 123
+ *     // other ...
+ * }
+ * ```
  *
  * @see KookGuildRole.updater
  *

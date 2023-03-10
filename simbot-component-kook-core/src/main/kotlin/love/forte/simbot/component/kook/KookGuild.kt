@@ -22,9 +22,9 @@ import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.role.KookGuildRole
+import love.forte.simbot.component.kook.role.KookGuildRoleCreator
 import love.forte.simbot.component.kook.role.KookRole
 import love.forte.simbot.definition.*
-import love.forte.simbot.kook.api.KookApiException
 import love.forte.simbot.utils.item.Items
 import kotlin.time.Duration
 import love.forte.simbot.kook.objects.Guild as KkGuild
@@ -180,49 +180,3 @@ public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
     override suspend fun previous(): Organization? = null
 }
 
-/**
- * 使用 DSL 风格API创建一个 [KookGuildRole].
- *
- * @see KookGuild.roleCreator
- */
-@ExperimentalSimbotApi
-public suspend inline fun KookGuild.createRole(block: KookGuildRoleCreator.() -> Unit): KookGuildRole {
-    return roleCreator().also(block).create()
-}
-
-/**
- * 服务器频道角色创建器。提供 Kotlin DSL风格的API和Java的惯用API。
- *
- * 通过 [KookGuild.roleCreator] 构建。
- *
- * 对于创建角色来说，[API](https://developer.kookapp.cn/doc/http/guild-role#%E5%88%9B%E5%BB%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A7%92%E8%89%B2)
- * 仅提供了 `name` 属性。如果希望指定其他属性，考虑在创建后使用 [KookGuildRole.updater] 进行属性更新。
- *
- */
-@ExperimentalSimbotApi
-public interface KookGuildRoleCreator {
-
-    //region DSL API
-    /**
-     * 角色名称。如果不写，则为"新角色"
-     */
-    public var name: String?
-    //endregion
-
-
-    /**
-     * 角色名称。如果不写，则为"新角色"
-     * @see name
-     */
-    public fun name(value: String): KookGuildRoleCreator = also { name = value }
-
-
-    /**
-     * 创建一个新角色。
-     *
-     * @throws KookApiException 任何在API请求过程中产生的异常
-     *
-     * @return 创建的角色
-     */
-    public suspend fun create(): KookGuildRole
-}

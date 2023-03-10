@@ -12,10 +12,3 @@ core模块实现 `simbot-api` 和 `simbot-core` 中绝大多数（可以被支�
 
 与角色相关的内容，例如频道服务器的角色配置或某用户拥有的角色信息。
 
-```
-KookRole
-
-KookGuildRole
-KookMemberRole
-```
-
