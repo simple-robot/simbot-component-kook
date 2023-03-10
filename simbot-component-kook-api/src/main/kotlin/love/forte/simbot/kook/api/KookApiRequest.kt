@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2021-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 @file:JvmName("ApiDataUtil")
@@ -29,17 +29,13 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
 import love.forte.simbot.kook.Kook
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_BUCKET
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_GLOBAL
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_LIMIT
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_REMAINING
-import love.forte.simbot.kook.api.RateLimit.Companion.X_RATE_LIMIT_RESET
 import love.forte.simbot.logger.LoggerFactory
-import love.forte.simbot.utils.runInBlocking
+import love.forte.simbot.util.api.requestor.API
+import love.forte.simbot.utils.runInNoScopeBlocking
 import love.forte.simbot.utils.runWithInterruptible
 import java.util.function.Consumer
 
-private val logger = LoggerFactory.getLogger("KookApiRequest.debug")
+internal val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
 
 /**
  * 代表、包装了一个 Kook api的请求。
@@ -53,7 +49,7 @@ private val logger = LoggerFactory.getLogger("KookApiRequest.debug")
  * ### 不可变
  * 此接口的实现类应当是不可变、可复用的。
  */
-public abstract class KookApiRequest<T> {
+public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
     /**
      * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [Kook].
@@ -81,18 +77,23 @@ public abstract class KookApiRequest<T> {
     }
 
 
+    @JvmSynthetic
+    override suspend fun requestBy(requestor: KookApiRequestor): T {
+        return requestData(
+            requestor.client,
+            requestor.authorization,
+            DEFAULT_JSON
+        )
+    }
+
+    @Api4J
+    public fun requestBlockingBy(requester: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requester) }
+
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
      * @param client 使用的 [HttpClient] 实例。
      * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
-     * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
-     * ```kotlin
-     * Json {
-     *      isLenient = true
-     *      ignoreUnknownKeys = true
-     *  }
-     * ```
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
@@ -105,29 +106,43 @@ public abstract class KookApiRequest<T> {
     public open suspend fun request(
         client: HttpClient,
         authorization: String,
-        decoder: Json = DEFAULT_JSON,
         postChecker: suspend (HttpResponse) -> Unit = {}
     ): ApiResult {
+        val apiId: String? = if (apiLogger.isDebugEnabled) {
+            "${method.value} ${url.encodedPath}"
+        } else null
+
+        if (this is KookPostRequest) {
+            apiLogger.debug("API[{}] ======> query: {}, body: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" }, body)
+        } else {
+            apiLogger.debug("API[{}] ======> query: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" })
+        }
+
         val response = requestForResponse(client, authorization) {
             requestFinishingAction()
         }
 
+        apiLogger.debug("API[{}] <====== status: {}, response: {}", apiId, response.status, response)
+
         postChecker(response)
-    
-        logger.trace("api request response.body(), response: {}", response)
-        
-        val result: ApiResult = response.body()
-    
-        logger.trace("api request result pre rate limit: {}", result)
-        
+
+        apiLogger.debug("API[{}] <====== post checker", apiId)
+
+        val result: ApiResult = response.body<ApiResult>().also {
+            it.httpStatusCode = response.status.value
+            it.httpStatusDescription = response.status.description
+        }
+
+        apiLogger.debug("API[{}] <====== result: {}", apiId, result)
+
         // init rate limit info.
         val headers = response.headers
 
-        val limit = headers[X_RATE_LIMIT_LIMIT]?.toLongOrNull() // ?: RateLimit.DEFAULT.limit
-        val remaining = headers[X_RATE_LIMIT_REMAINING]?.toLongOrNull() // ?: RateLimit.DEFAULT.remaining
-        val reset = headers[X_RATE_LIMIT_RESET]?.toLongOrNull() // ?: RateLimit.DEFAULT.reset
-        val bucket = headers[X_RATE_LIMIT_BUCKET] // ?: RateLimit.DEFAULT.bucket
-        val global = headers[X_RATE_LIMIT_GLOBAL] != null
+        val limit = headers.rateLimit
+        val remaining = headers.rateRemaining
+        val reset = headers.rateReset
+        val bucket = headers.rateBucket
+        val global = headers.isRateGlobal
 
         val rateLimit = if (limit != null || remaining != null || reset != null || bucket != null || global) {
             RateLimit(
@@ -136,15 +151,18 @@ public abstract class KookApiRequest<T> {
                 reset ?: RateLimit.DEFAULT.reset,
                 bucket ?: RateLimit.DEFAULT.bucket,
                 global
-            )
+            ).also {
+                apiLogger.debug("API[{}] <====== rate limit: {}", apiId, it)
+            }
         } else {
-            RateLimit.DEFAULT
+            RateLimit.DEFAULT.also {
+                apiLogger.debug("API[{}] <====== rate limit: {} (DEFAULT)", apiId, it)
+            }
         }
 
+
         result.rateLimit = rateLimit
-    
-        logger.trace("api request result: {}", result)
-    
+
         return result
     }
 
@@ -154,13 +172,6 @@ public abstract class KookApiRequest<T> {
      *
      * @param client 使用的 [HttpClient] 实例。
      * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
-     * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
-     * ```kotlin
-     * Json {
-     *      isLenient = true
-     *      ignoreUnknownKeys = true
-     *  }
-     * ```
      *
      * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
      *
@@ -175,10 +186,9 @@ public abstract class KookApiRequest<T> {
     public open fun requestBlocking(
         client: HttpClient,
         authorization: String,
-        decoder: Json = DEFAULT_JSON,
         postChecker: Consumer<HttpResponse> = defaultRequestPostChecker
-    ): ApiResult = runInBlocking {
-        request(client, authorization, decoder) { resp ->
+    ): ApiResult = runInNoScopeBlocking {
+        request(client, authorization) { resp ->
             runWithInterruptible { postChecker.accept(resp) }
         }
     }
@@ -194,15 +204,18 @@ public abstract class KookApiRequest<T> {
      * Json {
      *      isLenient = true
      *      ignoreUnknownKeys = true
+     *      encodeDefaults = true
      *  }
      * ```
      *
      */
     @JvmSynthetic
     public open suspend fun requestData(
-        client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
+        client: HttpClient,
+        authorization: String,
+        decoder: Json = DEFAULT_JSON
     ): T {
-        val result = request(client, authorization, decoder)
+        val result = request(client, authorization)
         return result.parseDataOrThrow(decoder, resultDeserializer)
     }
 
@@ -225,13 +238,14 @@ public abstract class KookApiRequest<T> {
     @JvmOverloads
     public open fun requestDataBlocking(
         client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
-    ): T = runInBlocking { requestData(client, authorization, decoder) }
+    ): T = runInNoScopeBlocking { requestData(client, authorization, decoder) }
 
 
     public companion object {
         internal val DEFAULT_JSON = Json {
             isLenient = true
             ignoreUnknownKeys = true
+            encodeDefaults = true
         }
 
         internal val defaultRequestPostChecker: Consumer<HttpResponse> = Consumer {}

@@ -1,6 +1,6 @@
 # Simple Robot Kook 组件
 
-此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [Kook](https://www.kookapp.cn/) 的组件支持。
+此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK](https://www.kookapp.cn/) 的组件支持。
 
 更多详情请参考 [simbot3][simbot3] 或者 [simbot3官网](https://simbot.forte.love)。
 
@@ -16,45 +16,114 @@
 当前版本处于 **`ALPHA`** 版本阶段，即代表：
 - 可能存在诸多[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)和未知问题，
 - 不保证API的稳定与兼容（可能随时发布存在不兼容内容的更新）
-- 需要[反馈](https://github.com/simple-robot/simbot-component-kook/issues)或[PR](https://github.com/simple-robot/simbot-component-kook/pulls)协助
+- 需要[**反馈**](https://github.com/simple-robot/simbot-component-kook/issues)或[**PR协助**](https://github.com/simple-robot/simbot-component-kook/pulls)
 
-## 模块引导
+## 使用
 
-### API
+<details open>
+<summary>Gradle Kotlin DSL</summary>
 
-[api模块][m-api] 是用于提供对Kook中各内容（例如事件、API、对象等）的定义模块。此模块依赖 `simbot-api`，但仅最低限度的实现 `simbot-api` 中的部分类型，
-不实现任何功能性内容（例如只实现 `id`、`username` 属性的获取，但是不考虑诸如 **消息发送** 等相关内容的实现 ）。
+**使用api模块**
 
-此模块定义封装Kook中绝大多数的API（例如获取属性、发送消息等）供于其他模块或外界使用。
-API的封装于定义基于 [Ktor（v2）](https://ktor.io/)，如果仅希望获得一些对API的基本封装，则可以考虑单独使用此模块。
+```kotlin
+implementation("love.forte.simbot.component:simbot-component-kook-api:$CP_KOOK_VERSION")
+```
 
-👉 [前往模块][m-api] 查看更多
+**使用stdlib模块**
 
-### STDLIB
+```kotlin
+implementation("love.forte.simbot.component:simbot-component-kook-stdlib:$CP_KOOK_VERSION")
+```
 
-[stdlib模块][m-stdlib] 基于 [api模块][m-api]，是对 Kook Bot 的最**基础**实现。
-stdlib意为标准库，其宗旨在于实现完整的 Kook Bot 对事件的接收与处理，并尽可能保留事件最原始的状态（不做过多的封装）。
+**使用core模块**
 
-标准库实现 Kook Bot 最基础的事件监听（`websocket based`），而对于功能交互则需要开发者自行借助 [api模块][m-api] 中提供的内容来完成，
-这可以使得开发者对整个事件处理流程中拥有更多的掌控性或发挥空间。
+```kotlin
+implementation("love.forte.simbot:simbot-core:$SIMBOT_VERSION") // 必须显式引用simbot核心库（或其他衍生库，比如spring boot starter）
+implementation("love.forte.simbot.component:simbot-component-kook-core:$CP_KOOK_VERSION")
+```
 
-如果你希望通过更原生的方式开发 Kook Bot ，可以考虑直接使用stdlib模块。
+</details>
 
-👉 [前往模块][m-stdlib] 查看更多
+<details>
+<summary>Gradle Groovy</summary>
 
-### CORE
+**使用api模块**
 
-[core模块][m-core] 基于 [stdlib模块][m-stdlib]，是通过 [stdlib模块][m-stdlib] 对 [simbot3][simbot3]
-内容的封装，是 [simbot3][simbot3] 的 **Kook组件** (simbot-component-kook) 。
+```groovy
+implementation 'love.forte.simbot.component:simbot-component-kook-api:$CP_KOOK_VERSION'
+```
 
-通过 [core模块][m-core] 你可以使用 [simbot3][simbot3] 风格的API进行快速开发，并与其他支持的组件进行协同。
-[core模块][m-core] 实现 `simbot-api` 和 `simbot-core` 中绝大多数（可以被支持的）功能，包括事件的实现和功能性API等。
+**使用stdlib模块**
 
-如果你希望使用拥有更高封装性的API或与其他simbot组件协同，又或是与Spring Boot整合，那么 [core模块][m-core] 可以是一种参考。
+```groovy
+implementation 'love.forte.simbot.component:simbot-component-kook-stdlib:$CP_KOOK_VERSION'
+```
 
-👉 [前往模块][m-core] 查看更多
+**使用core模块**
+
+```groovy
+implementation 'love.forte.simbot:simbot-core:$SIMBOT_VERSION' // 必须显式引用simbot核心库（或其他衍生库，比如spring boot starter）
+implementation 'love.forte.simbot.component:simbot-component-kook-core:$CP_KOOK_VERSION'
+```
+
+</details>
+
+<details>
+<summary>Maven</summary>
+
+**使用api模块**
+
+```xml
+<dependency>
+    <groupId>love.forte.simbot.component</groupId>
+    <artifactId>simbot-component-kook-api</artifactId>
+    <version>${CP_KOOK_VERSION}</version>
+</dependency>
+```
+
+**使用stdlib模块**
+
+```xml
+<dependency>
+    <groupId>love.forte.simbot.component</groupId>
+    <artifactId>simbot-component-kook-stdlib</artifactId>
+    <version>${CP_KOOK_VERSION}</version>
+</dependency>
+```
+
+**使用core模块**
+
+```xml
+<!-- 必须显式引用simbot核心库（或其他衍生库，比如spring boot starter） -->
+<dependency>
+    <groupId>love.forte.simbot</groupId>
+    <artifactId>simbot-core</artifactId>
+    <version>${CP_KOOK_VERSION}</version>
+</dependency>
+<dependency>
+    <groupId>love.forte.simbot.component</groupId>
+    <artifactId>simbot-component-kook-core</artifactId>
+    <version>${CP_KOOK_VERSION}</version>
+</dependency>
+```
+
+</details>
+
+
+> simbot版本前往 [simbot3核心库][simbot3] 参考
+
+
+## 文档
+
+基本的核心API都由 [simbot3核心库][simbot3] 定义并提供。
+
+KDoc (APIDoc) 可以前往 [文档引导](https://docs.simbot.forte.love) 处前往并查看 [KOOK文档](https://docs.simbot.forte.love/components/kook) 。
 
 ## 走马观花
+
+<details>
+<summary>简单示例</summary>
+
 
 ```kotlin
 // simbot-core / simbot-boot
@@ -62,7 +131,6 @@ suspend fun KookContactMessageEvent.onEvent() {
     author().send("Hello World")
 }
 ```
-
 
 ```kotlin
 // simbot-boot
@@ -111,7 +179,25 @@ suspend fun main() {
 }
 ```
 
+</details>
 
+
+## License
+
+`simbot-component-kook` 使用 `LGPLv3` 许可证开源。
+
+```
+This program is free software: you can redistribute it and/or modify it under the terms of 
+the GNU Lesser General Public License as published by the Free Software Foundation, either 
+version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with this 
+program. If not, see <https://www.gnu.org/licenses/>.
+```
 
 [m-api]: simbot-component-kook-api
 [m-stdlib]: simbot-component-kook-stdlib

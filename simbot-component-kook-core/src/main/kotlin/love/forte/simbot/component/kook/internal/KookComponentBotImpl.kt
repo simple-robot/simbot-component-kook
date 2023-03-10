@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.internal
@@ -144,7 +144,7 @@ internal class KookComponentBotImpl(
             var page = 1
             do {
                 bot.logger.debug("Sync guild data ... page {}", page)
-                val guildsResult = GuildListRequest(page = page).requestDataBy(this@KookComponentBotImpl)
+                val guildsResult = GuildListRequest.create(page = page).requestDataBy(this@KookComponentBotImpl)
                 val guilds = guildsResult.items
                 bot.logger.debug("{} guild data synchronized in page {}", guilds.size, page)
                 guilds.forEach {
@@ -305,7 +305,7 @@ internal class KookComponentBotImpl(
     
     // region friend api
     override suspend fun contact(id: ID): KookUserChatImpl {
-        val chat = UserChatCreateRequest(id).requestDataBy(bot)
+        val chat = UserChatCreateRequest.create(id).requestDataBy(bot)
         return KookUserChatImpl(this, chat.toModel())
     }
     
@@ -335,7 +335,7 @@ internal class KookComponentBotImpl(
      */
     @JvmSynthetic
     override suspend fun uploadAsset(resource: Resource, type: Int): KookSimpleAssetMessage {
-        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        val asset = AssetCreateRequest.create(resource).requestDataBy(this)
         return asset.asMessage(type)
     }
     
@@ -354,7 +354,7 @@ internal class KookComponentBotImpl(
 
     
     override suspend fun uploadAssetImage(resource: Resource): KookAssetImage {
-        val asset = AssetCreateRequest(resource).requestDataBy(this)
+        val asset = AssetCreateRequest.create(resource).requestDataBy(this)
         return asset.asImage()
     }
     
@@ -381,7 +381,7 @@ internal class KookComponentBotImpl(
                         // query user info.
                         val guild = internalGuild(this.targetId) ?: return
                         val userInfo =
-                            UserViewRequest(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
+                            UserViewRequest.create(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
                         guild.internalMembers.compute(body.userId.literal) { _, current ->
@@ -431,7 +431,7 @@ internal class KookComponentBotImpl(
                         
                         internalGuilds[guildId]?.also { guild ->
                             // query channel info.
-                            val channelView = ChannelViewRequest(channelId).requestDataBy(this@KookComponentBotImpl)
+                            val channelView = ChannelViewRequest.create(channelId).requestDataBy(this@KookComponentBotImpl)
                             val channelModel = channelView.toModel()
                             guild.computeMergeChannelModel(channelModel)
                         }
@@ -502,7 +502,7 @@ internal class KookComponentBotImpl(
                     }
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
-                        val guildInfo = GuildViewRequest(body.guildId).requestDataBy(this@KookComponentBotImpl)
+                        val guildInfo = GuildViewRequest.create(body.guildId).requestDataBy(this@KookComponentBotImpl)
                         val guildModel = guildInfo.toModel()
                         val newGuild = guildModel.toKookGuild(this@KookComponentBotImpl)
                         internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->

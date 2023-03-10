@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api.asset
@@ -36,29 +36,43 @@ import java.net.URL
 
 
 /**
- *
  * [上传媒体文件](https://developer.kaiheila.cn/doc/http/asset).
  *
  * 创建（上传）文件资源，例如图片等。
  *
  *
- * @param resource 资源对象。
- * @param name 需要能够体现出文件的扩展名（例如 `mov`, `jpg`），否则尽可能提供 `resourceContentType` 参数。
- * @param resourceContentType 资源的content类型。
  * @author ForteScarlet
  */
-public class AssetCreateRequest(
+public class AssetCreateRequest internal constructor(
     private val resource: Resource,
     private val name: String? = resource.name,
     resourceContentType: ContentType? = null
 ) : KookPostRequest<AssetCreated>(false) {
     public companion object Key : BaseKookApiRequestKey("asset", "create") {
         private val logger = LoggerFactory.getLogger("love.forte.simbot.kook.api.asset.AssetCreateRequest")
+        
+        /**
+         * 构造一个 [AssetCreateRequest].
+         *
+         * @param resource 资源对象。
+         * @param name 需要能够体现出文件的扩展名（例如 `mov`, `jpg`），否则尽可能提供 `resourceContentType` 参数。
+         * @param resourceContentType 资源的content类型。
+         
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            resource: Resource,
+            name: String? = resource.name,
+            resourceContentType: ContentType? = null
+        ): AssetCreateRequest {
+            return AssetCreateRequest(resource, name, resourceContentType)
+        }
     }
-
+    
     private val contentType: ContentType
     private val inputProvider = InputProvider { resource.openStream().asInput() }
-
+    
     init {
         contentType = resourceContentType ?: run {
             val index = name?.lastIndexOf('.') ?: -1
@@ -76,15 +90,15 @@ public class AssetCreateRequest(
                 }
             }
         }
-
-
+        
+        
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out AssetCreated>
         get() = AssetCreated.serializer()
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun HttpRequestBuilder.requestFinishingAction() {
         setBody(this@AssetCreateRequest.body ?: EmptyContent)
         onUpload { bytesSentTotal, contentLength ->
@@ -97,17 +111,12 @@ public class AssetCreateRequest(
                 )
             }
         }
-        // headers {
-        //     //remove(HttpHeaders.ContentType)
-        //     this[HttpHeaders.ContentType] // = ContentType.Application
-        // }
     }
-
+    
     override fun createBody(): Any {
-
         return MultiPartFormDataContent(
             formData {
-
+                
                 val headers = headersOf(
                     if (name != null) {
                         HttpHeaders.ContentDisposition to listOf("filename=$name")
@@ -115,7 +124,7 @@ public class AssetCreateRequest(
                         HttpHeaders.ContentDisposition to listOf("filename=simbot-${RandomIDUtil.randomID()}")
                     }
                 )
-
+                
                 append(
                     "file",
                     inputProvider,
@@ -124,8 +133,8 @@ public class AssetCreateRequest(
             }
         )
     }
-
-
+    
+    
 }
 
 /**
@@ -133,7 +142,7 @@ public class AssetCreateRequest(
  */
 @Serializable
 public data class AssetCreated @ApiResultType constructor(val url: String) {
-
+    
     /**
      * 通过 [url] 构建一个 [URLResource].
      */

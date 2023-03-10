@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api.guild.role
@@ -34,24 +34,33 @@ import love.forte.simbot.kook.api.KookPostRequest
  * `/api/v3/guild-role/revoke`
  *
  */
-public class GuildRoleRevokeRequest(
-    /** 服务器ID */
+public class GuildRoleRevokeRequest internal constructor(
     private val guildId: ID,
-    /** 角色ID */
     private val roleId: ID,
-    /** 用户ID */
     private val userId: ID,
 ) : KookPostRequest<UserRoleOperated>() {
-    public companion object Key : BaseKookApiRequestKey("guild-role", "revoke")
-
+    public companion object Key : BaseKookApiRequestKey("guild-role", "revoke") {
+        
+        /**
+         * 构造 [GuildRoleRevokeRequest]
+         * @param guildId 服务器ID
+         * @param roleId 角色ID
+         * @param userId 用户ID
+         */
+        @JvmStatic
+        public fun create(guildId: ID, roleId: ID, userId: ID): GuildRoleRevokeRequest =
+            GuildRoleRevokeRequest(guildId, roleId, userId)
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out UserRoleOperated>
         get() = UserRoleOperated.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun createBody(): Any = Body(guildId, roleId, userId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("guild_id")

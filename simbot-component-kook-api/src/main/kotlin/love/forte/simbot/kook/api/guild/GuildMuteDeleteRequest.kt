@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2021-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api.guild
@@ -33,38 +33,39 @@ import love.forte.simbot.kook.api.KookPostRequest
  * request method: POST
  *
  */
-public class GuildMuteDeleteRequest(
-    /** 服务器id */
-    guildId: ID,
-    /** 用户id */
-    userId: ID,
-    /**
-     * 1代表麦克风闭麦，2代表耳机静音
-     *
-     * @see GuildMuteType.TYPE_MICROPHONE
-     * @see GuildMuteType.TYPE_EARPHONE
-     */
-    type: Int
+public class GuildMuteDeleteRequest internal constructor(
+    guildId: ID, userId: ID, type: Int
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("guild-mute", "delete")
-
+    public companion object Key : BaseKookApiRequestKey("guild-mute", "delete") {
+        
+        /**
+         * 构造 [GuildMuteDeleteRequest].
+         * @param guildId 服务器id
+         * @param userId 用户id
+         * @param type 静音类型
+         * - 麦克风闭麦: 1 ([GuildMuteType.TYPE_MICROPHONE])
+         * - 耳机静音: 2 ([GuildMuteType.TYPE_EARPHONE])
+         *
+         * @see GuildMuteType
+         */
+        @JvmStatic
+        public fun create(guildId: ID, userId: ID, type: Int): GuildMuteDeleteRequest =
+            GuildMuteDeleteRequest(guildId, userId, type)
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit>
         get() = Unit.serializer()
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override val body: Any = Body(guildId, userId, type)
-
+    
     @Serializable
     private data class Body(
         /** 服务器id */
-        @SerialName("guild_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val guildId: ID,
+        @SerialName("guild_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val guildId: ID,
         /** 用户id */
-        @SerialName("user_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val userId: ID,
+        @SerialName("user_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val userId: ID,
         /** 1代表麦克风闭麦，2代表耳机静音 */
         val type: Int
     )

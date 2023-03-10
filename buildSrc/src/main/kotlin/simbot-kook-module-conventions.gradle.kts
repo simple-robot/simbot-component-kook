@@ -1,22 +1,25 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.repository.Repositories
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import java.net.URL
 
 /*
  *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
@@ -49,7 +52,6 @@ if (isSnapshot()) {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         url = uri(Repositories.Snapshot.URL)
@@ -99,15 +101,68 @@ configurations.all {
 
 
 //// show project info
-println("========================================================")
-println("== project.group:   ${group}")
-println("== project.name:    ${name}")
-println("== project.version: ${version}")
-println("========================================================")
+logger.info("========================================================")
+logger.info("== project.group:   ${group}")
+logger.info("== project.name:    ${name}")
+logger.info("== project.version: ${version}")
+logger.info("========================================================")
 
 idea {
     module {
         isDownloadSources = true
         isDownloadJavadoc = true
+    }
+}
+
+//// dokka
+
+tasks.withType<DokkaTaskPartial>().configureEach {
+    dokkaSourceSets.configureEach {
+        version = P.version.toString()
+        documentedVisibilities.set(listOf(DokkaConfiguration.Visibility.PUBLIC, DokkaConfiguration.Visibility.PROTECTED))
+        reportUndocumented.set(true)
+        if (project.file("README.md").exists()) {
+            includes.from("README.md")
+        }
+        
+        
+        // samples
+        samples.from(
+            project.files(),
+            project.files("src/samples/samples"),
+        )
+        
+        sourceLink {
+            localDirectory.set(projectDir.resolve("src"))
+            val relativeTo = projectDir.relativeTo(rootProject.projectDir)
+            remoteUrl.set(URL("${P.HOMEPAGE}/tree/main/$relativeTo/src"))
+            remoteLineSuffix.set("#L")
+        }
+        
+        perPackageOption {
+            matchingRegex.set(".*internal.*") // will match all .internal packages and sub-packages
+            suppress.set(true)
+        }
+        
+        
+        
+        fun externalDocumentation(docUrl: URL) {
+            externalDocumentationLink {
+                url.set(docUrl)
+                packageListUrl.set(URL(docUrl, "${docUrl.path}/package-list"))
+            }
+        }
+        
+        // kotlin-coroutines doc
+        externalDocumentation(URL("https://kotlinlang.org/api/kotlinx.coroutines"))
+        
+        // kotlin-serialization doc
+        externalDocumentation(URL("https://kotlinlang.org/api/kotlinx.serialization"))
+        
+        // ktor
+        externalDocumentation(URL("https://api.ktor.io"))
+        
+        // simbot doc
+        externalDocumentation(URL("https://docs.simbot.forte.love/main"))
     }
 }

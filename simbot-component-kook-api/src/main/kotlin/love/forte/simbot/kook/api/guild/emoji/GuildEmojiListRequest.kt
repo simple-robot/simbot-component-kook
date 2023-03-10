@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2023. ForteScarlet.
+ *
+ * This file is part of simbot-component-kook.
+ *
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package love.forte.simbot.kook.api.guild.emoji
 
 import io.ktor.http.*
@@ -18,15 +35,22 @@ import love.forte.simbot.literal
  *
  * @author ForteScarlet
  */
-public class GuildEmojiListRequest(
+public class GuildEmojiListRequest internal constructor(
     private val guildId: ID,
-    private val pageRequest: PageRequestParameters? = null,
+    private val pageRequest: PageRequestParameters?,
 ) : KookGetRequest<KookApiResult.ListData<GuildEmojiData>>() {
-    public constructor(guildId: ID): this(guildId, null)
-    
     public companion object Key : BaseKookApiRequestKey("guild-emoji", "list") {
         private val serializer = KookApiResult.ListData.serializer(GuildEmojiDataImpl.serializer())
-        
+    
+        /**
+         * 构建 [GuildEmojiListRequest].
+         * @param guildId 频道服务器ID
+         * @param pageRequest 分页信息
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(guildId: ID, pageRequest: PageRequestParameters? = null): GuildEmojiListRequest
+            = GuildEmojiListRequest(guildId, pageRequest)
     }
     
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<GuildEmojiData>>

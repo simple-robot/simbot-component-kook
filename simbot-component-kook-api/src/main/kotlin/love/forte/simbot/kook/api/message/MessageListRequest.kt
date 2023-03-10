@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api.message
@@ -30,29 +30,29 @@ import love.forte.simbot.kook.api.appendIfNotnull
  *
  * @author ForteScarlet
  */
-public class MessageListRequest(
+public class MessageListRequest internal constructor(
     /**
      * 频道 id
      */
     private val targetId: ID,
-
+    
     /**
      * 参考消息 id，不传则默认为最新的消息 id
      */
     private val msgId: ID? = null,
-
+    
     /**
      * 是否查询置顶消息（置顶消息只支持查询最新的消息）。
      */
     private val pin: Boolean = false,
-
+    
     /**
      * 查询模式，有三种模式可以选择。不传则默认查询最新的消息.
      *
      * @see MessageListFlag
      */
     private val flag: MessageListFlag? = null,
-
+    
     /**
      * 当前分页消息数量, 如果小于等于零则不提供此参数。服务器此参数默认 50
      */
@@ -60,14 +60,33 @@ public class MessageListRequest(
 ) : KookGetRequest<KookApiResult.ListData<ChannelMessageDetails>>() {
     public companion object Key : BaseKookApiRequestKey("message", "list") {
         private val serializer = KookApiResult.ListData.serializer(ChannelMessageDetailsImpl.serializer())
+        
+        /**
+         * 构造 [MessageListRequest]
+         * @param targetId 频道 id
+         * @param msgId 参考消息 id，不传则默认为最新的消息 id
+         * @param pin 是否查询置顶消息（置顶消息只支持查询最新的消息）。
+         * @param flag 查询模式，有三种模式可以选择。不传则默认查询最新的消息.
+         * @param pageSize 当前分页消息数量, 如果小于等于零则不提供此参数。服务器此参数默认 50
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            targetId: ID,
+            msgId: ID? = null,
+            pin: Boolean = false,
+            flag: MessageListFlag? = null,
+            pageSize: Int = -1
+        ): MessageListRequest =
+            MessageListRequest(targetId, msgId, pin, flag, pageSize)
     }
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelMessageDetails>>
         get() = serializer
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("target_id", targetId.toString())
         appendIfNotnull("msgId", msgId)

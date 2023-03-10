@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
- *  
- *  本文件是 simbot-component-kook 的一部分。
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * This file is part of simbot-component-kook.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:  
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *  
- *   
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 package love.forte.simbot.kook.api.message
 
@@ -30,35 +30,55 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * *无返回参数*
  */
-public class MessageUpdateRequest(
+public class MessageUpdateRequest internal constructor(
     /**
      * 消息 id
      */
     private val msgId: ID,
-
+    
     /**
      * 消息内容
      */
     private val content: String,
-
+    
     /**
      * 回复某条消息的 msgId。如果为空
      * （为空大概指空字符串：`""`，可以使用 [CharSequenceID.EMPTY] 或者 `"".ID` ），
      * 则代表删除回复，不传则无影响。
      */
     private val quote: ID? = null,
-
+    
     /**
      * 用户 id，针对特定用户临时更新消息，必须是正常消息才能更新。与发送临时消息概念不同，但同样不保存数据库。
      */
     private val tempTargetId: ID? = null,
 ) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("message", "update")
-
+    public companion object Key : BaseKookApiRequestKey("message", "update") {
+    
+        /**
+         *
+         * @param msgId 消息 id
+         * @param content 消息内容
+         * @param quote 回复某条消息的 msgId。如果为空
+         * （为空大概指空字符串：`""`，可以使用 [CharSequenceID.EMPTY] 或者 `"".ID` ）
+         * 则代表删除回复，不传则无影响。
+         * @param tempTargetId 用户 id，针对特定用户临时更新消息，必须是正常消息才能更新。与发送临时消息概念不同，但同样不保存数据库。
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            msgId: ID,
+            content: String,
+            quote: ID? = null,
+            tempTargetId: ID? = null,
+        ): MessageUpdateRequest =
+            MessageUpdateRequest(msgId, content, quote, tempTargetId)
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(msgId, content, quote, tempTargetId)
-
+    
     @Serializable
     private data class Body(
         @SerialName("msg_id")
@@ -83,4 +103,4 @@ public fun MessageCreated.toUpdate(
     content: String,
     quote: ID? = null
 ): MessageUpdateRequest =
-    MessageUpdateRequest(msgId, content, quote)
+    MessageUpdateRequest.create(msgId, content, quote)

@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
- *  
- *  本文件是 simbot-component-kook 的一部分。
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * This file is part of simbot-component-kook.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:  
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *  
- *   
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 package love.forte.simbot.kook.api.message
 
@@ -28,7 +28,7 @@ import love.forte.simbot.kook.api.KookPostRequest
  *
  * @author ForteScarlet
  */
-public class MessageCreateRequest(
+public class MessageCreateRequest internal constructor(
     /**
      * 消息类型, 见[type], 不传默认为1, 代表文本类型。9代表 kmarkdown 消息, 10代表卡片消息。
      *
@@ -39,59 +39,76 @@ public class MessageCreateRequest(
      * @see MessageType
      */
     private val type: Int = MessageType.TEXT.type,
-
+    
     /**
      * 	目标频道 id
      */
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    private val targetId: ID,
-
+    @Serializable(ID.AsCharSequenceIDSerializer::class) private val targetId: ID,
+    
     /**
      * 	消息内容
      */
     private val content: String,
-
+    
     /**
      * 回复某条消息的 msgId
      */
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    private val quote: ID? = null,
-
+    @Serializable(ID.AsCharSequenceIDSerializer::class) private val quote: ID? = null,
+    
     /**
-     * nonce, 服务端不做处理, 原样返回
+     * 服务端不做处理, 原样返回
      */
     private val nonce: String? = null,
-
+    
     /**
      * 用户id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。用于在频道内针对用户的操作进行单独的回应通知等。
      */
-    @Serializable(ID.AsCharSequenceIDSerializer::class)
-    private val tempTargetId: ID? = null,
+    @Serializable(ID.AsCharSequenceIDSerializer::class) private val tempTargetId: ID? = null,
 ) : KookPostRequest<MessageCreated>() {
-    public companion object Key : BaseKookApiRequestKey("message", "create")
-
+    public companion object Key : BaseKookApiRequestKey("message", "create") {
+        
+        /**
+         * 构造 [MessageCreateRequest]
+         * @param type 消息类型, 见[type], 不传默认为1, 代表文本类型。9代表 kmarkdown 消息, 10代表卡片消息。
+         * @param targetId 目标频道 id
+         * @param content 消息内容
+         * @param quote 回复某条消息的 msgId
+         * @param nonce 服务端不做处理, 原样返回
+         * @param tempTargetId 用户id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。
+         * 用于在频道内针对用户的操作进行单独的回应通知等。
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            type: Int = MessageType.TEXT.type,
+            targetId: ID,
+            content: String,
+            quote: ID? = null,
+            nonce: String? = null,
+            tempTargetId: ID? = null,
+        ): MessageCreateRequest = MessageCreateRequest(type, targetId, content, quote, nonce, tempTargetId)
+        
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out MessageCreated> get() = MessageCreated.serializer()
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun createBody(): Any = Body(type, targetId, content, quote, nonce, tempTargetId)
-
-
+    
+    
     @Serializable
     private data class Body(
         val type: Int,
-        @SerialName("target_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val targetId: ID,
+        @SerialName("target_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val targetId: ID,
         val content: String,
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val quote: ID? = null,
+        @Serializable(ID.AsCharSequenceIDSerializer::class) val quote: ID? = null,
         val nonce: String? = null,
-        @SerialName("temp_target_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val tempTargetId: ID? = null,
+        @SerialName("temp_target_id") @Serializable(ID.AsCharSequenceIDSerializer::class) val tempTargetId: ID? = null,
     )
-
+    
     /**
      * 将此api转化为 [DirectMessageCreateRequest].
      */
@@ -99,11 +116,12 @@ public class MessageCreateRequest(
     public fun toDirect(targetId: ID = this.targetId): DirectMessageCreateRequest {
         return DirectMessageCreateRequest.byTargetId(targetId, content, type, quote, nonce)
     }
+    
     /**
      * 将此api转化为 [DirectMessageCreateRequest].
      */
     public fun toDirectByChatCode(chatCode: ID): DirectMessageCreateRequest {
         return DirectMessageCreateRequest.byChatCode(chatCode, content, type, quote, nonce)
     }
-
+    
 }

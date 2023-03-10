@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2021-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api.guild
@@ -35,7 +35,7 @@ import love.forte.simbot.literal
  * request method: GET
  *
  */
-public class GuildUserListRequest(
+public class GuildUserListRequest internal constructor(
     /**	是 服务器的 ID */
     private val guildId: ID,
     /**	否 服务器中频道的 ID */
@@ -55,7 +55,11 @@ public class GuildUserListRequest(
     /**	否 每页数据数量 */
     private val pageSize: Int = -1,
 ) : KookGetRequest<GuildUserList>() {
-
+    
+    @Deprecated(
+        "Use GuildUserListRequest.create(...)",
+        ReplaceWith("GuildUserListRequest.create(guildId = guildId, channelId = channelId, page = page, pageSize = pageSize)")
+    )
     @JvmOverloads
     public constructor(
         guildId: ID, channelId: ID? = null,
@@ -67,15 +71,55 @@ public class GuildUserListRequest(
         page = page,
         pageSize = pageSize
     )
-
-    public companion object Key : BaseKookApiRequestKey("guild", "user-list")
-
+    
+    public companion object Key : BaseKookApiRequestKey("guild", "user-list") {
+        
+        /**
+         * 构造 [GuildUserListRequest]
+         * @param guildId 服务器的 ID
+         * @param channelId 服务器中频道的 ID
+         * @param search 搜索关键字，在用户名或昵称中搜索
+         * @param roleId 角色 ID，获取特定角色的用户列表
+         * @param mobileVerified 只能为0或1，0是未认证，1是已认证
+         * @param activeTimeSort 根据活跃时间排序，0是顺序排列，1是倒序排列
+         * @param joinedAtSort 根据加入时间排序，0是顺序排列，1是倒序排列
+         * @param page 目标页
+         * @param pageSize 每页数据数量
+         *
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            guildId: ID,
+            channelId: ID? = null,
+            search: String? = null,
+            roleId: ID? = null,
+            mobileVerified: Boolean? = null,
+            activeTimeSort: Int? = null,
+            joinedAtSort: Int? = null,
+            page: Int = -1,
+            pageSize: Int = -1,
+        ): GuildUserListRequest =
+            GuildUserListRequest(
+                guildId,
+                channelId,
+                search,
+                roleId,
+                mobileVerified,
+                activeTimeSort,
+                joinedAtSort,
+                page,
+                pageSize
+            )
+        
+    }
+    
     override val resultDeserializer: DeserializationStrategy<out GuildUserList>
         get() = GuildUserList.serializer()
-
+    
     override val apiPaths: List<String>
         get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("guild_id", guildId.literal)
         appendIfNotnull("channelId", channelId) { it.literal }
@@ -91,8 +135,8 @@ public class GuildUserListRequest(
             append("page_size", pageSize.toString())
         }
     }
-
-
+    
+    
 }
 
 
@@ -165,6 +209,6 @@ public data class GuildUser @ApiResultType constructor(
     @SerialName("mobile_verified")
     override val mobileVerified: Boolean = false,
     @SerialName("identify_num")
-    override val identifyNum: String = username.split("#", limit = 2).let { if (it.size < 2) it[1] else "" },
+    override val identifyNum: String = username.split("#", limit = 2).let { if (it.size < 2) it[0] else "" },
     override val roles: List<LongID> = emptyList(),
 ) : User

@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api.message
@@ -54,9 +54,14 @@ public class DirectMessageListRequest private constructor(
     private val flag: MessageListFlag? = null,
 ) : KookGetRequest<KookApiResult.ListData<DirectMessageDetails>>() {
     public companion object Key : BaseKookApiRequestKey("direct-message", "list") {
+        /**
+         * 构造 [DirectMessageListRequest]
+         * @param chatCode 私信会话 Code。
+         * @param msgId 参考消息 id，不传则默认为最新的消息 id
+         * @param flag 查询模式，有三种模式可以选择。不传则默认查询最新的消息
+         */
         @JvmStatic
         @JvmOverloads
-        @JvmName("getInstanceByChatCode")
         public fun byChatCode(
             chatCode: ID,
             msgId: ID? = null,
@@ -66,10 +71,32 @@ public class DirectMessageListRequest private constructor(
                 chatCode = chatCode, targetId = null, msgId = msgId, flag = flag
             )
         }
-
+        
+        /**
+         * @suppress just use [byChatCode]
+         * @see byChatCode
+         */
+        @Deprecated(
+            "Just use byChatCode(...)", ReplaceWith(
+                "byChatCode(chatCode, msgId, flag)",
+                "love.forte.simbot.kook.api.message.DirectMessageListRequest.Key.byChatCode"
+            )
+        )
         @JvmStatic
         @JvmOverloads
-        @JvmName("getInstanceByTargetId")
+        public fun getInstanceByChatCode(
+            chatCode: ID, msgId: ID? = null, flag: MessageListFlag? = null
+        ): DirectMessageListRequest = byChatCode(chatCode, msgId, flag)
+    
+        /**
+         * 构造 [DirectMessageListRequest]
+         *
+         * @param targetId 目标用户 id，后端会自动创建会话。
+         * @param msgId 参考消息 id，不传则默认为最新的消息 id
+         * @param flag 查询模式，有三种模式可以选择。不传则默认查询最新的消息
+         */
+        @JvmStatic
+        @JvmOverloads
         public fun byTargetId(
             targetId: ID,
             msgId: ID? = null,
@@ -79,13 +106,33 @@ public class DirectMessageListRequest private constructor(
                 chatCode = null, targetId = targetId, msgId = msgId, flag = flag
             )
         }
+    
+        /**
+         * @suppress just use [byTargetId]
+         * @see byTargetId
+         */
+        @Deprecated(
+            "Just use byTargetId(...)",
+            ReplaceWith(
+                "byTargetId(targetId, msgId, flag)",
+                "love.forte.simbot.kook.api.message.DirectMessageListRequest.Key.byTargetId"
+            ),
+        )
+        @JvmStatic
+        @JvmOverloads
+        public fun getInstanceByTargetId(
+            targetId: ID,
+            msgId: ID? = null,
+            flag: MessageListFlag? = null,
+        ): DirectMessageListRequest = byTargetId(targetId, msgId, flag)
+        
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<DirectMessageDetails>>
         get() = KookApiResult.ListData.serializer(DirectMessageDetails.serializer)
-
+    
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         appendIfNotnull("chat_code", chatCode)
         appendIfNotnull("target_id", targetId)

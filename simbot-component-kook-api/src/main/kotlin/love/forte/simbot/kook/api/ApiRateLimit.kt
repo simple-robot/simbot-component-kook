@@ -1,23 +1,24 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api
 
 import io.ktor.client.statement.*
+import io.ktor.http.*
 
 
 // TODO
@@ -71,27 +72,54 @@ public object ApiRateLimits {
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_LIMIT_HEAD] 信息。
  */
-public val HttpResponse.rateLimit: Int? get() = headers[ApiRateLimits.RATE_LIMIT_LIMIT_HEAD]?.toIntOrNull()
+public inline val HttpResponse.rateLimit: Long? get() = headers.rateLimit
 
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_REMAINING_HEAD] 信息。
  */
-public val HttpResponse.rateRemaining: Int? get() = headers[ApiRateLimits.RATE_LIMIT_REMAINING_HEAD]?.toIntOrNull()
+public inline val HttpResponse.rateRemaining: Long? get() = headers.rateRemaining
 
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_RESET_HEAD] 信息。
  */
-public val HttpResponse.rateReset: Int? get() = headers[ApiRateLimits.RATE_LIMIT_RESET_HEAD]?.toIntOrNull()
+public inline val HttpResponse.rateReset: Long? get() = headers.rateReset
 
 /**
  * 尝试获取 [HttpResponse] 中的 [ApiRateLimits.RATE_LIMIT_BUCKET_HEAD] 信息。
  */
-public val HttpResponse.rateBucket: String? get() = headers[ApiRateLimits.RATE_LIMIT_BUCKET_HEAD]
+public inline val HttpResponse.rateBucket: String? get() = headers.rateBucket
 
 /**
  * [HttpResponse] 中是否存在 [ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD]。
  */
-public val HttpResponse.isRateGlobal: Boolean get() = headers[ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD] != null
+public inline val HttpResponse.isRateGlobal: Boolean get() = headers.isRateGlobal
+
+
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_LIMIT_HEAD] 信息。
+ */
+public inline val Headers.rateLimit: Long? get() = this[ApiRateLimits.RATE_LIMIT_LIMIT_HEAD]?.toLongOrNull()
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_REMAINING_HEAD] 信息。
+ */
+public inline val Headers.rateRemaining: Long? get() = this[ApiRateLimits.RATE_LIMIT_REMAINING_HEAD]?.toLongOrNull()
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_RESET_HEAD] 信息。
+ */
+public inline val Headers.rateReset: Long? get() = this[ApiRateLimits.RATE_LIMIT_RESET_HEAD]?.toLongOrNull()
+
+/**
+ * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_BUCKET_HEAD] 信息。
+ */
+public inline val Headers.rateBucket: String? get() = this[ApiRateLimits.RATE_LIMIT_BUCKET_HEAD]
+
+/**
+ * [Headers] 中是否存在 [ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD]。
+ */
+public inline val Headers.isRateGlobal: Boolean get() = this[ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD] != null
 
 
 

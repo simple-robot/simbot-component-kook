@@ -1,18 +1,18 @@
 /*
- *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
- *  
- *  本文件是 simbot-component-kook 的一部分。
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * This file is part of simbot-component-kook.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:  
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *  
- *   
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 package love.forte.simbot.kook.api.message
 
@@ -41,19 +41,44 @@ public class MessageReactionListRequest(
 ) : KookGetRequest<List<MessageReactor>>() {
     public constructor(msgId: ID, emoji: love.forte.simbot.message.Emoji) : this(msgId, emoji.id)
     public constructor(msgId: ID, emoji: Emoji) : this(msgId, emoji.id)
-
+    
     public companion object Key : BaseKookApiRequestKey("message", "reaction-list") {
         private val serializer = ListSerializer(MessageReactor.serializer())
+        
+        /**
+         * 构建 [MessageReactionListRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji的id
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: ID): MessageReactionListRequest = MessageReactionListRequest(msgId, emoji)
+        
+        /**
+         * 构建 [MessageReactionListRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: love.forte.simbot.message.Emoji): MessageReactionListRequest =
+            create(msgId, emoji.id)
+        
+        /**
+         * 构建 [MessageReactionListRequest]
+         * @param msgId 频道消息的id
+         * @param emoji emoji
+         */
+        @JvmStatic
+        public fun create(msgId: ID, emoji: Emoji): MessageReactionListRequest = create(msgId, emoji.id)
     }
-
+    
     override val resultDeserializer: DeserializationStrategy<out List<MessageReactor>> get() = serializer
     override val apiPaths: List<String> get() = apiPathList
-
+    
     override fun ParametersBuilder.buildParameters() {
         append("msg_id", msgId.toString())
         append("emoji", emoji.toString())
     }
-
+    
 }
 
 
@@ -62,22 +87,22 @@ public class MessageReactionListRequest(
  */
 @Serializable
 public class MessageReactor @ApiResultType constructor(
-
+    
     /**
      * 用户的id
      */
     public val id: CharSequenceID,
-
+    
     /**
      * 用户的名称
      */
     public val username: String,
-
+    
     /**
      * 用户在服务器内的呢称
      */
     public val nickname: String,
-
+    
     /**
      * 用户名的认证数字，用户名正常为：user_name#identify_num
      */
@@ -91,12 +116,12 @@ public class MessageReactor @ApiResultType constructor(
      * 用户的状态, 0代表正常，10代表被封禁
      */
     public val status: Int,
-
+    
     /**
      * 用户的头像的url地址
      */
     public val avatar: String,
-
+    
     /**
      * 	用户是否为机器人
      */
@@ -112,7 +137,7 @@ public class MessageReactor @ApiResultType constructor(
         public const val STATUS_NORMAL: Int = 0
         public const val STATUS_BAN: Int = 10
     }
-
+    
 }
 
 
