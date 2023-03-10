@@ -188,7 +188,6 @@ public class KookAggregatedMessageReceipt private constructor(
         /**
          * 将多个 [KookMessageReceipt] 合并为一个聚合的回执。
          *
-         * @param id 当前聚合回执中使用的id。默认为随机ID。
          * @param bot 如果为null，则会使用 receiver 中的第一个元素中的bot。
          * @throws IllegalArgumentException 如果 receiver 中元素为空
          */

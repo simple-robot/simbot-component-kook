@@ -12,16 +12,6 @@
 
 rootProject.name = "simbot-component-kook"
 
-enableFeaturePreview("VERSION_CATALOGS")
-
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files(File(rootProject.projectDir, "libs.versions.toml")))
-        }
-    }
-}
-
 include("simbot-component-kook-api")
 include("simbot-component-kook-stdlib")
 include("simbot-component-kook-core")

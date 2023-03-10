@@ -47,7 +47,6 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
      * 此频道对应的分组类型。
      *
      * 如果当前频道是属于“顶层分类”的频道（即 [source.parentId][KkChannel.parentId] 为空），则 [category] 结果为null。
-     * 如果你希望能够得到“顶层分类”下的所有频道，请参考 [KookGuild.rootCategory]。
      *
      *
      * @see KookChannelCategory
