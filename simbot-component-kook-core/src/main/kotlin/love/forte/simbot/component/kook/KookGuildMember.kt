@@ -1,33 +1,25 @@
 /*
- *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook, If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook
 
 import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
-import love.forte.simbot.Api4J
-import love.forte.simbot.ID
-import love.forte.simbot.JavaDuration
-import love.forte.simbot.Timestamp
+import love.forte.simbot.*
 import love.forte.simbot.action.UnsupportedActionException
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
+import love.forte.simbot.component.kook.role.KookMemberRole
 import love.forte.simbot.definition.GuildMember
-import love.forte.simbot.definition.Role
 import love.forte.simbot.kook.api.guild.GuildMuteType
 import love.forte.simbot.kook.objects.SystemUser
 import love.forte.simbot.message.Message
@@ -201,14 +193,11 @@ public interface KookGuildMember : GuildMember, KookComponentDefinition<KkUser> 
     /**
      * 获取此成员所拥有的所有角色。
      *
-     * Deprecated: 尚未实现。
+     * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
      */
-    @Deprecated(
-        "Not support yet.", ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
-    )
-    override val roles: Items<Role>
-        get() = emptyItems()
-    
+    @ExperimentalSimbotApi
+    override val roles: Items<KookMemberRole>
+
     
     override val joinTime: Timestamp get() = Timestamp.notSupport()
     override val nickname: String
@@ -234,7 +223,16 @@ public class KookGuildSystemMember(
     
     override val id: ID
         get() = source.id
-    
+
+
+    /**
+     * 系统角色视为无权限。
+     *
+     * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
+     */
+    @ExperimentalSimbotApi
+    override val roles: Items<KookMemberRole> = emptyItems()
+
     override suspend fun guild(): KookGuild = _guild
     
     /**

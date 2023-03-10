@@ -1,18 +1,13 @@
 /*
- *  Copyright (c) 2021-2022 ForteScarlet <ForteScarlet@163.com>
+ * Copyright (c) 2021-2023. ForteScarlet.
  *
- *  本文件是 simbot-component-kook 的一部分。
+ * This file is part of simbot-component-kook.
  *
- *  simbot-component-kook 是自由软件：你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- *  发布 simbot-component-kook 是希望它能有用，但是并无保障;甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- *  你应该随程序获得一份 GNU 通用公共许可证的复本。如果没有，请看:
- *  https://www.gnu.org/licenses
- *  https://www.gnu.org/licenses/gpl-3.0-standalone.html
- *  https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- *
- *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook, If not, see <https://www.gnu.org/licenses/>.
  */
 
 @file:JvmName("ApiDataUtil")
@@ -35,7 +30,7 @@ import love.forte.simbot.utils.runInNoScopeBlocking
 import love.forte.simbot.utils.runWithInterruptible
 import java.util.function.Consumer
 
-private val logger = LoggerFactory.getLogger("KookApiRequest.debug")
+internal val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
 
 /**
  * 代表、包装了一个 Kook api的请求。
@@ -50,33 +45,33 @@ private val logger = LoggerFactory.getLogger("KookApiRequest.debug")
  * 此接口的实现类应当是不可变、可复用的。
  */
 public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
-    
+
     /**
      * 此请求最终对应的url。最终拼接的URL中部分参数（例如host）来自于 [Kook].
      */
     public abstract val url: Url
-    
-    
+
+
     /**
      * 此请求的 method.
      */
     public abstract val method: HttpMethod
-    
-    
+
+
     /**
      * 得到响应值的反序列化器.
      */
     public abstract val resultDeserializer: DeserializationStrategy<out T>
-    
-    
+
+
     /**
      * 可以为 [request] 提供更多行为的函数，例如提供body、重置contentType等。
      */
     protected open fun HttpRequestBuilder.requestFinishingAction() {
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
     }
-    
-    
+
+
     @JvmSynthetic
     override suspend fun requestBy(requestor: KookApiRequestor): T {
         return requestData(
@@ -85,10 +80,10 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
             DEFAULT_JSON
         )
     }
-    
+
     @Api4J
-    public fun requestBlockingBy(requestor: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requestor) }
-    
+    public fun requestBlockingBy(requester: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requester) }
+
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
@@ -108,29 +103,42 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         authorization: String,
         postChecker: suspend (HttpResponse) -> Unit = {}
     ): ApiResult {
+        val apiId: String? = if (apiLogger.isDebugEnabled) {
+            "${method.value} ${url.encodedPath}"
+        } else null
+
+        if (this is KookPostRequest) {
+            apiLogger.debug("API[{}] ======> query: {}, body: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" }, body)
+        } else {
+            apiLogger.debug("API[{}] ======> query: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" })
+        }
+
         val response = requestForResponse(client, authorization) {
             requestFinishingAction()
         }
-        
+
+        apiLogger.debug("API[{}] <====== status: {}, response: {}", apiId, response.status, response)
+
         postChecker(response)
-        
-        logger.trace("api request response.body(), response: {}", response)
-        
-        val result: ApiResult = response.body()
-        
-        logger.trace("api request result pre rate limit: {}", result)
-        
+
+        apiLogger.debug("API[{}] <====== post checker", apiId)
+
+        val result: ApiResult = response.body<ApiResult>().also {
+            it.httpStatusCode = response.status.value
+            it.httpStatusDescription = response.status.description
+        }
+
+        apiLogger.debug("API[{}] <====== result: {}", apiId, result)
+
         // init rate limit info.
         val headers = response.headers
-        
-        
-        
+
         val limit = headers.rateLimit
         val remaining = headers.rateRemaining
         val reset = headers.rateReset
         val bucket = headers.rateBucket
         val global = headers.isRateGlobal
-        
+
         val rateLimit = if (limit != null || remaining != null || reset != null || bucket != null || global) {
             RateLimit(
                 limit ?: RateLimit.DEFAULT.limit,
@@ -138,19 +146,22 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
                 reset ?: RateLimit.DEFAULT.reset,
                 bucket ?: RateLimit.DEFAULT.bucket,
                 global
-            )
+            ).also {
+                apiLogger.debug("API[{}] <====== rate limit: {}", apiId, it)
+            }
         } else {
-            RateLimit.DEFAULT
+            RateLimit.DEFAULT.also {
+                apiLogger.debug("API[{}] <====== rate limit: {} (DEFAULT)", apiId, it)
+            }
         }
-        
+
+
         result.rateLimit = rateLimit
-        
-        logger.trace("api request result: {}", result)
-        
+
         return result
     }
-    
-    
+
+
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
@@ -176,8 +187,8 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
             runWithInterruptible { postChecker.accept(resp) }
         }
     }
-    
-    
+
+
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
@@ -202,8 +213,8 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         val result = request(client, authorization)
         return result.parseDataOrThrow(decoder, resultDeserializer)
     }
-    
-    
+
+
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
      *
@@ -223,18 +234,18 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
     public open fun requestDataBlocking(
         client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
     ): T = runInNoScopeBlocking { requestData(client, authorization, decoder) }
-    
-    
+
+
     public companion object {
         internal val DEFAULT_JSON = Json {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        
+
         internal val defaultRequestPostChecker: Consumer<HttpResponse> = Consumer {}
     }
-    
+
 }
 
 /**
@@ -247,12 +258,12 @@ private suspend inline fun KookApiRequest<*>.requestForResponse(
 ): HttpResponse {
     return client.request {
         this.method = this@requestForResponse.method
-        
+
         // set url
         url(this@requestForResponse.url)
-        
+
         headers[HttpHeaders.Authorization] = authorization
-        
+
         // 收尾动作
         finishingAction()
     }
@@ -264,14 +275,14 @@ public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
      * api 路径。
      */
     protected abstract val apiPaths: List<String>
-    
+
     /**
      * 参数构建器。
      */
     protected open fun ParametersBuilder.buildParameters() {}
-    
+
     private lateinit var _url: Url
-    
+
     /**
      * 通过 [apiPaths] 和 [buildParameters] 懒构建 [url] 属性。
      */
@@ -286,7 +297,7 @@ public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
                 buildUrl.also { _url = it }
             }
         }
-    
+
 }
 
 
@@ -313,10 +324,10 @@ public abstract class KookPostRequest<T>(
 ) : BaseKookApiRequest<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
-    
+
     private lateinit var _body: Any
-    
-    
+
+
     /**
      * 可以提供一个body实例。
      */
@@ -340,15 +351,15 @@ public abstract class KookPostRequest<T>(
                         }
                     }
                 }
-                
+
             } else createBody()
         }
-    
+
     /**
      * 构建一个新的 [body] 所使用的函数。用于简化懒加载逻辑。
      */
     protected open fun createBody(): Any? = null
-    
+
     /**
      * 通过 [body] 构建提供 body 属性。
      */
@@ -356,8 +367,8 @@ public abstract class KookPostRequest<T>(
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
         setBody(this@KookPostRequest.body ?: EmptyContent)
     }
-    
-    
+
+
     private object NULL
 }
 

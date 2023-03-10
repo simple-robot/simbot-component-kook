@@ -7,3 +7,8 @@
 core模块实现 `simbot-api` 和 `simbot-core` 中绝大多数（可以被支持的）功能，包括事件的实现和功能性API等。
 
 如果你希望使用拥有更高封装性的API或与其他simbot组件协同，又或是与Spring Boot整合，那么core模块可以是一种参考。
+
+# Package love.forte.simbot.component.kook.role
+
+与角色相关的内容，例如频道服务器的角色配置或某用户拥有的角色信息。
+

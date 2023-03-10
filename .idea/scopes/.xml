@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="生产源码" pattern="src[simbot-component-kook*]:*..*" />
+</component>
