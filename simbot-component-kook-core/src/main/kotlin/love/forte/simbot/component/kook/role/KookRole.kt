@@ -36,14 +36,12 @@ import love.forte.simbot.kook.objects.Permissions
  *
  * [KookRole] 是 [KookGuildRole] 和 [KookMemberRole] 的标准接口，更多内容参考它们的说明。
  *
- *
- * @see KookGuildRole
- * @see KookMemberRole
- *
  * _**Note: 尚在实验阶段，未来可能会产生变更或被移除。**_
  *
  * _目前阶段Role相关的API内部不会构建缓存，而是直接使用相关API，直到 [#82](https://github.com/simple-robot/simbot-component-kook/issues/82) 的过程中逐步改善_
  *
+ * @see KookGuildRole
+ * @see KookMemberRole
  *
  * @author ForteScarlet
  */
