@@ -25,7 +25,7 @@ repositories {
 }
 
 val kotlinVersion = "1.7.20"
-val dokkaVersion = "1.7.20"
+val dokkaVersion = "1.8.10"
 val suspendTransformVersion = "0.0.5"
 val gradleCommon = "0.0.11"
 
