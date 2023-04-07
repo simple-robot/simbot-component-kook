@@ -17,6 +17,7 @@
 
 package love.forte.simbot.component.kook
 
+import kotlinx.coroutines.CoroutineScope
 import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ExperimentalSimbotApi
@@ -35,7 +36,7 @@ import love.forte.simbot.kook.objects.Guild as KkGuild
  *
  * @author ForteScarlet
  */
-public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
+public interface KookGuild : Guild, CoroutineScope, KookComponentDefinition<KkGuild> {
     
     /**
      * 得到当前频道服务器所对应的api模块下的服务器对象。

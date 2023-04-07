@@ -28,8 +28,10 @@ import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.event.KookBotStartedEvent
+import love.forte.simbot.component.kook.event.KookMemberJoinedGuildEvent
 import love.forte.simbot.component.kook.internal.KookGuildImpl.Companion.toKookGuild
 import love.forte.simbot.component.kook.internal.event.KookBotStartedEventImpl
+import love.forte.simbot.component.kook.internal.event.KookMemberJoinedGuildEventImpl
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.message.KookAssetMessage
 import love.forte.simbot.component.kook.message.KookAssetMessage.Key.asImage
@@ -37,6 +39,7 @@ import love.forte.simbot.component.kook.message.KookAssetMessage.Key.asMessage
 import love.forte.simbot.component.kook.message.KookSimpleAssetMessage
 import love.forte.simbot.component.kook.model.toModel
 import love.forte.simbot.component.kook.util.requestDataBy
+import love.forte.simbot.event.Event
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kook.Kook
@@ -368,6 +371,7 @@ internal class KookComponentBotImpl(
     
     // region internal event process
     private suspend fun KkEvent<*>.internalPreProcessor() {
+        val thisBot = this@KookComponentBotImpl
         when (val ex = extra) {
             // 系统事件
             is Sys<*> -> {
@@ -389,19 +393,32 @@ internal class KookComponentBotImpl(
                             UserViewRequest.create(guild.id, body.userId).requestDataBy(this@KookComponentBotImpl)
                         val userModel = userInfo.toModel()
                         
-                        guild.internalMembers.compute(body.userId.literal) { _, current ->
-                            current?.also {
-                                it.source = userModel
-                            } ?: KookGuildMemberImpl(this@KookComponentBotImpl, guild, userModel)
+                        val member = guild.internalMembers.compute(body.userId.literal) { _, current ->
+                            current?.copySource(userModel) ?: KookGuildMemberImpl(this@KookComponentBotImpl, guild, userModel)
+                        }!!
+
+                        @Suppress("UNCHECKED_CAST")
+                        pushIfProcessable(KookMemberJoinedGuildEvent) {
+                            KookMemberJoinedGuildEventImpl(
+                                thisBot,
+                                this as love.forte.simbot.kook.event.Event<Sys<JoinedGuildEventBody>>,
+                                guild,
+                                member
+                            )
                         }
                     }
+
                     // 信息变更 （昵称变更）
                     is UpdatedGuildMemberEventBody -> {
                         val guild = internalGuild(this.targetId) ?: return
-                        val member = guild.internalMembers[body.userId.literal] ?: return
-                        member.source.also { old ->
-                            member.source = old.copy(nickname = body.nickname)
+//                        val member = guild.internalMembers[body.userId.literal] ?: return
+                        guild.internalMembers.computeIfPresent(body.userId.literal) { _, current ->
+                            current.copySource(current.source.copy(nickname = body.nickname))
                         }
+
+//                        member.source.also { old ->
+//                            member.source = old.copy(nickname = body.nickname)
+//                        }
                     }
                     // endregion
                     // region guilds
@@ -537,4 +554,26 @@ internal class KookComponentBotImpl(
     }
 }
 
+private suspend inline fun KookComponentBotImpl.pushIfProcessable(
+    eventKey: Event.Key<*>,
+    block: () -> Event?,
+): Boolean {
+    if (eventProcessor.isProcessable(eventKey)) {
+        val event = block() ?: return false
+        if (isEventProcessAsync) {
+            launch { eventProcessor.push(event) }
+        } else {
+            eventProcessor.push(event)
+        }
+        return true
+    }
 
+    return false
+}
+
+
+/**
+ * 从 [CoroutineScope] 中分配一个拥有新的 [SupervisorJob] 的 [CoroutineContext].
+ */
+internal fun CoroutineScope.newSupervisorCoroutineContext(): CoroutineContext =
+    coroutineContext + SupervisorJob(coroutineContext[Job])

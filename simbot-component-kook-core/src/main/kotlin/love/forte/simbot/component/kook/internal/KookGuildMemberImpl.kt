@@ -17,10 +17,10 @@
 
 package love.forte.simbot.component.kook.internal
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
@@ -56,16 +56,12 @@ import kotlin.coroutines.cancellation.CancellationException
 internal class KookGuildMemberImpl(
     override val bot: KookComponentBotImpl,
     internal val guildInternal: KookGuildImpl,
-    @Volatile override var source: UserModel,
+    override val source: UserModel,
+    override val coroutineContext: CoroutineContext = guildInternal.newSupervisorCoroutineContext(),
+    private val muteJob: MuteJob = MuteJob()
 ) : KookGuildMember, CoroutineScope {
-    private val job = SupervisorJob(guildInternal.job)
-    override val coroutineContext: CoroutineContext = guildInternal.coroutineContext + job
 
-    private val muteLock = Mutex()
-
-    @Volatile
-    private var muteJob: Job? = null
-
+    internal fun copySource(source: UserModel): KookGuildMemberImpl = KookGuildMemberImpl(bot, guildInternal, source, coroutineContext, muteJob)
 
     override val nickname: String get() = source.nickname ?: ""
     override val username: String = source.username
@@ -107,11 +103,7 @@ internal class KookGuildMemberImpl(
         val result = GuildMuteDeleteRequest.create(guildInternal.id, source.id, type).requestBy(bot)
         return result.isSuccess.also { success ->
             if (success) {
-                muteLock.withLock {
-                    muteJob?.also {
-                        muteJob = null
-                    }
-                }?.cancel()
+                muteJob.remove()?.cancel()
             }
         }
     }
@@ -123,23 +115,29 @@ internal class KookGuildMemberImpl(
         return result.isSuccess.also { success ->
             if (durationMillis > 0 && success) {
                 val scope: CoroutineScope = this
-                muteLock.withLock {
-                    muteJob.also { oldJob ->
-                        oldJob?.cancel()
-                        muteJob = scope.launch(bot.muteDelayJob) {
-                            delay(durationMillis)
-                            unmute(type)
-                        }.also { job ->
-                            val memberId = source.id
-                            val botId = bot.id
-                            job.invokeOnCompletion { e ->
-                                if (e is CancellationException) {
-                                    logger.debug("Member({}) from Bot({}) unmute job cancelled.", memberId, botId)
-                                }
+                muteJob.update { old ->
+                    old?.cancel()
+
+                    scope.launch(bot.muteDelayJob) {
+                        delay(durationMillis)
+                        unmute(type)
+                    }.also { job ->
+                        val memberId = source.id
+                        val botId = bot.id
+                        job.invokeOnCompletion { e ->
+                            if (e is CancellationException) {
+                                logger.debug("Member({}) from Bot({}) unmute job cancelled.", memberId, botId)
                             }
                         }
                     }
                 }
+
+//                muteLock.withLock {
+//                    muteJob.also { oldJob ->
+//                        oldJob?.cancel()
+//                        muteJob =
+//                    }
+//                }
             }
         }
     }
