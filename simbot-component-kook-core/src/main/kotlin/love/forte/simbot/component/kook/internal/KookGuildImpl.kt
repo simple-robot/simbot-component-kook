@@ -17,7 +17,6 @@
 
 package love.forte.simbot.component.kook.internal
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -56,11 +55,11 @@ import kotlin.coroutines.CoroutineContext
 internal class KookGuildImpl private constructor(
     internal val baseBot: KookComponentBotImpl,
     @Volatile override var source: GuildModel,
-) : KookGuild, CoroutineScope {
+) : KookGuild {
     override val id: ID get() = source.id
-    internal val job = SupervisorJob(baseBot.job)
 
-    override val coroutineContext: CoroutineContext = baseBot.coroutineContext + job
+    override val coroutineContext: CoroutineContext = baseBot.newSupervisorCoroutineContext()
+    internal val job = SupervisorJob(baseBot.job)
 
     override val createTime: Timestamp get() = Timestamp.notSupport()
     override val maximumMember: Int get() = source.maximumMember
@@ -249,12 +248,7 @@ internal class KookGuildImpl private constructor(
             .map(GuildUser::toModel)
             .collect { model ->
                 val computed = internalMembers.compute(model.id.literal) { _, current ->
-                    if (current != null) {
-                        current.source = model
-                        current
-                    } else {
-                        KookGuildMemberImpl(baseBot, this, model)
-                    }
+                    current?.copySource(model) ?: KookGuildMemberImpl(baseBot, this, model)
                 }
 
                 onComputed(computed)
