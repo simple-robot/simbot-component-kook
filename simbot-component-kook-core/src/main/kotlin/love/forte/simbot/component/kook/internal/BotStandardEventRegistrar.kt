@@ -36,7 +36,6 @@ import love.forte.simbot.kook.event.system.channel.*
 import love.forte.simbot.kook.event.system.guild.member.ExitedGuildEventBody
 import love.forte.simbot.kook.event.system.guild.member.GuildMemberOfflineEventBody
 import love.forte.simbot.kook.event.system.guild.member.GuildMemberOnlineEventBody
-import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kook.event.system.user.*
 import love.forte.simbot.kook.objects.Channel
 import love.forte.simbot.kook.objects.SystemUser
@@ -173,14 +172,14 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
             }
         }
         
-        is JoinedGuildEventBody -> bot.pushIfProcessable(KookMemberJoinedGuildEvent) {
-            KookMemberJoinedGuildEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<JoinedGuildEventBody>>,
-                guild,
-                author
-            )
-        }
+//        is JoinedGuildEventBody -> bot.pushIfProcessable(KookMemberJoinedGuildEvent) {
+//            KookMemberJoinedGuildEventImpl(
+//                bot,
+//                this as Event<Event.Extra.Sys<JoinedGuildEventBody>>,
+//                guild,
+//                author
+//            )
+//        }
         
         is SelfExitedGuildEventBody -> bot.pushIfProcessable(KookBotSelfExitedGuildEvent) {
             KookBotSelfExitedGuildEventImpl(

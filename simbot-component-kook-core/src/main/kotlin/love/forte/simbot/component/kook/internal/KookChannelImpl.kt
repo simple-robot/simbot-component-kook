@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kook.internal
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookChannel
@@ -59,8 +58,7 @@ internal class KookChannelImpl private constructor(
     override val bot: KookComponentGuildBot
         get() = _guild.bot
     
-    private val job = SupervisorJob(_guild.job)
-    override val coroutineContext: CoroutineContext = _guild.coroutineContext + job
+    override val coroutineContext: CoroutineContext = _guild.newSupervisorCoroutineContext()
     
     override val guildId: ID
         get() = _guild.id
