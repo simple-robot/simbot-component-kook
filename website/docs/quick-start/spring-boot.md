@@ -13,7 +13,7 @@ import TabItem from '@theme/TabItem';
 - `simboot-core-spring-boot-starter` _(`simbot3` 的 Spring Boot Starter)_
 - `simbot-component-kook-core` _(`simbot3` KOOK组件)_
 
-来编写一个QQ频道机器人。
+来编写一个KOOK机器人。
 
 ## 前提准备
 

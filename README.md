@@ -1,123 +1,31 @@
 # Simple Robot Kook 组件
 
-此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK](https://www.kookapp.cn/) 的组件支持。
+此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK API](https://www.kookapp.cn/) 的组件支持。
 
-更多详情请参考 [simbot3][simbot3] 或者 [simbot3官网](https://simbot.forte.love)。
+## 文档
 
+了解**simbot3**: [simbot3官网](https://simbot.forte.love)
 
-> ⚠️🔧 README 施工中。。。
+KOOK组件**的组件官网**: 
+
+**API文档**: [API文档引导站](https://docs.simbot.forte.love)
+
+> **Warning**
+> README 施工中。。。
 
 ## 支持情况
 
 已经基本完成。
 
-## 稳定程度
-
-当前版本处于 **`ALPHA`** 版本阶段，即代表：
-- 可能存在诸多[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)和未知问题，
-- 不保证API的稳定与兼容（可能随时发布存在不兼容内容的更新）
-- 需要[**反馈**](https://github.com/simple-robot/simbot-component-kook/issues)或[**PR协助**](https://github.com/simple-robot/simbot-component-kook/pulls)
+> **Warning**
+> 当前版本处于 **`ALPHA`** 版本阶段，即代表：
+> - 可能存在诸多[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)和未知问题，
+> - 不保证API的稳定与兼容（可能随时发布存在不兼容内容的更新）
+> - 需要[**反馈**](https://github.com/simple-robot/simbot-component-kook/issues)或[**协助**](https://github.com/simple-robot/simbot-component-kook/pulls)
 
 ## 使用
 
-<details open>
-<summary>Gradle Kotlin DSL</summary>
-
-**使用api模块**
-
-```kotlin
-implementation("love.forte.simbot.component:simbot-component-kook-api:$CP_KOOK_VERSION")
-```
-
-**使用stdlib模块**
-
-```kotlin
-implementation("love.forte.simbot.component:simbot-component-kook-stdlib:$CP_KOOK_VERSION")
-```
-
-**使用core模块**
-
-```kotlin
-implementation("love.forte.simbot:simbot-core:$SIMBOT_VERSION") // 必须显式引用simbot核心库（或其他衍生库，比如spring boot starter）
-implementation("love.forte.simbot.component:simbot-component-kook-core:$CP_KOOK_VERSION")
-```
-
-</details>
-
-<details>
-<summary>Gradle Groovy</summary>
-
-**使用api模块**
-
-```groovy
-implementation 'love.forte.simbot.component:simbot-component-kook-api:$CP_KOOK_VERSION'
-```
-
-**使用stdlib模块**
-
-```groovy
-implementation 'love.forte.simbot.component:simbot-component-kook-stdlib:$CP_KOOK_VERSION'
-```
-
-**使用core模块**
-
-```groovy
-implementation 'love.forte.simbot:simbot-core:$SIMBOT_VERSION' // 必须显式引用simbot核心库（或其他衍生库，比如spring boot starter）
-implementation 'love.forte.simbot.component:simbot-component-kook-core:$CP_KOOK_VERSION'
-```
-
-</details>
-
-<details>
-<summary>Maven</summary>
-
-**使用api模块**
-
-```xml
-<dependency>
-    <groupId>love.forte.simbot.component</groupId>
-    <artifactId>simbot-component-kook-api</artifactId>
-    <version>${CP_KOOK_VERSION}</version>
-</dependency>
-```
-
-**使用stdlib模块**
-
-```xml
-<dependency>
-    <groupId>love.forte.simbot.component</groupId>
-    <artifactId>simbot-component-kook-stdlib</artifactId>
-    <version>${CP_KOOK_VERSION}</version>
-</dependency>
-```
-
-**使用core模块**
-
-```xml
-<!-- 必须显式引用simbot核心库（或其他衍生库，比如spring boot starter） -->
-<dependency>
-    <groupId>love.forte.simbot</groupId>
-    <artifactId>simbot-core</artifactId>
-    <version>${CP_KOOK_VERSION}</version>
-</dependency>
-<dependency>
-    <groupId>love.forte.simbot.component</groupId>
-    <artifactId>simbot-component-kook-core</artifactId>
-    <version>${CP_KOOK_VERSION}</version>
-</dependency>
-```
-
-</details>
-
-
-> simbot版本前往 [simbot3核心库][simbot3] 参考
-
-
-## 文档
-
-基本的核心API都由 [simbot3核心库][simbot3] 定义并提供。
-
-KDoc (APIDoc) 可以前往 [文档引导](https://docs.simbot.forte.love) 处前往并查看 [KOOK文档](https://docs.simbot.forte.love/components/kook) 。
+前往 [组件官网]() 参考 **快速开始** 相关章节。
 
 ## 走马观花
 
