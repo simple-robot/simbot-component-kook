@@ -55,7 +55,7 @@ jobs:
   deploy-doc:
     name: Deploy snapshot doc
     runs-on: ubuntu-latest
-    needs: publish-release
+    needs: publish-snapshot
     steps:
       # 检出仓库代码
       - name: Check out repo
