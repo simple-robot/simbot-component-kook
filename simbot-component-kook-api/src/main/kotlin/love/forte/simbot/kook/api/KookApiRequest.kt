@@ -25,14 +25,17 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import love.forte.simbot.Api4J
+import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.Kook
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.util.api.requestor.API
+import love.forte.simbot.utils.runInAsync
 import love.forte.simbot.utils.runInNoScopeBlocking
-import love.forte.simbot.utils.runWithInterruptible
+import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 internal val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
@@ -76,7 +79,9 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
     }
 
-
+    /**
+     * 根据 [requestor] 中的信息请求当前API。
+     */
     @JvmSynthetic
     override suspend fun requestBy(requestor: KookApiRequestor): T {
         return requestData(
@@ -86,8 +91,35 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         )
     }
 
+    /**
+     * @suppress Deprecated
+     */
     @Api4J
-    public fun requestBlockingBy(requester: KookApiRequestor): T = runInNoScopeBlocking { requestBlockingBy(requester) }
+    @Deprecated("Use 'requestByBlocking'", ReplaceWith("requestByBlocking(requester)"))
+    public fun requestBlockingBy(requestor: KookApiRequestor): T = requestByBlocking(requestor)
+
+    /**
+     * 阻塞的请求当前API。
+     *
+     * @see requestBy
+     */
+    @Api4J
+    public fun requestByBlocking(requestor: KookApiRequestor): T = runInNoScopeBlocking { requestBy(requestor) }
+
+    /**
+     * 异步的请求当前API。如果 [requestor] 是 [CoroutineScope] 类型则会使用其作用域。
+     *
+     * @see requestBy
+     */
+    @OptIn(InternalSimbotApi::class)
+    @Api4J
+    public fun requestByAsync(requestor: KookApiRequestor): CompletableFuture<out T> {
+        return if (requestor is CoroutineScope) {
+            runInAsync(requestor) { requestBy(requestor) }
+        } else {
+            runInAsync { requestBy(requestor) }
+        }
+    }
 
     /**
      * 通过 [client] 执行网络请求并尝试得到结果。
@@ -128,12 +160,14 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
         apiLogger.debug("API[{}] <====== post checker", apiId)
 
-        val result: ApiResult = response.body<ApiResult>().also {
-            it.httpStatusCode = response.status.value
-            it.httpStatusDescription = response.status.description
-        }
+        val rawText = response.bodyAsText()
 
-        apiLogger.debug("API[{}] <====== result: {}", apiId, result)
+        apiLogger.debug("API[{}] <====== result: {}", apiId, rawText)
+
+        val result = DEFAULT_JSON.decodeFromString(ApiResult.serializer(), rawText)
+
+        result.httpStatusCode = response.status.value
+        result.httpStatusDescription = response.status.description
 
         // init rate limit info.
         val headers = response.headers
@@ -168,16 +202,7 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
 
     /**
-     * 通过 [client] 执行网络请求并尝试得到结果。
-     *
-     * @param client 使用的 [HttpClient] 实例。
-     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
-     *
-     * 可以通过重写 [requestFinishingAction] 来实现提供额外的收尾操作，例如为请求提供 body 等。
-     *
-     * @param postChecker 当得到了 http response 之后的后置检查，可以用于提供部分自定义的响应值检查函数，例如进行速率限制检查。
-     *
-     * @throws ApiRateLimitException 当API速度达到上限的时候。检查需要通过 [postChecker] 进行实现支持。
+     * 阻塞地请求当前 API。
      *
      * @see request
      */
@@ -189,7 +214,25 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         postChecker: Consumer<HttpResponse> = defaultRequestPostChecker
     ): ApiResult = runInNoScopeBlocking {
         request(client, authorization) { resp ->
-            runWithInterruptible { postChecker.accept(resp) }
+            postChecker.accept(resp)
+        }
+    }
+
+    /**
+     * 异步地请求当前 API。
+     *
+     * @see request
+     */
+    @OptIn(InternalSimbotApi::class)
+    @Api4J
+    @JvmOverloads
+    public open fun requestAsync(
+        client: HttpClient,
+        authorization: String,
+        postChecker: Consumer<HttpResponse> = defaultRequestPostChecker
+    ): CompletableFuture<out ApiResult> = runInAsync {
+        request(client, authorization) { resp ->
+            postChecker.accept(resp)
         }
     }
 
@@ -221,17 +264,8 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
 
     /**
-     * 通过 [client] 执行网络请求并尝试得到结果。
+     * 阻塞地请求当前API并得到结果。
      *
-     * @param client 使用的 [HttpClient] 实例。
-     * @param authorization 使用的鉴权值。注意，这里是完整的 `Authorization` 请求头中应当存在的内容，例如 `Bot aaaabbbbccccdddd`. 请参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
-     * @param decoder 用于反序列化的 [Json] 实例。如果不提供则使用内部的默认值:
-     * ```kotlin
-     * Json {
-     *      isLenient = true
-     *      ignoreUnknownKeys = true
-     *  }
-     * ```
      * @see requestData
      */
     @Api4J
@@ -239,6 +273,18 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
     public open fun requestDataBlocking(
         client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
     ): T = runInNoScopeBlocking { requestData(client, authorization, decoder) }
+
+    /**
+     * 异步地请求当前API并得到结果。
+     *
+     * @see requestData
+     */
+    @OptIn(InternalSimbotApi::class)
+    @Api4J
+    @JvmOverloads
+    public open fun requestDataAsync(
+        client: HttpClient, authorization: String, decoder: Json = DEFAULT_JSON
+    ): CompletableFuture<out T> = runInAsync { requestData(client, authorization, decoder) }
 
 
     public companion object {
@@ -274,7 +320,9 @@ private suspend inline fun KookApiRequest<*>.requestForResponse(
     }
 }
 
-
+/**
+ * [KookApiRequest] 的基础抽象类。
+ */
 public abstract class BaseKookApiRequest<T> : KookApiRequest<T>() {
     /**
      * api 路径。
