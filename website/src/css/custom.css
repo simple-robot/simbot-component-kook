@@ -17,6 +17,28 @@
     src: url("iconfont.ttf?t=1680524259075") format('truetype');
 }
 
+@font-face {
+    font-family: "LXGWNeoXiHeiScreen";
+    src: url("LXGWNeoXiHeiScreen.ttf");
+}
+
+@font-face {
+    font-family: "SmileySans-Oblique";
+    src: url("SmileySans-Oblique.otf.woff2");
+}
+
+body {
+    font-family: 'LXGWNeoXiHeiScreen', serif;
+}
+
+h1,h2,h3,h4 {
+    font-family: 'SmileySans-Oblique', serif;
+}
+
+header,h1,h2 {
+    text-align: center;
+}
+
 a:not([class])::before {
     content: '\f010b';
     font-family: "iconfont", serif !important;
