@@ -48,21 +48,25 @@ a:not([class])::before {
     -moz-osx-font-smoothing: grayscale;
 }
 
-strong[dark-theme='dark'] {
-    text-decoration-line: underline;
-    text-decoration-color: rgba(255, 255, 255, 0.9);
+code:not([class]) {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+strong:not([class]) {
+    margin-left: 3px;
+    margin-right: 3px;
 }
 
 strong {
     text-decoration-line: underline;
-    text-decoration-color: rgba(0,0,0,0.25);
-
+    text-decoration-thickness: from-font;
+    text-underline-offset: auto;
 }
 
 strong code {
     text-decoration-line: underline;
     text-decoration-color: var(--ifm-color-primary-dark);
-    /*#ef5d84*/
     /*#ef5d84: rgba(239,93,132,0.25)*/
 }
 
