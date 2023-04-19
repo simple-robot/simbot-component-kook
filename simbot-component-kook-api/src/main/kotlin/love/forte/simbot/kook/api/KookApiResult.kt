@@ -17,7 +17,9 @@
 
 package love.forte.simbot.kook.api
 
+import io.ktor.http.*
 import kotlinx.serialization.*
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -136,64 +138,98 @@ public object KookApiResult {
 }
 
 /**
- * 对 Kook Api标准响应数据的封装。
+ * 对 KOOK API 标准响应数据的封装。
+ *
+ * [ApiResult] 由内部反序列化器构造并组装，不应被外界实例化。
  */
 @Suppress("MemberVisibilityCanBePrivate")
 @Serializable
 public class ApiResult @ApiResultType constructor(
     public val code: Int,
     public val message: String,
-    public val data: JsonElement
+    public val data: JsonElement,
 ) {
-
     /**
-     * 当前api响应值的 [速率限制][RateLimit] 信息。会在当前类实例化之后再进行初始化。
+     * 当前 result 反序列化前的原始JSON字符串。
      */
     @Transient
-    public var rateLimit: RateLimit = RateLimit.DEFAULT
-        internal set
+    public lateinit var raw: String
+        @JvmSynthetic internal set // hide from Java, warning to Kt
+
+    /**
+     * 当前api响应值的 [速率限制][RateLimit] 信息。
+     */
+    @Transient
+    public lateinit var rateLimit: RateLimit
+        @JvmSynthetic internal set // hide from Java, warning to Kt
+
+    /**
+     * 此API的HTTP响应状态码
+     *
+     * @see HttpStatusCode
+     */
+    @Transient
+    public lateinit var httpStatus: HttpStatusCode
+        @JvmSynthetic internal set // hide from Java, warning to Kt
 
     /**
      * http响应状态码
+     *
+     * @see httpStatus
      */
-    @Transient
-    public var httpStatusCode: Int = -1
-        internal set
+    public val httpStatusCode: Int get() = httpStatus.value
 
     /**
      * http响应状态描述
+     *
+     * @see httpStatus
      */
-    @Transient
-    public var httpStatusDescription: String = ""
-        internal set
+    public val httpStatusDescription: String get() = httpStatus.description
 
     /**
      * 此接口的响应码是否为成功的响应码.
      */
-    public val isSuccess: Boolean get() = code == KookApiResult.SUCCESS_CODE
+    public val isSuccess: Boolean get() = isHttpSuccess && code == KookApiResult.SUCCESS_CODE
 
     /**
-     * 判断 [httpStatusCode] 是否在 200 .. 300(不含) 之间。
+     * 判断 [httpStatus] 是否 [成功][HttpStatusCode.isSuccess]。
      */
-    public val isHttpSuccess: Boolean get() = httpStatusCode in 200 until 300
+    public val isHttpSuccess: Boolean get() = httpStatus.isSuccess()
 
     /**
      * 提供解析参数来使用当前result中的data内容解析为目标结果。
      * 不会有任何判断，
      *
+     * @param json 用于解析 [data] 的json反序列化器
+     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApiRequest.resultDeserializer]
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
-    public fun <T> parseData(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
+    @JvmOverloads
+    public fun <T> parseData(
+        json: Json = KookApiRequest.DEFAULT_JSON,
+        deserializationStrategy: DeserializationStrategy<out T>
+    ): T {
+        if (deserializationStrategy == Unit.serializer()) {
+            @Suppress("UNCHECKED_CAST")
+            return Unit as T
+        }
+
         return json.decodeFromJsonElement(deserializationStrategy, data)
     }
 
     /**
      * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KookApiResult.SUCCESS_CODE]), 则抛出 [KookApiException] 异常。
      *
+     * @param json 用于解析 [data] 的json反序列化器
+     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApiRequest.resultDeserializer]
      * @throws KookApiException 如果 [code] 不为成功
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
-    public fun <T> parseDataOrThrow(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
+    @JvmOverloads
+    public fun <T> parseDataOrThrow(
+        json: Json = KookApiRequest.DEFAULT_JSON,
+        deserializationStrategy: DeserializationStrategy<out T>
+    ): T {
         if (!isSuccess) {
             throw KookApiException(code, "$message, api=$this")
         }
@@ -201,7 +237,7 @@ public class ApiResult @ApiResultType constructor(
     }
 
 
-    override fun toString(): String = "ApiResult(code=$code, message=$message, rateLimit=$rateLimit, data=$data)"
+    override fun toString(): String = "ApiResult(code=$code, message=$message, data=$data, httpStatus=$httpStatus, rateLimit=$rateLimit, raw=$raw)"
 
 
     override fun equals(other: Any?): Boolean {
@@ -210,9 +246,7 @@ public class ApiResult @ApiResultType constructor(
 
         if (code != other.code) return false
         if (message != other.message) return false
-        if (data != other.data) return false
-
-        return true
+        return data == other.data
     }
 
     override fun hashCode(): Int {

@@ -20,6 +20,7 @@ package love.forte.simbot.kook
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -38,33 +39,33 @@ public annotation class KookBotConfigurationDSL
  * @author ForteScarlet
  */
 public class KookBotConfiguration {
-    
+
     /**
      * 设置bot进行连接的时候使用要使用压缩数据。
      */
     @KookBotConfigurationDSL
     public var isCompress: Boolean = true
-    
+
     /**
-     * Bot用于解析api请求或其他用途的解析器。
+     * Bot用于解析API请求和解析推送事件的JSON序列化器。
      */
     @KookBotConfigurationDSL
     public var decoder: Json = defaultDecoder
-    
+
     /**
      * 为bot提供一个 [CoroutineContext]. 如果其中存在 [kotlinx.coroutines.Job], 则会作为parent job。
      */
     @KookBotConfigurationDSL
     public var coroutineContext: CoroutineContext = EmptyCoroutineContext
-    
-    
+
+
     // region request client
     /**
      * 配置bot内部要使用的client Engine。
      */
     @KookBotConfigurationDSL
     public var clientEngine: HttpClientEngine? = null
-    
+
     /**
      * 配置bot内部要使用的client Engine factory。
      *
@@ -72,33 +73,82 @@ public class KookBotConfiguration {
      */
     @KookBotConfigurationDSL
     public var clientEngineFactory: HttpClientEngineFactory<*>? = null
-    
+
     /**
-     * 配置bot内部要使用的httpclient。
-     *
-     * 默认情况下的client中已经install了
-     * [ContentNegotiation][io.ktor.client.plugins.contentnegotiation.ContentNegotiation.Plugin] 中的 `json`
+     * 配置bot内部要使用的 ws 连接用的 client Engine。
      */
     @KookBotConfigurationDSL
+    public var wsEngine: HttpClientEngine? = null
+
+    /**
+     * 配置bot内部要使用的 ws Engine factory。
+     *
+     * 如果 [wsEngine] 存在，则优先使用 [wsEngine].
+     */
+    @KookBotConfigurationDSL
+    public var wsEngineFactory: HttpClientEngineFactory<*>? = null
+
+    /**
+     * Deprecated: unused
+     */
+    @KookBotConfigurationDSL
+    @Deprecated("Unused")
     public var httpClientConfig: HttpClientConfig<*>.() -> Unit = {}
-    
-    
+
+
     /**
-     * 配置bot内部要使用的httpclient。
-     *
-     * 默认情况下的client中已经install了
-     * [ContentNegotiation][io.ktor.client.plugins.contentnegotiation.ContentNegotiation.Plugin] 中的 `json`
+     * Deprecated: unused
      */
     @KookBotConfigurationDSL
+    @Deprecated("Unused")
     public fun httpClientConfig(block: HttpClientConfig<*>.() -> Unit) {
         this.httpClientConfig = block
     }
+
+    /**
+     * 针对 [HttpClientEngineConfig] 中的通用默认属性的配置。
+     *
+     * 用于配置最终的 HTTP API Client 所使用的引擎。
+     *
+     * @see EngineConfiguration
+     */
+    @KookBotConfigurationDSL
+    public var clientEngineConfig: EngineConfiguration? = null
+
+    /**
+     * 针对 [HttpClientEngineConfig] 中的通用默认属性的配置。
+     *
+     * 用于配置最终的 ws Client 所使用的引擎。
+     *
+     * @see EngineConfiguration
+     */
+    @KookBotConfigurationDSL
+    public var wsEngineConfig: EngineConfiguration? = null
+
+    /**
+     * 针对 [HttpClientEngineConfig] 中的通用默认属性的配置。
+     *
+     */
+    @Serializable
+    public data class EngineConfiguration(
+        public var threadsCount: Int? = null,
+        public var pipelining: Boolean? = null,
+
+        // TODO
+//        public var proxy: ProxyConfig? = null,
+    )
+
     // endregion
-    
+
     // region api request timeout
     /**
      * api请求的超时配置。
      * 如果为null则不会在 `httpClient` 中安装 [io.ktor.client.plugins.HttpTimeout]。
+     *
+     * 默认情况下配置:
+     * - [connectTimeoutMillis][TimeoutConfiguration.connectTimeoutMillis] = 5000ms
+     * - [requestTimeoutMillis][TimeoutConfiguration.requestTimeoutMillis] = 5000ms
+     * - [socketTimeoutMillis][TimeoutConfiguration.socketTimeoutMillis] = null
      */
     @KookBotConfigurationDSL
     public var timeout: TimeoutConfiguration? = TimeoutConfiguration(
@@ -106,7 +156,19 @@ public class KookBotConfiguration {
         requestTimeoutMillis = 5000L,
         socketTimeoutMillis = null,
     )
-    
+
+
+    /**
+     * api请求的统一超时时间配置。
+     */
+    public data class TimeoutConfiguration(
+        var connectTimeoutMillis: Long? = null,
+        var requestTimeoutMillis: Long? = null,
+        var socketTimeoutMillis: Long? = null,
+    ) {
+        public constructor() : this(null, null, null)
+    }
+
     /**
      * 禁用超时配置。
      */
@@ -114,9 +176,11 @@ public class KookBotConfiguration {
     public fun disableTimeout() {
         timeout = null
     }
-    
+
     /**
-     * api请求的连接超时时间。
+     * HTTP API 请求的连接超时时间。
+     *
+     * @see TimeoutConfiguration.connectTimeoutMillis
      */
     @KookBotConfigurationDSL
     public var connectTimeoutMillis: Long?
@@ -126,9 +190,11 @@ public class KookBotConfiguration {
                 timeout = TimeoutConfiguration(connectTimeoutMillis = value)
             }
         }
-    
+
     /**
-     * api请求的请求超时时间。
+     * HTTP API 请求的请求超时时间。
+     *
+     * @see TimeoutConfiguration.requestTimeoutMillis
      */
     @KookBotConfigurationDSL
     public var requestTimeoutMillis: Long?
@@ -138,9 +204,11 @@ public class KookBotConfiguration {
                 timeout = TimeoutConfiguration(requestTimeoutMillis = value)
             }
         }
-    
+
     /**
-     * api请求的请求超时时间。
+     * HTTP API 请求的请求超时时间。
+     *
+     * @see TimeoutConfiguration.socketTimeoutMillis
      */
     @KookBotConfigurationDSL
     public var socketTimeoutMillis: Long?
@@ -151,13 +219,13 @@ public class KookBotConfiguration {
             }
         }
     // endregion
-    
+
     /**
      * ws连接超时时间。默认为 [DEFAULT_WS_CONNECT_TIMEOUT].
      */
     @KookBotConfigurationDSL
     public var wsConnectTimeout: Long = DEFAULT_WS_CONNECT_TIMEOUT
-    
+
     /**
      * 在进行**事件处理**时是否进行异步处理（使用 `launch { ... }` 调度）。
      *
@@ -168,24 +236,24 @@ public class KookBotConfiguration {
      */
     @KookBotConfigurationDSL
     public var isEventProcessAsync: Boolean = true
-    
-    
+
+
     /**
      * 禁用事件的异步调度。即 set [isEventProcessAsync] = `false`
-      */
+     */
     @KookBotConfigurationDSL
     public fun disableEventProcessAsync() {
         isEventProcessAsync = false
     }
-    
-    
+
+
     /**
      * 在执行 [KookBot.start] 建立连接成功后、进行事件处理之前执行此函数。
      */
     @KookBotConfigurationDSL
     public var preEventProcessor: suspend (bot: KookBot, sessionId: String) -> Unit = { _, _ -> }
-    
-    
+
+
     /**
      * 在执行 [KookBot.start] 建立连接成功后、进行事件处理之前执行此函数。
      */
@@ -197,15 +265,15 @@ public class KookBotConfiguration {
             block(b, s)
         }
     }
-    
-    
+
+
     public companion object {
         /**
          * 默认的连接超时时间。
          */
         public const val DEFAULT_WS_CONNECT_TIMEOUT: Long = 6000L
-    
-        
+
+
         /**
          * [KookBotConfiguration] 默认使用的解析器。
          */
@@ -217,17 +285,6 @@ public class KookBotConfiguration {
             // see https://github.com/kaiheila/api-docs/issues/174
             explicitNulls = false
         }
-    }
-    
-    /**
-     * api请求的统一超时时间配置。
-     */
-    public data class TimeoutConfiguration(
-        var connectTimeoutMillis: Long? = null,
-        var requestTimeoutMillis: Long? = null,
-        var socketTimeoutMillis: Long? = null,
-    ) {
-        public constructor() : this(null, null, null)
     }
 }
 
@@ -249,5 +306,25 @@ public inline fun KookBotConfiguration.timeout(
         this.timeout = KookBotConfiguration.TimeoutConfiguration().also(block)
     } else {
         timeout?.block()
+    }
+}
+
+/**
+ * 配置 [KookBotConfiguration.clientEngineConfig]。
+ *
+ * 只有当 [engineConfig][KookBotConfiguration.clientEngineConfig] 不为null时或者 [init] == true 时才会触发。
+ *
+ * @param init 如果 engineConfig 为null且 [init] 为true，则会初始化一个 [engineConfig][KookBotConfiguration.clientEngineConfig]
+ *
+ */
+public inline fun KookBotConfiguration.engine(
+    init: Boolean = true,
+    block: KookBotConfiguration.EngineConfiguration.() -> Unit,
+) {
+    val engineConfig = this.clientEngineConfig
+    if (engineConfig == null && init) {
+        this.clientEngineConfig = KookBotConfiguration.EngineConfiguration().also(block)
+    } else {
+        engineConfig?.block()
     }
 }

@@ -33,9 +33,10 @@ import org.slf4j.Logger
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Kook Bot对应的bot类型。
+ * 一个 KOOK BOT.
  *
- * [KookBot] 提供标准定义，但是不实现 simple-robot-api 中的 [love.forte.simbot.Bot] 接口。
+ * [KookBot] 承载了通过 `WebSocket` 的方式与KOOK服务器连接并订阅事件的能力，
+ * 以及通过各种 [KOOK HTTP API][love.forte.simbot.kook.api.KookApiRequest] 进行功能交互的能力。
  *
  * @author ForteScarlet
  */
@@ -61,13 +62,13 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
      *
      * 此实例代表的用于进行API请求（xxxRequest）的http client。
      */
-    public val httpClient: HttpClient
+    public val apiClient: HttpClient
     
     /**
-     * @see httpClient
+     * @see apiClient
      */
     override val client: HttpClient
-        get() = httpClient
+        get() = apiClient
     
     /**
      * @see ticket
