@@ -36,7 +36,7 @@ import love.forte.simbot.utils.runInNoScopeBlocking
 @JvmSynthetic
 public suspend inline fun KookApiRequest<*>.requestForResultBy(bot: KookBot): ApiResult {
     return request(
-        bot.httpClient,
+        bot.apiClient,
         bot.ticket.authorization,
     )
 }
@@ -47,7 +47,7 @@ public suspend inline fun KookApiRequest<*>.requestForResultBy(bot: KookBot): Ap
 @JvmSynthetic
 public suspend inline fun <T> KookApiRequest<T>.requestDataBy(bot: KookBot): T {
     return requestData(
-        bot.httpClient,
+        bot.apiClient,
         bot.ticket.authorization,
         bot.configuration.decoder,
     )

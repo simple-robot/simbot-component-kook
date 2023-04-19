@@ -18,6 +18,7 @@
 package love.forte.simbot.kook.api
 
 import kotlinx.serialization.*
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -184,6 +185,11 @@ public class ApiResult @ApiResultType constructor(
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
     public fun <T> parseData(json: Json, deserializationStrategy: DeserializationStrategy<out T>): T {
+        if (deserializationStrategy == Unit.serializer()) {
+            @Suppress("UNCHECKED_CAST")
+            return Unit as T
+        }
+
         return json.decodeFromJsonElement(deserializationStrategy, data)
     }
 
@@ -210,9 +216,7 @@ public class ApiResult @ApiResultType constructor(
 
         if (code != other.code) return false
         if (message != other.message) return false
-        if (data != other.data) return false
-
-        return true
+        return data == other.data
     }
 
     override fun hashCode(): Int {

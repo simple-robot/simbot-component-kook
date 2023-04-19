@@ -18,11 +18,10 @@
 package love.forte.simbot.kook.internal
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -71,159 +70,182 @@ internal class KookBotImpl(
 ) : KookBot {
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.client.${ticket.clientId}")
-    
+
     internal val isEventProcessAsync = configuration.isEventProcessAsync
     private val wsConnectTimeout = configuration.wsConnectTimeout
-    
+
     /**
      * 事件预处理器集。
      */
     private val preProcessorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
-    
+
     /**
      * 事件处理器集。
      */
     private val processorQueue: ConcurrentLinkedQueue<suspend Signal_0.(Json, () -> Event<*>) -> Unit> =
         ConcurrentLinkedQueue()
-    
+
     private val decoder = configuration.decoder
-    
+
     private val job: Job
     override val coroutineContext: CoroutineContext
-    
+
     /**
      * api请求的client
      */
-    override val httpClient: HttpClient
-    
+    override val apiClient: HttpClient
+
     /**
      * ws连接用的client
      */
     private val wsClient: HttpClient
-    
+
     private val isCompress = configuration.isCompress
     private val gatewayRequest: GatewayRequest = if (isCompress) GatewayRequest.Compress else GatewayRequest.NotCompress
-    
-    
+
+
     init {
         val parentJob = configuration.coroutineContext[Job]
         this.job = SupervisorJob(parentJob)
         this.coroutineContext = configuration.coroutineContext + job + CoroutineName("KookBot.${ticket.clientId}")
-        
-        val engine = configuration.clientEngine
-        val engineFactory = configuration.clientEngineFactory
-        
-        fun HttpClientConfig<*>.configClient() {
-            // json decoder
-            install(ContentNegotiation) {
-                json(decoder)
-            }
-            
-            // http request timeout
-            install(HttpTimeout) {
-                this.connectTimeoutMillis = configuration.connectTimeoutMillis
-                this.requestTimeoutMillis = configuration.requestTimeoutMillis
-            }
-            
-            // config it.
-            configuration.httpClientConfig(this)
+
+        logger.debug("Bot configuration: {}", configuration)
+
+        val apiEngine = configuration.clientEngine
+        val apiEngineFactory = configuration.clientEngineFactory
+
+        val wsEngine = configuration.wsEngine
+        val wsEngineFactory = configuration.wsEngineFactory
+
+        fun HttpClientEngineConfig.configEngine(engineConfig: KookBotConfiguration.EngineConfiguration) {
+            engineConfig.threadsCount?.also { this.threadsCount = it }
+            engineConfig.pipelining?.also { this.pipelining = it }
         }
-        
-        fun HttpClientConfig<*>.configWs() {
+
+        fun HttpClientConfig<*>.configApiClient() {
+            // engine config
+            configuration.clientEngineConfig?.also { engineConfig ->
+                engine { configEngine(engineConfig) }
+            }
+
+            // http request timeout
+            configuration.timeout?.also { timeoutConfig ->
+                install(HttpTimeout) {
+                    this.connectTimeoutMillis = timeoutConfig.connectTimeoutMillis
+                    this.requestTimeoutMillis = timeoutConfig.requestTimeoutMillis
+                    this.socketTimeoutMillis = timeoutConfig.socketTimeoutMillis
+                }
+            }
+        }
+
+        fun HttpClientConfig<*>.configWsClient() {
+            // engine config
+            configuration.wsEngineConfig?.also { engineConfig ->
+                engine { configEngine(engineConfig) }
+            }
+
             WebSockets {
                 pingInterval = 30_000L
             }
         }
-        
-        when {
-            engine != null -> {
-                httpClient = HttpClient(engine) {
-                    configClient()
-                }
-                wsClient = HttpClient(engine) {
-                    configWs()
-                }
+
+        apiClient = when {
+            apiEngine != null -> {
+                logger.debug("API engine used: {}", apiEngine)
+                HttpClient(apiEngine) { configApiClient() }
             }
-            
-            engineFactory != null -> {
-                httpClient = HttpClient(engineFactory) {
-                    configClient()
-                }
-                wsClient = HttpClient(engineFactory) {
-                    configWs()
-                }
+
+            apiEngineFactory != null -> {
+                logger.debug("API engine factory used: {}", apiEngineFactory)
+                HttpClient(apiEngineFactory) { configApiClient() }
             }
-            
+
             else -> {
-                httpClient = HttpClient {
-                    configClient()
-                }
-                wsClient = HttpClient {
-                    configWs()
-                }
+                logger.debug("API engine use ServiceLoader.")
+                HttpClient { configApiClient() }
             }
         }
-        
-        
+
+        logger.info("API client: {}, using engine: {}", apiClient, apiClient.engine)
+
+        wsClient = when {
+            wsEngine != null -> {
+                logger.debug("WS engine used: {}", wsEngine)
+                HttpClient(wsEngine) { configWsClient() }
+            }
+
+            wsEngineFactory != null -> {
+                logger.debug("WS engine factory used: {}", wsEngineFactory)
+                HttpClient(wsEngineFactory) { configWsClient() }
+            }
+
+            else -> {
+                logger.debug("WS engine use ServiceLoader.")
+                HttpClient { configWsClient() }
+            }
+        }
+
+        logger.info("WS client: {}, using engine: {}", wsClient, wsClient.engine)
+
     }
-    
+
     override fun preProcessor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
         preProcessorQueue.add(processor)
     }
-    
+
     override fun processor(processor: suspend Signal_0.(decoder: Json, decoded: () -> Event<*>) -> Unit) {
         processorQueue.add(processor)
     }
-    
+
     @Volatile
     private var _client: ClientImpl? = null
-    
+
     @Volatile
     private var stageLoop: StageLoop? = null
-    
+
     @Volatile
     override var isStarted: Boolean = false
-    
+
     private val clientLock = Mutex()
-    
+
     override suspend fun start(): Boolean = clientLock.withLock {
         if (job.isCancelled) {
             throw kotlinx.coroutines.CancellationException("Bot has been cancelled.")
         }
-        
+
         clientLogger.debug("Closing the current client: {}", _client)
         stageLoop?.job?.cancel()
         _client?.session?.cancel()
         stageLoop = null
         _client = null
-        
+
         val loopJob = SupervisorJob(job)
-        
+
         val loop = StageLoop(loopJob)
         logger.debug("Create stage loop {}", loop)
-        
+
         loop.addLast(RequestGateway())
-        
+
         var next = loop.nextStage()
         while (next != null && next !is Receive) {
             // 还没到receive阶段
             loop.invoke(next)
             next = loop.nextStage()
         }
-        
+
         logger.debug("Loop on stage 'Receive'")
-        
+
         launch(loopJob) {
             loop.invoke(next)
             loop.run()
         }
-        
+
         isStarted = true
         true
     }
-    
-    
+
+
     /**
      * 通过 [Gateway] 连接bot信息。
      */
@@ -237,7 +259,7 @@ internal class KookBotImpl(
             }
         }
     }
-    
+
     private suspend inline fun DefaultClientWebSocketSession.waitHello(): Signal.Hello {
         // receive Hello
         var hello: Signal.Hello? = null
@@ -253,15 +275,15 @@ internal class KookBotImpl(
         }
         return hello
     }
-    
+
     private suspend fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLong): HeartbeatJob {
         fun helloInterval(): Long {
             val r = kotlin.random.Random.nextLong(5000)
             return if (kotlin.random.Random.nextBoolean()) 30_000 + r else 30_000 - r
         }
-        
+
         val pongChannel = Channel<Signal.Pong>(1, BufferOverflow.DROP_OLDEST)
-        
+
         // heartbeat Job
         val heartbeatLaunchJob = launch {
             suspend fun waitForPong(timeout: Long): Signal.Pong {
@@ -269,14 +291,14 @@ internal class KookBotImpl(
                     pongChannel.receive()
                 }
             }
-            
+
             val pongTimeout = 6.seconds.inWholeMilliseconds
-            
+
             hb@ while (isActive) {
                 val ping = Signal.Ping(sn.get())
                 clientLogger.trace("Send 'Ping' {}", ping)
                 send(ping.jsonValue())
-                
+
                 // wait for pong
                 try {
                     // 如果超时:
@@ -287,7 +309,7 @@ internal class KookBotImpl(
                 } catch (timeout: TimeoutCancellationException) {
                     // timeout for waiting pong!
                     clientLogger.trace("pong receive timeout: {}", timeout.localizedMessage, timeout)
-                    
+
                     // retry twice
                     for (i in 1..2) {
                         try {
@@ -305,7 +327,7 @@ internal class KookBotImpl(
                             continue
                         }
                     }
-                    
+
                     clientLogger.error("pong receive timeout: {}, Cancel session", timeout.localizedMessage, timeout)
                     // close exceptionally
                     // closeExceptionally()
@@ -313,66 +335,66 @@ internal class KookBotImpl(
                     // cancel("pong receive timeout: ${timeout.localizedMessage}", timeout)
                     break
                 }
-                
+
                 delay(helloInterval())
             }
         }
-        
+
         heartbeatLaunchJob.invokeOnCompletion {
             pongChannel.close()
         }
-        
+
         return HeartbeatJob(heartbeatLaunchJob, pongChannel)
     }
-    
+
     private class HeartbeatJob(val job: Job, val pongChannel: Channel<Signal.Pong>) {
         fun pong(pong: Signal.Pong) {
             pongChannel.trySend(pong)
         }
-        
+
         override fun toString(): String {
             return "HeartbeatJob(job=$job)"
         }
     }
-    
+
     override suspend fun join() {
         job.join()
     }
-    
+
     override suspend fun cancel(reason: Throwable?) {
         if (job.isCancelled) {
             return
         }
-        
+
         if (reason == null) {
             job.cancel()
         } else {
             job.cancel(reason.localizedMessage, reason)
         }
-        
+
         job.join()
     }
-    
+
     override suspend fun me(): Me {
         return MeRequest.requestDataBy(this)
     }
-    
+
     override suspend fun offline() {
         return OfflineRequest.requestDataBy(this)
     }
-    
+
     private class GatewayInfo(val url: String, val urlBuilder: URLBuilder.() -> Unit = {})
-    
+
     private fun Gateway.info(urlBuilder: URLBuilder.() -> Unit = {}): GatewayInfo = GatewayInfo(url, urlBuilder)
-    
+
     data class ReconnectInfo(val sn: Long, val sessionId: String)
-    
+
     private open inner class Stage {
         open suspend operator fun invoke(loop: StageLoop) {
         }
     }
-    
-    
+
+
     /**
      * 请求并获取gateway信息。
      * @property time 当前获取gateway的次数。大于1时代表本次为某次的重试。
@@ -385,7 +407,7 @@ internal class KookBotImpl(
             clientLogger.debug("Requesting for gateway info... time: {}", time)
             // retry on failure?
             val gateway = gatewayRequest.requestDataBy(this@KookBotImpl)
-            
+
             // next: create session
             if (reconnectInfo != null) {
                 loop.addLast(CreateWsSession(RequestedGateway(this, gateway.info {
@@ -398,9 +420,9 @@ internal class KookBotImpl(
             }
         }
     }
-    
+
     private inner class RequestedGateway(val stage: RequestGateway, val gateway: GatewayInfo)
-    
+
     /**
      * ws 连接到 gateway
      *
@@ -412,7 +434,7 @@ internal class KookBotImpl(
             clientLogger.debug("Creating websocket session...")
             try {
                 val session = connectWs()
-                
+
                 // next: waiting hello?
                 // next: create client
                 loop.addLast(WaitingHello(gateway, session))
@@ -431,12 +453,12 @@ internal class KookBotImpl(
                 )
             }
         }
-        
+
         private suspend fun connectWs(): DefaultClientWebSocketSession {
             return wsClient.ws(gateway.gateway)
         }
     }
-    
+
     /**
      *
      * [CreateWsSession] 之后，等待 `Hello` 包。期间如果出现其他什么包，抛弃。
@@ -469,14 +491,14 @@ internal class KookBotImpl(
                 return
             }
             clientLogger.debug("Received 'Hello': {}, ready to process event.", hello)
-            
+
             // create heart beat job
             // event process (create client)
             loop.addLast(CreateHeartbeatJob(gatewayStage, wsSession, hello, AtomicLong(0)))
         }
     }
-    
-    
+
+
     /**
      * 创建心跳收发器
      */
@@ -493,7 +515,7 @@ internal class KookBotImpl(
             loop.addLast(CreateClient(gatewayStage, session, hello, sn, heartbeatJob))
         }
     }
-    
+
     /**
      * 创建一个 [ClientImpl], 并在其中异步的处理事件。
      */
@@ -507,26 +529,26 @@ internal class KookBotImpl(
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun invoke(loop: StageLoop) {
             val eventProcessChannel = Channel<Signal.Event>(capacity = Channel.BUFFERED)
-            
+
             eventProcessChannel.invokeOnClose { cause ->
                 clientLogger.debug("Event process closed, cause: {}", cause?.localizedMessage, cause)
             }
-            
+
             clientLogger.trace("Create event process channel: {}", eventProcessChannel)
-            
+
             val job = session.eventProcessJob(eventProcessChannel)
-            
+
             clientLogger.trace("Create event process job: {}", job)
-            
+
             val client = ClientImpl(gatewayStage.gateway, session, sn, heartbeatJob, job)
-            
+
             clientLogger.trace("Create client: {}", client)
-            
+
             // next: receive
             loop.addLast(Receive(hello, client))
         }
     }
-    
+
     /**
      * 连接成功后构建client，并开始接收处理信息。
      * client中事件在 flow 中异步处理，而 pong、reconnect等信令优先处理。
@@ -536,7 +558,7 @@ internal class KookBotImpl(
         private val client: ClientImpl,
     ) : Stage() {
         override suspend fun invoke(loop: StageLoop) {
-            
+
             val session = client.session
             if (!session.isActive) {
                 val reason = session.closeReason.await()
@@ -544,13 +566,13 @@ internal class KookBotImpl(
                 clientLogger.error("Session is closed. reason: {}.", reason)
                 return
             }
-            
+
             try {
                 // 接收
                 clientLogger.trace("Receiving next frame ...")
                 val frame = session.incoming.receive()
                 clientLogger.trace("Received frame: {}", frame)
-                
+
                 when (frame) {
                     is Frame.Text -> processString(frame.readToText(), loop)
                     is Frame.Binary -> processString(frame.readToText(), loop)
@@ -561,7 +583,11 @@ internal class KookBotImpl(
                     }
                 }
             } catch (cancellation: CancellationException) {
-                clientLogger.warn("Session is cancelled: {}, try reconnect.", cancellation.localizedMessage, cancellation)
+                clientLogger.warn(
+                    "Session is cancelled: {}, try reconnect.",
+                    cancellation.localizedMessage,
+                    cancellation
+                )
                 // next: self
                 loop.addLast(this)
             } catch (e: Throwable) {
@@ -570,26 +596,26 @@ internal class KookBotImpl(
                 loop.addLast(this)
             }
         }
-        
+
         /**
          * 更新SN的值。
          */
         private fun AtomicLong.updateSn(newSn: Long): Long {
             return updateAndGet { prev -> max(prev, newSn) }
         }
-        
+
         private suspend fun processString(eventString: String, loop: StageLoop) {
             clientLogger.trace("On signal: {}", eventString)
             val jsonElement = decoder.parseToJsonElement(eventString)
-            
-            
+
+
             fun <T> decode(strategy: DeserializationStrategy<T>): T {
                 return decoder.decodeFromJsonElement(strategy, jsonElement)
             }
-            
+
             // maybe op 11: heartbeat ack
             val s = jsonElement.jsonObject["s"]?.jsonPrimitive?.intOrNull ?: return
-            
+
             when (s) {
                 // Pong.
                 Signal.Pong.S_CODE -> {
@@ -597,33 +623,38 @@ internal class KookBotImpl(
                     // next: self
                     loop.addLast(this)
                 }
-                
+
                 // Reconnect.
                 Signal.Reconnect.S_CODE -> {
                     clientLogger.debug("Reconnect signal received: {}", eventString)
                     // next: reconnect
                     loop.addLast(Reconnect(client.atomicSn.get(), hello.data.sessionId))
-                    
+
                     val reconnect = decoder.decodeFromJsonElement(Signal.Reconnect.serializer(), jsonElement)
                     val reconnectData = reconnect.data
                     client.session.closeExceptionally(ReconnectException(reconnectData.code, reconnectData.err ?: ""))
                 }
-                
+
                 // Event
                 Signal.Event.S_CODE -> {
                     // next: self
                     loop.addLast(this)
-                    
+
                     val event = decode(Signal.Event.serializer())
-                    
+
                     clientLogger.trace("On event signal: {}", event)
-                    
+
                     // 如果sn比当前小，忽略此事件。
                     val eventSn = event.sn
                     val updated = client.atomicSn.updateSn(eventSn)
                     if (eventSn < updated) {
                         // just skip.
-                        clientLogger.trace("Event sn ({}) < current sn ({}), ignore and skip this event. The event: {}", eventSn, updated, event)
+                        clientLogger.trace(
+                            "Event sn ({}) < current sn ({}), ignore and skip this event. The event: {}",
+                            eventSn,
+                            updated,
+                            event
+                        )
                     } else {
                         // push event
                         try {
@@ -636,17 +667,17 @@ internal class KookBotImpl(
                                         success = true
                                         break
                                     }
-            
+
                                     if (sendResult.isFailure && !sendResult.isClosed) {
                                         // retry
                                         continue
                                     }
-            
+
                                     if (sendResult.isClosed) {
                                         return
                                     }
                                 }
-        
+
                                 if (!success) {
                                     sendEvent(event)
                                 }
@@ -659,7 +690,7 @@ internal class KookBotImpl(
             }
         }
     }
-    
+
     /**
      * 重连
      */
@@ -671,9 +702,9 @@ internal class KookBotImpl(
             loop.addLast(RequestGateway(reconnectInfo = ReconnectInfo(sn, sessionId)))
         }
     }
-    
+
     // inner class Stop : Stage()
-    
+
     private inner class StageLoop(
         val job: Job,
         val stageDeque: ConcurrentLinkedDeque<Stage> = ConcurrentLinkedDeque(),
@@ -681,11 +712,11 @@ internal class KookBotImpl(
         @Volatile
         var currentStage: Stage? = null
             private set
-        
+
         fun addLast(stage: Stage) {
             stageDeque.addLast(stage)
         }
-        
+
         suspend fun run() {
             var next: Stage? = nextStage()
             while (job.isActive && next != null) {
@@ -699,36 +730,36 @@ internal class KookBotImpl(
             logger.debug("Stage loop done. last stage: {}", currentStage)
             currentStage = null
         }
-        
+
         suspend fun invoke(stage: Stage?) {
             currentStage = stage
             if (stage != null) {
                 stage(this)
             }
         }
-        
+
         fun nextStage(): Stage? = stageDeque.pollFirst()
-        
+
     }
-    
+
     /**
      * 连接成功的client。
      */
     private inner class ClientImpl(
         val gatewayInfo: GatewayInfo,
-        
+
         val session: DefaultClientWebSocketSession,
-        
+
         /**
          * sn
          */
         val atomicSn: AtomicLong,
-        
+
         /**
          * 心跳Job
          */
         val heartbeatJob: HeartbeatJob,
-        
+
         /**
          * 事件通道
          */
@@ -749,13 +780,13 @@ internal class KookBotImpl(
             get() = gatewayInfo.url
         override val isActive: Boolean
             get() = session.isActive
-        
+
         override fun toString(): String {
             return "ClientImpl(sn=$sn, isCompress=$isCompress, heartbeatJob=$heartbeatJob, eventProcessJob=$eventProcessJob, bot=$bot)"
         }
-        
+
     }
-    
+
     private fun DefaultClientWebSocketSession.eventProcessJob(
         eventChannel: Channel<Signal.Event>,
     ): EventProcessJob {
@@ -764,48 +795,59 @@ internal class KookBotImpl(
             .cancellable()
             .buffer()
             .onEach { event ->
-            // val currPreProcessorQueue = preProcessorQueue
-            // val currProcessorQueue = processorQueue
-            if (preProcessorQueue.isNotEmpty() || processorQueue.isNotEmpty()) {
-                clientLogger.trace("On event: {}", event)
-                val eventType = event.type
-                val eventExtraType = event.extraType
-                
-                // Event(s=0,
-                // d={"channel_type":"GROUP","type":9,"target_id":"4587833303764121","author_id":"2371258185","content":"我是RBQ",
-                // "extra":{"type":1,
-                // "code":"","guild_id":"8582739890554982","channel_name":"查价bot (机器人)","author":{"id":"2371258185","username":"芦苇测试机","identify_num":"5173","online":true,"os":"Websocket","status":0,"avatar":"https://img.kaiheila.cn/assets/bot.png/icon","vip_avatar":"https://img.kaiheila.cn/assets/bot.png/icon","banner":"","nickname":"芦苇测试机","roles":[2842315],"is_vip":false,"is_ai_reduce_noise":false,"bot":true,"tag_info":{"color":"#34A853","text":"机器人"},"client_id":"OPYfwS3t0hPuVZZx"},"mention":[],"mention_all":false,"mention_roles":[],"mention_here":false,"nav_channels":[],"kmarkdown":{"raw_content":"我是RBQ","mention_part":[],"mention_role_part":[]},"last_msg_content":"芦苇测试机：我是RBQ"},"msg_id":"ee8b14c1-22eb-44d3-bb65-a1274ade96db","msg_timestamp":1650354611204,"nonce":"","from_type":1}, sn=2)
-                
-                val parser = EventSignals[eventType, eventExtraType] ?: run {
-                    val e =
-                        SimbotIllegalStateException("Unknown event type: $eventType, subType: $eventExtraType. data: $event")
-                    clientLogger.error(e.localizedMessage, e)
-                    // e.process(logger) { "Event receiving" } // TODO process exception?
-                    return@onEach
-                }
-                
-                val lazy = lazy(LazyThreadSafetyMode.PUBLICATION) {
-                    parser.deserialize(decoder, event.d)
-                }
-                
-                val lazyDecoded = lazy::value
-                
-                // pre process
-                preProcessorQueue.forEach { pre ->
-                    try {
-                        pre(event, decoder, lazyDecoded)
-                    } catch (e: Throwable) {
-                        if (clientLogger.isDebugEnabled) {
-                            clientLogger.debug(
-                                "Event pre precess failure. Event: {}, event.data: {}", event, event.data
-                            )
-                        }
-                        clientLogger.error("Event pre precess failure.", e)
+                // val currPreProcessorQueue = preProcessorQueue
+                // val currProcessorQueue = processorQueue
+                if (preProcessorQueue.isNotEmpty() || processorQueue.isNotEmpty()) {
+                    clientLogger.trace("On event: {}", event)
+                    val eventType = event.type
+                    val eventExtraType = event.extraType
+
+                    // Event(s=0,
+                    // d={"channel_type":"GROUP","type":9,"target_id":"4587833303764121","author_id":"2371258185","content":"我是RBQ",
+                    // "extra":{"type":1,
+                    // "code":"","guild_id":"8582739890554982","channel_name":"查价bot (机器人)","author":{"id":"2371258185","username":"芦苇测试机","identify_num":"5173","online":true,"os":"Websocket","status":0,"avatar":"https://img.kaiheila.cn/assets/bot.png/icon","vip_avatar":"https://img.kaiheila.cn/assets/bot.png/icon","banner":"","nickname":"芦苇测试机","roles":[2842315],"is_vip":false,"is_ai_reduce_noise":false,"bot":true,"tag_info":{"color":"#34A853","text":"机器人"},"client_id":"OPYfwS3t0hPuVZZx"},"mention":[],"mention_all":false,"mention_roles":[],"mention_here":false,"nav_channels":[],"kmarkdown":{"raw_content":"我是RBQ","mention_part":[],"mention_role_part":[]},"last_msg_content":"芦苇测试机：我是RBQ"},"msg_id":"ee8b14c1-22eb-44d3-bb65-a1274ade96db","msg_timestamp":1650354611204,"nonce":"","from_type":1}, sn=2)
+
+                    val parser = EventSignals[eventType, eventExtraType] ?: run {
+                        val e =
+                            SimbotIllegalStateException("Unknown event type: $eventType, subType: $eventExtraType. data: $event")
+                        clientLogger.error(e.localizedMessage, e)
+                        // e.process(logger) { "Event receiving" } // TODO process exception?
+                        return@onEach
                     }
-                }
-                
-                if (isEventProcessAsync) {
-                    launch {
+
+                    val lazy = lazy(LazyThreadSafetyMode.PUBLICATION) {
+                        parser.deserialize(decoder, event.d)
+                    }
+
+                    val lazyDecoded = lazy::value
+
+                    // pre process
+                    preProcessorQueue.forEach { pre ->
+                        try {
+                            pre(event, decoder, lazyDecoded)
+                        } catch (e: Throwable) {
+                            if (clientLogger.isDebugEnabled) {
+                                clientLogger.debug(
+                                    "Event pre precess failure. Event: {}, event.data: {}", event, event.data
+                                )
+                            }
+                            clientLogger.error("Event pre precess failure.", e)
+                        }
+                    }
+
+                    if (isEventProcessAsync) {
+                        launch {
+                            processorQueue.forEach { processor ->
+                                try {
+                                    processor(event, decoder, lazyDecoded)
+                                } catch (e: Throwable) {
+                                    clientLogger.debug(
+                                        "Event precess failure. Event: {}, event.data: {}", event, event.data, e
+                                    )
+                                }
+                            }
+                        }
+                    } else {
                         processorQueue.forEach { processor ->
                             try {
                                 processor(event, decoder, lazyDecoded)
@@ -816,19 +858,8 @@ internal class KookBotImpl(
                             }
                         }
                     }
-                } else {
-                    processorQueue.forEach { processor ->
-                        try {
-                            processor(event, decoder, lazyDecoded)
-                        } catch (e: Throwable) {
-                            clientLogger.debug(
-                                "Event precess failure. Event: {}, event.data: {}", event, event.data, e
-                            )
-                        }
-                    }
                 }
-            }
-        }.onCompletion { cause ->
+            }.onCompletion { cause ->
                 if (cause == null) {
                     clientLogger.debug("Event process flow is completed. No cause.")
                 } else {
@@ -836,36 +867,36 @@ internal class KookBotImpl(
                         "Event process flow is completed. Cause: {}", cause.localizedMessage, cause
                     )
                 }
-            
-        }.catch { cause ->
-            clientLogger.error(
-                "Event process flow on error: {}", cause.localizedMessage, cause
-            )
-        }.launchIn(this)
-        
+
+            }.catch { cause ->
+                clientLogger.error(
+                    "Event process flow on error: {}", cause.localizedMessage, cause
+                )
+            }.launchIn(this)
+
         return EventProcessJob(launchJob, eventChannel)
     }
-    
+
     private class EventProcessJob(
         val job: Job,
         val eventChannel: Channel<Signal.Event>,
     ) {
-        
+
         suspend fun sendEvent(event: Signal.Event) {
             eventChannel.send(event)
         }
-        
+
         fun trySendEvent(event: Signal.Event): ChannelResult<Unit> {
             return eventChannel.trySend(event)
         }
-        
+
         override fun toString(): String {
             return "EventProcessJob(job=$job, eventChannel=$eventChannel)"
         }
     }
-    
+
     companion object
-    
+
 }
 
 
@@ -895,14 +926,14 @@ private fun Frame.readToText(): String {
 private fun waitForHello(decoder: Json, frame: Frame): Signal.Hello? {
     var hello: Signal.Hello? = null
     // for hello
-    
+
     if (frame is Frame.Text || frame is Frame.Binary) {
         val json = decoder.parseToJsonElement(frame.readToText())
         if (json.jsonObject["s"]?.jsonPrimitive?.intOrNull == Signal.Hello.S_CODE) {
             hello = decoder.decodeFromJsonElement(Signal.Hello.serializer(), json)
         }
     }
-    
+
     return hello
 }
 
@@ -915,7 +946,7 @@ private fun Signal.Hello.check(): Signal.Hello {
         val info = Signal.Hello.getErrorInfo(d.code)
         throw KookApiException(d.code.toInt(), info)
     }
-    
+
     return this
 }
 
