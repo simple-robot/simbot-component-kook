@@ -20,9 +20,12 @@
 package love.forte.simbot.kook
 
 import love.forte.simbot.Api4J
+import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.api.ApiResult
 import love.forte.simbot.kook.api.KookApiRequest
+import love.forte.simbot.utils.runInAsync
 import love.forte.simbot.utils.runInNoScopeBlocking
+import java.util.concurrent.CompletableFuture
 
 
 /**
@@ -96,6 +99,35 @@ public fun KookBot.requestBlocking(api: KookApiRequest<*>): ApiResult {
 @Api4J
 public fun <T> KookBot.requestDataBlocking(api: KookApiRequest<T>): T {
     return runInNoScopeBlocking(coroutineContext) { api.requestDataBy(this@requestDataBlocking) }
+}
+
+
+
+
+/**
+ * 通过指定Bot，利用其token和client发起请求并得到对应的[ApiResult]。
+ *
+ * 如果你希望自动检测 [ApiResult] 响应类型并直接得到 [ApiResult.data] 的反序列化结果，参考 [requestDataAsync]
+ *
+ * @see requestForResultBy
+ * @see requestDataAsync
+ *
+ */
+@OptIn(InternalSimbotApi::class)
+@Api4J
+public fun KookBot.requestAsync(api: KookApiRequest<*>): CompletableFuture<out ApiResult> {
+    return runInAsync(this) { api.requestForResultBy(this@requestAsync) }
+}
+
+/**
+ * 通过指定Bot，利用其token和client发起请求并得到对应的data响应值。
+ *
+ * @see requestDataBy
+ */
+@OptIn(InternalSimbotApi::class)
+@Api4J
+public fun <T> KookBot.requestDataAsync(api: KookApiRequest<T>): CompletableFuture<out T> {
+    return runInAsync(this) { api.requestDataBy(this@requestDataAsync) }
 }
 
 
