@@ -165,9 +165,8 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         apiLogger.debug("API[{}] <====== result: {}", apiId, rawText)
 
         val result = DEFAULT_JSON.decodeFromString(ApiResult.serializer(), rawText)
-
-        result.httpStatusCode = response.status.value
-        result.httpStatusDescription = response.status.description
+        result.httpStatus = response.status
+        result.raw = rawText
 
         // init rate limit info.
         val headers = response.headers

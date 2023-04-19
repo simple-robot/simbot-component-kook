@@ -1,6 +1,8 @@
+import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import love.forte.simbot.kook.api.ApiResult
 import love.forte.simbot.kook.api.KookApiResult
+import love.forte.simbot.kook.api.RateLimit
 import kotlin.test.Test
 
 /**
@@ -33,6 +35,10 @@ class ApiRequestTest {
         """.trimIndent()
 
         val listDataResult = json.decodeFromString(ApiResult.serializer(), jsonStr)
+        listDataResult.httpStatus = HttpStatusCode(200, "OK")
+        listDataResult.raw = jsonStr
+        listDataResult.rateLimit = RateLimit.DEFAULT
+
         val listData = listDataResult.parseDataOrThrow(json, KookApiResult.ListData.serializer(User.serializer()))
         assert(listData.items.size == 2)
         assert(listDataResult.isSuccess)
