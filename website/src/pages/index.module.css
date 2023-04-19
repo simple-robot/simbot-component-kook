@@ -25,12 +25,11 @@
 /*https://pxlab.cn/color/index.html*/
 
 .heroBannerBg {
-  /* 五颜六色的桃子 */
+  /* 皇家园林 */
   background-image: linear-gradient(to right, #ed6ea0 0%, #ec8c69 100%);
-
 }
 [data-theme='dark'] .heroBannerBg {
-  /* 天使降临 */
-  background-image: linear-gradient(-225deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%);
-}
+  /* 我心爱的人 */
+  background-image: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%);
 
+}
