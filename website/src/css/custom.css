@@ -9,22 +9,22 @@
 /* You can override the default Infima variables here. */
 @font-face {
     font-family: "JetBrains Mono";
-    src: url("JetBrainsMono-SemiBold.woff2");
+    src: url("/static/fonts/JetBrainsMono-SemiBold.woff2") format('woff');
 }
 
 @font-face {
     font-family: "iconfont";
-    src: url("iconfont.ttf?t=1680524259075") format('truetype');
+    src: url("/static/fonts/iconfont.ttf?t=1680524259075") format('truetype');
 }
 
 @font-face {
     font-family: "LXGWNeoXiHeiScreen";
-    src: url("LXGWNeoXiHeiScreen.ttf");
+    src: url("/static/fonts/LXGWNeoXiHeiScreen.ttf") format('truetype');
 }
 
 @font-face {
     font-family: "SmileySans-Oblique";
-    src: url("SmileySans-Oblique.otf.woff2");
+    src: url("/static/fonts/SmileySans-Oblique.otf.woff2") format('woff');
 }
 
 body {
