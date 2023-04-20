@@ -27,6 +27,11 @@
     src: url("/static/fonts/SmileySans-Oblique.otf.woff2") format('woff');
 }
 
+@font-face {
+    font-family: "ZCOOLKuaiLe-Regular";
+    src: url("/static/fonts/ZCOOLKuaiLe-Regular.ttf") format('truetype');
+}
+
 body {
     font-family: 'LXGWNeoXiHeiScreen', serif;
 }
@@ -37,6 +42,10 @@ h1,h2,h3,h4 {
 
 header,h1,h2 {
     text-align: center;
+}
+
+.theme-admonition {
+    font-family: 'ZCOOLKuaiLe-Regular', 'LXGWNeoXiHeiScreen', serif;
 }
 
 a:not([class])::before {
