@@ -75,13 +75,6 @@ API包装类的命名也存在一定的规律，比如一个 `获取某列表` �
 
 以 [获取当前用户(BOT)加入的服务器列表](https://developer.kookapp.cn/doc/http/guild#%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%88%97%E8%A1%A8) 为例。
 
-
-:::caution 没必要的步骤
-
-示例中的 `install(ContentNegotiation)` 会在后续更新中优化，参考 [**#91**](https://github.com/simple-robot/simbot-component-kook/issues/91)。
-
-:::
-
 <Tabs groupId="code">
 <TabItem value="Kotlin">
 
@@ -89,10 +82,7 @@ API包装类的命名也存在一定的规律，比如一个 `获取某列表` �
 // 用于请求的 Ktor HttpClient，如有必要则需要自行引入并选择需要使用的引擎。
 // 参考：https://ktor.io/docs/http-client-engines.html
 val client = HttpClient(Java) {
-    // 必须使用 kotlinx 的JSON的反序列化。#91完成后此步骤不再需要。
-    install(ContentNegotiation) {
-        json()
-    }
+    // config...
 }
 
 // 鉴权信息
@@ -118,12 +108,7 @@ guildListData.items.forEach { ... }
 // 参考：https://ktor.io/docs/http-client-engines.html
 // 此处以 ktor-java 引擎为例。
 var client = HttpClientKt.HttpClient(Java.INSTANCE, config -> {
-    // 需要安装 kotlinx 的 json 序列化器。
-    // 等 #91 完成后此段固定代码就不需要了
-    config.install(ContentNegotiation.Plugin, builder -> {
-        JsonSupportKt.json(builder, JsonSupportKt.getDefaultJson(), ContentType.Application.INSTANCE.getJson());
-        return Unit.INSTANCE;
-    });
+    // config...   
     return Unit.INSTANCE;
 });
 
