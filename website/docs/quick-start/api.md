@@ -5,16 +5,12 @@ sidebar_position: 1
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import {version} from '@site/static/version.json'
 
 API模块是独立的，你可以单独使用它作为 [KOOK API](https://developer.kookapp.cn/doc/) 的封装库。
 
-:::info 版本?
-
-版本可前往 [**Releases**](https://github.com/simple-robot/simbot-component-kook/releases) 查看并选择。
-
-:::
-
-:::caution 全变了
+:::danger 全变了
 
 API模块在 [**#82**](https://github.com/simple-robot/simbot-component-kook/issues/82) 的过程中会**大改**，
 包括变更API接口的结果实现、事件类型的实现等，以及变更所有API的命名为 `GetXxxListApi` 风格等。
@@ -24,42 +20,43 @@ API模块在 [**#82**](https://github.com/simple-robot/simbot-component-kook/iss
 ## 安装
 
 <Tabs groupId="use-dependency">
-
 <TabItem value="Gradle Kotlin DSL">
 
-```kotlin
+<CodeBlock language="kotlin">{`
 // 不要忘记使用 Gradle 的 kotlin 插件来允许自动选择对应平台，比如JVM或JS等。
-
-implementation("love.forte.simbot.component:simbot-component-kook-api:$VERSION") // 版本参考前文所述的 Releases
-```
+implementation("love.forte.simbot.component:simbot-component-kook-api:${version}") // 版本参考下文所述的 Releases
+`.trim()}</CodeBlock>
 
 </TabItem>
-
 <TabItem value="Gradle Groovy">
 
-```groovy
+<CodeBlock language="gradle">{`
 // 不要忘记使用 Gradle 的 kotlin 插件来允许自动选择对应平台，比如JVM或JS等。
-
-implementation 'love.forte.simbot.component:simbot-component-kook-api:$VERSION' // 版本参考前文所述的 Releases
-```
+implementation 'love.forte.simbot.component:simbot-component-kook-api:${version}' // 版本参考下文所述的 Releases
+`.trim()}</CodeBlock>
 
 </TabItem>
-
 <TabItem value="Maven">
 
-```xml
+<CodeBlock language="xml">{`
 <dependency>
     <groupId>love.forte.simbot.component</groupId>
     <!-- 在Maven中使用 '-jvm' 后缀来选择使用JVM平台库 -->
     <artifactId>simbot-component-kook-api</artifactId>
-    <!-- 版本参考前文所述的 Releases -->
-    <version>${VERSION}</version>
+    <!-- 版本参考下文所述的 Releases -->
+    <version>${version}</version>
 </dependency>
-```
+`.trim()}</CodeBlock>
 
 </TabItem>
-
 </Tabs>
+
+
+:::info 版本参考
+
+版本可前往 [**Releases**](https://github.com/simple-robot/simbot-component-kook/releases) 查看并选择。
+
+:::
 
 ## 使用
 
@@ -86,7 +83,6 @@ API包装类的命名也存在一定的规律，比如一个 `获取某列表` �
 :::
 
 <Tabs groupId="code">
-
 <TabItem value="Kotlin">
 
 ```kotlin
@@ -114,7 +110,6 @@ guildListData.items.forEach { ... }
 ```
 
 </TabItem>
-
 <TabItem value="Java">
 
 ```java
@@ -148,6 +143,5 @@ for (var guild : guildListData) {
 ```
 
 </TabItem>
-
 </Tabs>
 

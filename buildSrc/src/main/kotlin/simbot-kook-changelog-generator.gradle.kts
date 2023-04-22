@@ -52,6 +52,29 @@ tasks.create("createChangelog") {
     }
 }
 
+tasks.create("updateWebsiteVersionJson") {
+    group = "documentation"
+    doFirst {
+        val version = P.version.toString()
+
+        val websiteVersionJsonDir = rootProject.file("website/static")
+        if (!websiteVersionJsonDir.exists()) {
+            websiteVersionJsonDir.mkdirs()
+        }
+        val websiteVersionJsonFile = File(websiteVersionJsonDir, "version.json")
+        if (!websiteVersionJsonFile.exists()) {
+            websiteVersionJsonFile.createNewFile()
+        }
+
+        websiteVersionJsonFile.writeText(
+            """
+            {
+              "version": "$version"
+            }
+        """.trimIndent()
+        )
+    }
+}
 
 //fun repoRow(moduleName: String, group: String, id: String, version: String): String {
 //    return "| $moduleName | [$moduleName: v$version](https://repo1.maven.org/maven2/${group.replace(".", "/")}/${id.replace(".", "/")}/$version) | [$moduleName: v$version](https://search.maven.org/artifact/$group/$id/$version/jar)  |"
