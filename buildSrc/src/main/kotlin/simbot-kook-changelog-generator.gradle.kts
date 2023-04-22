@@ -15,43 +15,44 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import changelog.generateChangelog
+
 
 tasks.create("createChangelog") {
-    group = "build"
+    group = "documentation"
     doFirst {
-        val realVersion = P.version.toString()
-        val version = "v$realVersion"
-        println("Generate change log for $version ...")
-        // configurations.runtimeClasspath
-        val changelogDir = rootProject.file(".changelog").also {
-            it.mkdirs()
-        }
-        val file = File(changelogDir, "$version.md")
-        if (!file.exists()) {
-            file.createNewFile()
-            val coreVersion = simbotVersion.toString()
-            val autoGenerateText = """
-                
-                **部分依赖库版本参考**
-                
-                | **库** | **版本** |
-                |---------|--------|
-                | 核心库 | [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion) |   
-                
-                > **Warning**
-                当前版本处于 **`ALPHA`**阶段，仍旧有很多[**已知问题**](https://github.com/simple-robot/simbot-component-kook/issues/)和可能存在的**潜在问题**，
-                如有发现问题请积极[反馈](https://github.com/simple-robot/simbot-component-kook/issues/)或 [协助我们解决](https://github.com/simple-robot/simbot-component-kook/pulls)，非常感谢！
-                
-                
-            """.trimIndent()
-
-
-            file.writeText(autoGenerateText)
-        }
+        generateChangelog("v${P.version}")
+//        println("Generate change log for $version ...")
+//        // configurations.runtimeClasspath
+//        val changelogDir = rootProject.file(".changelog").also {
+//            it.mkdirs()
+//        }
+//        val file = File(changelogDir, "$version.md")
+//        if (!file.exists()) {
+//            file.createNewFile()
+//            val coreVersion = simbotVersion.toString()
+//            val autoGenerateText = """
+//
+//                **部分依赖库版本参考**
+//
+//                | **库** | **版本** |
+//                |---------|--------|
+//                | 核心库 | [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion) |
+//
+//                > **Warning**
+//                当前版本处于 **`ALPHA`**阶段，仍旧有很多[**已知问题**](https://github.com/simple-robot/simbot-component-kook/issues/)和可能存在的**潜在问题**，
+//                如有发现问题请积极[反馈](https://github.com/simple-robot/simbot-component-kook/issues/)或 [协助我们解决](https://github.com/simple-robot/simbot-component-kook/pulls)，非常感谢！
+//
+//
+//            """.trimIndent()
+//
+//
+//            file.writeText(autoGenerateText)
+//        }
     }
 }
 
 
-fun repoRow(moduleName: String, group: String, id: String, version: String): String {
-    return "| $moduleName | [$moduleName: v$version](https://repo1.maven.org/maven2/${group.replace(".", "/")}/${id.replace(".", "/")}/$version) | [$moduleName: v$version](https://search.maven.org/artifact/$group/$id/$version/jar)  |"
-}
+//fun repoRow(moduleName: String, group: String, id: String, version: String): String {
+//    return "| $moduleName | [$moduleName: v$version](https://repo1.maven.org/maven2/${group.replace(".", "/")}/${id.replace(".", "/")}/$version) | [$moduleName: v$version](https://search.maven.org/artifact/$group/$id/$version/jar)  |"
+//}

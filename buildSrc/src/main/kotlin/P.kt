@@ -52,7 +52,7 @@ val simbotRequestorKtor = "love.forte.simbot.util:simbot-util-api-requestor-ktor
 
 object P : ProjectDetail() {
     const val GROUP = "love.forte.simbot.component"
-    const val DESCRIPTION = "Simple Robot框架下针对开黑啦(Kook)平台的组件实现"
+    const val DESCRIPTION = "Simple Robot框架下针对开黑啦(KOOK)平台的组件实现"
     const val HOMEPAGE = "https://github.com/simple-robot/simbot-component-kook"
 
     override val homepage: String
