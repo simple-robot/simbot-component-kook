@@ -76,7 +76,7 @@ public class IntimacyUpdateRequest internal constructor(
         Simbot.require(socialInfo?.length?.let { it <= 500 } ?: true) { "Social info must <= 500." }
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Unit>
+    override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
     override val apiPaths: List<String>
         get() = apiPathList

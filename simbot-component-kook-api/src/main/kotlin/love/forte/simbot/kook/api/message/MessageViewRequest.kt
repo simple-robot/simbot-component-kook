@@ -38,7 +38,7 @@ public class MessageViewRequest internal constructor(private val msgId: ID) : Ko
         public fun create(msgId: ID): MessageViewRequest = MessageViewRequest(msgId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out ChannelMessageDetails>
+    override val resultDeserializer: DeserializationStrategy<ChannelMessageDetails>
         get() = ChannelMessageDetailsImpl.serializer()
 
     override val apiPaths: List<String>

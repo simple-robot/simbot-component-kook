@@ -49,7 +49,7 @@ public class IntimacyIndexRequest internal constructor(
         public fun create(userId: ID): IntimacyIndexRequest = IntimacyIndexRequest(userId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out IntimacyIndex>
+    override val resultDeserializer: DeserializationStrategy<IntimacyIndex>
         get() = IntimacyIndex.serializer()
 
     override val apiPaths: List<String> get() = apiPathList

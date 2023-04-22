@@ -63,7 +63,7 @@ public class InviteListRequest internal constructor(
         }
     }
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<InviteInfo>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<InviteInfo>>
         get() = serializer
     
     override val apiPaths: List<String>

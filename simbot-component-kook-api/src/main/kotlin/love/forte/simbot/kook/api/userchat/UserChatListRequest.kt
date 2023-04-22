@@ -29,7 +29,7 @@ import love.forte.simbot.kook.util.unmodifiableListOf
  * @author ForteScarlet
  */
 public object UserChatListRequest : KookGetRequest<KookApiResult.ListData<UserChatView>>() {
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<UserChatView>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<UserChatView>>
         get() = KookApiResult.ListData.serializer(
             UserChatViewImpl.serializer()
         )

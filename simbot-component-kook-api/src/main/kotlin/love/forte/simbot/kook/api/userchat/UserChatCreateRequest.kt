@@ -42,7 +42,7 @@ public class UserChatCreateRequest internal constructor(private val targetId: ID
         public fun create(targetId: ID): UserChatCreateRequest = UserChatCreateRequest(targetId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out UserChatView> get() = UserChatViewImpl.serializer()
+    override val resultDeserializer: DeserializationStrategy<UserChatView> get() = UserChatViewImpl.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(targetId)
 

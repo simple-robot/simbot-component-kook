@@ -52,7 +52,7 @@ public class GuildRoleGrantRequest internal constructor(
         
     }
     
-    override val resultDeserializer: DeserializationStrategy<out UserRoleOperated>
+    override val resultDeserializer: DeserializationStrategy<UserRoleOperated>
         get() = UserRoleOperated.serializer()
     
     override val apiPaths: List<String>

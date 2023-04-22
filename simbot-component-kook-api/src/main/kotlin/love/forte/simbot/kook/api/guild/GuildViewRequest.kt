@@ -54,7 +54,7 @@ public class GuildViewRequest internal constructor(private val guildId: ID) : Ko
     override val apiPaths: List<String>
         get() = apiPathList
 
-    override val resultDeserializer: DeserializationStrategy<out Guild>
+    override val resultDeserializer: DeserializationStrategy<Guild>
         get() = GuildView.serializer()
 
     override fun ParametersBuilder.buildParameters() {

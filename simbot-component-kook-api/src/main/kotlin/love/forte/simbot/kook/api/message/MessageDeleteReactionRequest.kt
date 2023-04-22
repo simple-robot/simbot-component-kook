@@ -84,7 +84,7 @@ public class MessageDeleteReactionRequest internal constructor(
             create(msgId, emoji.id, userId)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
+    override val resultDeserializer: DeserializationStrategy<Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(msgId, emoji, userId)
     

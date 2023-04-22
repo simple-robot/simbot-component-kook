@@ -17,9 +17,6 @@
 
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.repository.Repositories
-import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import java.net.URL
 
 /*
  *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
@@ -44,6 +41,7 @@ plugins {
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
     idea
+//    `kook-dokka-partial-configure`
 }
 
 setup(P)
@@ -111,58 +109,5 @@ idea {
     module {
         isDownloadSources = true
         isDownloadJavadoc = true
-    }
-}
-
-//// dokka
-
-tasks.withType<DokkaTaskPartial>().configureEach {
-    dokkaSourceSets.configureEach {
-        version = P.version.toString()
-        documentedVisibilities.set(listOf(DokkaConfiguration.Visibility.PUBLIC, DokkaConfiguration.Visibility.PROTECTED))
-        reportUndocumented.set(true)
-        if (project.file("README.md").exists()) {
-            includes.from("README.md")
-        }
-        
-        
-        // samples
-        samples.from(
-            project.files(),
-            project.files("src/samples/samples"),
-        )
-        
-        sourceLink {
-            localDirectory.set(projectDir.resolve("src"))
-            val relativeTo = projectDir.relativeTo(rootProject.projectDir)
-            remoteUrl.set(URL("${P.HOMEPAGE}/tree/main/$relativeTo/src"))
-            remoteLineSuffix.set("#L")
-        }
-        
-        perPackageOption {
-            matchingRegex.set(".*internal.*") // will match all .internal packages and sub-packages
-            suppress.set(true)
-        }
-        
-        
-        
-        fun externalDocumentation(docUrl: URL) {
-            externalDocumentationLink {
-                url.set(docUrl)
-                packageListUrl.set(URL(docUrl, "${docUrl.path}/package-list"))
-            }
-        }
-        
-        // kotlin-coroutines doc
-        externalDocumentation(URL("https://kotlinlang.org/api/kotlinx.coroutines"))
-        
-        // kotlin-serialization doc
-        externalDocumentation(URL("https://kotlinlang.org/api/kotlinx.serialization"))
-        
-        // ktor
-        externalDocumentation(URL("https://api.ktor.io"))
-        
-        // simbot doc
-        externalDocumentation(URL("https://docs.simbot.forte.love/main"))
     }
 }

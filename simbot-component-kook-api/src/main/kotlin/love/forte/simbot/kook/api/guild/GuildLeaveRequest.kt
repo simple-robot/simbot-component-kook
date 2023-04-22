@@ -43,7 +43,7 @@ public class GuildLeaveRequest internal constructor(private val guildId: ID) : K
         public fun create(guildId: ID): GuildLeaveRequest = GuildLeaveRequest(guildId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out Unit>
+    override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPaths: List<String>

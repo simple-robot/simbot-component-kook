@@ -45,7 +45,7 @@ public class UserChatDeleteRequest internal constructor(private val chatCode: ID
         public fun create(chatCode: ID): UserChatDeleteRequest = UserChatDeleteRequest(chatCode)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
+    override val resultDeserializer: DeserializationStrategy<Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(chatCode)
 
