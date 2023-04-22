@@ -56,7 +56,7 @@ public class GuildRoleCreateRequest internal constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<out GuildRoleCreated>
+    override val resultDeserializer: DeserializationStrategy<GuildRoleCreated>
         get() = GuildRoleCreated.serializer()
 
     override val apiPaths: List<String>

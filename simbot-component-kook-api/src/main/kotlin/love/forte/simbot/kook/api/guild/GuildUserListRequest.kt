@@ -114,7 +114,7 @@ public class GuildUserListRequest internal constructor(
         
     }
     
-    override val resultDeserializer: DeserializationStrategy<out GuildUserList>
+    override val resultDeserializer: DeserializationStrategy<GuildUserList>
         get() = GuildUserList.serializer()
     
     override val apiPaths: List<String>

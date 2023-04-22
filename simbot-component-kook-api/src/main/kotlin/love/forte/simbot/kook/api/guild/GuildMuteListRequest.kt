@@ -48,7 +48,7 @@ public class GuildMuteListRequest(private val guildId: ID) : KookGetRequest<Guil
             GuildMuteListRequest(guildId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out GuildMuteList>
+    override val resultDeserializer: DeserializationStrategy<GuildMuteList>
         get() = GuildMuteList.serializer()
 
     override val apiPaths: List<String>

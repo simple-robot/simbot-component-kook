@@ -44,7 +44,7 @@ public sealed class GatewayRequest(private val isCompress: Boolean) : KookGetReq
 
     protected open fun ParametersBuilder.buildParameters0() {}
 
-    override val resultDeserializer: DeserializationStrategy<out Gateway>
+    override val resultDeserializer: DeserializationStrategy<Gateway>
         get() = Gateway.serializer()
 
     override val apiPaths: List<String>

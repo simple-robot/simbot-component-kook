@@ -69,7 +69,7 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
     /**
      * 得到响应值的反序列化器.
      */
-    public abstract val resultDeserializer: DeserializationStrategy<out T>
+    public abstract val resultDeserializer: DeserializationStrategy<T>
 
 
     /**

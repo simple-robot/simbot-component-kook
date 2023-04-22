@@ -133,7 +133,7 @@ public class DirectMessageCreateRequest internal constructor(
         )
     }
 
-    override val resultDeserializer: DeserializationStrategy<out MessageCreated> get() = MessageCreated.serializer()
+    override val resultDeserializer: DeserializationStrategy<MessageCreated> get() = MessageCreated.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any =
         Body(type, targetId, chatCode, content, quote, nonce)

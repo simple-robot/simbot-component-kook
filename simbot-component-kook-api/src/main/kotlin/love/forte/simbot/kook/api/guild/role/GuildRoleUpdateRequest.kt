@@ -117,7 +117,7 @@ public class GuildRoleUpdateRequest internal constructor(override val body: Body
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<out Role>
+    override val resultDeserializer: DeserializationStrategy<Role>
         get() = RoleImpl.serializer()
 
     override val apiPaths: List<String>

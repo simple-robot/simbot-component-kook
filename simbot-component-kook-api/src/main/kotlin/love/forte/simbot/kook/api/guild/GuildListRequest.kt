@@ -75,7 +75,7 @@ public class GuildListRequest internal constructor(
     override val apiPaths: List<String>
         get() = apiPathList
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<Guild>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<Guild>>
         get() = serializer
     
     override fun ParametersBuilder.buildParameters() {

@@ -128,7 +128,7 @@ public class DirectMessageListRequest private constructor(
         
     }
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<DirectMessageDetails>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<DirectMessageDetails>>
         get() = KookApiResult.ListData.serializer(DirectMessageDetails.serializer)
     
     override val apiPaths: List<String> get() = apiPathList

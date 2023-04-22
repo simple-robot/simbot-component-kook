@@ -17,9 +17,9 @@
 
 plugins {
     kotlin("multiplatform")
-//    `kook-multiplatform-maven-publish`
+//    `kook-multiplatform-maven-publish` // TODO
     kotlin("plugin.serialization")
-    `kook-dokka-partial-configure`
+//    `kook-dokka-partial-configure` // TODO
 }
 
 repositories {

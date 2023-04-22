@@ -55,7 +55,7 @@ public class GuildRoleListRequest internal constructor(
             GuildRoleListRequest(guildId, pageRequest)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<Role>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<Role>>
         get() = serializer
     
     override val apiPaths: List<String>

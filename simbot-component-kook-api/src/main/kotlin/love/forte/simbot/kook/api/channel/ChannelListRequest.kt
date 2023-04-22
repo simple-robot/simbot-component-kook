@@ -66,7 +66,7 @@ public class ChannelListRequest internal constructor(
         ): ChannelListRequest = ChannelListRequest(guildId, page, pageSize, type)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelInfo>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<ChannelInfo>>
         get() = serializer
     
     override val apiPaths: List<String>

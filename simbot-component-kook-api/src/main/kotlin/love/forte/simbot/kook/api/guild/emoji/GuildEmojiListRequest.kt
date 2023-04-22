@@ -53,7 +53,7 @@ public class GuildEmojiListRequest internal constructor(
             = GuildEmojiListRequest(guildId, pageRequest)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<GuildEmojiData>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<GuildEmojiData>>
         get() = serializer
     
     override val apiPaths: List<String>

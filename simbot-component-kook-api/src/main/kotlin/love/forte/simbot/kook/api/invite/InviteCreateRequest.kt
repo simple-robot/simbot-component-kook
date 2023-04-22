@@ -274,7 +274,7 @@ public class InviteCreateRequest internal constructor(
         }
     }
     
-    override val resultDeserializer: DeserializationStrategy<out InviteCreated>
+    override val resultDeserializer: DeserializationStrategy<InviteCreated>
         get() = InviteCreated.serializer()
     
     override val apiPaths: List<String> get() = apiPathList

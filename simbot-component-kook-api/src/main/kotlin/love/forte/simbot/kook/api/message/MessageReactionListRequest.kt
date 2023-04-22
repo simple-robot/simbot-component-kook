@@ -71,7 +71,7 @@ public class MessageReactionListRequest(
         public fun create(msgId: ID, emoji: Emoji): MessageReactionListRequest = create(msgId, emoji.id)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out List<MessageReactor>> get() = serializer
+    override val resultDeserializer: DeserializationStrategy<List<MessageReactor>> get() = serializer
     override val apiPaths: List<String> get() = apiPathList
     
     override fun ParametersBuilder.buildParameters() {

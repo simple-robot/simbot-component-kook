@@ -48,7 +48,7 @@ public class GuildKickoutRequest internal constructor(
         public fun create(guildId: ID, targetId: ID): GuildKickoutRequest = GuildKickoutRequest(guildId, targetId)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Unit>
+    override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
     override val apiPaths: List<String>
         get() = apiPathList

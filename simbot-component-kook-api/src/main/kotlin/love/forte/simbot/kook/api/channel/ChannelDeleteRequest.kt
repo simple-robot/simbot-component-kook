@@ -49,7 +49,7 @@ public class ChannelDeleteRequest internal constructor(private val channelId: ID
         
     }
 
-    override val resultDeserializer: DeserializationStrategy<out Unit>
+    override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPaths: List<String>

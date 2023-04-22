@@ -207,7 +207,7 @@ public class ApiResult @ApiResultType constructor(
     @JvmOverloads
     public fun <T> parseData(
         json: Json = KookApiRequest.DEFAULT_JSON,
-        deserializationStrategy: DeserializationStrategy<out T>
+        deserializationStrategy: DeserializationStrategy<T>
     ): T {
         if (deserializationStrategy == Unit.serializer()) {
             @Suppress("UNCHECKED_CAST")
@@ -228,7 +228,7 @@ public class ApiResult @ApiResultType constructor(
     @JvmOverloads
     public fun <T> parseDataOrThrow(
         json: Json = KookApiRequest.DEFAULT_JSON,
-        deserializationStrategy: DeserializationStrategy<out T>
+        deserializationStrategy: DeserializationStrategy<T>
     ): T {
         if (!isSuccess) {
             throw KookApiException(code, "$message, api=$this")

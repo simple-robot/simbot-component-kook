@@ -53,7 +53,7 @@ public class GuildMuteDeleteRequest internal constructor(
             GuildMuteDeleteRequest(guildId, userId, type)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Unit>
+    override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
     
     override val apiPaths: List<String> get() = apiPathList

@@ -61,7 +61,7 @@ public class DirectMessageUpdateRequest internal constructor(
             DirectMessageUpdateRequest(msgId, content, quote)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
+    override val resultDeserializer: DeserializationStrategy<Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
 
     protected override fun createBody(): Any = Body(msgId, content, quote)

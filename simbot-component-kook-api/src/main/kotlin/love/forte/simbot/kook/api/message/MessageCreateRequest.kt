@@ -92,7 +92,7 @@ public class MessageCreateRequest internal constructor(
         
     }
     
-    override val resultDeserializer: DeserializationStrategy<out MessageCreated> get() = MessageCreated.serializer()
+    override val resultDeserializer: DeserializationStrategy<MessageCreated> get() = MessageCreated.serializer()
     
     override val apiPaths: List<String> get() = apiPathList
     

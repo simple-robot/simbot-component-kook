@@ -84,7 +84,7 @@ public class MessageListRequest internal constructor(
     override val apiPaths: List<String>
         get() = apiPathList
     
-    override val resultDeserializer: DeserializationStrategy<out KookApiResult.ListData<ChannelMessageDetails>>
+    override val resultDeserializer: DeserializationStrategy<KookApiResult.ListData<ChannelMessageDetails>>
         get() = serializer
     
     override fun ParametersBuilder.buildParameters() {

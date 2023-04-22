@@ -35,7 +35,7 @@ import love.forte.simbot.kook.util.unmodifiableListOf
 public object MeRequest : KookGetRequest<Me>() {
     override val apiPaths: List<String> = unmodifiableListOf("user", "me")
 
-    override val resultDeserializer: DeserializationStrategy<out Me>
+    override val resultDeserializer: DeserializationStrategy<Me>
         get() = Me.serializer()
 }
 
