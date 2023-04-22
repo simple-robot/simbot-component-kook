@@ -20,16 +20,14 @@ package love.forte.simbot.kook
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
-import love.forte.simbot.Api4J
-import love.forte.simbot.CharSequenceID
-import love.forte.simbot.ID
-import love.forte.simbot.LoggerContainer
+import love.forte.simbot.*
 import love.forte.simbot.kook.api.KookApiRequestor
 import love.forte.simbot.kook.api.user.Me
 import love.forte.simbot.kook.api.user.MeRequest
 import love.forte.simbot.kook.api.user.OfflineRequest
 import love.forte.simbot.kook.event.*
 import org.slf4j.Logger
+import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -50,12 +48,10 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
      */
     public val configuration: KookBotConfiguration
 
-
     /**
      * 当前bot的[票据][Ticket]信息。
      */
     public val ticket: Ticket
-
 
     /**
      * 当前bot所使用的 [HttpClient] 实例。
@@ -67,6 +63,7 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
     /**
      * @see apiClient
      */
+    @Deprecated("Use 'apiClient'", ReplaceWith("apiClient"))
     override val client: HttpClient
         get() = apiClient
     
@@ -93,24 +90,28 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
     public fun processor(processor: suspend Signal.Event.(decoder: Json, decoded: () -> Event<*>) -> Unit)
 
     /**
-     * process for java
+     * [processor] for java
+     *
+     * @see processor
      */
     @Api4J
-    public fun process(processor: (rawEvent: Signal.Event, decoder: Json, decoded: () -> Event<*>) -> Unit) {
-        processor { decoder, decoded -> processor(this, decoder, decoded) }
+    public fun processorBlocking(processor: ExConsumer<Signal.Event, Json, () -> Event<*>>) { // (rawEvent: Signal.Event, decoder: Json, decoded: () -> Event<*>) -> Unit
+        processor { decoder, decoded -> processor.accept(this, decoder, decoded) }
     }
 
     /**
-     * process for java
+     * [processor] for java
+     *
+     * @see processor
      */
     @Api4J
-    public fun <EX : Event.Extra, E : Event<EX>> process(eventParser: EventParser<EX, E>, processor: (E) -> Unit) {
+    public fun <EX : Event.Extra, E : Event<EX>> processorBlocking(eventParser: EventParser<EX, E>, processor: Consumer<E>) {
         processor { _, decoded ->
 
             if (eventParser.check(type, extraTypePrimitive)) {
                 // val eventData: R = decoder.decodeFromJsonElement(eventType.decoder, data)
                 @Suppress("UNCHECKED_CAST")
-                processor(decoded() as E)
+                processor.accept(decoded() as E)
             }
         }
     }
@@ -133,20 +134,20 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
          */
         public val clientId: ID
 
-
         /**
          * 当前bot所使用的 `Token`. 从 [Bot](https://developer.kook.cn/bot/) 中 websocket链接模式中得到。
          *
          * 鉴于此token可以重新生成，当前ticket中的token也可以随时修改，并且立即生效。
+         *
+         * _**⚠ 是否能直接修改仍待探讨，未来可能会变更**_
          *
          * 如果需要进行API请求，请直接使用 [authorization].
          *
          */
         public var token: String
 
-
         /**
-         * 当前bot使用的 [token] 拼接了 `Bot ` 前缀的结果，用于通过API进行请求，会随着 [token] 的变化儿变化。
+         * 当前bot使用的 [token] 拼接了 `Bot ` 前缀的结果，用于通过API进行请求，会随着 [token] 的变化而变化。
          */
         public val authorization: String
 
@@ -164,20 +165,21 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
      * @throws kotlinx.coroutines.CancellationException 如果已经被关闭。
      * @return 如果正常运行中，则尝试重新启动；如果尚未开始，则启动。如果已经被关闭，抛出 [kotlinx.coroutines.CancellationException].
      */
-    @JvmSynthetic
+    @JvmSuspendTrans
     public suspend fun start(): Boolean
 
 
     /**
      * 等待直到当前bot被取消。
      */
+    @JvmSuspendTrans
     public suspend fun join()
 
 
     /**
      * 终止此bot并关闭所有连接。
      */
-    @JvmSynthetic
+    @JvmSuspendTrans
     public suspend fun cancel(reason: Throwable? = null)
 
 
@@ -186,6 +188,15 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
      */
     public val isStarted: Boolean
 
+    /**
+     * 获取当前bot所持有的 WebSocket 事件订阅连接。
+     *
+     * 当连接失效或尚未启动时可能会得到null。
+     * 如果正处于重新连接阶段，则可能会得到null，也可能会得到 [Client.isActive] == `false` 的旧连接。
+     *
+     */
+    @ExperimentalSimbotApi
+    public val eventClient: Client?
 
     /**
      * Bot内部持有的连接信息。
@@ -199,31 +210,54 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
         /**
          * 此连接所属Bot。
          */
+        @Deprecated("Will be removed in the future")
         public val bot: KookBot
 
-
         /**
-         * 此连接的目标url。
+         * 此连接的目标 `gateway url`。
          */
         public val url: String
-
 
         /**
          * 此连接内部所持有的 `sn` 。
          */
         public val sn: Long
 
-
         /**
-         * 当前 client 是否处于运行状态。
+         * 此 `client` 是否处于运行状态。
          */
         public val isActive: Boolean
-
-
     }
 
 
     //// some self func
+
+    /**
+     * bot作为用户时的用户信息。
+     *
+     * 需要至少执行过一次 [me] 或已经 [启动][start] 才可获得，
+     * 每次使用 [me] 的同时也会刷新此属性的记录。
+     *
+     * [userInfo] 不会主动刷新。如果需要通过真实API请求，请使用 [me]。
+     *
+     * @throws UninitializedPropertyAccessException 没有被初始化过
+     */
+    public val userInfo: Me
+
+
+    /**
+     * bot作为用户时的用户ID。
+     *
+     * 需要至少执行过一次 [me] 或已经 [启动][start] 才可获得，
+     * 每次使用 [me] 的同时也会刷新此属性的记录。
+     *
+     * [userId] 不会主动刷新。如果需要通过真实API请求，请使用 [me]。
+     *
+     * @see userInfo
+     *
+     * @throws UninitializedPropertyAccessException 没有被初始化过
+     */
+    public val userId: CharSequenceID get() = userInfo.id
 
 
     /**
@@ -231,6 +265,7 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
      *
      * @see MeRequest
      */
+    @JvmSuspendTrans
     public suspend fun me(): Me
 
     /**
@@ -238,6 +273,7 @@ public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
      *
      * @see OfflineRequest
      */
+    @JvmSuspendTrans
     public suspend fun offline()
 
 }
@@ -308,4 +344,10 @@ private fun String.hide(size: Int = 3, hide: String = "********"): String {
 
 }
 
-
+/**
+ * 三个参数的消费函数接口。
+ */
+@Api4J
+public fun interface ExConsumer<A, B, C> {
+    public fun accept(a: A, b: B, c: C)
+}
