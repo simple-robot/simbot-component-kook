@@ -14,6 +14,9 @@ on:
       - 'buildSrc/**'
       - '**.kts'
 
+    tags-ignore:
+      - 'v3.**.**.**'
+
   # 手动触发工作流
   workflow_dispatch:
 
