@@ -19,11 +19,10 @@
 
 package love.forte.simbot.kook
 
+import kotlinx.coroutines.future.future
 import love.forte.simbot.Api4J
-import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.api.ApiResult
 import love.forte.simbot.kook.api.KookApiRequest
-import love.forte.simbot.utils.runInAsync
 import love.forte.simbot.utils.runInNoScopeBlocking
 import java.util.concurrent.CompletableFuture
 
@@ -113,10 +112,9 @@ public fun <T> KookBot.requestDataBlocking(api: KookApiRequest<T>): T {
  * @see requestDataAsync
  *
  */
-@OptIn(InternalSimbotApi::class)
 @Api4J
 public fun KookBot.requestAsync(api: KookApiRequest<*>): CompletableFuture<out ApiResult> {
-    return runInAsync(this) { api.requestForResultBy(this@requestAsync) }
+    return future { api.requestForResultBy(this@requestAsync) }
 }
 
 /**
@@ -124,10 +122,9 @@ public fun KookBot.requestAsync(api: KookApiRequest<*>): CompletableFuture<out A
  *
  * @see requestDataBy
  */
-@OptIn(InternalSimbotApi::class)
 @Api4J
 public fun <T> KookBot.requestDataAsync(api: KookApiRequest<T>): CompletableFuture<out T> {
-    return runInAsync(this) { api.requestDataBy(this@requestDataAsync) }
+    return future { api.requestDataBy(this@requestDataAsync) }
 }
 
 

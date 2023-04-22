@@ -35,6 +35,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.SimbotIllegalStateException
 import love.forte.simbot.kook.KookBot
@@ -104,6 +105,8 @@ internal class KookBotImpl(
     private val isCompress = configuration.isCompress
     private val gatewayRequest: GatewayRequest = if (isCompress) GatewayRequest.Compress else GatewayRequest.NotCompress
 
+    @Volatile
+    override lateinit var userInfo: Me
 
     init {
         val parentJob = configuration.coroutineContext[Job]
@@ -201,6 +204,9 @@ internal class KookBotImpl(
     @Volatile
     private var _client: ClientImpl? = null
 
+    @ExperimentalSimbotApi
+    override val eventClient: KookBot.Client? get() = _client
+
     @Volatile
     private var stageLoop: StageLoop? = null
 
@@ -234,12 +240,21 @@ internal class KookBotImpl(
             next = loop.nextStage()
         }
 
-        logger.debug("Loop on stage 'Receive'")
+        if (next != null) {
+            logger.debug("Loop on stage 'Receive' {}", next)
+        } else {
+            logger.warn("Loop done. stage is null")
+        }
 
-        launch(loopJob) {
+        // save client
+        _client = (next as? Receive)?.client
+
+        launch {
             loop.invoke(next)
             loop.run()
         }
+
+        stageLoop = loop
 
         isStarted = true
         true
@@ -376,7 +391,9 @@ internal class KookBotImpl(
     }
 
     override suspend fun me(): Me {
-        return MeRequest.requestDataBy(this)
+        return MeRequest.requestDataBy(this).also {
+            userInfo = it
+        }
     }
 
     override suspend fun offline() {
@@ -555,7 +572,7 @@ internal class KookBotImpl(
      */
     private inner class Receive(
         private val hello: Signal.Hello,
-        private val client: ClientImpl,
+        val client: ClientImpl,
     ) : Stage() {
         override suspend fun invoke(loop: StageLoop) {
 
@@ -774,6 +791,7 @@ internal class KookBotImpl(
             get() = atomicSn.get()
         override val isCompress: Boolean
             get() = this@KookBotImpl.isCompress
+        @Deprecated("Will be removed in the future")
         override val bot: KookBot
             get() = this@KookBotImpl
         override val url: String

@@ -264,8 +264,7 @@ internal class KookComponentBotImpl(
     
     override fun isMe(id: ID): Boolean {
         if (id == this.id) return true
-        if (::me.isInitialized && me.id == id) return true
-        return false
+        return ::me.isInitialized && me.id == id
     }
     // endregion
     
@@ -295,7 +294,9 @@ internal class KookComponentBotImpl(
     
     
     override suspend fun guild(id: ID): KookGuildImpl? = internalGuilds[id.literal]
-    
+
+    override suspend fun guildCount(): Int = internalGuilds.size
+
     override val guildList: List<KookGuild>
         get() = internalGuilds.values.toList()
     
@@ -320,6 +321,10 @@ internal class KookComponentBotImpl(
                 prop.effectOn(flow)
             }
         }
+
+    override suspend fun contactCount(): Int {
+        return UserChatListRequest.requestDataBy(this).meta.total
+    }
     
     // endregion
     

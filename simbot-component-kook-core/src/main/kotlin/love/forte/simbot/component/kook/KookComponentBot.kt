@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook
 import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
+import love.forte.simbot.JvmSuspendTrans
 import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.message.KookAssetMessage
@@ -100,8 +101,8 @@ public interface KookComponentBot : Bot {
     @JvmBlocking(baseName = "getGuild", suffix = "")
     @JvmAsync(baseName = "getGuild")
     public override suspend fun guild(id: ID): KookGuild?
-    
-    
+
+
     // region image api
     /**
      * 上传一个资源并得到一个 [KookAssetMessage].
@@ -109,8 +110,7 @@ public interface KookComponentBot : Bot {
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值，即 `2`、`3`、`4`。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JvmSuspendTrans
     public suspend fun uploadAsset(resource: Resource, type: Int): KookSimpleAssetMessage
     
     /**
@@ -118,8 +118,7 @@ public interface KookComponentBot : Bot {
      * @param resource 需要上传的资源
      * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE] 中的值.
      */
-    @JvmBlocking
-    @JvmAsync
+    @JvmSuspendTrans
     public suspend fun uploadAsset(resource: Resource, type: MessageType): KookSimpleAssetMessage =
         uploadAsset(resource, type.type)
     
@@ -127,8 +126,7 @@ public interface KookComponentBot : Bot {
     /**
      * 提供一个资源类型并将其上传后作为 [KookAssetImage] 使用。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JvmSuspendTrans
     public suspend fun uploadAssetImage(resource: Resource): KookAssetImage
     
     /**
@@ -137,8 +135,7 @@ public interface KookComponentBot : Bot {
      * 但是需要验证此 [id] 是否为 `https://www.kook.cn` 开头，即是否为 kook 的资源。
      *
      */
-    @JvmBlocking
-    @JvmAsync
+    @JvmSuspendTrans
     public override suspend fun resolveImage(id: ID): KookAssetImage
     // endregion
     
