@@ -55,7 +55,7 @@ public class InviteDeleteRequest internal constructor(
         
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
+    override val resultDeserializer: DeserializationStrategy<Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     
     override fun createBody(): Any = Body(urlCode, guildId, channelId)

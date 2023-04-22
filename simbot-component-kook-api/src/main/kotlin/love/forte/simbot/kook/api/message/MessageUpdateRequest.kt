@@ -75,7 +75,7 @@ public class MessageUpdateRequest internal constructor(
             MessageUpdateRequest(msgId, content, quote, tempTargetId)
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Unit> get() = Unit.serializer()
+    override val resultDeserializer: DeserializationStrategy<Unit> get() = Unit.serializer()
     override val apiPaths: List<String> get() = apiPathList
     override fun createBody(): Any = Body(msgId, content, quote, tempTargetId)
     

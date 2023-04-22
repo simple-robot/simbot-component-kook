@@ -20,6 +20,7 @@ plugins {
     `simbot-kook-module-conventions`
     `simbot-kook-maven-publish`
     `simbot-kook-suspend-transform`
+    `kook-dokka-partial-configure`
 }
 
 

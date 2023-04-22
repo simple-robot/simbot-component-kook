@@ -29,7 +29,7 @@ import love.forte.simbot.kook.util.unmodifiableListOf
  * @author ForteScarlet
  */
 public object OfflineRequest : KookPostRequest<Unit>() {
-    override val resultDeserializer: DeserializationStrategy<out Unit>
+    override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPaths: List<String> = unmodifiableListOf("user", "offline")

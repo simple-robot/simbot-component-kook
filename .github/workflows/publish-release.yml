@@ -14,8 +14,8 @@ env:
   GRADLE_OPTS: "-Xmx8g -Xms2g -Dfile.encoding=UTF-8"
 
 jobs:
-  run-test:
-    name: Run Test
+  run-test-and-publish:
+    name: Run test and publish
     runs-on: ubuntu-latest
     steps:
       # 检出仓库代码
@@ -28,46 +28,29 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
+          cache: 'gradle'
 
       # setup Gradle
       - name: Gradle Run Test
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.6
-          arguments: clean build test
-
-
-
-  publish-release:
-    name: Publish Release
-    runs-on: ubuntu-latest
-    needs: run-test
-    steps:
-      # 检出仓库代码
-      - name: Check Out Repo
-        uses: actions/checkout@v3
-
-      # setup Java
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 11
+          arguments: clean assemble test
 
       # setup Gradle
       - name: Gradle Publish Release
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.6
-          arguments: | 
+          arguments: |
             publishToSonatype
             closeAndReleaseStagingRepository
-            --warning-mode all
             --info
-            -Pkotlin.daemon.jvmargs="-Xmx8g -XX:MaxPermSize=1g -Dfile.encoding=UTF-8"
+            --warning-mode all
+            -x test
+            --build-cache
             -Porg.gradle.jvmargs="-Xmx8g -XX:MaxPermSize=1g -Dfile.encoding=UTF-8"
-            -Porg.gradle.workers.max=8
-            -Porg.gradle.parallel=true
+            -Porg.gradle.daemon=false
 
         env:
           SIMBOT_IS_SNAPSHOT: false
@@ -76,7 +59,7 @@ jobs:
   create-release:
     name: Create release
     runs-on: ubuntu-latest
-    needs: publish-release
+    needs: run-test-and-publish
     permissions:
       contents: write
     steps:
@@ -96,7 +79,7 @@ jobs:
   publish-snapshot:
     name: Publish snapshot
     runs-on: ubuntu-latest
-    needs: publish-release
+    needs: run-test-and-publish
     steps:
       # 检出仓库代码
       - name: Check out repo
@@ -122,7 +105,7 @@ jobs:
   deploy-doc:
     name: Deploy-doc
     runs-on: ubuntu-latest
-    needs: publish-release
+    needs: run-test-and-publish
     steps:
       # 检出仓库代码
       - name: Check out repo
@@ -160,3 +143,28 @@ jobs:
           publish_dir: ./build/dokka/html
           # deploy to sub dir
           destination_dir: components/kook
+
+  deploy-website:
+    name: Deploy Website
+    runs-on: ubuntu-latest
+    needs: run-test-and-publish
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+          cache-dependency-path: ./website/package-lock.json
+
+      - run: |
+          npm ci
+          npm run build
+        working-directory: ./website
+
+      # https://github.com/marketplace/actions/github-pages-action
+      - name: Push to doc repository
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PUSH_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./website/build

@@ -15,47 +15,67 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import changelog.generateChangelog
+
 
 tasks.create("createChangelog") {
-    group = "build"
+    group = "documentation"
     doFirst {
-        val realVersion = P.version.toString()
-        val version = "v$realVersion"
-        println("Generate change log for $version ...")
-        // configurations.runtimeClasspath
-        val changelogDir = rootProject.file(".changelog").also {
-            it.mkdirs()
-        }
-        val file = File(changelogDir, "$version.md")
-        if (!file.exists()) {
-            file.createNewFile()
-            val coreVersion = simbotVersion.toString()
-            val autoGenerateText = """
-                > 对应核心版本: [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion)
-                
-                **⚠️注意:**
-
-                当前版本处于 **`ALPHA`**阶段，仍旧有很多[**已知问题**](https://github.com/simple-robot/simbot-component-kook/issues/)和可能存在的**潜在问题**，
-                如有发现问题请积极[反馈](https://github.com/simple-robot/simbot-component-kook/issues/)或 [协助我们解决](https://github.com/simple-robot/simbot-component-kook/pulls)，非常感谢！
-
-                
-                **仓库参考:**
-                
-                | **模块** | **repo1.maven** | **search.maven** |
-                |---------|-----------------|------------------|
-                ${repoRow("simbot-kook-api", "love.forte.simbot.component", "simbot-component-kook-api", realVersion)}
-                ${repoRow("simbot-kook-stdlib", "love.forte.simbot.component", "simbot-component-kook-stdlib", realVersion)}
-                ${repoRow("simbot-kook-core", "love.forte.simbot.component", "simbot-component-kook-core", realVersion)}
-                
-            """.trimIndent()
-
-
-            file.writeText(autoGenerateText)
-        }
+        generateChangelog("v${P.version}")
+//        println("Generate change log for $version ...")
+//        // configurations.runtimeClasspath
+//        val changelogDir = rootProject.file(".changelog").also {
+//            it.mkdirs()
+//        }
+//        val file = File(changelogDir, "$version.md")
+//        if (!file.exists()) {
+//            file.createNewFile()
+//            val coreVersion = simbotVersion.toString()
+//            val autoGenerateText = """
+//
+//                **部分依赖库版本参考**
+//
+//                | **库** | **版本** |
+//                |---------|--------|
+//                | 核心库 | [**v$coreVersion**](https://github.com/ForteScarlet/simpler-robot/releases/tag/v$coreVersion) |
+//
+//                > **Warning**
+//                当前版本处于 **`ALPHA`**阶段，仍旧有很多[**已知问题**](https://github.com/simple-robot/simbot-component-kook/issues/)和可能存在的**潜在问题**，
+//                如有发现问题请积极[反馈](https://github.com/simple-robot/simbot-component-kook/issues/)或 [协助我们解决](https://github.com/simple-robot/simbot-component-kook/pulls)，非常感谢！
+//
+//
+//            """.trimIndent()
+//
+//
+//            file.writeText(autoGenerateText)
+//        }
     }
 }
 
+tasks.create("updateWebsiteVersionJson") {
+    group = "documentation"
+    doFirst {
+        val version = P.version.toString()
 
-fun repoRow(moduleName: String, group: String, id: String, version: String): String {
-    return "| $moduleName | [$moduleName: v$version](https://repo1.maven.org/maven2/${group.replace(".", "/")}/${id.replace(".", "/")}/$version) | [$moduleName: v$version](https://search.maven.org/artifact/$group/$id/$version/jar)  |"
+        val websiteVersionJsonDir = rootProject.file("website/static")
+        if (!websiteVersionJsonDir.exists()) {
+            websiteVersionJsonDir.mkdirs()
+        }
+        val websiteVersionJsonFile = File(websiteVersionJsonDir, "version.json")
+        if (!websiteVersionJsonFile.exists()) {
+            websiteVersionJsonFile.createNewFile()
+        }
+
+        websiteVersionJsonFile.writeText(
+            """
+            {
+              "version": "$version"
+            }
+        """.trimIndent()
+        )
+    }
 }
+
+//fun repoRow(moduleName: String, group: String, id: String, version: String): String {
+//    return "| $moduleName | [$moduleName: v$version](https://repo1.maven.org/maven2/${group.replace(".", "/")}/${id.replace(".", "/")}/$version) | [$moduleName: v$version](https://search.maven.org/artifact/$group/$id/$version/jar)  |"
+//}

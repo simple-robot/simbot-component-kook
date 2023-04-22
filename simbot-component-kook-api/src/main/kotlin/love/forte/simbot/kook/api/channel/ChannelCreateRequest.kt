@@ -84,7 +84,7 @@ public class ChannelCreateRequest internal constructor(
         require(voiceQuality in 1..3) { "The 'voiceQuality' must between 1 and 3, but $voiceQuality" }
     }
     
-    override val resultDeserializer: DeserializationStrategy<out Channel>
+    override val resultDeserializer: DeserializationStrategy<Channel>
         get() = ChannelView.serializer()
     
     override val apiPaths: List<String>

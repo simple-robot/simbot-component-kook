@@ -48,7 +48,7 @@ public class UserViewRequest internal constructor(
         
     }
 
-    override val resultDeserializer: DeserializationStrategy<out User>
+    override val resultDeserializer: DeserializationStrategy<User>
         get() = UserImpl.serializer()
 
     override val apiPaths: List<String>

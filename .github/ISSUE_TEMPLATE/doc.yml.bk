@@ -1,0 +1,41 @@
+name: "📃文档反馈"
+description: "反馈与文档、网站内容相关的问题反馈"
+labels: [ "文档" ]
+assignees: [ "ForteScarlet" ]
+# https://docs.github.com/cn/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 须知
+        在进行问题反馈前，请**确认**以下内容：
+        1. 我确认目前的 [Issues](https://github.com/simple-robot/simbot-component-qq-guild/issues?q=is%3Aissue+label%3A%E6%96%87%E6%A1%A3) 中没有类似内容。
+        2. 我已确认所述内容不涉及任何个人隐私或其他敏感信息，遵守相关地区法律法规。
+        
+        <hr />
+
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 反馈内容类型
+      options:
+        - 网站
+        - API文档
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: links
+    attributes:
+      label: 相关链接
+      description: 提供可用的相关链接
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 内容描述
+      description: 描述你的反馈内容
+    validations:
+      required: true

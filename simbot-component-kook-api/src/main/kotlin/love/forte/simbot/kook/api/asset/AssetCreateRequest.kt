@@ -94,7 +94,7 @@ public class AssetCreateRequest internal constructor(
         
     }
     
-    override val resultDeserializer: DeserializationStrategy<out AssetCreated>
+    override val resultDeserializer: DeserializationStrategy<AssetCreated>
         get() = AssetCreated.serializer()
     
     override val apiPaths: List<String> get() = apiPathList

@@ -51,7 +51,7 @@ public class ChannelViewRequest internal constructor(private val targetId: ID) :
         public fun create(targetId: ID): ChannelViewRequest = ChannelViewRequest(targetId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<out ChannelView>
+    override val resultDeserializer: DeserializationStrategy<ChannelView>
         get() = ChannelView.serializer()
 
     override val apiPaths: List<String>
