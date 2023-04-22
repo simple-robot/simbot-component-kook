@@ -800,7 +800,7 @@ internal class KookBotImpl(
             get() = session.isActive
 
         override fun toString(): String {
-            return "ClientImpl(sn=$sn, isCompress=$isCompress, heartbeatJob=$heartbeatJob, eventProcessJob=$eventProcessJob, bot=$bot)"
+            return "ClientImpl(sn=$sn, isCompress=$isCompress, heartbeatJob=$heartbeatJob, eventProcessJob=$eventProcessJob)"
         }
 
     }

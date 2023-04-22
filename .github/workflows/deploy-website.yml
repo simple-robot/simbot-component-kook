@@ -5,9 +5,10 @@ on:
       - main
       - dev/ver/**
       - dev/main
-
     paths:
       - 'website/**'
+    tags-ignore:
+      - 'v3.**.**.**'
 
 jobs:
   deploy-website:
