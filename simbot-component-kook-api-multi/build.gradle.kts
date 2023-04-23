@@ -132,6 +132,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api(simbotRequestorCore)
                 api(libs.ktor.client.core)
                 api(libs.ktor.client.contentNegotiation)
                 api(libs.ktor.serialization.kotlinx.json)
