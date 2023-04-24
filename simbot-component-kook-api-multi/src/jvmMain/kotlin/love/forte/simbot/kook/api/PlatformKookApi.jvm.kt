@@ -19,7 +19,14 @@ package love.forte.simbot.kook.api
 
 import io.ktor.client.*
 import io.ktor.client.statement.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.future.future
+import kotlinx.coroutines.runBlocking
+import love.forte.simbot.Api4J
 import love.forte.simbot.util.api.requestor.API
+import java.util.concurrent.CompletableFuture
 
 /**
  * 面向 JVM 平台实现的 [KookApi] 的抽象类。
@@ -36,8 +43,7 @@ public actual abstract class PlatformKookApi<T> actual constructor() : API<KookA
      */
     @JvmSynthetic
     public actual abstract suspend fun request(
-        client: HttpClient,
-        authorization: String
+        client: HttpClient, authorization: String
     ): HttpResponse
 
     /**
@@ -47,8 +53,7 @@ public actual abstract class PlatformKookApi<T> actual constructor() : API<KookA
      */
     @JvmSynthetic
     public actual abstract suspend fun requestRaw(
-        client: HttpClient,
-        authorization: String
+        client: HttpClient, authorization: String
     ): String
 
     /**
@@ -69,6 +74,102 @@ public actual abstract class PlatformKookApi<T> actual constructor() : API<KookA
     @JvmSynthetic
     public actual abstract override suspend fun requestBy(requestor: KookApiRequestor): T
 
-    // TODO blocking, async
+    /**
+     * 阻塞的使用 [request]
+     *
+     * @see request
+     */
+    @Api4J
+    public fun requestBlocking(client: HttpClient, authorization: String): HttpResponse =
+        runBlocking { request(client, authorization) }
+
+
+    /**
+     * 阻塞的使用 [requestRaw]
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @see requestRaw
+     */
+    @Api4J
+    public fun requestRawBlocking(client: HttpClient, authorization: String): String =
+        runBlocking { requestRaw(client, authorization) }
+
+
+    /**
+     * 阻塞的使用 [requestData]
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     *
+     * @see requestData
+     */
+    @Api4J
+    public fun requestDataBlocking(client: HttpClient, authorization: String): T =
+        runBlocking { requestData(client, authorization) }
+
+
+    /**
+     * 阻塞的使用 [requestBy]
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     *
+     * @see requestBy
+     */
+    @Api4J
+    public fun requestByBlocking(requestor: KookApiRequestor): T = runBlocking { requestBy(requestor) }
+
+    /**
+     * 异步地使用 [request]
+     *
+     * @see request
+     */
+    @Api4J
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestAsync(client: HttpClient, authorization: String): CompletableFuture<out HttpResponse> =
+        GlobalScope.future { request(client, authorization) }
+
+
+    /**
+     * 异步地使用 [requestRaw]
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @see requestRaw
+     */
+    @Api4J
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestRawAsync(client: HttpClient, authorization: String): CompletableFuture<out String> =
+        GlobalScope.future { requestRaw(client, authorization) }
+
+
+    /**
+     * 异步地使用 [requestData]
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     *
+     * @see requestData
+     */
+    @Api4J
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestDataAsync(client: HttpClient, authorization: String): CompletableFuture<out T> =
+        GlobalScope.future { requestData(client, authorization) }
+
+
+    /**
+     * 异步地使用 [requestBy]
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     *
+     * @see requestBy
+     */
+    @Api4J
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestByAsync(requestor: KookApiRequestor): CompletableFuture<out T> {
+        val scope = requestor as? CoroutineScope ?: GlobalScope
+        return scope.future { requestBy(requestor) }
+    }
+
 
 }
