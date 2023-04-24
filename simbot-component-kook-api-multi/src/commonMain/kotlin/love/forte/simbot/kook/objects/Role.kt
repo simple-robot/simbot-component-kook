@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2023. ForteScarlet.
+ *
+ * This file is part of simbot-component-kook.
+ *
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package love.forte.simbot.kook.objects
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmSynthetic
+
+
+/**
+ * [角色 Role](https://developer.kookapp.cn/doc/objects#%E8%A7%92%E8%89%B2%20Role)
+ *
+ * @author ForteScarlet
+ */
+public interface Role : Comparable<Role> {
+
+    /** 角色id */
+    public val roleId: Int // role_id
+
+    /** 角色名称 */
+    public val name: String
+
+    /** 颜色色值 */
+    public val color: Int
+
+    /** 顺序位置 */
+    public val position: Int
+
+    /** 是否为角色设定(与普通成员分开显示) */
+    public val hoist: Int
+
+    /** 是否允许任何人@提及此角色 */
+    public val isMentionable: Int
+
+    /** 权限码 */
+    @get:JvmSynthetic
+    public val permissions: Permissions
+
+    /**
+     * 权限码的数字值
+     */
+    public val permissionsValue: Int get() = permissions.perm.toInt()
+
+    /**
+     * 排序
+     */
+    public override fun compareTo(other: Role): Int = position.compareTo(other.position)
+
+    public companion object
+}
+
+/**
+ * [Role] 的基础实现，大部分数值字段默认值为 `-1`。
+ */
+@Serializable
+public data class SimpleRole(
+    @SerialName("role_id") override val roleId: Int,
+    override val name: String,
+    override val color: Int = -1,
+    override val position: Int = -1,
+    override val hoist: Int = -1,
+    @SerialName("mentionable") override val isMentionable: Int = -1,
+    override val permissions: Permissions = Permissions(0u)
+) : Role
