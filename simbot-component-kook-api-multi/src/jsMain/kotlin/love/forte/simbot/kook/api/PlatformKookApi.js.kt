@@ -19,7 +19,12 @@ package love.forte.simbot.kook.api
 
 import io.ktor.client.*
 import io.ktor.client.statement.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.promise
 import love.forte.simbot.util.api.requestor.API
+import kotlin.js.Promise
 
 /**
  * 面向 JS 平台实现的 [KookApi] 的抽象类。
@@ -67,5 +72,50 @@ public actual abstract class PlatformKookApi<T> actual constructor() : API<KookA
     public actual abstract override suspend fun requestBy(requestor: KookApiRequestor): T
 
     // TODO Promise
+
+    /**
+     * 异步地执行 [request]
+     * @see request
+     *
+     * 得到原始的 [HttpResponse] 而不对结果有任何处理。
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestAsync(client: HttpClient, authorization: String): Promise<HttpResponse> =
+        GlobalScope.promise { request(client, authorization) }
+
+    /**
+     * 异步地执行 [requestRaw]
+     * @see requestRaw
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestRawAsync(client: HttpClient, authorization: String): Promise<String> =
+        GlobalScope.promise { requestRaw(client, authorization) }
+
+    /**
+     * 异步地执行 [requestData]
+     * @see requestData
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestDataAsync(client: HttpClient, authorization: String): Promise<T> =
+        GlobalScope.promise { requestData(client, authorization) }
+
+    /**
+     * 异步地执行 [requestBy]
+     *
+     * @see requestBy
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    public fun requestByAsync(requestor: KookApiRequestor): Promise<T> {
+        val scope = requestor as? CoroutineScope ?: GlobalScope
+        return scope.promise { requestBy(requestor) }
+    }
 
 }
