@@ -23,8 +23,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
+import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.util.api.requestor.API
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
+import kotlin.jvm.Volatile
 
 /**
  * 面向平台实现的 [KookApi] 的抽象类。
@@ -97,7 +100,7 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
     /**
      * 可以为 [request] 提供更多行为的函数，例如提供body、重置contentType等。
      */
-    protected open fun HttpRequestBuilder.requestFinishingAction() {
+    protected open fun HttpRequestBuilder.requestPostAction() {
         headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
     }
 
@@ -109,7 +112,23 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
      */
     @JvmSynthetic
     override suspend fun request(client: HttpClient, authorization: String): HttpResponse {
-        TODO()
+        val apiId: String? = if (apiLogger.isDebugEnabled()) {
+            "${method.value} ${url.encodedPath}"
+        } else null
+
+        if (this is KookPostApi) {
+            apiLogger.debug("API[{}] ======> query: {}, body: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" }, body)
+        } else {
+            apiLogger.debug("API[{}] ======> query: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" })
+        }
+
+        val response = reqForResp(client, authorization) {
+            requestPostAction()
+        }
+
+        apiLogger.debug("API[{}] <====== status: {}, response: {}", apiId, response.status, response)
+
+        return response;
     }
 
     /**
@@ -119,7 +138,11 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
      */
     @JvmSynthetic
     override suspend fun requestRaw(client: HttpClient, authorization: String): String {
-        TODO()
+        val response = request(client, authorization)
+        if (!response.status.isSuccess()) {
+            throw ApiResponseException(response, "API [$this] response status non-successful: ${response.status}")
+        }
+        return response.bodyAsText()
     }
 
     /**
@@ -145,10 +168,70 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
 
 
     public companion object {
+        @JvmField
+        internal val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
+
+        @JvmField
         internal val DEFAULT_JSON = Json {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
     }
+}
+
+
+private suspend inline fun KookApi<*>.reqForResp(
+    client: HttpClient,
+    authorization: String,
+    preAction: HttpRequestBuilder.() -> Unit = {},
+    postAction: HttpRequestBuilder.() -> Unit = {}
+): HttpResponse = client.request {
+    preAction()
+    this.method = this@reqForResp.method
+    url(this@reqForResp.url)
+    headers[HttpHeaders.Authorization] = authorization
+    postAction()
+}
+
+
+/**
+ * 使用 [`POST`][HttpMethod.Post] 进行请求的 [KookApi] 基础抽象。
+ *
+ * [KookPostApi] 对外暴露其用于请求的 [body] 实体。
+ *
+ */
+public abstract class KookPostApi<T> : KookApi<T>() {
+    override val method: HttpMethod
+        get() = HttpMethod.Post
+
+    @Volatile
+    private lateinit var _body: Any
+
+    /**
+     * 用于请求的body实体。
+     *
+     * [body] 内部懒加载，
+     * 但不保证任何时间得到的结果始终如一 （无锁）
+     *
+     * 可通过重写 [body] 来改变此行为
+     *
+     */
+    public open val body: Any?
+        get() = if (::_body.isInitialized) _body.takeIf { it !is NULL } else {
+            createBody().also {
+                _body = it ?: NULL
+            }
+        }
+
+    /**
+     * 用于为 [body] 提供实例构造的函数. 默认得到 null。
+     * 当得到null时 [body] 的结果即为null。
+     */
+    protected open fun createBody(): Any? = null
+
+    /**
+     * NULL Marker
+     */
+    private object NULL
 }
