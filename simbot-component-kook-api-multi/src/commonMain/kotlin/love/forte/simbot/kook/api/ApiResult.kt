@@ -22,7 +22,11 @@ import kotlinx.serialization.*
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_LIMIT
+import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_REMAINING
+import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_RESET
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmSynthetic
 
@@ -31,7 +35,7 @@ import kotlin.jvm.JvmSynthetic
  *
  * Kook Api的响应值标准格式。
  *
- * 参考 <https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83>.
+ * 参考 [文档](https://developer.kaiheila.cn/doc/reference#%E5%B8%B8%E8%A7%84%20http%20%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83).
  *
  * 响应值类型无外乎三种形式：列表、对象、空。
  *
@@ -147,8 +151,9 @@ public class ListData<out T>(
 public class ApiResult @ApiResultType constructor(
     public val code: Int,
     public val message: String,
-    public val data: JsonElement,
+    public val data: JsonElement = EMPTY_OBJECT,
 ) {
+
     /**
      * 当前 result 反序列化前的原始JSON字符串。
      */
@@ -201,7 +206,7 @@ public class ApiResult @ApiResultType constructor(
      * 不会有任何判断，
      *
      * @param json 用于解析 [data] 的json反序列化器
-     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApiRequest.resultDeserializer]
+     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApi.resultDeserializer]
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
     @JvmOverloads
@@ -218,11 +223,11 @@ public class ApiResult @ApiResultType constructor(
     }
 
     /**
-     * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KookApiResult.SUCCESS_CODE]), 则抛出 [KookApiException] 异常。
+     * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KookApiResults.SUCCESS_CODE]), 则抛出 [ApiResultException] 异常。
      *
      * @param json 用于解析 [data] 的json反序列化器
-     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApiRequest.resultDeserializer]
-     * @throws KookApiException 如果 [code] 不为成功
+     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApi.resultDeserializer]
+     * @throws ApiResultException 如果 [code] 不为成功
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
     @JvmOverloads
@@ -231,7 +236,7 @@ public class ApiResult @ApiResultType constructor(
         deserializationStrategy: DeserializationStrategy<T>
     ): T {
         if (!isSuccess) {
-            throw ApiResultException(this, raw, message)
+            throw ApiResultException(this, message)
         }
         return parseData(json, deserializationStrategy)
     }
@@ -257,7 +262,9 @@ public class ApiResult @ApiResultType constructor(
         return result
     }
 
-
+    public companion object {
+        private val EMPTY_OBJECT = buildJsonObject {}
+    }
 }
 
 
@@ -267,24 +274,27 @@ public class ApiResult @ApiResultType constructor(
 @Serializable
 public data class RateLimit(
     /**
-     * `X-Rate-Limit-Limit`, 一段时间内允许的最大请求次数
+     * `X-Rate-Limit-Limit`, 一段时间内允许的最大请求次数，
+     * 当无法获取时填充 [`-1`][DEFAULT_LIMIT]。
      */
     public val limit: Long,
 
     /**
-     * `X-Rate-Limit-Remaining`, 一段时间内还剩下的请求数
+     * `X-Rate-Limit-Remaining`, 一段时间内还剩下的请求数，
+     * 当无法获取时填充 [`-1`][DEFAULT_REMAINING]。
      */
     public val remaining: Long,
 
     /**
-     * `X-Rate-Limit-Reset`, 回复到最大请求次数需要等待的时间
+     * `X-Rate-Limit-Reset`, 回复到最大请求次数需要等待的时间，
+     * 当无法获取时填充 [`-1`][DEFAULT_RESET]。
      */
     public val reset: Long,
 
     /**
      * `X-Rate-Limit-Bucket`, 请求数的bucket
      */
-    public val bucket: String,
+    public val bucket: String?,
 
     /**
      * `X-Rate-Limit-Global`, 触犯全局请求次数限制
@@ -300,6 +310,8 @@ public data class RateLimit(
         public const val X_RATE_LIMIT_BUCKET: String = ApiRateLimits.RATE_LIMIT_BUCKET_HEAD // "X-Rate-Limit-Bucket"
         public const val X_RATE_LIMIT_GLOBAL: String = ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD // "X-Rate-Limit-Global"
 
-        public val DEFAULT: RateLimit = RateLimit(99999, 99999, 0, "default/not-init", false)
+        public const val DEFAULT_LIMIT: Long = -1
+        public const val DEFAULT_REMAINING: Long = -1
+        public const val DEFAULT_RESET: Long = -1
     }
 }

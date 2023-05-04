@@ -96,7 +96,6 @@ public inline val HttpResponse.rateBucket: String? get() = headers.rateBucket
 public inline val HttpResponse.isRateGlobal: Boolean get() = headers.isRateGlobal
 
 
-
 /**
  * 尝试获取 [Headers] 中的 [ApiRateLimits.RATE_LIMIT_LIMIT_HEAD] 信息。
  */
@@ -122,5 +121,21 @@ public inline val Headers.rateBucket: String? get() = this[ApiRateLimits.RATE_LI
  */
 public inline val Headers.isRateGlobal: Boolean get() = this[ApiRateLimits.RATE_LIMIT_GLOBAL_HEAD] != null
 
+/**
+ * 通过 [Headers] 构建并得到 [RateLimit]。
+ */
+internal fun Headers.createRateLimit(): RateLimit {
+    val limit = this.rateLimit
+    val remaining = this.rateRemaining
+    val reset = this.rateReset
+    val bucket = this.rateBucket
+    val global = this.isRateGlobal
 
-
+    return RateLimit(
+        limit ?: RateLimit.DEFAULT_LIMIT,
+        remaining ?: RateLimit.DEFAULT_REMAINING,
+        reset ?: RateLimit.DEFAULT_RESET,
+        bucket,
+        global
+    )
+}

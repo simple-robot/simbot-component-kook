@@ -21,10 +21,15 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.util.api.requestor.API
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 import kotlin.jvm.Volatile
@@ -51,6 +56,15 @@ public expect abstract class PlatformKookApi<T>() : API<KookApiRequestor, T> {
      */
     @JvmSynthetic
     public abstract suspend fun requestRaw(client: HttpClient, authorization: String): String
+
+    /**
+     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个 [ApiResult] 结果。
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     */
+    @JvmSynthetic
+    public abstract suspend fun requestResult(client: HttpClient, authorization: String): ApiResult
 
     /**
      * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
@@ -94,6 +108,12 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
 
     /**
      * 预期结果类型的反序列化策略。
+     *
+     * 策略应为以下类型中的一种：
+     * - [ListData]
+     * - []
+     * -
+     *
      */
     public abstract val resultDeserializer: DeserializationStrategy<T>
 
@@ -116,6 +136,8 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
             "${method.value} ${url.encodedPath}"
         } else null
 
+        coroutineContext[APIContext]?.apiId = apiId
+
         if (this is KookPostApi) {
             apiLogger.debug("API[{}] ======> query: {}, body: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" }, body)
         } else {
@@ -128,7 +150,7 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
 
         apiLogger.debug("API[{}] <====== status: {}, response: {}", apiId, response.status, response)
 
-        return response;
+        return response
     }
 
     /**
@@ -139,10 +161,15 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
     @JvmSynthetic
     override suspend fun requestRaw(client: HttpClient, authorization: String): String {
         val response = request(client, authorization)
-        if (!response.status.isSuccess()) {
-            throw ApiResponseException(response, "API [$this] response status non-successful: ${response.status}")
+        return response.requireSuccess().bodyAsText()
+    }
+
+    private fun HttpResponse.requireSuccess(): HttpResponse {
+        if (!status.isSuccess()) {
+            throw ApiResponseException(this, "API [${this@KookApi}] response status non-successful: $status")
         }
-        return response.bodyAsText()
+
+        return this
     }
 
     /**
@@ -152,8 +179,52 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
      * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
      */
     @JvmSynthetic
+    override suspend fun requestResult(client: HttpClient, authorization: String): ApiResult {
+        var apiContext: APIContext? = null
+        val response = if (apiLogger.isDebugEnabled()) {
+            apiContext = coroutineContext[APIContext] ?: APIContext(null)
+            withContext(apiContext) {
+                request(client, authorization)
+            }
+        } else {
+            request(client, authorization)
+        }.requireSuccess()
+
+        val raw = response.bodyAsText()
+
+        val result = DEFAULT_JSON.decodeFromString(ApiResult.serializer(), raw)
+        result.httpStatus = response.status
+        result.raw = raw
+
+        val rateLimit = response.headers.createRateLimit().also {
+            apiLogger.debug("API[{}] <====== rate limit: {}", apiContext?.apiId, it)
+        }
+        result.rateLimit = rateLimit
+
+        return result
+    }
+
+
+    /**
+     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     */
+    @JvmSynthetic
     override suspend fun requestData(client: HttpClient, authorization: String): T {
-        TODO()
+        val result = requestResult(client, authorization)
+
+        if (!result.isSuccess) {
+            throw ApiResultException(result, "result.code is not success(${result.code})")
+        }
+
+        if (resultDeserializer == Unit.serializer()) {
+            @Suppress("UNCHECKED_CAST")
+            return Unit as T
+        }
+
+        return result.parseDataOrThrow(DEFAULT_JSON, resultDeserializer)
     }
 
     /**
@@ -180,6 +251,19 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
     }
 }
 
+private class APIContext(
+    var apiId: String? = null
+) : AbstractCoroutineContextElement(APIContext) {
+    /**
+     * Key for [APIContext] instance in the coroutine context.
+     */
+    companion object Key : CoroutineContext.Key<APIContext>
+
+    /**
+     * Returns a string representation of the object.
+     */
+    override fun toString(): String = "APIContext(apiId=$apiId)"
+}
 
 private suspend inline fun KookApi<*>.reqForResp(
     client: HttpClient,

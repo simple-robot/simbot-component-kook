@@ -55,6 +55,15 @@ public actual abstract class PlatformKookApi<T> actual constructor() : API<KookA
         authorization: String
     ): String
 
+
+    /**
+     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个 [ApiResult] 结果。
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     */
+    public actual abstract suspend fun requestResult(client: HttpClient, authorization: String): ApiResult
+
     /**
      * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
      *
