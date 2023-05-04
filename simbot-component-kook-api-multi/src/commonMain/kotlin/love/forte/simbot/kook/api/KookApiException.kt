@@ -45,10 +45,6 @@ public class ApiResultException(
      * 响应结果
      */
     public val result: ApiResult,
-    /**
-     * 原始JSON字符串
-     */
-    public val raw: String,
     message: String? = null,
     cause: Throwable? = null,
 ) : KookException(message, cause)
