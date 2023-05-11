@@ -15,9 +15,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.card
+package love.forte.simbot.kook.messages.card
 
-import love.forte.simbot.kook.card.CardModule.ActionGroup
+import love.forte.simbot.kook.messages.card.CardModule.ActionGroup
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 

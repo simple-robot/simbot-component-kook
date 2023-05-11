@@ -23,6 +23,21 @@ import io.ktor.http.*
 /**
  * 通过 [URLBuilder] lambda 构建 [Url] 实例。
  */
-public inline fun buildUrl(builder: URLBuilder.() -> Unit): Url {
-    return URLBuilder().apply(builder).build()
+public inline fun buildUrl(url: Url? = null, builder: URLBuilder.() -> Unit): Url {
+    val urlBuilder = url?.let { URLBuilder(it) } ?: URLBuilder()
+    return urlBuilder.apply(builder).build()
+}
+
+/**
+ * 通过 [URLBuilder] lambda 构建 [Url] 实例。
+ */
+public inline fun buildUrl(urlString: String, builder: URLBuilder.() -> Unit): Url {
+    return URLBuilder(urlString).apply(builder).build()
+}
+
+/**
+ * 使用 [URLBuilder.parameters]
+ */
+public inline fun URLBuilder.parameters(block: ParametersBuilder.() -> Unit) {
+    parameters.apply(block)
 }

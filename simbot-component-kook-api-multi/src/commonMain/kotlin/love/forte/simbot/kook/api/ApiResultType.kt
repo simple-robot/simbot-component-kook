@@ -19,10 +19,10 @@ package love.forte.simbot.kook.api
 
 /**
  * 标记为一个作为 KOOK API 请求而返回的类型，
- * 未来可能会抽象化并隐藏具体实现，请避免直接的实例化。
+ * 应由 KOOK API 请求结果进行反序列化实现而不可直接构造。
  */
 @RequiresOptIn(
-    "作为 Kook API请求而返回的类型，未来可能会抽象化并隐藏具体实现，请避免直接的实例化",
+    "作为KOOK API请求结果的类型，请避免直接构造",
     level = RequiresOptIn.Level.WARNING
 )
 @Retention(AnnotationRetention.BINARY)

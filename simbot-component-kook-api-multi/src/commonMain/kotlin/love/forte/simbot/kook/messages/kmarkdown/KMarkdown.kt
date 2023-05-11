@@ -18,14 +18,13 @@
 @file:JvmName("KMarkdowns")
 @file:Suppress("unused")
 
-package love.forte.simbot.kook.kmarkdown
+package love.forte.simbot.kook.messages.kmarkdown
 
-import User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.kook.Experimental
-import love.forte.simbot.kook.kmarkdown.AtTarget.*
 import love.forte.simbot.kook.messages.MentionPart
+import love.forte.simbot.kook.messages.kmarkdown.AtTarget.*
 import love.forte.simbot.kook.objects.Role
 import love.forte.simbot.kook.objects.SimpleRole
 import kotlin.jvm.JvmName
@@ -610,7 +609,7 @@ constructor(public val name: CharSequence? = null, public val url: CharSequence)
 public data class MdServerEmoticons(public val name: CharSequence, public val id: String)
 
 /**
- * 可用于 [At][KookMarkdownGrammar.At] 的目标类型，分为[指定用户][User]、[全体][All]和[在线][Here]。
+ * 可用于 [At][KookMarkdownGrammar.At] 的目标类型，分为[指定用户]User、[全体][All]和[在线][Here]。
  */
 public sealed class AtTarget : CharSequence {
 //    @Suppress("MemberVisibilityCanBePrivate")

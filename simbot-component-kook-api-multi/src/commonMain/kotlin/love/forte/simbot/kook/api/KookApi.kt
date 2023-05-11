@@ -25,6 +25,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import love.forte.simbot.kook.KOOK
+import love.forte.simbot.kook.util.buildUrl
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.util.api.requestor.API
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -280,12 +282,98 @@ private suspend inline fun KookApi<*>.reqForResp(
 
 
 /**
+ * [KookApi] 的进一步抽象实现，简化针对 [KookApi.url] 的构造过程。
+ */
+public abstract class BaseKookApi<T> : KookApi<T>() {
+
+    /**
+     * API路径片段，例如：
+     * ```
+     * ApiPath(isEncoded = true /* by default */ , "foo", "bar") // -> url: /foo/bar
+     * ```
+     *
+     * [apiPath] 的值基本静态，无特殊情况考虑置于伴生对象中。
+     *
+     */
+    protected abstract val apiPath: ApiPath
+
+    /**
+     * [Url] 构建器，用于首次初始化 [url] 时执行的逻辑处理，
+     * 默认无逻辑，实现类型在有需要的时候重写此方法。
+     *
+     * [url] 的初始化不加锁、不验证实例唯一，因此 [urlBuild] 可能会被执行多次。
+     *
+     */
+    protected open fun urlBuild(builder: URLBuilder) {}
+
+    private lateinit var _url: Url
+
+    /**
+     * [Url] 构建器，用于首次初始化 [url] 时执行，过程中会使用 [urlBuild]。
+     *
+     * [url] 的初始化不加锁、不验证实例唯一，因此 [initUrl] 可能会被执行多次。
+     *
+     */
+    protected open fun initUrl(): Url {
+        return buildUrl(KOOK.SERVER_URL_WITH_VERSION) {
+            apiPath.includeTo(this)
+            urlBuild(this)
+        }
+    }
+
+
+    /**
+     * 根据当前API获取请求URL。
+     *
+     * [url] 是懒初始化的，会在获取时初始化。
+     *
+     * 初始化过程不加锁、不验证实例唯一。
+     */
+    override val url: Url
+        get() = if (::_url.isInitialized) _url else initUrl().also { _url = it }
+
+    /**
+     * 提供API的完整路径后缀信息。
+     *
+     * _Internal type._
+     */
+    protected sealed class ApiPath {
+        internal abstract val apiPath: List<String>
+        internal abstract fun includeTo(builder: URLBuilder)
+        public companion object {
+            public fun create(isEncoded: Boolean, vararg apiPath: String): ApiPath {
+                return if (isEncoded) {
+                    EncodedApiPath(apiPath.asList())
+                } else {
+                    SimpleApiPath(apiPath.asList())
+                }
+            }
+
+            public fun create(vararg apiPath: String): ApiPath = create(true, apiPath = apiPath)
+        }
+
+        private data class EncodedApiPath(override val apiPath: List<String>) : ApiPath() {
+            override fun includeTo(builder: URLBuilder) {
+                builder.appendEncodedPathSegments(apiPath)
+            }
+        }
+
+        private data class SimpleApiPath(override val apiPath: List<String>) : ApiPath() {
+            override fun includeTo(builder: URLBuilder) {
+                builder.appendPathSegments(apiPath)
+            }
+        }
+    }
+}
+
+
+/**
  * 使用 [`POST`][HttpMethod.Post] 进行请求的 [KookApi] 基础抽象。
  *
  * [KookPostApi] 对外暴露其用于请求的 [body] 实体。
  *
  */
-public abstract class KookPostApi<T> : KookApi<T>() {
+public abstract class KookPostApi<T> : BaseKookApi<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
 
@@ -318,4 +406,14 @@ public abstract class KookPostApi<T> : KookApi<T>() {
      * NULL Marker
      */
     private object NULL
+}
+
+/**
+ * 使用 [`GET`][HttpMethod.Get] 进行请求的 [KookApi] 基础抽象。
+ *
+ *
+ */
+public abstract class KookGetApi<T> : BaseKookApi<T>() {
+    override val method: HttpMethod
+        get() = HttpMethod.Get
 }

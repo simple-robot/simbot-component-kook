@@ -67,7 +67,7 @@ public object KOOK {
      * 携带 [API_VERSION] 信息的 [Url] 类型 [BASE_URL_VALUE]，会额外追加一段 [API_VERSION] 路径。
      */
     @JvmField
-    public val SERVER_URL_WITH_VERSION: Url = Url("$BASE_URL_VALUE/v$API_VERSION")
+    public val SERVER_URL_WITH_VERSION: Url = Url("$BASE_URL_VALUE/$API_VERSION")
 }
 
 /**
