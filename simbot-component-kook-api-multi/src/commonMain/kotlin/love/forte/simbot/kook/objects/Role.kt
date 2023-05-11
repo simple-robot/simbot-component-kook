@@ -30,7 +30,7 @@ import kotlin.jvm.JvmSynthetic
 public interface Role : Comparable<Role> {
 
     /** 角色id */
-    public val roleId: Int // role_id
+    public val roleId: Long // role_id
 
     /** 角色名称 */
     public val name: String
@@ -42,10 +42,12 @@ public interface Role : Comparable<Role> {
     public val position: Int
 
     /** 是否为角色设定(与普通成员分开显示) */
-    public val hoist: Int
+    public val isHoist: Boolean
+    // ser name: hoist
 
     /** 是否允许任何人@提及此角色 */
-    public val isMentionable: Int
+    public val isMentionable: Boolean
+    // ser name: mentionable
 
     /** 权限码 */
     @get:JvmSynthetic
@@ -69,11 +71,11 @@ public interface Role : Comparable<Role> {
  */
 @Serializable
 public data class SimpleRole(
-    @SerialName("role_id") override val roleId: Int,
+    @SerialName("role_id") override val roleId: Long,
     override val name: String,
     override val color: Int = -1,
     override val position: Int = -1,
-    override val hoist: Int = -1,
-    @SerialName("mentionable") override val isMentionable: Int = -1,
+    @SerialName("hoist") override val isHoist: Boolean = false,
+    @SerialName("mentionable") override val isMentionable: Boolean = false,
     override val permissions: Permissions = Permissions(0u)
 ) : Role
