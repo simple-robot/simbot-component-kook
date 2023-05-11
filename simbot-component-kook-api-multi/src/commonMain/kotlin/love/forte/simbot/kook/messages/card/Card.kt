@@ -17,7 +17,7 @@
 
 @file:Suppress("unused")
 
-package love.forte.simbot.kook.card
+package love.forte.simbot.kook.messages.card
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
