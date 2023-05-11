@@ -87,7 +87,7 @@ public interface User {
     /**
      * 用户在当前服务器中的角色 id 组成的列表。为null则代表信息中未包含此信息。
      */
-    public val roles: List<Int>?
+    public val roles: List<Long>?
 
     public companion object {
         /**
@@ -108,6 +108,20 @@ public inline val User.isStatusBanned: Boolean get() = status == User.BANNED_STA
 /**
  * [User] 的基础实现。
  *
+ * 除了
+ *
+ * - [id]
+ * - [username]
+ * - [avatar]
+ *
+ * 以外，大部分属性因为都可能缺失而存在默认值。
+ * 当缺失时，
+ *
+ * - 可能为 `null` 的属性默认为 `null`
+ * - 整型类型无特殊说明情况下默认为 `-1`
+ * - 字符串类型无特殊说明情况下默认为 `""` (空字符串)
+ * - 布尔类型无特殊说明情况下默认为 `false`
+ *
  * @see User
  */
 @Serializable
@@ -115,6 +129,7 @@ public data class SimpleUser(
     override val id: String,
     override val username: String,
     override val avatar: String,
+
     /**
      * 用户在当前服务器的昵称，默认为 `null`
      */
@@ -149,5 +164,5 @@ public data class SimpleUser(
     /**
      * 用户在当前服务器中的角色 id 组成的列表，默认为 `null`
      */
-    override val roles: List<Int>? = null
+    override val roles: List<Long>? = null
 ) : User
