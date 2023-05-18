@@ -18,6 +18,6 @@
 rootProject.name = "simbot-component-kook"
 
 include("simbot-component-kook-api")
-include("simbot-component-kook-api-multi")
+//include("simbot-component-kook-api-multi")
 include("simbot-component-kook-stdlib")
 include("simbot-component-kook-core")

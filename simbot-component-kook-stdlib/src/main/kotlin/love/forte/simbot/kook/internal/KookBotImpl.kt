@@ -20,8 +20,10 @@ package love.forte.simbot.kook.internal
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -132,6 +134,11 @@ internal class KookBotImpl(
                 engine { configEngine(engineConfig) }
             }
 
+            // ContentNegotiation
+            install(ContentNegotiation) {
+                json()
+            }
+
             // http request timeout
             configuration.timeout?.also { timeoutConfig ->
                 install(HttpTimeout) {
@@ -146,6 +153,10 @@ internal class KookBotImpl(
             // engine config
             configuration.wsEngineConfig?.also { engineConfig ->
                 engine { configEngine(engineConfig) }
+            }
+            // ContentNegotiation
+            install(ContentNegotiation) {
+                json()
             }
 
             WebSockets {
@@ -165,8 +176,10 @@ internal class KookBotImpl(
             }
 
             else -> {
-                logger.debug("API engine use ServiceLoader.")
-                HttpClient { configApiClient() }
+                logger.debug("API engine load by ServiceLoader.")
+                HttpClient { configApiClient() }.also {
+                    logger.debug("API engine used: {}", it.engine)
+                }
             }
         }
 
@@ -791,6 +804,7 @@ internal class KookBotImpl(
             get() = atomicSn.get()
         override val isCompress: Boolean
             get() = this@KookBotImpl.isCompress
+
         @Deprecated("Will be removed in the future")
         override val bot: KookBot
             get() = this@KookBotImpl

@@ -21,13 +21,18 @@ package love.forte.simbot.kook.api
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.*
+import kotlinx.serialization.builtins.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
 import love.forte.simbot.Api4J
 import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.Kook
@@ -74,9 +79,10 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
     /**
      * 可以为 [request] 提供更多行为的函数，例如提供body、重置contentType等。
+     *
+     * 如果实现 [KookPostRequest] 则不需要设置body，会自动检测并设置。
      */
     protected open fun HttpRequestBuilder.requestFinishingAction() {
-        headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
     }
 
     /**
@@ -151,6 +157,31 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
         }
 
         val response = requestForResponse(client, authorization) {
+            headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
+            if (this@KookApiRequest is KookPostRequest) {
+                when (val body = this@KookApiRequest.body) {
+                    null -> setBody(EmptyContent)
+                    is OutgoingContent -> setBody(body)
+                    else -> {
+                        if (client.pluginOrNull(ContentNegotiation) != null) {
+                            setBody(body)
+                        } else {
+                            try {
+                                val ser = guessSerializer(body, DEFAULT_JSON.serializersModule)
+                                val bodyJson = DEFAULT_JSON.encodeToString(ser, body)
+                                setBody(bodyJson)
+                            } catch (e: Throwable) {
+                                try {
+                                    setBody(body)
+                                } catch (e0: Throwable) {
+                                    e0.addSuppressed(e)
+                                    throw e0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             requestFinishingAction()
         }
 
@@ -287,10 +318,16 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
 
     public companion object {
+        @OptIn(ExperimentalSerializationApi::class)
         internal val DEFAULT_JSON = Json {
             isLenient = true
             ignoreUnknownKeys = true
-            encodeDefaults = true
+            allowSpecialFloatingPointValues = true
+            allowStructuredMapKeys = true
+            prettyPrint = false
+            useArrayPolymorphism = false
+            // see https://github.com/kaiheila/api-docs/issues/174
+            explicitNulls = false
         }
 
         internal val defaultRequestPostChecker: Consumer<HttpResponse> = Consumer {}
@@ -412,12 +449,7 @@ public abstract class KookPostRequest<T>(
      */
     protected open fun createBody(): Any? = null
 
-    /**
-     * 通过 [body] 构建提供 body 属性。
-     */
     override fun HttpRequestBuilder.requestFinishingAction() {
-        headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString()
-        setBody(this@KookPostRequest.body ?: EmptyContent)
     }
 
 
@@ -450,3 +482,57 @@ public inline fun <reified T> ParametersBuilder.appendIfNotnull(
         append(name, toStringBlock(v))
     }
 }
+
+
+
+//region Ktor ContentNegotiation guessSerializer
+// see KotlinxSerializationJsonExtensions.kt
+// see SerializerLookup.kt
+
+@Suppress("UNCHECKED_CAST")
+private fun guessSerializer(value: Any?, module: SerializersModule): KSerializer<Any> = when (value) {
+    null -> String.serializer().nullable
+    is List<*> -> ListSerializer(value.elementSerializer(module))
+    is Array<*> -> value.firstOrNull()?.let { guessSerializer(it, module) } ?: ListSerializer(String.serializer())
+    is Set<*> -> SetSerializer(value.elementSerializer(module))
+    is Map<*, *> -> {
+        val keySerializer = value.keys.elementSerializer(module)
+        val valueSerializer = value.values.elementSerializer(module)
+        MapSerializer(keySerializer, valueSerializer)
+    }
+
+    else -> {
+        @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
+        module.getContextual(value::class) ?: value::class.serializer()
+    }
+} as KSerializer<Any>
+
+
+@OptIn(ExperimentalSerializationApi::class)
+private fun Collection<*>.elementSerializer(module: SerializersModule): KSerializer<*> {
+    val serializers: List<KSerializer<*>> =
+        filterNotNull().map { guessSerializer(it, module) }.distinctBy { it.descriptor.serialName }
+
+    if (serializers.size > 1) {
+        error(
+            "Serializing collections of different element types is not yet supported. " +
+                    "Selected serializers: ${serializers.map { it.descriptor.serialName }}",
+        )
+    }
+
+    val selected = serializers.singleOrNull() ?: String.serializer()
+
+    if (selected.descriptor.isNullable) {
+        return selected
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    selected as KSerializer<Any>
+
+    if (any { it == null }) {
+        return selected.nullable
+    }
+
+    return selected
+}
+//endregion
