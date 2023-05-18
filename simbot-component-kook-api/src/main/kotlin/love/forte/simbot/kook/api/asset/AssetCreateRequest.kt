@@ -112,8 +112,8 @@ public class AssetCreateRequest internal constructor(
             }
         }
     }
-    
-    override fun createBody(): Any {
+
+    override fun createBody(): MultiPartFormDataContent {
         return MultiPartFormDataContent(
             formData {
                 

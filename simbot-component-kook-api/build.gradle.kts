@@ -32,6 +32,7 @@ dependencies {
     api(libs.ktor.client.core)
     api(libs.ktor.client.cio)
     api(libs.ktor.client.serialization)
+    api(libs.ktor.client.contentNegotiation)
     api(libs.kotlinx.serialization.json)
     compileOnly(libs.jetbrains.annotations)
 }
