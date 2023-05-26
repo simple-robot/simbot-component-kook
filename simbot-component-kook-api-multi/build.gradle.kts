@@ -15,6 +15,25 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
+
+/*
+ * Copyright (c) 2023. ForteScarlet.
+ *
+ * This file is part of simbot-component-kook.
+ *
+ * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
 plugins {
     kotlin("multiplatform")
 //    `kook-multiplatform-maven-publish` // TODO
@@ -58,38 +77,41 @@ kotlin {
     val mainPresets = mutableSetOf<org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet>()
     val testPresets = mutableSetOf<org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet>()
 
-    // see https://kotlinlang.org/docs/native-target-support.html
-    val supportTargets = setOf(
-        // Tier 1
-        "linuxX64",
-        "macosX64",
-        "macosArm64",
-        "iosSimulatorArm64",
-        "iosX64",
+    // see https://kotlinlang.org/docs/native-target-supporsupportTargets = setOf(
+    ////        // Tier 1
+    ////        "linuxX64",
+    ////        "macosX64",
+    ////        "macosArm64",
+    ////        "iosSimulatorArm64",
+    ////        "iosX64",
+    ////
+    ////        // Tier 2
+    //////        "linuxArm64",
+    ////        "watchosSimulatorArm64",
+    ////        "watchosX64",
+    ////        "watchosArm32",
+    ////        "watchosArm64",
+    ////        "tvosSimulatorArm64",
+    ////        "tvosX64",
+    ////        "tvosArm64",
+    ////        "iosArm64",
+    ////
+    ////        // Tier 3
+    //////        "androidNativeArm32",
+    //////        "androidNativeArm64",
+    //////        "androidNativeX86",
+    //////        "androidNativeX64",
+    ////        "mingwX64",
+    //////        "watchosDeviceArm64",
+    ////    )t.html
+//    val
 
-        // Tier 2
-//        "linuxArm64",
-        "watchosSimulatorArm64",
-        "watchosX64",
-        "watchosArm32",
-        "watchosArm64",
-        "tvosSimulatorArm64",
-        "tvosX64",
-        "tvosArm64",
-        "iosArm64",
+    val targets = NativeTargets.Official.all.intersect(NativeTargets.KtorClient.all)
 
-        // Tier 3
-//        "androidNativeArm32",
-//        "androidNativeArm64",
-//        "androidNativeX86",
-//        "androidNativeX64",
-        "mingwX64",
-//        "watchosDeviceArm64",
-    )
 
     targets {
         presets.filterIsInstance<org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeTargetPreset<*>>()
-            .filter { it.name in supportTargets }
+            .filter { it.name in targets }
             .forEach { presets ->
                 val target = fromPreset(presets, presets.name)
                 val mainSourceSet = target.compilations["main"].kotlinSourceSets.first()
@@ -132,6 +154,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api(simbotAnnotations)
                 api(simbotRequestorCore)
                 api(libs.ktor.client.core)
                 api(libs.ktor.client.contentNegotiation)
@@ -150,7 +173,7 @@ kotlin {
 
         getByName("jvmMain") {
             dependencies {
-                compileOnly(simbotApi) // use @Api4J annotation
+//                compileOnly(simbotApi) // use @Api4J annotation
             }
         }
 

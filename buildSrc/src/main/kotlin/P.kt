@@ -39,9 +39,10 @@ import love.forte.gradle.common.core.project.version as v
 *
 */
 
-val simbotVersion = v(3, 0, 0) - v("RC.3")
+val simbotVersion = v(3, 0, 0)
 
 val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
+val simbotAnnotations = "love.forte.simbot.util:simbot-annotations:$simbotVersion"
 val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
 val simbotLogger = "love.forte.simbot:simbot-logger:$simbotVersion"
 val simbotLoggerSlf4j = "love.forte.simbot:simbot-logger-slf4j-impl:$simbotVersion"

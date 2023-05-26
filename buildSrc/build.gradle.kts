@@ -24,10 +24,10 @@ repositories {
     gradlePluginPortal()
 }
 
-val kotlinVersion = "1.8.10"
+val kotlinVersion = "1.8.21"
 val dokkaVersion = "1.8.10"
-val suspendTransformVersion = "0.2.7"
-val gradleCommon = "0.0.11"
+val suspendTransformVersion = "0.3.1"
+val gradleCommon = "0.1.1"
 
 dependencies {
     // kotlin("jvm") apply false
@@ -40,9 +40,10 @@ dependencies {
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
     
     implementation("love.forte.plugin.suspend-transform:suspend-transform-plugin-gradle:$suspendTransformVersion")
-    implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
-    implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
-    implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
+//    implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
+//    implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
+//    implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
+    implementation("love.forte.gradle.common:gradle-common-all:$gradleCommon")
 }
 
 val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
