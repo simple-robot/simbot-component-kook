@@ -318,6 +318,7 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
 
 
     public companion object {
+        @OptIn(ExperimentalSerializationApi::class)
         internal val DEFAULT_JSON = Json {
             isLenient = true
             ignoreUnknownKeys = true
@@ -325,6 +326,8 @@ public abstract class KookApiRequest<T> : API<KookApiRequestor, T> {
             allowStructuredMapKeys = true
             prettyPrint = false
             useArrayPolymorphism = false
+            // see https://github.com/kaiheila/api-docs/issues/174
+            explicitNulls = false
         }
 
         internal val defaultRequestPostChecker: Consumer<HttpResponse> = Consumer {}

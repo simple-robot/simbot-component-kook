@@ -1,3 +1,9 @@
+# v3.0.0.0-alpha.6
+
+> Release & Pull Notes: [v3.0.0.0-alpha.6](https://github.com/simple-robot/simpler-robot/releases/tag/v3.0.0.0-alpha.6) 
+
+- fix(api): API请求不再强制要求 HttpClient 安装 ContentNegotiation 插件 ([`60deb93`](https://github.com/simple-robot/simpler-robot/commit/60deb93))
+
 # v3.0.0.0-alpha.5
 
 > Release & Pull Notes: [v3.0.0.0-alpha.5](https://github.com/simple-robot/simpler-robot/releases/tag/v3.0.0.0-alpha.5) 
