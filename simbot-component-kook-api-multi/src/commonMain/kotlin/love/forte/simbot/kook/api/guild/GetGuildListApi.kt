@@ -19,10 +19,12 @@ package love.forte.simbot.kook.api.guild
 
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookGetApi
 import love.forte.simbot.kook.api.ListData
 import love.forte.simbot.kook.objects.Guild
-import love.forte.simbot.kook.objects.SimpleGuild
 import love.forte.simbot.kook.util.parameters
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmOverloads
@@ -39,10 +41,10 @@ public class GetGuildListApi private constructor(
     private val page: Int? = null,
     private val pageSize: Int? = null,
     private val sort: String? = null,
-) : KookGetApi<ListData<Guild>>() {
+) : KookGetApi<ListData<SimpleGuildResult>>() {
     public companion object Factory {
         private val PATH = ApiPath.create("guild", "list")
-        private val deserializer = ListData.serializer(SimpleGuild.serializer())
+        private val deserializer = ListData.serializer(SimpleGuildResult.serializer())
 
         /**
          * 此分页API的第 `1` 页的 `50` 条数据查询。
@@ -83,7 +85,7 @@ public class GetGuildListApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<ListData<Guild>> get() = deserializer
+    override val resultDeserializer: DeserializationStrategy<ListData<SimpleGuildResult>> get() = deserializer
     override val apiPath: ApiPath get() = PATH
 
     override fun urlBuild(builder: URLBuilder) {
@@ -94,3 +96,36 @@ public class GetGuildListApi private constructor(
         }
     }
 }
+
+/**
+ * 通过 [GetGuildListApi] 获取到的集合中的元素。
+ *
+ * 与 [Guild] 相比增加了一些额外的属性：
+ * - [boostNum]
+ * - [level]
+ *
+ */
+@Serializable
+public data class SimpleGuildResult @ApiResultType constructor(
+    override val id: String,
+    override val name: String,
+    override val topic: String,
+    @SerialName("user_id") override val userId: String,
+    override val icon: String,
+    @SerialName("notify_type") override val notifyType: Int,
+    override val region: String,
+    @SerialName("enable_open") override val enableOpen: Boolean,
+    @SerialName("open_id") override val openId: String,
+    @SerialName("default_channel_id") override val defaultChannelId: String,
+    @SerialName("welcome_channel_id") override val welcomeChannelId: String,
+
+    /**
+     * 服务器助力数量
+     */
+    @SerialName("boost_num") val boostNum: Int,
+
+    /**
+     * 服务器等级
+     */
+    val level: Int
+) : Guild
