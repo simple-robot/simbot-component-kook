@@ -445,7 +445,7 @@ public abstract class KookPostApi<T> : BaseKookApi<T>() {
      * 用于为 [body] 提供实例构造的函数。
      * 当得到null时 [body] 的结果即为null。
      */
-    protected fun createBody(): Any? = null
+    protected open fun createBody(): Any? = null
 
     /**
      * NULL Marker

@@ -15,39 +15,32 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.api.member
+package love.forte.simbot.kook.api.guild
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.kook.api.KookPostApi
-import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
 
 /**
- *
- * [修改服务器中用户的昵称](https://developer.kookapp.cn/doc/http/guild#%E4%BF%AE%E6%94%B9%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%AD%E7%94%A8%E6%88%B7%E7%9A%84%E6%98%B5%E7%A7%B0)
+ * [离开服务器](https://developer.kookapp.cn/doc/http/guild#%E7%A6%BB%E5%BC%80%E6%9C%8D%E5%8A%A1%E5%99%A8)
  *
  * @author ForteScarlet
  */
-public class ModifyMemberNicknameApi private constructor(private val _body: Body) : KookPostApi<Unit>() {
+public class LeaveGuildApi(guildId: String) : KookPostApi<Unit>() {
     public companion object Factory {
-        private val PATH = ApiPath.create("guild", "nickname")
+        private val PATH = ApiPath.create("guild", "leave")
 
         /**
-         * 构造 [ModifyMemberNicknameApi].
+         * 构造 [LeaveGuildApi]
          *
-         * @param guildId 服务器的 ID
-         * @param nickname 昵称，2 - 64 长度，不传则清空昵称
-         * @param userId 要修改昵称的目标用户 ID，不传则修改当前登陆用户的昵称
-         *
+         * @param guildId 	服务器 id
          */
         @JvmStatic
-        @JvmOverloads
-        public fun create(guildId: String, nickname: String? = null, userId: String? = null): ModifyMemberNicknameApi =
-            ModifyMemberNicknameApi(Body(guildId, nickname, userId))
-
+        public fun create(guildId: String): LeaveGuildApi =
+            LeaveGuildApi(guildId)
     }
 
     override val resultDeserializer: DeserializationStrategy<Unit>
@@ -56,11 +49,7 @@ public class ModifyMemberNicknameApi private constructor(private val _body: Body
     override val apiPath: ApiPath
         get() = PATH
 
-    override val body: Any get() = _body
+    override val body: Any = Body(guildId)
 
-    private data class Body(
-        @SerialName("guild_id") val guildId: String,
-        val nickname: String? = null,
-        @SerialName("user_id") val userId: String? = null
-    )
+    private data class Body(@SerialName("guild_id") val guildId: String)
 }
