@@ -19,6 +19,7 @@ package love.forte.simbot.kook.api.member
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.kook.api.KookPostApi
 import kotlin.jvm.JvmOverloads
@@ -58,6 +59,7 @@ public class ModifyMemberNicknameApi private constructor(private val _body: Body
 
     override val body: Any get() = _body
 
+    @Serializable
     private data class Body(
         @SerialName("guild_id") val guildId: String,
         val nickname: String? = null,

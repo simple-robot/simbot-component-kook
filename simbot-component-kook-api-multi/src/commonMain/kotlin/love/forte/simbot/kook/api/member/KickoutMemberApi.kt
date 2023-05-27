@@ -15,7 +15,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.api.guild
+package love.forte.simbot.kook.api.member
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
@@ -26,22 +26,23 @@ import kotlin.jvm.JvmStatic
 
 
 /**
- * [离开服务器](https://developer.kookapp.cn/doc/http/guild#%E7%A6%BB%E5%BC%80%E6%9C%8D%E5%8A%A1%E5%99%A8)
+ * [踢出服务器](https://developer.kookapp.cn/doc/http/guild#%E8%B8%A2%E5%87%BA%E6%9C%8D%E5%8A%A1%E5%99%A8)
  *
  * @author ForteScarlet
  */
-public class LeaveGuildApi(guildId: String) : KookPostApi<Unit>() {
+public class KickoutMemberApi private constructor(guildId: String, targetId: String) : KookPostApi<Unit>() {
     public companion object Factory {
-        private val PATH = ApiPath.create("guild", "leave")
+        private val PATH = ApiPath.create("guild", "kickout")
 
         /**
-         * 构造 [LeaveGuildApi]
+         * 构造 [KickoutMemberApi].
          *
-         * @param guildId 	服务器 id
+         * @param guildId 服务器 ID
+         * @param targetId 目标用户 ID
+         *
          */
         @JvmStatic
-        public fun create(guildId: String): LeaveGuildApi =
-            LeaveGuildApi(guildId)
+        public fun create(guildId: String, targetId: String): KickoutMemberApi = KickoutMemberApi(guildId, targetId)
     }
 
     override val resultDeserializer: DeserializationStrategy<Unit>
@@ -50,8 +51,8 @@ public class LeaveGuildApi(guildId: String) : KookPostApi<Unit>() {
     override val apiPath: ApiPath
         get() = PATH
 
-    override val body: Any = Body(guildId)
+    override val body: Any = Body(guildId, targetId)
 
     @Serializable
-    private data class Body(@SerialName("guild_id") val guildId: String)
+    private data class Body(@SerialName("guild_id") val guildId: String, @SerialName("target_id") val targetId: String)
 }
