@@ -183,7 +183,7 @@ kotlin {
                 implementation(simbotApi) // use @Api4J annotation
                 implementation(libs.log4j.api)
                 implementation(libs.log4j.core)
-                implementation(libs.log4j.slf4jImpl)
+                implementation(libs.log4j.slf4j2Impl)
             }
         }
 
