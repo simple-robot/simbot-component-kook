@@ -19,7 +19,10 @@
 
 package love.forte.simbot.kook.objects
 
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.listSerialDescriptor
@@ -489,10 +492,12 @@ public sealed class CardModule {
      */
     @Serializable
     @SerialName(Header.TYPE)
-    public data class Header(public val text: String) : CardModule() {
-        init {
-            check(text.length <= 100) { "Content text length can only allow up to 100." }
-        }
+    public data class Header(public val text: CardElement.Text) : CardModule() {
+//        init {
+//            if (text is CardElement.PlainText) {
+//                check(text.content.length <= 100) { "Content text length can only allow up to 100." }
+//            }
+//        }
 
         public companion object {
             public const val TYPE: String = "header"
