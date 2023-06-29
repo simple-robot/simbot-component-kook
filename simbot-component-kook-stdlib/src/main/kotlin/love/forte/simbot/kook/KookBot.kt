@@ -36,6 +36,18 @@ import kotlin.coroutines.CoroutineContext
  * [KookBot] 承载了通过 `WebSocket` 的方式与KOOK服务器连接并订阅事件的能力，
  * 以及通过各种 [KOOK HTTP API][love.forte.simbot.kook.api.KookApiRequest] 进行功能交互的能力。
  *
+ * ### LOG
+ *
+ * 每一个 [KookBot] 内都会至少存在三个命名的日志：
+ *
+ * ```
+ * love.forte.simbot.kook.bot.$clientId
+ * love.forte.simbot.kook.bot.client.$clientId
+ * love.forte.simbot.kook.bot.event.$clientId
+ * ```
+ *
+ * 它们分别会输出一些可能会有用的 `DEBUG` 或 `TRACE` 级别日志。
+ *
  * @author ForteScarlet
  */
 public interface KookBot : CoroutineScope, LoggerContainer, KookApiRequestor {
