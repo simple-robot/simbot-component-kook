@@ -21,7 +21,9 @@ import love.forte.simbot.kook.messages.card.CardModule.ActionGroup
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
-
+/**
+ * @suppress 染色注解
+ */
 @DslMarker
 @Retention(AnnotationRetention.BINARY)
 public annotation class CardMsgBuildDsl

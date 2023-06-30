@@ -612,11 +612,44 @@ public data class MdServerEmoticons(public val name: CharSequence, public val id
  * 可用于 [At][KookMarkdownGrammar.At] 的目标类型，分为[指定用户]User、[全体][All]和[在线][Here]。
  */
 public sealed class AtTarget : CharSequence {
-//    @Suppress("MemberVisibilityCanBePrivate")
-//    public class User(public val id: String) : AtTarget(), CharSequence by id
-//    public object All : AtTarget(), CharSequence by "all"
-//    public object Here : AtTarget(), CharSequence by "here"
-    // TODO
+
+    /**
+     * at 一个具体的ID
+     *
+     * @see AtTarget
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public class User(public val id: String) : AtTarget() {
+        override val length: Int get() = id.length
+        override fun get(index: Int): Char = id[index]
+        override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = id.subSequence(startIndex, endIndex)
+    }
+
+    /**
+     * at 'all', 即at全体。
+     *
+     * @see AtTarget
+     */
+    public object All : AtTarget() {
+        private const val DELEGATE = "all"
+        override val length: Int get() = DELEGATE.length
+        override fun get(index: Int): Char = DELEGATE[index]
+        override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
+            DELEGATE.subSequence(startIndex, endIndex)
+    }
+
+    /**
+     * at 'here', 即at在线用户。
+     *
+     * @see AtTarget
+     */
+    public object Here : AtTarget() {
+        private const val DELEGATE = "here"
+        override val length: Int get() = DELEGATE.length
+        override fun get(index: Int): Char = DELEGATE[index]
+        override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
+            DELEGATE.subSequence(startIndex, endIndex)
+    }
 }
 
 /**
