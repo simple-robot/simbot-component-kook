@@ -79,3 +79,9 @@ public data class SimpleRole(
     @SerialName("mentionable") override val isMentionable: Boolean = false,
     override val permissions: Permissions = Permissions(0u)
 ) : Role
+
+/**
+ * 提及角色权限组时候使用的 `mention_role_part` 字段值。
+ */
+@Serializable
+public data class MentionRolePart(@SerialName("role_id") val id: String, val name: String)
