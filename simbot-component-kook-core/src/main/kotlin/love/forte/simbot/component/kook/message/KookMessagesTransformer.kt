@@ -77,7 +77,8 @@ public suspend fun Message.sendToChannel(
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
-): KookMessageReceipt? = send0(bot, targetId, NOT_DIRECT, quote, nonce, tempTargetId)
+    defaultTempTargetId: ID? = null,
+): KookMessageReceipt? = send0(bot, targetId, NOT_DIRECT, quote, nonce, tempTargetId, defaultTempTargetId)
 
 
 /**
@@ -124,6 +125,7 @@ public suspend fun Message.sendToDirectByChatCode(
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
  * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
  *
+ * @param defaultTempTargetId 如果存在 [KookTempTarget]
  *
  * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
  */
@@ -135,46 +137,42 @@ private suspend fun Message.send0(
     quote: ID? = null,
     nonce: String? = null,
     tempTargetId: ID? = null,
+    defaultTempTargetId: ID? = null,
 ): KookMessageReceipt? {
-    data class ReqData(
-        val type: Int,
-        val targetId: ID,
-        val content: String,
-        var nonce: String?,
-        var quote: ID?,
-        var tempTargetId: ID?,
-    )
+    data class TempTargetIdWrapper(var tempTargetId: ID?)
 
-    var quote0 = quote
+//    var quote0 = quote
 
-    fun doRequest(type: Int, content: String): KookApiRequest<*> {
+    fun doRequest(type: Int, content: String, nonce: String?, quote: ID?, tempTargetId: ID?): KookApiRequest<*> {
         return when (directType) {
             NOT_DIRECT -> MessageCreateRequest.create(
                 type = type,
                 targetId = targetId,
                 content = content,
-                quote = quote0,
+                quote = quote,
                 nonce = nonce,
-                tempTargetId = null, // TODO
+                tempTargetId = tempTargetId
             )
 
-            DIRECT_TYPE_BY_TARGET -> DirectMessageCreateRequest.byTargetId(targetId, content, type, quote0, nonce)
-            DIRECT_TYPE_BY_CODE -> DirectMessageCreateRequest.byChatCode(targetId, content, type, quote0, nonce)
+            DIRECT_TYPE_BY_TARGET -> DirectMessageCreateRequest.byTargetId(targetId, content, type, quote, nonce)
+            DIRECT_TYPE_BY_CODE -> DirectMessageCreateRequest.byChatCode(targetId, content, type, quote, nonce)
             else -> throw SimbotIllegalArgumentException("Unknown direct type: $directType")
-        }.also {
-            quote0 = null
         }
     }
 
     val message = this
-
     var kMarkdownBuilder: KMarkdownBuilder? = null
+    var quote0 = quote
+    val tempWrapper = TempTargetIdWrapper(tempTargetId)
 
-    val requests: List<KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
+//    val requests: List<KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
+    val requests: List<() -> KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
         // 清算 kmd
         fun liquidationKmd() {
             kMarkdownBuilder?.let { kmb ->
-                add(doRequest(MessageType.KMARKDOWN.type, kmb.buildRaw()))
+                val currentQuote = quote0
+                quote0 = null
+                add { doRequest(MessageType.KMARKDOWN.type, kmb.buildRaw(), nonce, currentQuote, tempWrapper.tempTargetId) }
                 kMarkdownBuilder = null
             }
         }
@@ -183,13 +181,18 @@ private suspend fun Message.send0(
             when (message) {
                 is KookRequestMessage -> {
                     liquidationKmd()
-                    add(message.request)
+                    add { message.request }
+                }
+
+                is KookTempTarget -> when (message) {
+                    is KookTempTarget.Target -> tempWrapper.tempTargetId = message.id
+                    is KookTempTarget.Current -> tempWrapper.tempTargetId = defaultTempTargetId
                 }
 
                 else -> {
                     message.elementToRequest(bot, isSingle, { type, content ->
                         liquidationKmd()
-                        add(doRequest(type, content))
+                        add { doRequest(type, content, nonce, null, tempWrapper.tempTargetId) }
                     }) { block ->
                         block(kMarkdownBuilder ?: KMarkdownBuilder().also { kMarkdownBuilder = it })
                     }
@@ -236,11 +239,11 @@ private suspend fun Message.send0(
         }
 
         requests.size == 1 -> {
-            return requests.first().requestDataBy(bot).toReceipt()
+            return requests.first()().requestDataBy(bot).toReceipt()
         }
 
         else -> {
-            return requests.map { req -> req.requestDataBy(bot).toReceipt() }.merge(bot = bot)
+            return requests.map { req -> req().requestDataBy(bot).toReceipt() }.merge(bot = bot)
         }
     }
 }
