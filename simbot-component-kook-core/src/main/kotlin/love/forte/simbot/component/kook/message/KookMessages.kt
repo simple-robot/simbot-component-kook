@@ -17,7 +17,9 @@
 
 package love.forte.simbot.component.kook.message
 
-import love.forte.simbot.*
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
+import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.KookApiRequest
@@ -28,6 +30,7 @@ import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.objects.AtTarget
 import love.forte.simbot.kook.objects.KMarkdown
 import love.forte.simbot.kook.objects.buildRawKMarkdown
+import love.forte.simbot.literal
 import love.forte.simbot.message.*
 import love.forte.simbot.resources.Resource.Companion.toResource
 import java.net.URL
@@ -84,6 +87,7 @@ public object KookMessages {
  *
  * 如果当前 [Message] 是一个消息链，则可能会根据消息类型的情况将消息转化为 `KMarkdown` 类型的消息。
  *
+ * @see Message.sendToChannel
  */
 @Deprecated(
     "Use Message.sendToChannel", ReplaceWith(

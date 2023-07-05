@@ -17,7 +17,9 @@
 
 package love.forte.simbot.component.kook.message
 
-import love.forte.simbot.*
+import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.ID
+import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookComponentBot
 import love.forte.simbot.component.kook.message.KookAggregatedMessageReceipt.Companion.merge
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
@@ -30,6 +32,7 @@ import love.forte.simbot.kook.api.message.MessageCreated
 import love.forte.simbot.kook.api.message.MessageType
 import love.forte.simbot.kook.objects.AtTarget
 import love.forte.simbot.kook.objects.KMarkdownBuilder
+import love.forte.simbot.literal
 import love.forte.simbot.message.*
 import love.forte.simbot.resources.Resource.Companion.toResource
 import love.forte.simbot.utils.view.isNotEmpty
@@ -133,7 +136,17 @@ private suspend fun Message.send0(
     nonce: String? = null,
     tempTargetId: ID? = null,
 ): KookMessageReceipt? {
+    data class ReqData(
+        val type: Int,
+        val targetId: ID,
+        val content: String,
+        var nonce: String?,
+        var quote: ID?,
+        var tempTargetId: ID?,
+    )
+
     var quote0 = quote
+
     fun doRequest(type: Int, content: String): KookApiRequest<*> {
         return when (directType) {
             NOT_DIRECT -> MessageCreateRequest.create(
@@ -142,9 +155,9 @@ private suspend fun Message.send0(
                 content = content,
                 quote = quote0,
                 nonce = nonce,
-                tempTargetId = tempTargetId,
+                tempTargetId = null, // TODO
             )
-            
+
             DIRECT_TYPE_BY_TARGET -> DirectMessageCreateRequest.byTargetId(targetId, content, type, quote0, nonce)
             DIRECT_TYPE_BY_CODE -> DirectMessageCreateRequest.byChatCode(targetId, content, type, quote0, nonce)
             else -> throw SimbotIllegalArgumentException("Unknown direct type: $directType")
@@ -152,11 +165,11 @@ private suspend fun Message.send0(
             quote0 = null
         }
     }
-    
+
     val message = this
-    
+
     var kMarkdownBuilder: KMarkdownBuilder? = null
-    
+
     val requests: List<KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
         // 清算 kmd
         fun liquidationKmd() {
@@ -165,14 +178,14 @@ private suspend fun Message.send0(
                 kMarkdownBuilder = null
             }
         }
-        
+
         suspend fun process(isSingle: Boolean, message: Message.Element<*>) {
             when (message) {
                 is KookRequestMessage -> {
                     liquidationKmd()
                     add(message.request)
                 }
-                
+
                 else -> {
                     message.elementToRequest(bot, isSingle, { type, content ->
                         liquidationKmd()
@@ -183,10 +196,10 @@ private suspend fun Message.send0(
                 }
             }
         }
-        
+
         when (message) {
             is Message.Element<*> -> process(true, message)
-            
+
             is Messages -> {
                 if (message.isNotEmpty()) {
                     val isSingle = message.size == 1
@@ -196,11 +209,11 @@ private suspend fun Message.send0(
                 }
             }
         }
-        
+
         liquidationKmd()
     }
-    
-    
+
+
     /*
         return if (result is MessageCreated) {
                 result.asReceipt(false, baseBot)
@@ -208,7 +221,7 @@ private suspend fun Message.send0(
                 KookApiRequestedReceipt(result, false, baseBot)
             }
      */
-    
+
     fun Any?.toReceipt(): SingleKookMessageReceipt {
         return if (this is MessageCreated) {
             this.asReceipt(false, bot)
@@ -216,16 +229,16 @@ private suspend fun Message.send0(
             KookApiRequestedReceipt(this, false, bot)
         }
     }
-    
+
     when {
         requests.isEmpty() -> {
             return null
         }
-        
+
         requests.size == 1 -> {
             return requests.first().requestDataBy(bot).toReceipt()
         }
-        
+
         else -> {
             return requests.map { req -> req.requestDataBy(bot).toReceipt() }.merge(bot = bot)
         }
@@ -244,19 +257,19 @@ private suspend fun Message.send0(
 @OptIn(ExperimentalSimbotApi::class)
 private suspend inline fun Message.Element<*>.elementToRequest(
     bot: KookComponentBot,
-    
+
     /**
      * 实际上的消息元素数量。如果需要发送的消息只有一个，那么处理时可能会选择直接使用 doRequest 而不是拼接内容到 kmd 中。
      *
      * 至少为1。
      */
     isSingleElement: Boolean,
-    
+
     /**
      * 得到（进行）一次请求
      */
     doRequest: (type: Int, content: String) -> Unit,
-    
+
     /**
      * 将信息填充到 kmd 中。kmd的发送是自动的，其产生于：
      * 执行中途的 doRequest 之前和全部元素遍历之后。
@@ -277,7 +290,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
                 }
             }
         }
-        
+
         is KookMessageElement<*> -> when (message) {
             // 媒体资源
             is KookAssetMessage<*> -> doRequest(message.type, message.asset.url)
@@ -285,54 +298,55 @@ private suspend inline fun Message.Element<*>.elementToRequest(
             is KookKMarkdownMessage -> doRequest(MessageType.KMARKDOWN.type, message.kMarkdown.rawContent)
             // card message
             is KookCardMessage -> doRequest(MessageType.CARD.type, message.cards.encode())
-            
+
             // is KookRequestMessage -> {
             //     this.request
             // }
-            
+
             is KookAtAllHere -> {
                 withinKmd {
                     at(AtTarget.Here)
                 }
             }
-            
+
             is KookAttachmentMessage -> {
                 val type: MessageType = when (message) {
-                    is SimpleKookAttachmentMessage -> when(val attType = message.attachment.type.lowercase()) {
+                    is SimpleKookAttachmentMessage -> when (val attType = message.attachment.type.lowercase()) {
                         "file" -> MessageType.FILE
                         "image" -> MessageType.IMAGE
                         "video" -> MessageType.VIDEO
                         else -> throw IllegalArgumentException("Unknown attachment type: $attType")
                     }
-        
+
                     is KookAttachmentFile -> MessageType.FILE
                     is KookAttachmentImage -> MessageType.IMAGE
                     is KookAttachmentVideo -> MessageType.VIDEO
                 }
-                
+
                 // TODO just re-upload and send, waiting for fix.
                 //  see https://github.com/simple-robot/simbot-component-kook/issues/75
-                
-                val createRequest = AssetCreateRequest.create(URL(message.attachment.url).toResource(message.attachment.name))
+
+                val createRequest =
+                    AssetCreateRequest.create(URL(message.attachment.url).toResource(message.attachment.name))
                 val asset = createRequest.requestDataBy(bot)
-                
+
                 doRequest(type.type, asset.url)
             }
-            
+
             else -> {
                 // other, ignore.
             }
         }
-        
+
         // 需要上传的图片
         is ResourceImage -> {
             val asset = AssetCreateRequest.create(message.resource()).requestDataBy(bot)
             doRequest(MessageType.IMAGE.type, asset.url)
         }
-        
+
         // 其他任意图片类型, 直接使用id
         is Image<*> -> doRequest(MessageType.IMAGE.type, message.id.literal)
-        
+
         // std at
         is At -> {
             withinKmd {
@@ -344,20 +358,20 @@ private suspend inline fun Message.Element<*>.elementToRequest(
                 }
             }
         }
-        
+
         is Face -> {
             // TODO guild emoji..?
             //  serverEmoticons?
         }
-        
+
         is Emoji -> {
             withinKmd {
                 emoji(message.id.literal)
-                
+
             }
         }
-        
-        
+
+
         else -> {
             // other..?
         }
