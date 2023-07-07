@@ -41,3 +41,21 @@ public inline fun buildUrl(urlString: String, builder: URLBuilder.() -> Unit): U
 public inline fun URLBuilder.parameters(block: ParametersBuilder.() -> Unit) {
     parameters.apply(block)
 }
+
+/**
+ * 当 [value] 不为 null 时向 [ParametersBuilder] 中添加 [name] 与 [value]。
+ */
+public fun ParametersBuilder.appendIfNotNull(name: String, value: String?) {
+    value?.also { append(name, it) }
+}
+
+/**
+ * 当 [value] 不为 null 时向 [ParametersBuilder] 中添加 [name] 与 [value]。
+ *
+ * @param stringValue [value] 的字符串值。
+ *
+ */
+public inline fun <T> ParametersBuilder.appendIfNotNull(name: String, value: T?, stringValue: (T) -> String) {
+    value?.also { append(name, stringValue(it)) }
+}
+
