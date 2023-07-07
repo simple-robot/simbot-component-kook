@@ -20,7 +20,6 @@ package love.forte.simbot.kook.api.channel
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.Api4J
 import love.forte.simbot.kook.api.KookPostApi
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
@@ -98,15 +97,24 @@ public class CreateChannelApi private constructor(
         /**
          * 得到一个 [CreateChannelApi.Builder]，
          * 用于构建 [CreateChannelApi]。
+         *
+         * @param guildId 服务器id
+         * @param name 频道名称
          */
         @JvmStatic
-        public fun builder(): Builder = Builder()
+        public fun builder(guildId: String, name: String): Builder = Builder(guildId, name)
 
         /**
          * 使用 [Builder] 构建 [CreateChannelApi].
+         *
+         * @param guildId 服务器id
+         * @param name 频道名称
+         *
+         * @see builder
          */
         @JvmSynthetic
-        public inline fun build(block: Builder.() -> Unit): CreateChannelApi = builder().apply(block).build()
+        public inline fun build(guildId: String, name: String, block: Builder.() -> Unit): CreateChannelApi =
+            builder(guildId, name).apply(block).build()
     }
 
     /**
@@ -117,16 +125,16 @@ public class CreateChannelApi private constructor(
      * @see CreateChannelApi
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    public class Builder {
+    public class Builder internal constructor(
         /**
          * 服务器id
          */
-        public var guildId: String? = null
-
+        public val guildId: String,
         /**
          * 频道名称
          */
-        public var name: String? = null
+        public val name: String
+    ) {
 
         /**
          * 频道类型，`1` 文字，`2` 语音，默认为文字
@@ -163,55 +171,36 @@ public class CreateChannelApi private constructor(
             }
 
         /**
-         * 服务器id
-         */
-        @Api4J
-        public fun guildId(value: String): Builder = apply { guildId = value }
-
-        /**
-         * 频道名称
-         */
-        @Api4J
-        public fun name(value: String): Builder = apply { name = value }
-
-        /**
          * 频道类型，`1` 文字，`2` 语音，默认为文字
          */
-        @Api4J
         public fun type(value: Int): Builder = apply { type = value }
 
         /**
          * 父分组id
          */
-        @Api4J
         public fun parentId(value: String): Builder = apply { parentId = value }
 
         /**
          * 语音频道人数限制，最大 `99`
          */
-        @Api4J
         public fun limitAmount(value: Int): Builder = apply { limitAmount = value }
 
         /**
          * 语音音质，默认为 `2`。
          */
-        @Api4J
         public fun voiceQualityValue(value: Int): Builder = apply { voiceQualityValue = value }
 
         /**
          * 语音音质，默认为 `2`。
          */
-        @Api4J
         public fun voiceQuality(value: VoiceQuality): Builder = apply { voiceQuality = value }
 
         /**
          * 根据当前属性得到 [CreateChannelApi] 实例
-         *
-         * @throws IllegalArgumentException 未提供必需的属性时
          */
         public fun build(): CreateChannelApi = CreateChannelApi(
-            guildId = guildId ?: throw IllegalArgumentException("Required 'guildId' is null"),
-            name = name ?: throw IllegalArgumentException("Required 'name' is null"),
+            guildId = guildId,
+            name = name,
             type = type,
             parentId = parentId,
             limitAmount = limitAmount,

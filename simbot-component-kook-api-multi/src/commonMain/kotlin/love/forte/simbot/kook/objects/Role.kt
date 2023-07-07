@@ -19,6 +19,7 @@ package love.forte.simbot.kook.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.util.BooleanToIntSerializer
 import kotlin.jvm.JvmSynthetic
 
 
@@ -71,12 +72,17 @@ public interface Role : Comparable<Role> {
  */
 @Serializable
 public data class SimpleRole(
-    @SerialName("role_id") override val roleId: Long,
+    @SerialName("role_id")
+    override val roleId: Long,
     override val name: String,
     override val color: Int = -1,
     override val position: Int = -1,
-    @SerialName("hoist") override val isHoist: Boolean = false,
-    @SerialName("mentionable") override val isMentionable: Boolean = false,
+    @SerialName("hoist")
+    @Serializable(with = BooleanToIntSerializer::class)
+    override val isHoist: Boolean = false,
+    @SerialName("mentionable")
+    @Serializable(with = BooleanToIntSerializer::class)
+    override val isMentionable: Boolean = false,
     override val permissions: Permissions = Permissions(0u)
 ) : Role
 
