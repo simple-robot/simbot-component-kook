@@ -117,10 +117,7 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
     /**
      * 预期结果类型的反序列化策略。
      *
-     * 策略应为以下类型中的一种：
-     * - [ListData]
-     * - []
-     * -
+     * 更多有关 API 响应体的说明参考 [KookApiResults]。
      *
      */
     public abstract val resultDeserializer: DeserializationStrategy<T>
