@@ -15,9 +15,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.messages.card
+package love.forte.simbot.kook.objects.card
 
-import love.forte.simbot.kook.messages.card.CardModule.ActionGroup
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
@@ -187,6 +186,13 @@ public class CardModulesBuilder @JvmOverloads constructor(private val collect: M
      * 增加一个 [CardModule.Header]。
      */
     public fun header(text: String): CardModulesBuilder {
+        return add(CardModule.Header(CardElement.PlainText(text)))
+    }
+
+    /**
+     * 增加一个 [CardModule.Header]。
+     */
+    public fun header(text: CardElement.Text): CardModulesBuilder {
         return add(CardModule.Header(text))
     }
     //endregion
@@ -244,16 +250,16 @@ public class CardModulesBuilder @JvmOverloads constructor(private val collect: M
 
     //region action-group
     /**
-     * 添加一个[ActionGroup].
+     * 添加一个[CardModule.ActionGroup].
      */
     @Suppress("MemberVisibilityCanBePrivate")
     public fun actionGroup(elements: List<CardElement.Button>): CardModulesBuilder {
-        return add(ActionGroup(elements))
+        return add(CardModule.ActionGroup(elements))
     }
 
 
     /**
-     * 添加一个[ActionGroup].
+     * 添加一个[CardModule.ActionGroup].
      */
     public fun actionGroup(vararg elements: CardElement.Button): CardModulesBuilder {
         return actionGroup(elements.asList())
@@ -361,7 +367,7 @@ public class CardModulesBuilder @JvmOverloads constructor(private val collect: M
 
     //region collect action
     /**
-     * 得到当前收集到的所有 [CardModule].
+     * 得到当前收集的所有 [CardModule].
      */
     public fun build(): List<CardModule> {
         return collect.toList()
@@ -369,7 +375,7 @@ public class CardModulesBuilder @JvmOverloads constructor(private val collect: M
 
 
     /**
-     * 得到当前收集到的所有 [CardModule].
+     * 清理当前收集的所有 [CardModule].
      */
     public fun clear() {
         collect.clear()

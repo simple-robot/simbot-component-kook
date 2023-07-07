@@ -494,12 +494,6 @@ public sealed class CardModule {
     @Serializable
     @SerialName(Header.TYPE)
     public data class Header(public val text: CardElement.Text) : CardModule() {
-//        init {
-//            if (text is CardElement.PlainText) {
-//                check(text.content.length <= 100) { "Content text length can only allow up to 100." }
-//            }
-//        }
-
         public companion object {
             public const val TYPE: String = "header"
         }
