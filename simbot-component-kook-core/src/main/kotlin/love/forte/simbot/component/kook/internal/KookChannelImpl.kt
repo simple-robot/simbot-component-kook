@@ -82,20 +82,11 @@ internal class KookChannelImpl private constructor(
     override suspend fun member(id: ID): KookGuildMember? = _guild.member(id)
     
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
-        return message.sendToChannel(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
-            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-        // val request = message.toRequest(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
-        //     ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-        //
-        // val result = request.requestDataBy(baseBot)
-        //
-        // return if (result is MessageCreated) {
-        //     result.asReceipt(false, baseBot)
-        // } else {
-        //     KookApiRequestedReceipt(result, false, baseBot)
-        // }
+        return send0(message, quote, tempTargetId, null)
+//        return message.sendToChannel(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
+//            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
     }
-    
+
     override suspend fun send(message: MessageContent, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
         return when (message) {
             is KookReceiveMessageContent -> {
@@ -126,6 +117,12 @@ internal class KookChannelImpl private constructor(
                 send(message.messages)
             }
         }
+    }
+
+
+    internal suspend fun send0(message: Message, quote: ID?, tempTargetId: ID?, defaultTempTargetId: ID?): KookMessageReceipt {
+        return message.sendToChannel(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId, defaultTempTargetId = defaultTempTargetId)
+            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
     }
     
     override fun toString(): String {

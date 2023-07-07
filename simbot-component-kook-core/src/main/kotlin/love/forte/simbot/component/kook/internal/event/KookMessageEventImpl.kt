@@ -58,7 +58,7 @@ internal class KookChannelMessageEventImpl(
     override suspend fun channel(): KookChannel = _channel
     
     override suspend fun reply(message: Message): KookMessageReceipt {
-        return _channel.send(message, sourceEvent.msgId)
+        return _channel.send0(message, sourceEvent.msgId, null, _author.id)
     }
     
     override suspend fun reply(text: String): KookMessageReceipt {
