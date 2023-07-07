@@ -15,7 +15,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.api.guild
+package love.forte.simbot.kook.api.mute
 
 /**
  * 静音类型

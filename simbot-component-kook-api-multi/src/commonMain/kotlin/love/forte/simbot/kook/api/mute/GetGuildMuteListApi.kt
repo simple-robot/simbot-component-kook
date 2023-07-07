@@ -15,7 +15,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.api.guild
+package love.forte.simbot.kook.api.mute
 
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
