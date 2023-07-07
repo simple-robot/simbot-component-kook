@@ -30,7 +30,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.builtins.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import love.forte.simbot.kook.KOOK
+import love.forte.simbot.kook.Kook
 import love.forte.simbot.kook.api.KookApi.Companion.DEFAULT_JSON
 import love.forte.simbot.kook.util.buildUrl
 import love.forte.simbot.logger.LoggerFactory
@@ -357,7 +357,7 @@ public abstract class BaseKookApi<T> : KookApi<T>() {
      *
      */
     protected open fun initUrl(): Url {
-        return buildUrl(KOOK.SERVER_URL_WITH_VERSION) {
+        return buildUrl(Kook.SERVER_URL_WITH_VERSION) {
             apiPath.includeTo(this)
             urlBuild(this)
         }

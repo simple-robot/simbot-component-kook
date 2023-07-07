@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
  * If not, see <https://www.gnu.org/licenses/>.
  */
+ */
 
 package love.forte.simbot.kook
 
@@ -27,7 +28,7 @@ import kotlin.jvm.JvmStatic
  * 相关内容参考 [KOOK开发者文档](https://developer.kookapp.cn/doc/reference)
  */
 @Suppress("MemberVisibilityCanBePrivate")
-public object KOOK {
+public object Kook {
 
     /**
      * 当前的 KOOK api 的版本数值。
