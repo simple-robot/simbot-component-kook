@@ -23,46 +23,44 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
-import love.forte.simbot.ID
-import love.forte.simbot.kook.api.BaseKookApiRequestKey
-import love.forte.simbot.kook.api.KookPostRequest
+import love.forte.simbot.kook.api.KookPostApi
 import kotlin.jvm.JvmStatic
 
 
 /**
  *
- * [删除频道](https://developer.kaiheila.cn/doc/http/channel#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93)
+ * [删除频道](https://developer.kookapp.cn/doc/http/channel#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93)
  *
  *
  * @author ForteScarlet
  */
-public class ChannelDeleteRequest internal constructor(private val channelId: ID) : KookPostRequest<Unit>() {
-    public companion object Key : BaseKookApiRequestKey("channel", "delete") {
-    
+public class DeleteChannelApi private constructor(private val channelId: String) : KookPostApi<Unit>() {
+    public companion object Factory {
+        private val PATH = ApiPath.create("channel", "delete")
+
         /**
-         * 构建 [ChannelDeleteRequest].
+         * 构建 [DeleteChannelApi].
          * @param channelId 要删除的频道的ID
          */
         @JvmStatic
-        public fun create(channelId: ID): ChannelDeleteRequest {
-            return ChannelDeleteRequest(channelId)
-        }
-        
+        public fun create(channelId: String): DeleteChannelApi =
+            DeleteChannelApi(channelId)
+
     }
 
     override val resultDeserializer: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
-    override val apiPaths: List<String>
-        get() = apiPathList
+    override val apiPath: ApiPath
+        get() = PATH
+
 
     override fun createBody(): Any = Body(channelId)
 
     @Serializable
     private data class Body(
         @SerialName("channel_id")
-        @Serializable(ID.AsCharSequenceIDSerializer::class)
-        val channelId: ID
+        val channelId: String
     )
 
 }

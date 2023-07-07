@@ -23,6 +23,8 @@ import kotlinx.serialization.Serializable
 /**
  * [频道 Channel](https://developer.kookapp.cn/doc/objects#%E9%A2%91%E9%81%93%20Channel)
  *
+ * @see SimpleChannel
+ *
  * @author ForteScarlet
  */
 public interface Channel {
