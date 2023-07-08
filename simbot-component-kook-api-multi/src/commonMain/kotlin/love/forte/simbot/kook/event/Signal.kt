@@ -20,7 +20,6 @@ package love.forte.simbot.kook.event
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 import kotlin.jvm.JvmStatic
 
 
@@ -138,7 +137,7 @@ public sealed class Signal {
      */
     @Serializable
     public data class Event(
-        override val d: JsonElement,
+        override val d: love.forte.simbot.kook.event.Event<*>,
         private val sn: Int
     ) : Signal() {
         override val s: Int
