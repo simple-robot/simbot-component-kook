@@ -211,14 +211,14 @@ public data class UpdatedMessageEventExtra(override val body: Body) : SystemExtr
  * @author ForteScarlet
  */
 @Serializable
-@SerialName(DeletedChannelMessageEventExtra.TYPE)
-public data class DeletedChannelMessageEventExtra(override val body: Body) : SystemExtra() {
+@SerialName(DeletedMessageEventExtra.TYPE)
+public data class DeletedMessageEventExtra(override val body: Body) : SystemExtra() {
     public companion object {
         public const val TYPE: String = "deleted_message"
     }
 
     /**
-     * [DeletedChannelMessageEventExtra] 事件 body
+     * [DeletedMessageEventExtra] 事件 body
      */
     @Serializable
     public data class Body(
@@ -237,6 +237,55 @@ public data class DeletedChannelMessageEventExtra(override val body: Body) : Sys
 }
 
 
-// TODO
-//  pinned_message
-//  unpinned_message
+/**
+ * [新的频道置顶消息](https://developer.kookapp.cn/doc/event/channel#%E6%96%B0%E7%9A%84%E9%A2%91%E9%81%93%E7%BD%AE%E9%A1%B6%E6%B6%88%E6%81%AF)
+ *
+ * @author ForteScarlet
+ */
+@Serializable
+@SerialName(PinnedMessageEventExtra.TYPE)
+public data class PinnedMessageEventExtra(override val body: PingEventExtraBody) : SystemExtra() {
+    public companion object {
+        public const val TYPE: String = "pinned_message"
+    }
+}
+
+
+/**
+ * [取消频道置顶消息](https://developer.kookapp.cn/doc/event/channel#%E5%8F%96%E6%B6%88%E9%A2%91%E9%81%93%E7%BD%AE%E9%A1%B6%E6%B6%88%E6%81%AF)
+ *
+ * @author ForteScarlet
+ */
+@Serializable
+@SerialName(UnpinnedMessageEventExtra.TYPE)
+public data class UnpinnedMessageEventExtra(override val body: PingEventExtraBody) : SystemExtra() {
+    public companion object {
+        public const val TYPE: String = "unpinned_message"
+    }
+}
+
+
+/**
+ * 置顶消息相关事件 extra 内 body
+ *
+ */
+@Serializable
+public data class PingEventExtraBody(
+    /**
+     * 频道 id
+     */
+    @SerialName("channel_id")
+    val channelId: String,
+
+    /**
+     * 操作人 id
+     */
+    @SerialName("operator_id")
+    val operatorId: String,
+
+    /**
+     * 被操作的消息 id
+     */
+    @SerialName("msg_id")
+    val msgId: String
+)

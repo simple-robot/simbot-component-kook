@@ -183,6 +183,8 @@ public sealed class EventExtra {
          * 通过 [json] 中的 `type` 和 `extra.type` 来获取对应的 [DeserializationStrategy] 。
          * 当无法获取时得到 `null`。
          *
+         * @param json 一个事件 JSON 中的 `d` 属性值。
+         *
          * @throws IllegalArgumentException 当 [json] 中某个节点的属性格式不符合预期 （例如 [json] 并非 [JsonObject] 类型）
          *
          */
