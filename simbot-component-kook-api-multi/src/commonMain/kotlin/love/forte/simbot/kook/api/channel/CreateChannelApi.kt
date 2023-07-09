@@ -113,7 +113,7 @@ public class CreateChannelApi private constructor(
          * @see builder
          */
         @JvmSynthetic
-        public inline fun build(guildId: String, name: String, block: Builder.() -> Unit): CreateChannelApi =
+        public inline fun create(guildId: String, name: String, block: Builder.() -> Unit): CreateChannelApi =
             builder(guildId, name).apply(block).build()
     }
 

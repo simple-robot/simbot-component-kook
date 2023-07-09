@@ -48,6 +48,6 @@ public data class Quote(
     /**
      * 作者的用户信息
      */
-    val user: String // TODO User
+    val author: SimpleUser
 )
 

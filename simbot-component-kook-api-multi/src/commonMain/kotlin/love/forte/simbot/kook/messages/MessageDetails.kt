@@ -94,7 +94,7 @@ public data class ChannelMessageDetails(
     /**
      * 	作者的用户信息
      */
-    public val author: User,
+    public val author: SimpleUser,
 
     /**
      * 消息内容
@@ -106,12 +106,12 @@ public data class ChannelMessageDetails(
     /**
      * at特定用户 的用户ID数组，与 mention_info 中的数据对应
      */
-    public val mention: List<String>,
+    public val mention: List<String> = emptyList(),
 
     /**
      * 是否含有 @全体人员
      */
-    @SerialName("mention_all") public val isMentionAll: Boolean,
+    @SerialName("mention_all") public val isMentionAll: Boolean = false,
 
     /**
      * at特定角色 的角色ID数组，与 [mentionInfo] 中的数据对应
@@ -144,9 +144,15 @@ public data class ChannelMessageDetails(
     override val quote: Quote? = null,
 
     /**
-     * 通知信息
+     * 引用特定用户或特定角色的信息
      */
-    @SerialName("mention_info") public val mentionInfo: MentionInfo
+    @SerialName("mention_info") public val mentionInfo: MentionInfo? = null,
+
+    /**
+     * 消息所属的频道id
+     */
+    @SerialName("channel_id")
+    public val channelId: String? = null, // TODO null? or exists?
 
 ) : MessageDetails {
     override val authorId: String
@@ -205,12 +211,18 @@ public data class Emoji @ApiResultType constructor(
 
 
 /**
- * 提及（at）信息。
+ * 引用特定用户或特定角色的信息
  */
 @Serializable
 public data class MentionInfo @ApiResultType constructor(
+    /**
+     * `@特定用户` 详情
+     */
     @SerialName("mention_part") val mentionPart: List<MentionPart>,
 
+    /**
+     * `@特定角色` 详情
+     */
     @SerialName("mention_role_part") val mentionRolePart: List<Role>,
 )
 
