@@ -139,7 +139,7 @@ kotlin {
 
         getByName("jvmMain") {
             dependencies {
-//                compileOnly(simbotApi) // use @Api4J annotation
+                api(project(":simbot-component-kook-api-multi"))
             }
         }
 
