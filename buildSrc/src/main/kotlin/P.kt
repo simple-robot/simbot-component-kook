@@ -50,6 +50,8 @@ val simbotLoggerSlf4j = "love.forte.simbot:simbot-logger-slf4j-impl:$simbotVersi
 val simbotRequestorCore = "love.forte.simbot.util:simbot-util-api-requestor-core:$simbotVersion"
 val simbotRequestorKtor = "love.forte.simbot.util:simbot-util-api-requestor-ktor:$simbotVersion"
 
+val simbotUtilSuspendTransformer = "love.forte.simbot.util:simbot-util-suspend-transformer:$simbotVersion"
+
 
 object P : ProjectDetail() {
     const val GROUP = "love.forte.simbot.component"

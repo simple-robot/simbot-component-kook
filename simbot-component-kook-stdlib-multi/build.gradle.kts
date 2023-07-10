@@ -39,6 +39,8 @@ plugins {
 //    `kook-multiplatform-maven-publish` // TODO
     kotlin("plugin.serialization")
 //    `kook-dokka-partial-configure` // TODO
+    `simbot-kook-suspend-transform`
+    id("kotlinx-atomicfu")
 }
 
 repositories {
@@ -127,6 +129,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":simbot-component-kook-api-multi"))
+                api(simbotUtilSuspendTransformer)
+                api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
             }
         }
 

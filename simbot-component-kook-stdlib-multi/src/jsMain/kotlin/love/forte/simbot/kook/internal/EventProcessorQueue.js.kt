@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -15,18 +15,23 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins {
-    `simbot-kook-nexus-publish`
-    `simbot-kook-changelog-generator`
-    `simbot-kook-dokka-multi-module`
-}
+package love.forte.simbot.kook.internal
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
+/**
+ * 事件处理器队列。typealias [EventProcessorQueue] with [ArrayList]
+ */
+public actual typealias EventProcessorQueue<T> = ArrayList<T>
 
-    dependencies {
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${libs.versions.atomicfu.get()}")
-    }
+/**
+ * 创建一个 [EventProcessorQueue]。
+ *
+ * @param initialCapacity 初始容量。如果 [EventProcessorQueue] 的实现支持，那么应当在创建时指定初始容量。
+ */
+public actual fun <T> createEventProcessorQueue(initialCapacity: Int): EventProcessorQueue<T> =
+    EventProcessorQueue(initialCapacity)
+
+/**
+ * foreach [EventProcessorQueue] values.
+ */
+public actual inline fun <T> EventProcessorQueue<T>.forEach(block: (T) -> Unit) {
 }
