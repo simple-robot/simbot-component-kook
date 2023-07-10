@@ -36,6 +36,7 @@ import love.forte.simbot.kook.Bot
 import love.forte.simbot.kook.BotConfiguration
 import love.forte.simbot.kook.ProcessorType
 import love.forte.simbot.kook.Ticket
+import love.forte.simbot.kook.api.Gateway
 import love.forte.simbot.kook.api.user.GetMeApi
 import love.forte.simbot.kook.api.user.Me
 import love.forte.simbot.kook.api.user.OfflineApi
@@ -209,4 +210,18 @@ internal class AtomicLongRef(initValue: Long = 0) {
         }
 
     fun updateAndGet(function: (Long) -> Long): Long = atomicValue.updateAndGet(function)
+}
+
+/**
+ * 通过 [Gateway] 连接bot信息。
+ */
+private suspend fun HttpClient.ws(gateway: GatewayInfo): DefaultClientWebSocketSession {
+    return webSocketSession {
+        url {
+            takeFrom(gateway.url)
+            gateway.apply {
+                urlBuilder()
+            }
+        }
+    }
 }
