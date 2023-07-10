@@ -51,6 +51,8 @@ val simbotRequestorCore = "love.forte.simbot.util:simbot-util-api-requestor-core
 val simbotRequestorKtor = "love.forte.simbot.util:simbot-util-api-requestor-ktor:$simbotVersion"
 
 val simbotUtilSuspendTransformer = "love.forte.simbot.util:simbot-util-suspend-transformer:$simbotVersion"
+val simbotUtilLoop = "love.forte.simbot.util:simbot-util-stage-loop:$simbotVersion"
+val simbotUtilAnnotations = "love.forte.simbot.util:simbot-annotations:$simbotVersion"
 
 
 object P : ProjectDetail() {

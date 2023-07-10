@@ -43,6 +43,12 @@ plugins {
     id("kotlinx-atomicfu")
 }
 
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.encoding = "UTF-8"
+}
+
 repositories {
     mavenCentral()
 }
@@ -50,11 +56,11 @@ repositories {
 kotlin {
     explicitApi()
 
-    sourceSets.configureEach {
-        languageSettings {
-//            optIn("love.forte.simbot.qguild.InternalApi")
-        }
-    }
+//    sourceSets.configureEach {
+//        languageSettings {
+//            optIn("love.forte.simbot.kook.InternalApi")
+//        }
+//    }
 
     jvm {
         withJava()
@@ -72,7 +78,6 @@ kotlin {
 
     js(IR) {
         nodejs()
-        binaries.library()
     }
 
 
@@ -130,6 +135,8 @@ kotlin {
             dependencies {
                 api(project(":simbot-component-kook-api-multi"))
                 api(simbotUtilSuspendTransformer)
+                api(simbotUtilLoop)
+                api(libs.ktor.client.ws)
                 api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
             }
         }
@@ -142,9 +149,9 @@ kotlin {
         }
 
         getByName("jvmMain") {
-            dependencies {
-                api(project(":simbot-component-kook-api-multi"))
-            }
+//            dependencies {
+//                api(project(":simbot-component-kook-api-multi"))
+//            }
         }
 
         getByName("jvmTest") {
@@ -177,6 +184,13 @@ kotlin {
     }
 
 }
+
+atomicfu {
+    transformJvm = true
+    transformJs = true
+    jvmVariant = "FU"
+}
+
 
 // suppress all?
 //tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {

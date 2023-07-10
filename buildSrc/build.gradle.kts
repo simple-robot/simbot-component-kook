@@ -40,9 +40,9 @@ dependencies {
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
     
     implementation("love.forte.plugin.suspend-transform:suspend-transform-plugin-gradle:$suspendTransformVersion")
-//    implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
-//    implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
-//    implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
+    implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
+    implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
+    implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
     implementation("love.forte.gradle.common:gradle-common-all:$gradleCommon")
 }
 

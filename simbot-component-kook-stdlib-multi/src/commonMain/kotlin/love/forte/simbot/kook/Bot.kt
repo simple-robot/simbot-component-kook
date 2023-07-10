@@ -140,7 +140,7 @@ public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
      *
      * [start] 会由 [Mutex] 进行同步，同一时间只会有一个启动流程在执行。
      */
-    @JvmSuspendTrans(asyncBaseName = "asFuture", asyncSuffix = "")
+    @JvmSuspendTrans
     public suspend fun start()
 
     /**
