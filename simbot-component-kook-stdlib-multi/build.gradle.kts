@@ -56,11 +56,11 @@ repositories {
 kotlin {
     explicitApi()
 
-//    sourceSets.configureEach {
-//        languageSettings {
-//            optIn("love.forte.simbot.kook.InternalApi")
-//        }
-//    }
+    sourceSets.configureEach {
+        languageSettings {
+            optIn("love.forte.simbot.InternalSimbotApi")
+        }
+    }
 
     jvm {
         withJava()

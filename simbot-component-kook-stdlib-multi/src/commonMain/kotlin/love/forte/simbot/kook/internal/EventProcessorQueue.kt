@@ -17,11 +17,14 @@
 
 package love.forte.simbot.kook.internal
 
+import love.forte.simbot.InternalSimbotApi
+
 /**
  * 事件处理器队列。
  *
  * [EventProcessorQueue] 由平台实现，对其中的各项操作应当是线程安全的。
  */
+@InternalSimbotApi
 public expect class EventProcessorQueue<T> {
 
     /**
