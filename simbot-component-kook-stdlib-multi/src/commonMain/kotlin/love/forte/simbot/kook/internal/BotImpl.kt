@@ -162,12 +162,25 @@ internal class BotImpl(
 
     override suspend fun start() {
         startLock.withLock {
+            if (job.isCancelled) {
+                throw IllegalStateException("Bot is already started.")
+            }
+            // close current client if exist
+
+
+            val loopJob = SupervisorJob(job)
+
+
             // get gateway
             // connect gateway
 
             TODO("Not yet implemented")
         }
     }
+
+
+
+
 
     override suspend fun join() {
         job.join()
