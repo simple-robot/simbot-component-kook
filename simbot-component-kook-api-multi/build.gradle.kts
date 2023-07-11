@@ -15,13 +15,22 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
     kotlin("multiplatform")
-//    `kook-multiplatform-maven-publish` // TODO
+    `kook-multiplatform-maven-publish` // TODO
     kotlin("plugin.serialization")
-//    `kook-dokka-partial-configure` // TODO
+    `kook-dokka-partial-configure` // TODO
+}
+
+setup(P)
+
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.encoding = "UTF-8"
 }
 
 repositories {
@@ -137,7 +146,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(simbotAnnotations)
+//                compileOnly(simbotAnnotations)
                 api(simbotRequestorCore)
                 api(libs.ktor.client.core)
                 api(libs.ktor.client.contentNegotiation)
@@ -156,7 +165,8 @@ kotlin {
 
         getByName("jvmMain") {
             dependencies {
-//                compileOnly(simbotApi) // use @Api4J annotation
+                compileOnly(simbotApi) // use @Api4J annotation
+                compileOnly(simbotAnnotations) // use @Api4J annotation
             }
         }
 

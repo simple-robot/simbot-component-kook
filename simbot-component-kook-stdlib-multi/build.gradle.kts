@@ -15,24 +15,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
-
-/*
- * Copyright (c) 2023. ForteScarlet.
- *
- * This file is part of simbot-component-kook.
- *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
- */
 
 plugins {
     kotlin("multiplatform")
@@ -42,6 +26,8 @@ plugins {
     `simbot-kook-suspend-transform`
     id("kotlinx-atomicfu")
 }
+
+setup(P)
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"
@@ -134,8 +120,10 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":simbot-component-kook-api-multi"))
-                api(simbotUtilSuspendTransformer)
+                api(simbotLogger)
                 api(simbotUtilLoop)
+                api(simbotUtilSuspendTransformer)
+                compileOnly(simbotUtilAnnotations)
                 api(libs.ktor.client.ws)
                 api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
             }
@@ -148,16 +136,23 @@ kotlin {
             }
         }
 
-        getByName("jvmMain") {
+        val jvmMain by getting {
+            dependencies {
+                compileOnly(simbotUtilAnnotations) // use @Api4J annotation
+            }
+        }
+
+//        getByName("jvmMain") {
 //            dependencies {
+//                compileOnly(simbotUtilAnnotations) // use @Api4J annotation
 //                api(project(":simbot-component-kook-api-multi"))
 //            }
-        }
+//        }
 
         getByName("jvmTest") {
             dependencies {
-                implementation(libs.ktor.client.cio)
-                implementation(simbotApi) // use @Api4J annotation
+                runtimeOnly(libs.ktor.client.cio)
+                implementation(simbotApi)
                 implementation(libs.log4j.api)
                 implementation(libs.log4j.core)
                 implementation(libs.log4j.slf4j2Impl)
@@ -166,7 +161,7 @@ kotlin {
 
         getByName("jsMain") {
             dependencies {
-                api(libs.ktor.client.js)
+                implementation(libs.ktor.client.js)
             }
         }
 

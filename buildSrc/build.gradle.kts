@@ -43,11 +43,11 @@ dependencies {
     implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
     implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
     implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
-    implementation("love.forte.gradle.common:gradle-common-all:$gradleCommon")
+//    implementation("love.forte.gradle.common:gradle-common-all:$gradleCommon")
 }
 
 val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
 
 compileKotlin.kotlinOptions {
-    freeCompilerArgs = listOf("-Xinline-classes")
+    freeCompilerArgs += listOf("-Xinline-classes")
 }

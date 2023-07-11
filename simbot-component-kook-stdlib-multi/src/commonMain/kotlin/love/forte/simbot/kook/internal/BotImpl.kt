@@ -61,7 +61,11 @@ internal class BotImpl(
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
     private val queueMap =
-        ActualEnumMap.create<ProcessorType, EventProcessorQueue<EventProcessor>> { createEventProcessorQueue(16) }
+        ActualEnumMap.create<ProcessorType, EventProcessorQueue<EventProcessor>> {
+            createEventProcessorQueue(
+                16
+            )
+        }
 
     override fun processor(processorType: ProcessorType, processor: suspend Signal.Event<*>.(Event<*>) -> Unit) {
         queueMap[processorType].add(processor)
