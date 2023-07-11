@@ -44,7 +44,7 @@ kotlin {
 
     sourceSets.configureEach {
         languageSettings {
-            optIn("love.forte.simbot.InternalSimbotApi")
+//            optIn("love.forte.simbot.InternalSimbotApi")
         }
     }
 

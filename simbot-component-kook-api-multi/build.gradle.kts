@@ -146,7 +146,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-//                compileOnly(simbotAnnotations)
+                compileOnly(simbotAnnotations)
                 api(simbotRequestorCore)
                 api(libs.ktor.client.core)
                 api(libs.ktor.client.contentNegotiation)
