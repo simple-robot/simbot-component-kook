@@ -183,7 +183,7 @@ public class CardModulesBuilder @JvmOverloads constructor(private val collect: M
      * 增加一个 [CardModule.Header]。
      */
     public fun header(text: String): CardModulesBuilder {
-        return add(CardModule.Header(text))
+        return add(CardModule.Header(CardElement.PlainText(text)))
     }
     //endregion
 

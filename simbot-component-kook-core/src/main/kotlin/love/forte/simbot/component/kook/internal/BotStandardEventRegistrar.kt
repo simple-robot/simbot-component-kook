@@ -49,10 +49,10 @@ internal suspend fun Event<*>.register(bot: KookComponentBotImpl) {
     when (this) {
         // 消息事件
         is MessageEvent<*> -> registerMessageEvent(bot)
-        
+
         // 系统事件
         is SystemEvent<*, Event.Extra.Sys<*>> -> registerSystemEvent(bot)
-        
+
         else -> {
             // 目前不太可能会触发此处
             pushUnsupported(bot)
@@ -84,7 +84,7 @@ private suspend fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotIm
                 }
             }
         }
-        
+
         Channel.Type.GROUP -> {
             val guild = bot.internalGuild(extra.guildId) ?: return
             val author = guild.getInternalMember(authorId) ?: return
@@ -121,25 +121,41 @@ private suspend fun MessageEvent<*>.registerMessageEvent(bot: KookComponentBotIm
 @Suppress("UnnecessaryOptInAnnotation")
 @OptIn(ExperimentalSimbotApi::class)
 private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotImpl) {
-    
     // 准备资源
-    val guild = bot.internalGuild(targetId) ?: return
-    
-    val author =
-        guild.getInternalMember(authorId)
-            ?: toMemberIfSystem(authorId, bot, guild)
-            ?: return
-    
+
+    // target_id
+    // 发送目的,
+    // 频道消息类时, 代表的是频道 channel_id，
+    // 如果 channel_type 为 GROUP 组播且 type 为 255 系统消息时，则代表服务器 guild_id
+
+    val guild: KookGuildImpl? = if (channelType == Channel.Type.GROUP) {
+        bot.internalGuild(targetId)
+    } else {
+        null
+    }
+
+//    val guild = bot.internalGuild(targetId) ?: return
+
+    // author_id
+    // 发送者 id, 1 代表系统
+
+    val author = guild?.let { g ->
+        g.getInternalMember(authorId)
+            ?: toMemberIfSystem(authorId, bot, g)
+//            ?: return // TODO ?
+    }
+
     @Suppress("UNCHECKED_CAST")
     when (val body = extra.body) {
         // region 成员变更相关
         // 某人退出事件
         is UserExitedChannelEventBody -> {
             // remove this user.
+            guild ?: return
             val removedMember = guild.internalMembers.remove(body.userId.literal)
                 ?.also { it.cancel() }
                 ?: return
-            
+
             bot.pushIfProcessable(KookMemberExitedChannelEvent) {
                 val channel = guild.getInternalChannel(body.channelId) ?: return
                 KookMemberExitedChannelEventImpl(
@@ -150,60 +166,71 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 )
             }
         }
-        
+
         is UserJoinedChannelEventBody -> bot.pushIfProcessable(KookMemberJoinedChannelEvent) {
+            guild ?: return
             val channel = guild.getInternalChannel(body.channelId) ?: return
             KookMemberJoinedChannelEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<UserJoinedChannelEventBody>>,
                 channel,
-                author
+                author ?: return
             )
         }
-        
+
         is ExitedGuildEventBody -> {
-            
+
             bot.pushIfProcessable(KookMemberExitedGuildEvent) {
                 KookMemberExitedGuildEventImpl(
                     bot,
                     this as Event<Event.Extra.Sys<ExitedGuildEventBody>>,
-                    guild,
-                    author
+                    guild ?: return,
+                    author ?: return
                 )
             }
         }
-        
+
         is JoinedGuildEventBody -> bot.pushIfProcessable(KookMemberJoinedGuildEvent) {
             KookMemberJoinedGuildEventImpl(
                 bot,
                 this as Event<Event.Extra.Sys<JoinedGuildEventBody>>,
-                guild,
-                author
+                guild ?: return,
+                author ?: return
             )
         }
-        
-        is SelfExitedGuildEventBody -> bot.pushIfProcessable(KookBotSelfExitedGuildEvent) {
-            KookBotSelfExitedGuildEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
-                guild,
-                author
-            )
+
+        is SelfExitedGuildEventBody -> {
+            val removedGuild = bot.internalGuildRemove(body.guildId.literal)
+            val botSelf = removedGuild?.bot?.asMember()
+
+            bot.pushIfProcessable(KookBotSelfExitedGuildEvent) {
+                KookBotSelfExitedGuildEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
+                    removedGuild ?: return,
+                    botSelf ?: return
+                )
+            }
         }
-        
-        is SelfJoinedGuildEventBody -> bot.pushIfProcessable(KookBotSelfJoinedGuildEvent) {
-            KookBotSelfJoinedGuildEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
-                guild,
-                author
-            )
+
+        is SelfJoinedGuildEventBody -> {
+            val joinedGuild = bot.internalGuild(body.guildId)
+            val botSelf = joinedGuild?.bot?.asMember()
+
+            bot.pushIfProcessable(KookBotSelfJoinedGuildEvent) {
+                KookBotSelfJoinedGuildEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
+                    joinedGuild ?: return,
+                    botSelf ?: return
+                )
+            }
         }
-        
+
         // online
         is GuildMemberOnlineEventBody -> {
             val userInfo = bot.findUserInGuilds(body.userId, body.guilds) ?: return
-            
+
             bot.pushIfProcessable(KookUserOnlineStatusChangedEvent.Online) {
                 KookMemberOnlineEventImpl(
                     bot,
@@ -212,11 +239,11 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 )
             }
         }
-        
+
         // offline
         is GuildMemberOfflineEventBody -> {
             val userInfo = bot.findUserInGuilds(body.userId, body.guilds) ?: return
-            
+
             bot.pushIfProcessable(KookUserOnlineStatusChangedEvent.Offline) {
                 KookMemberOfflineEventImpl(
                     bot,
@@ -225,9 +252,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 )
             }
         }
-        
+
         // endregion
-        
+
         // region 用户信息更新事件
         is UserUpdatedEventBody -> bot.pushIfProcessable(KookUserUpdatedEvent) {
             KookUserUpdatedEventImpl(
@@ -236,9 +263,10 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
             )
         }
         // endregion
-        
+
         // region 频道变更事件
         is AddedChannelExtraBody -> bot.pushIfProcessable(KookAddedChannelChangedEvent) {
+            guild ?: return
             val channel = guild.getInternalChannel(body.id) ?: return
             KookAddedChannelChangedEventImpl(
                 bot,
@@ -246,8 +274,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
-        
+
         is UpdatedChannelExtraBody -> bot.pushIfProcessable(KookUpdatedChannelChangedEvent) {
+            guild ?: return
             val channel = guild.getInternalChannel(body.id) ?: return
             KookUpdatedChannelChangedEventImpl(
                 bot,
@@ -255,8 +284,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
-        
+
         is DeletedChannelExtraBody -> bot.pushIfProcessable(KookDeletedChannelChangedEvent) {
+            guild ?: return
             val channel = guild.getInternalChannel(body.id) ?: return
             KookDeletedChannelChangedEventImpl(
                 bot,
@@ -264,8 +294,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel
             )
         }
-        
+
         is PinnedMessageExtraBody -> bot.pushIfProcessable(KookPinnedMessageEvent) {
+            guild ?: return
             val channel = guild.getInternalChannel(body.channelId) ?: return
             val operator = guild.getInternalMember(body.operatorId)
             KookPinnedMessageEventImpl(
@@ -274,8 +305,9 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel, operator
             )
         }
-        
+
         is UnpinnedMessageExtraBody -> bot.pushIfProcessable(KookUnpinnedMessageEvent) {
+            guild ?: return
             val channel = guild.getInternalChannel(body.channelId) ?: return
             val operator = guild.getInternalMember(body.operatorId)
             KookUnpinnedMessageEventImpl(
@@ -284,18 +316,25 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
                 guild, channel, operator
             )
         }
-        
+
         // endregion
-        
-        
+
+        // btn
+        is MessageBtnClickEventBody -> bot.pushIfProcessable(KookMessageBtnClickEvent) {
+            KookMessageBtnClickEventImpl(
+                bot,
+                this as Event<Event.Extra.Sys<MessageBtnClickEventBody>>
+            )
+        }
+
         // other..?
-        
-        
+
+
         // 其他未知事件类型
         else -> pushUnsupported(bot)
     }
-    
-    
+
+
 }
 
 private suspend fun KookComponentBotImpl.findUserInGuilds(userId: ID, guildIds: Collection<ID>): UserInfo? {
@@ -322,7 +361,7 @@ private suspend inline fun KookComponentBotImpl.pushIfProcessable(
         }
         return true
     }
-    
+
     return false
 }
 
@@ -335,6 +374,6 @@ private fun toMemberIfSystem(
     if (id != SystemUser.id) {
         return null
     }
-    
+
     return KookGuildMemberImpl(bot, guild, SystemUser.toModel())
 }

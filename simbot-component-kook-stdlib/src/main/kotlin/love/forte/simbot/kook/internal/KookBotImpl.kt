@@ -73,6 +73,7 @@ internal class KookBotImpl(
 ) : KookBot {
     override val logger: Logger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
     private val clientLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.client.${ticket.clientId}")
+    private val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.event.${ticket.clientId}")
 
     internal val isEventProcessAsync = configuration.isEventProcessAsync
     private val wsConnectTimeout = configuration.wsConnectTimeout
@@ -635,7 +636,7 @@ internal class KookBotImpl(
         }
 
         private suspend fun processString(eventString: String, loop: StageLoop) {
-            clientLogger.trace("On signal: {}", eventString)
+            eventLogger.trace("On signal: {}", eventString)
             val jsonElement = decoder.parseToJsonElement(eventString)
 
 
@@ -656,7 +657,7 @@ internal class KookBotImpl(
 
                 // Reconnect.
                 Signal.Reconnect.S_CODE -> {
-                    clientLogger.debug("Reconnect signal received: {}", eventString)
+                    eventLogger.debug("Reconnect signal received: {}", eventString)
                     // next: reconnect
                     loop.addLast(Reconnect(client.atomicSn.get(), hello.data.sessionId))
 
@@ -670,16 +671,18 @@ internal class KookBotImpl(
                     // next: self
                     loop.addLast(this)
 
+                    eventLogger.debug("On event raw: {}", eventString)
+
                     val event = decode(Signal.Event.serializer())
 
-                    clientLogger.trace("On event signal: {}", event)
+                    eventLogger.debug("On event signal: {}", event)
 
                     // 如果sn比当前小，忽略此事件。
                     val eventSn = event.sn
                     val updated = client.atomicSn.updateSn(eventSn)
                     if (eventSn < updated) {
                         // just skip.
-                        clientLogger.trace(
+                        eventLogger.trace(
                             "Event sn ({}) < current sn ({}), ignore and skip this event. The event: {}",
                             eventSn,
                             updated,
@@ -713,7 +716,7 @@ internal class KookBotImpl(
                                 }
                             }
                         } catch (e: Throwable) {
-                            clientLogger.error("Event push on error: {}", e.localizedMessage, e)
+                            eventLogger.error("Event push on error: {}", e.localizedMessage, e)
                         }
                     }
                 }
@@ -830,7 +833,6 @@ internal class KookBotImpl(
                 // val currPreProcessorQueue = preProcessorQueue
                 // val currProcessorQueue = processorQueue
                 if (preProcessorQueue.isNotEmpty() || processorQueue.isNotEmpty()) {
-                    clientLogger.trace("On event: {}", event)
                     val eventType = event.type
                     val eventExtraType = event.extraType
 
@@ -842,7 +844,7 @@ internal class KookBotImpl(
                     val parser = EventSignals[eventType, eventExtraType] ?: run {
                         val e =
                             SimbotIllegalStateException("Unknown event type: $eventType, subType: $eventExtraType. data: $event")
-                        clientLogger.error(e.localizedMessage, e)
+                        eventLogger.error(e.localizedMessage, e)
                         // e.process(logger) { "Event receiving" } // TODO process exception?
                         return@onEach
                     }
@@ -858,12 +860,12 @@ internal class KookBotImpl(
                         try {
                             pre(event, decoder, lazyDecoded)
                         } catch (e: Throwable) {
-                            if (clientLogger.isDebugEnabled) {
-                                clientLogger.debug(
+                            if (eventLogger.isDebugEnabled) {
+                                eventLogger.debug(
                                     "Event pre precess failure. Event: {}, event.data: {}", event, event.data
                                 )
                             }
-                            clientLogger.error("Event pre precess failure.", e)
+                            eventLogger.error("Event pre precess failure.", e)
                         }
                     }
 
@@ -873,7 +875,7 @@ internal class KookBotImpl(
                                 try {
                                     processor(event, decoder, lazyDecoded)
                                 } catch (e: Throwable) {
-                                    clientLogger.debug(
+                                    eventLogger.debug(
                                         "Event precess failure. Event: {}, event.data: {}", event, event.data, e
                                     )
                                 }
@@ -884,24 +886,28 @@ internal class KookBotImpl(
                             try {
                                 processor(event, decoder, lazyDecoded)
                             } catch (e: Throwable) {
-                                clientLogger.debug(
+                                eventLogger.debug(
                                     "Event precess failure. Event: {}, event.data: {}", event, event.data, e
                                 )
                             }
                         }
                     }
+                } else {
+                    // 事件 A 将会被丢弃
+                    eventLogger.debug("Event processors are empty. Event signal {} will be dropped", event)
+
                 }
             }.onCompletion { cause ->
                 if (cause == null) {
-                    clientLogger.debug("Event process flow is completed. No cause.")
+                    eventLogger.debug("Event process flow is completed. No cause.")
                 } else {
-                    clientLogger.debug(
+                    eventLogger.debug(
                         "Event process flow is completed. Cause: {}", cause.localizedMessage, cause
                     )
                 }
 
             }.catch { cause ->
-                clientLogger.error(
+                eventLogger.error(
                     "Event process flow on error: {}", cause.localizedMessage, cause
                 )
             }.launchIn(this)

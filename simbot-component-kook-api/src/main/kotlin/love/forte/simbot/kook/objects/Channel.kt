@@ -91,7 +91,12 @@ public interface Channel : KookObjects, ChannelInfo {
     /** 针对角色在该频道的权限覆写规则组成的列表 */
     public val permissionOverwrites: List<ChannelPermissionOverwrites>
 
-    /** 针对用户在该频道的权限覆写规则组成的列表 */
+    /**
+     * 针对用户在该频道的权限覆写规则组成的列表
+     *
+     * 在一些官方文档未提及的地方（例如 /guild/view API），permissionUsers 可能会默认得到空。
+     *
+     */
     public val permissionUsers: List<ID>
 
     /** 权限设置是否与分组同步, 1 or 0 */

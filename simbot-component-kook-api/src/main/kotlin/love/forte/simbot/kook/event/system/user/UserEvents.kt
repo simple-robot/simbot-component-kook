@@ -103,7 +103,7 @@ public object UserEvents {
      * @see MessageBtnClickEventBody
      */
     public val messageBtnClickEventParser: SysEventParser<MessageBtnClickEventBody> =
-        sysParser(SELF_JOINED_GUILD, MessageBtnClickEventBodyImpl.serializer())
+        sysParser(MESSAGE_BTN_CLICK, MessageBtnClickEventBodyImpl.serializer())
 
 }
 

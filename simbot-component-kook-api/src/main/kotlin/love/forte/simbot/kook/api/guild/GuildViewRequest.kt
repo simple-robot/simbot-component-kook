@@ -21,14 +21,15 @@ import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.CharSequenceID
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.BaseKookApiRequestKey
 import love.forte.simbot.kook.api.KookGetRequest
-import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.kook.api.channel.ChannelView
 import love.forte.simbot.kook.objects.Guild
-import love.forte.simbot.kook.objects.Role
+import love.forte.simbot.kook.objects.impl.RoleImpl
 import love.forte.simbot.literal
 
 
@@ -128,11 +129,11 @@ public class GuildViewRequest internal constructor(private val guildId: ID) : Ko
 
 @Serializable
 internal data class GuildView @ApiResultType constructor(
-    override val id: ID,
+    override val id: CharSequenceID,
     override val name: String,
     override val topic: String,
     @SerialName("master_id")
-    override val masterId: ID,
+    override val masterId: CharSequenceID,
     override val icon: String,
     @SerialName("notify_type")
     override val notifyType: Int,
@@ -140,11 +141,11 @@ internal data class GuildView @ApiResultType constructor(
     @SerialName("enable_open")
     override val enableOpen: Boolean,
     @SerialName("open_id")
-    override val openId: ID,
+    override val openId: CharSequenceID,
     @SerialName("default_channel_id")
-    override val defaultChannelId: ID,
+    override val defaultChannelId: CharSequenceID,
     @SerialName("welcome_channel_id")
-    override val welcomeChannelId: ID,
+    override val welcomeChannelId: CharSequenceID,
     /**
      * 服务器助力数量
      */
@@ -154,8 +155,8 @@ internal data class GuildView @ApiResultType constructor(
      * 服务器等级
      */
     val level: Int,
-    override val roles: List<Role>,
-    override val channels: List<Channel>,
+    override val roles: List<RoleImpl>,
+    override val channels: List<ChannelView>,
 
     ////
     override val maximumChannel: Int = -1,

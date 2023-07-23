@@ -42,7 +42,7 @@ import love.forte.simbot.literal
 public class ChannelViewRequest internal constructor(private val targetId: ID) : KookGetRequest<ChannelView>() {
 
     public companion object Key : BaseKookApiRequestKey("channel", "view") {
-    
+
         /**
          * 构建 [ChannelViewRequest]
          * @param targetId 目标频道ID
@@ -89,21 +89,17 @@ public data class ChannelView @ApiResultType constructor(
     override val level: Int,
     /** 慢速限制，单位秒。用户发送消息之后再次发送消息的等待时间。 */
     @SerialName("slow_mode")
-    override val slowMode: Int,
+    override val slowMode: Int = -1,
     /** 人数限制 */
     @SerialName("limit_amount")
-    override val maximumMember: Int,
+    override val maximumMember: Int = -1,
     /** 是否为分组类型 */
     @SerialName("is_category")
-    override val isCategory: Boolean,
-    /** 语音服务器地址，HOST:PORT的格式 */
-    @SerialName("server_url")
-    val serverUrl: String,
+    override val isCategory: Boolean = false,
     // maybe miss
     @SerialName("permission_overwrites")
-    override val permissionOverwrites: List<ChannelPermissionOverwrites> = emptyList(),
-    @SerialName("permission_users")
-    override val permissionUsers: List<CharSequenceID> = emptyList(),
+    override val permissionOverwrites: List<ChannelPermissionOverwritesView> = emptyList(),
+
     @SerialName("permission_sync")
     override val permissionSync: Int = 0,
 ) : Channel {
@@ -112,4 +108,23 @@ public data class ChannelView @ApiResultType constructor(
 
     override val icon: String
         get() = ""
+
+    /**
+     * 始终得到空集合。
+     *
+     * 在官方文档中并未提及 `permission_users` 属性，因此不会对其进行解析。
+     *
+     */
+    override val permissionUsers: List<CharSequenceID> get() = emptyList()
 }
+
+
+@Serializable
+public data class ChannelPermissionOverwritesView(
+    @SerialName("role_id")
+    override val roleId: Int,
+    override val allow: Int,
+    override val deny: Int,
+) : ChannelPermissionOverwrites
+
+
