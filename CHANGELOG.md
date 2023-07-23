@@ -1,3 +1,15 @@
+# v3.0.0.0-alpha.7
+
+> Release & Pull Notes: [v3.0.0.0-alpha.7](https://github.com/simple-robot/simpler-robot/releases/tag/v3.0.0.0-alpha.7) 
+
+- fix(event): 修复 /guild/view API 以及 Bot 加入/离开 频道服务器时事件推送的问题 ([`8479330`](https://github.com/simple-robot/simpler-robot/commit/8479330))
+- feat(core): 核心模块提供 `KookTempTarget` 支持追加临时消息id ([`c6c419f`](https://github.com/simple-robot/simpler-robot/commit/c6c419f))
+- feat(core): 支持 `KookTempTarget` 来追加指定一个 `temp_target_id` ([`6a18976`](https://github.com/simple-robot/simpler-robot/commit/6a18976))
+- feat: 修复 `MessageBtnClickEvent` 无法被正确触发的问题；增加组件模块下对 `MessageBtnClickEvent` 的支持事件类型 `KookMessageBtnClickEvent` ([`aa2fda4`](https://github.com/simple-robot/simpler-robot/commit/aa2fda4))
+- pref(stdlib): 优化 bot 内 DEBUG 等调试日志 ([`b3da397`](https://github.com/simple-robot/simpler-robot/commit/b3da397))
+- build: 版本递增 ([`60920b3`](https://github.com/simple-robot/simpler-robot/commit/60920b3))
+- fix(api): 尝试修复 `Card` 反序列化异常的问题 ([`0720f20`](https://github.com/simple-robot/simpler-robot/commit/0720f20))
+
 # v3.0.0.0-alpha.6
 
 > Release & Pull Notes: [v3.0.0.0-alpha.6](https://github.com/simple-robot/simpler-robot/releases/tag/v3.0.0.0-alpha.6) 
