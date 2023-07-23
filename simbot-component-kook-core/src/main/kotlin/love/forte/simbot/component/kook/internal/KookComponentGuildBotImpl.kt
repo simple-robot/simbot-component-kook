@@ -36,9 +36,9 @@ import kotlin.coroutines.CoroutineContext
  */
 internal class KookComponentGuildBotImpl private constructor(
     override val bot: KookComponentBotImpl,
-    private val member: KookGuildMember,
+    private val member: KookGuildMemberImpl,
 ) : KookComponentGuildBot() {
-    override suspend fun asMember(): KookGuildMember = member
+    override suspend fun asMember(): KookGuildMemberImpl = member
     
     override suspend fun guild(id: ID): KookGuild? = bot.guild(id)
     
@@ -115,7 +115,7 @@ internal class KookComponentGuildBotImpl private constructor(
     }
     
     companion object {
-        internal fun KookComponentBotImpl.toMemberBot(member: KookGuildMember): KookComponentGuildBotImpl =
+        internal fun KookComponentBotImpl.toMemberBot(member: KookGuildMemberImpl): KookComponentGuildBotImpl =
             KookComponentGuildBotImpl(this, member)
     }
 }

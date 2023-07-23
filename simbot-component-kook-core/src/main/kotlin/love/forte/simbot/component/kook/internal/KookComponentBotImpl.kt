@@ -61,7 +61,6 @@ import love.forte.simbot.kook.event.system.guild.DeletedGuildExtraBody
 import love.forte.simbot.kook.event.system.guild.UpdatedGuildExtraBody
 import love.forte.simbot.kook.event.system.guild.member.JoinedGuildEventBody
 import love.forte.simbot.kook.event.system.guild.member.UpdatedGuildMemberEventBody
-import love.forte.simbot.kook.event.system.user.SelfExitedGuildEventBody
 import love.forte.simbot.kook.event.system.user.SelfJoinedGuildEventBody
 import love.forte.simbot.kook.event.system.user.UserUpdatedEventBody
 import love.forte.simbot.literal
@@ -108,7 +107,13 @@ internal class KookComponentBotImpl(
     @JvmSynthetic
     internal fun internalGuild(id: String): KookGuildImpl? = internalGuilds[id]
     
-    
+      @JvmSynthetic
+    internal fun internalGuildRemove(id: ID): KookGuildImpl? = internalGuildRemove(id.literal)
+
+    @JvmSynthetic
+    internal fun internalGuildRemove(id: String): KookGuildImpl? = internalGuilds.remove(id)
+
+
     init {
         sourceBot.preProcessor { _, decoded ->
             val decodedEvent = decoded()
@@ -502,9 +507,9 @@ internal class KookComponentBotImpl(
                         }
                     }
                     // bot退出了某个服务器
-                    is SelfExitedGuildEventBody -> {
-                        internalGuilds.remove(body.guildId.literal)?.also { it.cancel() }
-                    }
+//                    is SelfExitedGuildEventBody -> {
+//                        internalGuilds.remove(body.guildId.literal)?.also { it.cancel() }
+//                    }
                     // bot加入了某服务器
                     is SelfJoinedGuildEventBody -> {
                         val guildInfo = GuildViewRequest.create(body.guildId).requestDataBy(this@KookComponentBotImpl)
@@ -513,6 +518,8 @@ internal class KookComponentBotImpl(
                         internalGuilds.merge(guildInfo.id.literal, newGuild) { old, cur ->
                             old.cancel()
                             cur
+                        }.also {
+
                         }
                     }
                     // endregion
