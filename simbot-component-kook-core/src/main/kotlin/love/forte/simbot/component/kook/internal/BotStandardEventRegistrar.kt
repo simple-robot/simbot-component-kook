@@ -199,22 +199,32 @@ private suspend fun SystemEvent<*, *>.registerSystemEvent(bot: KookComponentBotI
             )
         }
 
-        is SelfExitedGuildEventBody -> bot.pushIfProcessable(KookBotSelfExitedGuildEvent) {
-            KookBotSelfExitedGuildEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
-                guild ?: return,
-                author ?: return
-            )
+        is SelfExitedGuildEventBody -> {
+            val removedGuild = bot.internalGuildRemove(body.guildId.literal)
+            val botSelf = removedGuild?.bot?.asMember()
+
+            bot.pushIfProcessable(KookBotSelfExitedGuildEvent) {
+                KookBotSelfExitedGuildEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<SelfExitedGuildEventBody>>,
+                    removedGuild ?: return,
+                    botSelf ?: return
+                )
+            }
         }
 
-        is SelfJoinedGuildEventBody -> bot.pushIfProcessable(KookBotSelfJoinedGuildEvent) {
-            KookBotSelfJoinedGuildEventImpl(
-                bot,
-                this as Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
-                guild ?: return,
-                author ?: return
-            )
+        is SelfJoinedGuildEventBody -> {
+            val joinedGuild = bot.internalGuild(body.guildId)
+            val botSelf = joinedGuild?.bot?.asMember()
+
+            bot.pushIfProcessable(KookBotSelfJoinedGuildEvent) {
+                KookBotSelfJoinedGuildEventImpl(
+                    bot,
+                    this as Event<Event.Extra.Sys<SelfJoinedGuildEventBody>>,
+                    joinedGuild ?: return,
+                    botSelf ?: return
+                )
+            }
         }
 
         // online
