@@ -255,6 +255,8 @@ public sealed class Signal {
 
         override val d: Unit
             get() = Unit
+
+        public fun jsonValue(): String = """{"s":$S_PING,"sn":$sn}"""
     }
 
     /**

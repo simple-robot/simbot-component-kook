@@ -36,7 +36,6 @@ import love.forte.simbot.kook.Bot
 import love.forte.simbot.kook.BotConfiguration
 import love.forte.simbot.kook.ProcessorType
 import love.forte.simbot.kook.Ticket
-import love.forte.simbot.kook.api.Gateway
 import love.forte.simbot.kook.api.user.GetMeApi
 import love.forte.simbot.kook.api.user.Me
 import love.forte.simbot.kook.api.user.OfflineApi
@@ -56,7 +55,7 @@ internal class BotImpl(
     override val ticket: Ticket,
     override val configuration: BotConfiguration
 ) : Bot {
-    private val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
+    internal val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
 
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
@@ -82,7 +81,7 @@ internal class BotImpl(
             configuration.clientEngineConfig
         )
 
-    private val wsClient: HttpClient =
+    internal val wsClient: HttpClient =
         resolveHttpClient(
             configuration,
             configuration.wsEngine,
@@ -141,6 +140,55 @@ internal class BotImpl(
         }
     }
 
+    private fun resolveWsClient(
+        configuration: BotConfiguration,
+        engine: HttpClientEngine?,
+        engineFactory: HttpClientEngineFactory<*>?,
+        engineConfig: BotConfiguration.EngineConfiguration?,
+    ): HttpClient = when {
+        engine != null -> HttpClient(engine) {
+            configWsClient(configuration, engineConfig)
+        }
+
+        engineFactory != null -> HttpClient(engineFactory) {
+            configWsClient(configuration, engineConfig)
+        }
+
+        else -> HttpClient {
+            configWsClient(configuration, engineConfig)
+        }
+    }
+
+    private fun HttpClientConfig<*>.configWsClient(
+        configuration: BotConfiguration,
+        engineConfiguration: BotConfiguration.EngineConfiguration?
+    ) {
+        install(ContentNegotiation) {
+            json(defaultApiDecoder)
+        }
+
+        install(HttpRequestRetry) {
+            maxRetries = 3
+        }
+
+        WebSockets {
+            pingInterval = 30_000L
+            if (configuration.isCompress) {
+                supportCompress(this@BotImpl, configuration, engineConfiguration)
+            }
+        }
+
+
+
+        engineConfiguration?.also { ec ->
+            engine {
+                ec.pipelining?.also { pipelining = it }
+                ec.threadsCount?.also { threadsCount = it }
+            }
+        }
+    }
+
+
     override val isActive: Boolean
         get() = job.isActive
 
@@ -183,9 +231,6 @@ internal class BotImpl(
     }
 
 
-
-
-
     override suspend fun join() {
         job.join()
     }
@@ -204,7 +249,7 @@ internal class BotImpl(
 
 
     companion object {
-        private val defaultApiDecoder = Json {
+        internal val defaultApiDecoder = Json {
             encodeDefaults = true
             isLenient = true
             allowSpecialFloatingPointValues = true
@@ -229,16 +274,12 @@ internal class AtomicLongRef(initValue: Long = 0) {
     fun updateAndGet(function: (Long) -> Long): Long = atomicValue.updateAndGet(function)
 }
 
+
 /**
- * 通过 [Gateway] 连接bot信息。
+ * 由平台实现，使 ws client 支持 compress 解压缩。
  */
-private suspend fun HttpClient.ws(gateway: GatewayInfo): DefaultClientWebSocketSession {
-    return webSocketSession {
-        url {
-            takeFrom(gateway.url)
-            gateway.apply {
-                urlBuilder()
-            }
-        }
-    }
-}
+internal expect fun WebSockets.Config.supportCompress(
+    bot: BotImpl,
+    configuration: BotConfiguration,
+    engineConfiguration: BotConfiguration.EngineConfiguration?
+)

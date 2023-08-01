@@ -44,7 +44,7 @@ kotlin {
 
     sourceSets.configureEach {
         languageSettings {
-//            optIn("love.forte.simbot.InternalSimbotApi")
+            optIn("love.forte.simbot.InternalSimbotApi")
         }
     }
 
@@ -125,6 +125,7 @@ kotlin {
                 api(simbotUtilSuspendTransformer)
                 compileOnly(simbotUtilAnnotations)
                 api(libs.ktor.client.ws)
+                api(libs.ktor.server.compression)
                 api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
             }
         }

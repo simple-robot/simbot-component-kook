@@ -173,7 +173,7 @@ public class BotConfiguration {
     // endregion
 
     /**
-     * ws连接超时时间。默认为 [DEFAULT_WS_CONNECT_TIMEOUT].
+     * ws连接超时时间，单位 ms 。默认为 [DEFAULT_WS_CONNECT_TIMEOUT].
      */
     public var wsConnectTimeout: Long = DEFAULT_WS_CONNECT_TIMEOUT
 
