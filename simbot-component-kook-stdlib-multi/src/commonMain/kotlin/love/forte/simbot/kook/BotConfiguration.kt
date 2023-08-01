@@ -21,6 +21,11 @@ import io.ktor.client.engine.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+/**
+ * [BotConfiguration] 中 [BotConfiguration.isCompress] 的默认值。
+ * 在 JVM 中默认开启，其他平台下默认关闭且不保证支持。
+ */
+public expect val DEFAULT_COMPRESS: Boolean
 
 /**
  *
@@ -32,7 +37,7 @@ public class BotConfiguration {
     /**
      * 设置bot进行连接的时候使用要使用压缩数据。
      */
-    public var isCompress: Boolean = true
+    public var isCompress: Boolean = DEFAULT_COMPRESS
 
     /**
      * 为bot提供一个 [CoroutineContext]。
