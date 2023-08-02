@@ -26,6 +26,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
@@ -345,6 +346,7 @@ private class HeartbeatJob(val job: Job, val pongChannel: Channel<Signal.Pong>) 
 private class CreateClient(
     override val bot: BotImpl,
     override val botLogger: Logger,
+    private val session: DefaultClientWebSocketSession,
     private val hello: Signal.Hello,
     private val gateway: RequestedGateway,
     private val sn: AtomicLongRef,
@@ -359,13 +361,52 @@ private class CreateClient(
         }
         botLogger.trace("Creating event process channel: {}", eventProcessChannel)
 
+        val eventProcessJob = session.eventProcessJob(eventProcessChannel)
 
         TODO("Not yet implemented")
     }
 
-    private fun DefaultClientWebSocketSession.eventProcessJob(channel: Channel<Signal.Event<*>>) {
+    private fun DefaultClientWebSocketSession.eventProcessJob(channel: Channel<Signal.Event<*>>): EventProcessJob {
 
         TODO("event process job")
+    }
+}
+
+private class EventProcessJob(
+    val job: Job,
+    val eventChannel: Channel<Signal.Event<*>>
+) {
+    suspend fun sendEvent(event: Signal.Event<*>) {
+        eventChannel.send(event)
+    }
+
+    fun trySendEvent(event: Signal.Event<*>): ChannelResult<Unit> {
+        return eventChannel.trySend(event)
+    }
+
+    override fun toString(): String {
+        return "EventProcessJob(job=$job, eventChannel=$eventChannel)"
+    }
+}
+
+// TODO
+private class Client(
+    val gateway: GatewayInfo0,
+    val session: DefaultClientWebSocketSession,
+    val sn: AtomicLongRef,
+    val heartbeatJob: HeartbeatJob,
+    val eventProcessJob: EventProcessJob
+)
+
+/**
+ * 事件循环接收状态
+ */
+private class Receiving(
+    override val bot: BotImpl,
+    override val botLogger: Logger,
+) : State() {
+    override suspend fun invoke(): State? {
+        TODO("Not yet implemented")
     }
 }
 
