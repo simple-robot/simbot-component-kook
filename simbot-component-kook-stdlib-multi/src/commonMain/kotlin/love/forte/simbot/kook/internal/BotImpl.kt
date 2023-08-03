@@ -56,6 +56,7 @@ internal class BotImpl(
     override val configuration: BotConfiguration
 ) : Bot {
     internal val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
+    internal val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.event.${ticket.clickId}")
 
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
@@ -247,6 +248,22 @@ internal class BotImpl(
         // event process job
     )
 
+    internal suspend fun processEvent(event: Signal.Event<*>) {
+        // TODO process event
+        val prepareProcessors = queueMap[ProcessorType.PREPARE]
+        val normalProcessors = queueMap[ProcessorType.NORMAL]
+        if (prepareProcessors.isEmpty() && normalProcessors.isEmpty()) {
+            return
+        }
+
+        // TODO process
+        prepareProcessors.forEach { processor ->
+            // TODO try-catch
+            processor.invoke(event, event.d)
+        }
+
+
+    }
 
     companion object {
         internal val defaultApiDecoder = Json {

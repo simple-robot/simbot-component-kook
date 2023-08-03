@@ -36,6 +36,11 @@ public expect class EventProcessorQueue<T> {
      * 移除指定目标。
      */
     public fun remove(element: T): Boolean
+
+    /**
+     * 判断当前队列内容是否为空
+     */
+    public fun isEmpty(): Boolean
 }
 
 /**
@@ -49,3 +54,10 @@ public expect fun <T> createEventProcessorQueue(initialCapacity: Int): EventProc
  * foreach [EventProcessorQueue] values.
  */
 public expect inline fun <T> EventProcessorQueue<T>.forEach(block: (T) -> Unit)
+
+/**
+ * 判断当前队列内容是否不为空
+ *
+ * @see EventProcessorQueue.isEmpty
+ */
+public inline fun <T> EventProcessorQueue<T>.isNotEmpty(): Boolean = !isEmpty()

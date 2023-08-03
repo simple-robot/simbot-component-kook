@@ -27,6 +27,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ChannelResult
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
@@ -254,8 +255,7 @@ private class CreateHeartbeatJob(
 
         botLogger.debug("Heartbeat job created: {}", heartbeatJob)
 
-
-        TODO("Not yet implemented")
+        return CreateClient(bot, botLogger, session, hello, gateway, sn, heartbeatJob)
     }
 
     private suspend fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLongRef): HeartbeatJob {
@@ -367,8 +367,24 @@ private class CreateClient(
     }
 
     private fun DefaultClientWebSocketSession.eventProcessJob(channel: Channel<Signal.Event<*>>): EventProcessJob {
+        val job = channel
+            .receiveAsFlow()
+            .cancellable()
+            .buffer()
+            .onEach(bot::processEvent)
+            .onCompletion { e ->
+                if (e == null) {
+                    bot.eventLogger.debug("Event process flow is completed. No exception.")
+                } else {
+                    bot.eventLogger.debug(
+                        "Event process flow is completed. Cause: {}", e.message, e
+                    )
+                }
+            }.catch { e ->
+                bot.eventLogger.error("Event process flow on error. Cause: {}", e.message, e)
+            }.launchIn(session)
 
-        TODO("event process job")
+        return EventProcessJob(job, channel)
     }
 }
 

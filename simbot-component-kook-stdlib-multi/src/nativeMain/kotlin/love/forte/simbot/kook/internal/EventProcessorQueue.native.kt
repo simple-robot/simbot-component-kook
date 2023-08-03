@@ -26,6 +26,7 @@ import kotlinx.atomicfu.locks.synchronized
  * native 平台内基于 [ArrayList] 配合 [SynchronizedObject] 实现线程安全。
  */
 public actual class EventProcessorQueue<T>(initialCapacity: Int) : SynchronizedObject() {
+    // TODO copyOnWrite?
     private val list = ArrayList<T>(initialCapacity)
 
     /**
@@ -40,6 +41,13 @@ public actual class EventProcessorQueue<T>(initialCapacity: Int) : SynchronizedO
      */
     public actual fun remove(element: T): Boolean {
         return synchronized(this) { list.remove(element) }
+    }
+
+    /**
+     * 判断当前队列内容是否为空
+     */
+    public actual fun isEmpty(): Boolean {
+        return synchronized(this) { list.isEmpty() }
     }
 
     /**
