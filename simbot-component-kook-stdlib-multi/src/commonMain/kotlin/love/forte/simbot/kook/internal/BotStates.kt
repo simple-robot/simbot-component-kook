@@ -354,19 +354,19 @@ private class CreateClient(
 ) : State() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun invoke(): State? {
+    override suspend fun invoke(): State {
         val eventProcessChannel = Channel<Signal.Event<*>>(capacity = Channel.BUFFERED)
         eventProcessChannel.invokeOnClose { cause ->
             botLogger.debug("Event process closed, cause: {}", cause?.message, cause)
         }
-        botLogger.trace("Creating event process channel: {}", eventProcessChannel)
+        botLogger.debug("Creating event process channel: {}", eventProcessChannel)
 
-        val eventProcessJob = session.eventProcessJob(eventProcessChannel)
+        val eventProcessJob = eventProcessJob(eventProcessChannel)
 
-        TODO("Not yet implemented")
+        return Receiving(bot, botLogger, hello, Client(gateway.gateway, session, sn, heartbeatJob, eventProcessJob))
     }
 
-    private fun DefaultClientWebSocketSession.eventProcessJob(channel: Channel<Signal.Event<*>>): EventProcessJob {
+    private fun eventProcessJob(channel: Channel<Signal.Event<*>>): EventProcessJob {
         val job = channel
             .receiveAsFlow()
             .cancellable()
@@ -420,10 +420,48 @@ private class Client(
 private class Receiving(
     override val bot: BotImpl,
     override val botLogger: Logger,
+    private val hello: Signal.Hello,
+    private val client: Client
 ) : State() {
+    private inline val eventLogger
+        get() = bot.eventLogger
+
     override suspend fun invoke(): State? {
+
+        val session = client.session
+        if (!session.isActive) {
+            // 会话不再活跃。
+            val reason = session.closeReason.await()
+            botLogger.error("The session [{}] is no longer active. reason: {}", session, reason)
+            // reconnect?
+            return null
+        }
+
+        try {
+            eventLogger.trace("Receiving next frame...")
+            val frame = session.incoming.receive()
+            eventLogger.trace("Next frame: {}", frame)
+
+
+        } catch (cancellation: CancellationException) {
+            botLogger.warn("Session is cancelled: {}, try to re-receive", cancellation.message, cancellation)
+            // reconnect?
+            return this
+        } catch (e: Throwable) {
+            botLogger.error("Session received frame failed: {}, try to re-receive.", e.message, e)
+            // next: self
+            return this
+        }
+
         TODO("Not yet implemented")
     }
+
+    private fun AtomicLongRef.updateSn(newSn: Long): Long {
+
+
+        TODO()
+    }
+
 }
 
 
