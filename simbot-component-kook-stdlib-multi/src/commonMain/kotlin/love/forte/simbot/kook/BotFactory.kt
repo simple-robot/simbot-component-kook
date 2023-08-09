@@ -15,23 +15,37 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.kook.internal
+package love.forte.simbot.kook
 
-import io.ktor.client.plugins.websocket.*
-import io.ktor.websocket.*
-import love.forte.simbot.kook.BotConfiguration
+import love.forte.simbot.kook.internal.BotImpl
+import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
 
 /**
- * 由平台实现，使 ws client 支持 compress 解压缩。
+ * 构建 [Bot] 的工厂。
+ *
+ * @see Bot
  */
-internal actual fun WebSockets.Config.supportCompress(
-    bot: BotImpl,
-    configuration: BotConfiguration,
-    engineConfiguration: BotConfiguration.EngineConfiguration?
-) {
-    extensions {
-        install(WebSocketDeflateExtension) {
-            compressIf { it is Frame.Binary }
-        }
-    }
+public object BotFactory {
+
+    /**
+     * 构建一个尚未启动的 [Bot] 对象。
+     *
+     * @param ticket bot启动所需的票据信息
+     */
+    @JvmOverloads
+    @JvmStatic
+    public fun create(ticket: Ticket, configuration: BotConfiguration = BotConfiguration()): Bot =
+        BotImpl(ticket, configuration)
+
+}
+
+
+/**
+ * 构建一个尚未启动的 [Bot] 对象。
+ *
+ * @param ticket bot启动所需的票据信息
+ */
+public inline fun BotFactory.create(ticket: Ticket, config: BotConfiguration.() -> Unit): Bot {
+    return create(ticket, BotConfiguration().also(config))
 }

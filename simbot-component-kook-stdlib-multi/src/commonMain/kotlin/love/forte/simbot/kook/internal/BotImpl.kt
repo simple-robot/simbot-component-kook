@@ -22,13 +22,12 @@ import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
-import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.atomicfu.AtomicLong
 import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.updateAndGet
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -42,6 +41,7 @@ import love.forte.simbot.kook.api.user.OfflineApi
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.Signal
 import love.forte.simbot.logger.LoggerFactory
+import love.forte.simbot.util.stageloop.loop
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
 
@@ -52,20 +52,18 @@ internal typealias EventProcessor = suspend Signal.Event<*>.(Event<*>) -> Unit
  * @author ForteScarlet
  */
 internal class BotImpl(
-    override val ticket: Ticket,
-    override val configuration: BotConfiguration
+    override val ticket: Ticket, override val configuration: BotConfiguration
 ) : Bot {
     internal val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
     internal val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.event.${ticket.clickId}")
 
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
-    private val queueMap =
-        ActualEnumMap.create<ProcessorType, EventProcessorQueue<EventProcessor>> {
-            createEventProcessorQueue(
-                16
-            )
-        }
+    private val queueMap = ActualEnumMap.create<ProcessorType, EventProcessorQueue<EventProcessor>> {
+        createEventProcessorQueue(
+            16
+        )
+    }
 
     override fun processor(processorType: ProcessorType, processor: suspend Signal.Event<*>.(Event<*>) -> Unit) {
         queueMap[processorType].add(processor)
@@ -74,21 +72,13 @@ internal class BotImpl(
     private val job = SupervisorJob(configuration.coroutineContext[Job])
     override val coroutineContext: CoroutineContext = job + configuration.coroutineContext
 
-    override val apiClient: HttpClient =
-        resolveHttpClient(
-            configuration,
-            configuration.clientEngine,
-            configuration.clientEngineFactory,
-            configuration.clientEngineConfig
-        )
+    override val apiClient: HttpClient = resolveHttpClient(
+        configuration, configuration.clientEngine, configuration.clientEngineFactory, configuration.clientEngineConfig
+    ).also(::closeOnBotClosed)
 
-    internal val wsClient: HttpClient =
-        resolveHttpClient(
-            configuration,
-            configuration.wsEngine,
-            configuration.wsEngineFactory,
-            configuration.wsEngineConfig
-        )
+    internal val wsClient: HttpClient = resolveWsClient(
+        configuration, configuration.wsEngine, configuration.wsEngineFactory, configuration.wsEngineConfig
+    ).also(::closeOnBotClosed)
 
     private fun resolveHttpClient(
         configuration: BotConfiguration,
@@ -110,8 +100,7 @@ internal class BotImpl(
     }
 
     private fun HttpClientConfig<*>.configApiHttpClient(
-        configuration: BotConfiguration,
-        engineConfiguration: BotConfiguration.EngineConfiguration?
+        configuration: BotConfiguration, engineConfiguration: BotConfiguration.EngineConfiguration?
     ) {
         install(ContentNegotiation) {
             json(defaultApiDecoder)
@@ -160,9 +149,9 @@ internal class BotImpl(
         }
     }
 
+
     private fun HttpClientConfig<*>.configWsClient(
-        configuration: BotConfiguration,
-        engineConfiguration: BotConfiguration.EngineConfiguration?
+        configuration: BotConfiguration, engineConfiguration: BotConfiguration.EngineConfiguration?
     ) {
         install(ContentNegotiation) {
             json(defaultApiDecoder)
@@ -174,12 +163,7 @@ internal class BotImpl(
 
         WebSockets {
             pingInterval = 30_000L
-            if (configuration.isCompress) {
-                supportCompress(this@BotImpl, configuration, engineConfiguration)
-            }
         }
-
-
 
         engineConfiguration?.also { ec ->
             engine {
@@ -190,10 +174,14 @@ internal class BotImpl(
     }
 
 
+    private fun closeOnBotClosed(client: HttpClient) {
+        job.invokeOnCompletion { client.close() }
+    }
+
     override val isActive: Boolean
         get() = job.isActive
 
-    override val isStarted: Boolean by atomic(false)
+    override var isStarted: Boolean by atomic(false)
 
     @Volatile
     private lateinit var _me: Me
@@ -213,21 +201,48 @@ internal class BotImpl(
 
     private val startLock = Mutex()
 
-    override suspend fun start() {
-        startLock.withLock {
-            if (job.isCancelled) {
-                throw IllegalStateException("Bot is already started.")
+    @Volatile
+    private var currentClientJob: Job? = null
+
+    override suspend fun start(closeBotOnFailure: Boolean) {
+        try {
+            startLock.withLock {
+                if (job.isCancelled) {
+                    throw CancellationException("Bot has bean cancelled.")
+                }
+                // close current client if exist
+                if (currentClientJob != null) {
+                    botLogger.debug("Cancel current client: {}", currentClientJob)
+                    currentClientJob?.cancel()
+                    currentClientJob = null
+                }
+
+
+                val connect = Connect(this, botLogger, configuration.isCompress)
+                botLogger.debug("Create connect: {}", connect)
+
+                var currentState: State? = connect
+                while (currentState?.isReceiving == false) {
+                    currentState = currentState()
+                }
+
+                if (currentState == null) {
+                    throw IllegalStateException("Bot start failed.")
+                }
+
+                currentClientJob = launch { currentState.loop() }
+
+                isStarted = true
+
+                me() // init bot user info
             }
-            // close current client if exist
-
-
-            val loopJob = SupervisorJob(job)
-
-
-            // get gateway
-            // connect gateway
-
-            TODO("Not yet implemented")
+        } catch (e: Throwable) {
+            // close this bot
+            if (closeBotOnFailure) {
+                botLogger.error("Close bot on start failed", e)
+                close()
+            }
+            throw e
         }
     }
 
@@ -238,28 +253,57 @@ internal class BotImpl(
 
     override fun close() {
         job.cancel()
+        currentClientJob = null
     }
-
-    private inner class Client(
-        val gatewayInfo: GatewayInfo,
-        val session: DefaultClientWebSocketSession,
-        val sn: AtomicLongRef,
-        // heart beat job
-        // event process job
-    )
 
     internal suspend fun processEvent(event: Signal.Event<*>) {
         // TODO process event
         val prepareProcessors = queueMap[ProcessorType.PREPARE]
         val normalProcessors = queueMap[ProcessorType.NORMAL]
         if (prepareProcessors.isEmpty() && normalProcessors.isEmpty()) {
+            eventLogger.trace("prepare processors and normal processors are both empty, skip.")
             return
         }
 
-        // TODO process
+        val eventData = event.d
         prepareProcessors.forEach { processor ->
-            // TODO try-catch
-            processor.invoke(event, event.d)
+            try {
+                processor.invoke(event, eventData)
+            } catch (e: Throwable) {
+                eventLogger.error("Event prepare process failed. Enable debug level log for more information.", e)
+                eventLogger.debug(
+                    "Event prepare processor {} invoke failed. Event: {}, event.data: {}",
+                    processor,
+                    event,
+                    eventData,
+                    e
+                )
+            }
+        }
+
+        suspend fun doNormalProcess() {
+            normalProcessors.forEach { processor ->
+                try {
+                    processor.invoke(event, eventData)
+                } catch (e: Throwable) {
+                    eventLogger.error("Event normal process failed. Enable debug level log for more information.", e)
+                    eventLogger.debug(
+                        "Event normal processor {} invoke failed. Event: {}, event.data: {}",
+                        processor,
+                        event,
+                        eventData,
+                        e
+                    )
+                }
+            }
+        }
+
+        if (configuration.isNormalEventProcessAsync) {
+            launch {
+                doNormalProcess()
+            }
+        } else {
+            doNormalProcess()
         }
 
 
@@ -272,31 +316,8 @@ internal class BotImpl(
             allowSpecialFloatingPointValues = true
             prettyPrint = false
             useArrayPolymorphism = false
+            ignoreUnknownKeys = true
         }
     }
 }
 
-
-private data class GatewayInfo(val url: String, val urlBuilder: URLBuilder.() -> Unit = {})
-
-
-internal class AtomicLongRef(initValue: Long = 0) {
-    private val atomicValue: AtomicLong = atomic(initValue)
-    var value: Long
-        get() = atomicValue.value
-        set(value) {
-            atomicValue.value = value
-        }
-
-    fun updateAndGet(function: (Long) -> Long): Long = atomicValue.updateAndGet(function)
-}
-
-
-/**
- * 由平台实现，使 ws client 支持 compress 解压缩。
- */
-internal expect fun WebSockets.Config.supportCompress(
-    bot: BotImpl,
-    configuration: BotConfiguration,
-    engineConfiguration: BotConfiguration.EngineConfiguration?
-)

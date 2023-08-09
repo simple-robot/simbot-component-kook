@@ -125,7 +125,6 @@ kotlin {
                 api(simbotUtilSuspendTransformer)
                 compileOnly(simbotUtilAnnotations)
                 api(libs.ktor.client.ws)
-                api(libs.ktor.server.compression)
                 api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
             }
         }
@@ -152,11 +151,13 @@ kotlin {
 
         getByName("jvmTest") {
             dependencies {
-                runtimeOnly(libs.ktor.client.cio)
+                implementation(libs.ktor.client.cio)
                 implementation(simbotApi)
-                implementation(libs.log4j.api)
-                implementation(libs.log4j.core)
-                implementation(libs.log4j.slf4j2Impl)
+                implementation(simbotLogger)
+                implementation(simbotLoggerSlf4j)
+//                implementation(libs.log4j.api)
+//                implementation(libs.log4j.core)
+//                implementation(libs.log4j.slf4j2Impl)
             }
         }
 

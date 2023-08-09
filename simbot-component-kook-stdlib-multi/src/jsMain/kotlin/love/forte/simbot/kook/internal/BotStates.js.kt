@@ -17,18 +17,15 @@
 
 package love.forte.simbot.kook.internal
 
-import io.ktor.client.plugins.websocket.*
-import love.forte.simbot.kook.BotConfiguration
+import io.ktor.websocket.*
+import love.forte.simbot.InternalSimbotApi
 
 /**
- * 由平台实现，使 ws client 支持 compress 解压缩。
+ * JS 平台中不支持, 会抛出 [UnsupportedOperationException]
  *
- * native 平台暂不支持。
+ * @throws UnsupportedOperationException 当不支持解析二进制数据时
  */
-internal actual fun WebSockets.Config.supportCompress(
-    bot: BotImpl,
-    configuration: BotConfiguration,
-    engineConfiguration: BotConfiguration.EngineConfiguration?
-) {
-    bot.botLogger.warn("Native platform does not support compress yet.")
+@InternalSimbotApi
+public actual fun Frame.Binary.readToTextWithDeflated(): String {
+    throw UnsupportedOperationException("Parsing binary compressed data on JS platforms is not yet supported")
 }

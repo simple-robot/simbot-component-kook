@@ -17,19 +17,17 @@
 
 package love.forte.simbot.kook.internal
 
-import io.ktor.client.plugins.websocket.*
-import love.forte.simbot.kook.BotConfiguration
+import io.ktor.websocket.*
+import love.forte.simbot.InternalSimbotApi
+import java.util.zip.InflaterInputStream
 
 /**
- * 由平台实现，使 ws client 支持 compress 解压缩。
+ * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。
+ * JVM 中会使用 [InflaterInputStream] 对 [Frame.Binary.data] 进行解码
  *
- * JS 中目前暂不支持
- *
+ * @throws UnsupportedOperationException 当不支持解析二进制数据时
  */
-internal actual fun WebSockets.Config.supportCompress(
-    bot: BotImpl,
-    configuration: BotConfiguration,
-    engineConfiguration: BotConfiguration.EngineConfiguration?
-) {
-    bot.botLogger.warn("JS platform does not support compress yet.")
+@InternalSimbotApi
+public actual fun Frame.Binary.readToTextWithDeflated(): String {
+    return InflaterInputStream(data.inputStream()).reader().use { it.readText() }
 }

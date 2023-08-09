@@ -139,9 +139,35 @@ public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
      * 如果 bot 已经被启动，则关闭旧连接并重新连接。
      *
      * [start] 会由 [Mutex] 进行同步，同一时间只会有一个启动流程在执行。
+     *
+     * 如果启动过程中出现任何异常则会关闭当前 Bot。
+     *
+     * @throws kotlinx.coroutines.CancellationException Bot 已经被关闭时 ([isActive] == false)
+     * @throws IllegalStateException bot 启动失败
+     *
      */
     @JvmSuspendTrans
-    public suspend fun start()
+    public suspend fun start() {
+        start(true)
+    }
+
+    /**
+     * 启动此bot，即连接到 ws 服务器并订阅事件。
+     *
+     * 如果 bot 已经被启动，则关闭旧连接并重新连接。
+     *
+     * [start] 会由 [Mutex] 进行同步，同一时间只会有一个启动流程在执行。
+     *
+     * 当 [closeBotOnFailure] 为 true 时，如果启动过程中出现任何异常则会关闭当前 Bot。
+     *
+     * @see start
+     * @param closeBotOnFailure 为 true 时，如果启动过程中出现任何异常则会关闭当前 Bot。
+     * @throws kotlinx.coroutines.CancellationException Bot 已经被关闭时 ([isActive] == false)
+     * @throws IllegalStateException bot 启动失败
+     *
+     */
+    @JvmSuspendTrans
+    public suspend fun start(closeBotOnFailure: Boolean)
 
     /**
      * 挂起 bot 直到其被 [关闭][close]。
@@ -156,6 +182,35 @@ public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
      * @see kotlinx.coroutines.Job.cancel
      */
     public fun close()
+}
+
+/**
+ * Start and return bot self.
+ *
+ * @see Bot.start
+ */
+public suspend fun Bot.alsoStart(): Bot = also { start() }
+
+/**
+ * Close bot and join.
+ *
+ * @see Bot.close
+ * @see Bot.join
+ */
+public suspend fun Bot.closeAndJoin() {
+    close()
+    join()
+}
+
+/**
+ * Start bot and join.
+ *
+ * @see Bot.start
+ * @see Bot.join
+ */
+public suspend fun Bot.startAndJoin() {
+    start()
+    join()
 }
 
 /**
@@ -242,6 +297,10 @@ public enum class ProcessorType {
     /**
      * 普通类型。所有事件处理器会在每次触发的时候按照添加顺序依次进行处理，
      * 但是以事件为单位，整个流程可能是异步的。
+     *
+     * [NORMAL] 最终是否会异步处理会受配置项 [BotConfiguration.isNormalEventProcessAsync]
+     * 的影响，默认为异步。如果此配置为 `false` 则 [NORMAL] 的实际表现效果将会与 [PREPARE] 类似，
+     * 只是优先级低于 [PREPARE]。
      */
     NORMAL;
 }

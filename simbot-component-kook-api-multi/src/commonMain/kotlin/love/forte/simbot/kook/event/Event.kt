@@ -215,6 +215,44 @@ public sealed class EventExtra {
             }
         }
 
+        /**
+         * 通过 [json] 中的 `type` 来获取对应的 [KSerializer] 。
+         * 当无法获取时得到 `null`。
+         *
+         * @param json 一个事件 JSON 中的 `d` 属性值。
+         *
+         * @throws IllegalArgumentException 当 [json] 中某个节点的属性格式不符合预期 （例如 [json] 并非 [JsonObject] 类型）
+         *
+         */
+        @JvmStatic
+        public fun eventSerializerOrNull(json: JsonElement): KSerializer<out Signal.Event<out EventExtra>>? {
+            val type = json.jsonObject["type"]?.jsonPrimitive?.intOrNull ?: return null
+            return eventSerializerOrNull(type)
+        }
+
+        /**
+         * 通过 [type] 来获取对应的 [KSerializer] 。
+         * 当无法获取时得到 `null`。
+         */
+        @JvmStatic
+        public fun eventSerializerOrNull(type: Int): KSerializer<out Signal.Event<out EventExtra>>? {
+            return when (type) {
+                Event.Type.TEXT.value -> TEXT_EVENT_SERIALIZER
+                Event.Type.IMAGE.value -> IMAGE_EVENT_SERIALIZER
+                Event.Type.VIDEO.value -> VIDEO_EVENT_SERIALIZER
+                Event.Type.KMARKDOWN.value -> KMARKDOWN_EVENT_SERIALIZER
+                Event.Type.CARD.value -> CARD_EVENT_SERIALIZER
+                Event.Type.SYSTEM.value -> SYSTEM_EVENT_SERIALIZER
+                else -> null
+            }
+        }
+
+        private val TEXT_EVENT_SERIALIZER = Signal.Event.serializer(TextEventExtra.serializer())
+        private val IMAGE_EVENT_SERIALIZER = Signal.Event.serializer(ImageEventExtra.serializer())
+        private val VIDEO_EVENT_SERIALIZER = Signal.Event.serializer(VideoEventExtra.serializer())
+        private val KMARKDOWN_EVENT_SERIALIZER = Signal.Event.serializer(KMarkdownEventExtra.serializer())
+        private val CARD_EVENT_SERIALIZER = Signal.Event.serializer(CardEventExtra.serializer())
+        private val SYSTEM_EVENT_SERIALIZER = Signal.Event.serializer(SystemExtra.serializer())
     }
 }
 

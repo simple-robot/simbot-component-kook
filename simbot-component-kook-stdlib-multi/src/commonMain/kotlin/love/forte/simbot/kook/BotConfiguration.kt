@@ -36,6 +36,9 @@ public expect val DEFAULT_COMPRESS: Boolean
 public class BotConfiguration {
     /**
      * 设置bot进行连接的时候使用要使用压缩数据。
+     *
+     * 默认值参考 [DEFAULT_COMPRESS]，不同的平台实现对 compress 的支持是不同的。
+     *
      */
     public var isCompress: Boolean = DEFAULT_COMPRESS
 
@@ -181,6 +184,15 @@ public class BotConfiguration {
      * ws连接超时时间，单位 ms 。默认为 [DEFAULT_WS_CONNECT_TIMEOUT].
      */
     public var wsConnectTimeout: Long = DEFAULT_WS_CONNECT_TIMEOUT
+
+
+    /**
+     * [ProcessorType.NORMAL] 类型的事件处理器是否在异步中执行。
+     * 默认为 `true`。
+     * 当为 `false` 时, [ProcessorType.NORMAL] 的表现效果将会与
+     * [ProcessorType.PREPARE] 基本类似。
+     */
+    public var isNormalEventProcessAsync: Boolean = true
 
 
     public companion object {

@@ -138,7 +138,7 @@ public sealed class Signal {
     @Serializable
     public data class Event<EX : EventExtra>(
         override val d: love.forte.simbot.kook.event.Event<EX>,
-        private val sn: Int
+        public val sn: Int
     ) : Signal() {
         override val s: Int
             get() = S_EVENT
