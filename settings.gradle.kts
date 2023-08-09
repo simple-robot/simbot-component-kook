@@ -22,3 +22,7 @@ include("simbot-component-kook-api-multi")
 include("simbot-component-kook-stdlib")
 include("simbot-component-kook-stdlib-multi")
 include("simbot-component-kook-core")
+
+//
+
+include("simbot-component-kook-stdlib-test")

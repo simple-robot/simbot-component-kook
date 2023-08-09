@@ -233,7 +233,9 @@ internal class BotImpl(
 
                 isStarted = true
 
-                me() // init bot user info
+                val me = me() // init bot user info
+
+                botLogger.info("Bot(id={}, name={}) started", me.id, me.username)
             }
         } catch (e: Throwable) {
             // close this bot

@@ -20,14 +20,8 @@ import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
     kotlin("multiplatform")
-//    `kook-multiplatform-maven-publish` // TODO
     kotlin("plugin.serialization")
-//    `kook-dokka-partial-configure` // TODO
-    `simbot-kook-suspend-transform`
-    id("kotlinx-atomicfu")
 }
-
-setup(P)
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"
@@ -40,15 +34,6 @@ repositories {
 }
 
 kotlin {
-    explicitApi()
-
-    sourceSets.configureEach {
-        languageSettings {
-            optIn("love.forte.simbot.InternalSimbotApi")
-            optIn("love.forte.simbot.ExperimentalSimbotApi")
-        }
-    }
-
     jvm {
         withJava()
         compilations.all {
@@ -64,7 +49,9 @@ kotlin {
     }
 
     js(IR) {
-        nodejs()
+        nodejs {
+        }
+        binaries.executable()
     }
 
 
@@ -90,13 +77,13 @@ kotlin {
 
                     // win
                     tn.startsWith("mingw") -> {
-                        testSourceSet.dependencies {
+                        mainSourceSet.dependencies {
                             implementation(libs.ktor.client.winhttp)
                         }
                     }
                     // linux: CIO..?
                     tn.startsWith("linux") -> {
-                        testSourceSet.dependencies {
+                        mainSourceSet.dependencies {
                             implementation(libs.ktor.client.cio)
                         }
                     }
@@ -106,7 +93,7 @@ kotlin {
                             || tn.startsWith("ios")
                             || tn.startsWith("watchos")
                             || tn.startsWith("tvos") -> {
-                        testSourceSet.dependencies {
+                        mainSourceSet.dependencies {
                             implementation(libs.ktor.client.darwin)
                         }
                     }
@@ -120,13 +107,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":simbot-component-kook-api-multi"))
-                api(simbotLogger)
-                api(simbotUtilLoop)
-                api(simbotUtilSuspendTransformer)
-                compileOnly(simbotUtilAnnotations)
-                api(libs.ktor.client.ws)
-                api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
+                api(project(":simbot-component-kook-stdlib-multi"))
             }
         }
 
@@ -139,16 +120,11 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
+                runtimeOnly(libs.ktor.client.cio)
                 compileOnly(simbotUtilAnnotations) // use @Api4J annotation
             }
         }
 
-//        getByName("jvmMain") {
-//            dependencies {
-//                compileOnly(simbotUtilAnnotations) // use @Api4J annotation
-//                api(project(":simbot-component-kook-api-multi"))
-//            }
-//        }
 
         getByName("jvmTest") {
             dependencies {
@@ -156,15 +132,13 @@ kotlin {
                 implementation(simbotApi)
                 implementation(simbotLogger)
                 implementation(simbotLoggerSlf4j)
-//                implementation(libs.log4j.api)
-//                implementation(libs.log4j.core)
-//                implementation(libs.log4j.slf4j2Impl)
             }
         }
 
         getByName("jsMain") {
             dependencies {
                 implementation(libs.ktor.client.js)
+                implementation("love.forte.plugin.suspend-transform:suspend-transform-annotation:0.4.0")
             }
         }
 
@@ -183,11 +157,6 @@ kotlin {
 
 }
 
-atomicfu {
-    transformJvm = true
-    transformJs = true
-    jvmVariant = "FU"
-}
 
 
 // suppress all?

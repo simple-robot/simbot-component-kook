@@ -17,8 +17,14 @@
 
 package love.forte.simbot.kook
 
+import io.ktor.websocket.*
+import love.forte.simbot.kook.internal.readToTextWithDeflated
+
 /**
  * [BotConfiguration] 中 [BotConfiguration.isCompress] 的默认值。
- * 在 JVM 中默认开启。
+ *
+ * 在 JVM 平台中默认开启，通过 [Frame.Binary.readToTextWithDeflated] 的平台实现支持。
+ *
+ * @see Frame.Binary.readToTextWithDeflated
  */
 public actual const val DEFAULT_COMPRESS: Boolean = true

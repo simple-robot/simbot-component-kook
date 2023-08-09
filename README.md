@@ -1,4 +1,4 @@
-# Simple Robot Kook 组件
+# Simple Robot KOOK 组件
 
 此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK API](https://www.kookapp.cn/) 的组件支持。
 

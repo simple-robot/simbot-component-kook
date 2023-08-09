@@ -23,11 +23,10 @@ import java.util.zip.InflaterInputStream
 
 /**
  * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。
- * JVM 中会使用 [InflaterInputStream] 对 [Frame.Binary.data] 进行解码
  *
- * @throws UnsupportedOperationException 当不支持解析二进制数据时
+ * JVM 中会使用 [InflaterInputStream] 对 [Frame.Binary.data] 进行解码
  */
 @InternalSimbotApi
-public actual fun Frame.Binary.readToTextWithDeflated(): String {
+public actual suspend fun Frame.Binary.readToTextWithDeflated(): String {
     return InflaterInputStream(data.inputStream()).reader().use { it.readText() }
 }

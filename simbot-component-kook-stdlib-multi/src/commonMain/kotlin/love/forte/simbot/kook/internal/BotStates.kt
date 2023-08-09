@@ -591,7 +591,7 @@ private data class Reconnect(
 }
 
 
-private fun Frame.readToText(): String {
+private suspend fun Frame.readToText(): String {
     return when (this) {
         is Frame.Text -> readText()
         is Frame.Binary -> readToTextWithDeflated()
@@ -605,12 +605,11 @@ private data class EventData(val event: Signal.Event<*>, val raw: String)
 
 /**
  * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。
- * JVM 中会使用 `DeflateEncoder`, 其他平台不保证对压缩数据处理的支持。
  *
  * @throws UnsupportedOperationException 当不支持解析二进制数据时
  */
 @InternalSimbotApi
-public expect fun Frame.Binary.readToTextWithDeflated(): String
+public expect suspend fun Frame.Binary.readToTextWithDeflated(): String
 
 private class AtomicLongRef(initValue: Long = 0) {
     private val atomicValue: AtomicLong = atomic(initValue)

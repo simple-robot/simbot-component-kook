@@ -18,14 +18,50 @@
 package love.forte.simbot.kook.internal
 
 import io.ktor.websocket.*
+import kotlinx.coroutines.await
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.InternalSimbotApi
+import org.khronos.webgl.Uint8Array
+import org.w3c.files.Blob
+import kotlin.js.Promise
 
 /**
- * JS 平台中不支持, 会抛出 [UnsupportedOperationException]
+ * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。
  *
- * @throws UnsupportedOperationException 当不支持解析二进制数据时
+ * JS 平台中会使用 [DecompressionStream](https://nodejs.org/api/webstreams.html#class-decompressionstream)
+ * 对数据进行解压缩、并最终使用 [TextDecoder](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) 解析字符串。
+ *
+ * _Note: JS 平台下的二进制数据是**实验性**的，不保证可用性，且在未来可能会修改/删除。_
  */
 @InternalSimbotApi
-public actual fun Frame.Binary.readToTextWithDeflated(): String {
-    throw UnsupportedOperationException("Parsing binary compressed data on JS platforms is not yet supported")
+@ExperimentalSimbotApi
+public actual suspend fun Frame.Binary.readToTextWithDeflated(): String {
+    val uint8Array0 = Uint8Array(data.toTypedArray())
+
+    @Suppress("UNUSED_VARIABLE")
+    val blob = Blob(arrayOf(uint8Array0))
+
+    val decompressionStream = js("new DecompressionStream('deflate')")
+    val decompressedStream = js("blob.stream()").pipeThrough(decompressionStream)
+
+    val reader = decompressedStream.getReader()
+
+    val chunks = mutableListOf<Uint8Array>()
+    var result = (reader.read() as Promise<dynamic>).await()
+
+    while (!result.done as Boolean) {
+        val rv = result.value
+        @Suppress("UnsafeCastFromDynamic")
+        chunks.add(rv)
+        result = (reader.read() as Promise<dynamic>).await()
+    }
+
+    val uint8Array = Uint8Array(chunks.sumOf { it.length })
+    var offset = 0
+    chunks.forEach {
+        uint8Array.set(it, offset)
+        offset += it.length
+    }
+
+    return js("new TextDecoder()").decode(uint8Array) as String
 }

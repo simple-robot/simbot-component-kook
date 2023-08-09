@@ -23,7 +23,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * [BotConfiguration] 中 [BotConfiguration.isCompress] 的默认值。
- * 在 JVM 中默认开启，其他平台下默认关闭且不保证支持。
  */
 public expect val DEFAULT_COMPRESS: Boolean
 

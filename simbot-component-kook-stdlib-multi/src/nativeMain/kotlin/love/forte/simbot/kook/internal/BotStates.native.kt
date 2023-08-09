@@ -26,6 +26,6 @@ import love.forte.simbot.InternalSimbotApi
  * @throws UnsupportedOperationException 当不支持解析二进制数据时
  */
 @InternalSimbotApi
-public actual fun Frame.Binary.readToTextWithDeflated(): String {
+public actual suspend fun Frame.Binary.readToTextWithDeflated(): String {
     throw UnsupportedOperationException("Parsing binary compressed data on native platforms is not yet supported")
 }
