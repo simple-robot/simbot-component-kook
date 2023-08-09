@@ -123,28 +123,6 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
     }
 }
 
-/*
-    下面这些用于 rename 的序列化内容用于使用兼容 `khl.xx.xx` 的消息序列化命名中。
-    当 [khlCompatibleMessageSerializersModule] 被移除后，它们也将被移除。
- */
-
-private fun <T> KSerializer<T>.rename(newSerialName: String): KSerializer<T> = RenameKSerializer(newSerialName, this)
-
-@OptIn(ExperimentalSerializationApi::class)
-private inline fun <T> KSerializer<T>.rename(newSerialName: (String) -> String): KSerializer<T> {
-    return rename(newSerialName(descriptor.serialName))
-}
-
-private class RenameKSerializer<T>(serialName: String, serializer: KSerializer<T>) : KSerializer<T> by serializer {
-    @OptIn(ExperimentalSerializationApi::class)
-    override val descriptor: SerialDescriptor = RenameSerialDescriptor(serialName, serializer.descriptor)
-}
-
-@ExperimentalSerializationApi
-private class RenameSerialDescriptor(override val serialName: String, serialDescriptor: SerialDescriptor) :
-    SerialDescriptor by serialDescriptor
-
-
 /**
  *
  * [KookComponent] 注册时所使用的配置类。
