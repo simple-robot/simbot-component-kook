@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -15,15 +15,25 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
+package love.forte.simbot.component.kook
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-api-multi")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-stdlib-multi")
-include("simbot-component-kook-core")
-include("simbot-component-kook-core-new")
+import love.forte.simbot.kook.objects.Channel as KChannel
 
-//
 
-include("simbot-component-kook-stdlib-test")
+/**
+ * 一个基于 Kook Channel 的类型定义。
+ *
+ * @see KookChannel
+ * @see KookChannelCategory
+ *
+ * @author ForteScarlet
+ */
+public interface KookChannelBased {
+
+    /**
+     * 得到此实例内对应的 api 模块下的原始 channel 信息。
+     *
+     * @see KChannel
+     */
+    public val source: KChannel
+}

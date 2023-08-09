@@ -15,15 +15,27 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-api-multi")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-stdlib-multi")
-include("simbot-component-kook-core")
-include("simbot-component-kook-core-new")
+plugins {
+    `simbot-kook-module-conventions`
+    `simbot-kook-maven-publish`
+    `simbot-kook-suspend-transform`
+    `kook-dokka-partial-configure`
+}
 
-//
+kotlin {
+    sourceSets.configureEach {
+        languageSettings {
+            optIn("love.forte.simbot.InternalSimbotApi")
+        }
+    }
+}
 
-include("simbot-component-kook-stdlib-test")
+dependencies {
+    api(project(":simbot-component-kook-stdlib-multi"))
+    compileOnly(simbotCore)
+    compileOnly(libs.jetbrains.annotations)
+
+    testImplementation(simbotCore)
+    testImplementation(simbotLoggerSlf4j)
+}

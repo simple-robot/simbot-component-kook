@@ -69,10 +69,10 @@ public expect interface PlatformBot : CoroutineScope, KookApiRequestor {
  * ### 日志
  *
  * [Bot] 中主要提供了两个日志命名：
- * - `love.forte.simbot.kook.bot.${ticket.clickId}`
- * - `love.forte.simbot.kook.event.${ticket.clickId}`
+ * - `love.forte.simbot.kook.bot.${ticket.clientId}`
+ * - `love.forte.simbot.kook.event.${ticket.clientId}`
  *
- * (其中 `ticket.clickId` 对应了当前 bot 的 [Bot.ticket] 中的实际信息)
+ * (其中 `ticket.clientId` 对应了当前 bot 的 [Bot.ticket] 中的实际信息)
  *
  * 其中，前缀为 `love.forte.simbot.kook.event` 的日志命名会主要输出与事件有较大关系的信息，例如每次收到的事件原始JSON等。
  * 而其他的日志则主要由前缀为 `love.forte.simbot.kook.bot` 的日志命名输出。
@@ -238,7 +238,7 @@ public interface Ticket {
     /**
      * Client Id.
      */
-    public val clickId: String
+    public val clientId: String
 
     /**
      * Token.
@@ -256,12 +256,12 @@ public interface Ticket {
          * 得到 [TokenType.BOT] 类型的、用于 WebSocket 连接的票据信息。
          */
         @JvmStatic
-        public fun botWsTicket(clickId: String, token: String): Ticket = BotWsTicket(clickId, token)
+        public fun botWsTicket(clientId: String, token: String): Ticket = BotWsTicket(clientId, token)
     }
 }
 
 
-private data class BotWsTicket(override val clickId: String, override val token: String) : Ticket {
+private data class BotWsTicket(override val clientId: String, override val token: String) : Ticket {
     override val type: TokenType
         get() = TokenType.BOT
 }

@@ -114,11 +114,11 @@ internal class Connect(
     }
 }
 
-private data class GatewayInfo0(val url: String, val urlBuilder: URLBuilder.() -> Unit = {})
+private data class GatewayInfo(val url: String, val urlBuilder: URLBuilder.() -> Unit = {})
 
-private fun Gateway.info(urlBuilder: URLBuilder.() -> Unit = {}): GatewayInfo0 = GatewayInfo0(url, urlBuilder)
+private fun Gateway.info(urlBuilder: URLBuilder.() -> Unit = {}): GatewayInfo = GatewayInfo(url, urlBuilder)
 
-private class RequestedGateway(val connect: Connect, val gateway: GatewayInfo0)
+private class RequestedGateway(val connect: Connect, val gateway: GatewayInfo)
 
 /**
  * 根据 gateway 信息创建 ws 会话
@@ -157,7 +157,7 @@ private class CreateWsSession(
     /**
      * 通过 [Gateway] 连接bot信息。
      */
-    private suspend fun HttpClient.ws(gateway: GatewayInfo0): DefaultClientWebSocketSession {
+    private suspend fun HttpClient.ws(gateway: GatewayInfo): DefaultClientWebSocketSession {
         return webSocketSession {
             url {
                 takeFrom(gateway.url)

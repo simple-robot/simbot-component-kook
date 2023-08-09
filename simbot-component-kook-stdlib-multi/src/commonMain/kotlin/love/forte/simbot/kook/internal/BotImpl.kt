@@ -54,8 +54,8 @@ internal typealias EventProcessor = suspend Event<*>.(raw: String) -> Unit
 internal class BotImpl(
     override val ticket: Ticket, override val configuration: BotConfiguration
 ) : Bot {
-    private val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
-    internal val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.event.${ticket.clickId}")
+    private val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
+    internal val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.event.${ticket.clientId}")
 
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 

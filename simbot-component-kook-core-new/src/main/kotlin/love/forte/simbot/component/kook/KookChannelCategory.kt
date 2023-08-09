@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -15,15 +15,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
+package love.forte.simbot.component.kook
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-api-multi")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-stdlib-multi")
-include("simbot-component-kook-core")
-include("simbot-component-kook-core-new")
+import love.forte.simbot.definition.Category
 
-//
 
-include("simbot-component-kook-stdlib-test")
+/**
+ * KOOK 组件中对于 [频道类型(分组)][Category] 的定义。
+ *
+ * @author ForteScarlet
+ */
+public interface KookChannelCategory : Category {
+    // TODO
+
+
+}

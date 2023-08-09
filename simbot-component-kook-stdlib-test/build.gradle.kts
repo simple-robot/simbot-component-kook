@@ -15,7 +15,6 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
