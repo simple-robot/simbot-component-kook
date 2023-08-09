@@ -142,6 +142,13 @@ public sealed class Signal {
     ) : Signal() {
         override val s: Int
             get() = S_EVENT
+
+        /**
+         * [d] 的别名。
+         *
+         * @see d
+         */
+        public val data: love.forte.simbot.kook.event.Event<EX> get() = d
     }
 
     /**

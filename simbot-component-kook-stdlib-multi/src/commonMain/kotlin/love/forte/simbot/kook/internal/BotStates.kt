@@ -359,7 +359,7 @@ private class CreateClient(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun invoke(): State {
-        val eventProcessChannel = Channel<Signal.Event<*>>(capacity = Channel.BUFFERED)
+        val eventProcessChannel = Channel<EventData>(capacity = Channel.BUFFERED)
         eventProcessChannel.invokeOnClose { cause ->
             botLogger.debug("Event process closed, cause: {}", cause?.message, cause)
         }
@@ -375,12 +375,12 @@ private class CreateClient(
         )
     }
 
-    private fun eventProcessJob(channel: Channel<Signal.Event<*>>): EventProcessJob {
+    private fun eventProcessJob(channel: Channel<EventData>): EventProcessJob {
         val job = channel
             .receiveAsFlow()
             .cancellable()
             .buffer()
-            .onEach(bot::processEvent)
+            .onEach { (event, raw) -> bot.processEvent(event, raw) }
             .onCompletion { e ->
                 if (e == null) {
                     bot.eventLogger.debug("Event process flow is completed. No exception.")
@@ -399,14 +399,14 @@ private class CreateClient(
 
 private class EventProcessJob(
     val job: Job,
-    val eventChannel: Channel<Signal.Event<*>>
+    val eventChannel: Channel<EventData>
 ) {
-    suspend fun sendEvent(event: Signal.Event<*>) {
-        eventChannel.send(event)
+    suspend fun sendEvent(eventData: EventData) {
+        eventChannel.send(eventData)
     }
 
-    fun trySendEvent(event: Signal.Event<*>): ChannelResult<Unit> {
-        return eventChannel.trySend(event)
+    fun trySendEvent(eventData: EventData): ChannelResult<Unit> {
+        return eventChannel.trySend(eventData)
     }
 
     override fun toString(): String {
@@ -538,10 +538,12 @@ private class Receiving(
                     eventLogger.debug("Event sn {} < current sn {}, ignore and skip this event.", eventSn, currentSn)
                     return this
                 } else {
-                    try {// push event
+                    val eventData = EventData(event, eventString)
+                    try {
+                        // push event
                         client.eventProcessJob.apply {
                             for (i in 1..3) {
-                                val sendResult = trySendEvent(event)
+                                val sendResult = trySendEvent(eventData)
                                 if (sendResult.isSuccess) {
                                     return@apply
                                 }
@@ -556,7 +558,7 @@ private class Receiving(
                                 }
                             }
 
-                            sendEvent(event)
+                            sendEvent(eventData)
                         }
                     } catch (e: Throwable) {
                         eventLogger.error("Event push on error: {}", e.message, e)
@@ -597,6 +599,9 @@ private fun Frame.readToText(): String {
         else -> throw IllegalArgumentException("Frame is not text or binary type.")
     }
 }
+
+
+private data class EventData(val event: Signal.Event<*>, val raw: String)
 
 /**
  * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。

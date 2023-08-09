@@ -20,7 +20,6 @@ package love.forte.simbot.kook
 import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.kook.api.KookApiRequestor
 import love.forte.simbot.kook.event.Event
-import love.forte.simbot.kook.event.Signal
 
 
 /**
@@ -39,5 +38,5 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
      * @param processor 事件处理器
      */
-    public actual fun processor(processorType: ProcessorType, processor: suspend Signal.Event<*>.(Event<*>) -> Unit)
+    public actual fun processor(processorType: ProcessorType, processor: suspend Event<*>.(raw: String) -> Unit)
 }

@@ -21,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.await
 import love.forte.simbot.kook.api.KookApiRequestor
 import love.forte.simbot.kook.event.Event
-import love.forte.simbot.kook.event.Signal
 import kotlin.js.Promise
 
 
@@ -41,7 +40,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
      * @param processor 事件处理器
      */
-    public actual fun processor(processorType: ProcessorType, processor: suspend Signal.Event<*>.(Event<*>) -> Unit)
+    public actual fun processor(processorType: ProcessorType, processor: suspend Event<*>.(raw: String) -> Unit)
 
     /**
      * 添加一个事件处理器。所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
@@ -51,7 +50,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      */
     public fun asyncProcessor(
         processorType: ProcessorType = ProcessorType.NORMAL,
-        processor: Signal.Event<*>.(Event<*>) -> Promise<Unit?>
+        processor: Event<*>.(raw: String) -> Promise<Unit?>
     ) {
         processor(processorType) { event -> processor(event).await() }
     }
@@ -64,7 +63,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      */
     public fun blockingProcessor(
         processorType: ProcessorType = ProcessorType.NORMAL,
-        processor: Signal.Event<*>.(Event<*>) -> Unit
+        processor: Event<*>.(raw: String) -> Unit
     ) {
         processor(processorType) { event -> processor(event) }
     }

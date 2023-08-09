@@ -45,7 +45,7 @@ import love.forte.simbot.util.stageloop.loop
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
 
-internal typealias EventProcessor = suspend Signal.Event<*>.(Event<*>) -> Unit
+internal typealias EventProcessor = suspend Event<*>.(raw: String) -> Unit
 
 /**
  *
@@ -54,7 +54,7 @@ internal typealias EventProcessor = suspend Signal.Event<*>.(Event<*>) -> Unit
 internal class BotImpl(
     override val ticket: Ticket, override val configuration: BotConfiguration
 ) : Bot {
-    internal val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
+    private val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clickId}")
     internal val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.event.${ticket.clickId}")
 
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
@@ -65,7 +65,7 @@ internal class BotImpl(
         )
     }
 
-    override fun processor(processorType: ProcessorType, processor: suspend Signal.Event<*>.(Event<*>) -> Unit) {
+    override fun processor(processorType: ProcessorType, processor: suspend Event<*>.(raw: String) -> Unit) {
         queueMap[processorType].add(processor)
     }
 
@@ -77,7 +77,7 @@ internal class BotImpl(
     ).also(::closeOnBotClosed)
 
     internal val wsClient: HttpClient = resolveWsClient(
-        configuration, configuration.wsEngine, configuration.wsEngineFactory, configuration.wsEngineConfig
+        configuration.wsEngine, configuration.wsEngineFactory, configuration.wsEngineConfig
     ).also(::closeOnBotClosed)
 
     private fun resolveHttpClient(
@@ -131,27 +131,26 @@ internal class BotImpl(
     }
 
     private fun resolveWsClient(
-        configuration: BotConfiguration,
         engine: HttpClientEngine?,
         engineFactory: HttpClientEngineFactory<*>?,
         engineConfig: BotConfiguration.EngineConfiguration?,
     ): HttpClient = when {
         engine != null -> HttpClient(engine) {
-            configWsClient(configuration, engineConfig)
+            configWsClient(engineConfig)
         }
 
         engineFactory != null -> HttpClient(engineFactory) {
-            configWsClient(configuration, engineConfig)
+            configWsClient(engineConfig)
         }
 
         else -> HttpClient {
-            configWsClient(configuration, engineConfig)
+            configWsClient(engineConfig)
         }
     }
 
 
     private fun HttpClientConfig<*>.configWsClient(
-        configuration: BotConfiguration, engineConfiguration: BotConfiguration.EngineConfiguration?
+        engineConfiguration: BotConfiguration.EngineConfiguration?
     ) {
         install(ContentNegotiation) {
             json(defaultApiDecoder)
@@ -256,8 +255,7 @@ internal class BotImpl(
         currentClientJob = null
     }
 
-    internal suspend fun processEvent(event: Signal.Event<*>) {
-        // TODO process event
+    internal suspend fun processEvent(event: Signal.Event<*>, raw: String) {
         val prepareProcessors = queueMap[ProcessorType.PREPARE]
         val normalProcessors = queueMap[ProcessorType.NORMAL]
         if (prepareProcessors.isEmpty() && normalProcessors.isEmpty()) {
@@ -268,7 +266,7 @@ internal class BotImpl(
         val eventData = event.d
         prepareProcessors.forEach { processor ->
             try {
-                processor.invoke(event, eventData)
+                processor.invoke(eventData, raw)
             } catch (e: Throwable) {
                 eventLogger.error("Event prepare process failed. Enable debug level log for more information.", e)
                 eventLogger.debug(
@@ -284,7 +282,7 @@ internal class BotImpl(
         suspend fun doNormalProcess() {
             normalProcessors.forEach { processor ->
                 try {
-                    processor.invoke(event, eventData)
+                    processor.invoke(eventData, raw)
                 } catch (e: Throwable) {
                     eventLogger.error("Event normal process failed. Enable debug level log for more information.", e)
                     eventLogger.debug(

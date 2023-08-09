@@ -51,12 +51,12 @@ public expect interface PlatformBot : CoroutineScope, KookApiRequestor {
      * 添加一个事件处理器。所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
      *
      * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
-     * @param processor 事件处理器
+     * @param processor 事件处理器。receiver 为本次接收到的事件信令 [Signal.Event] 中的 [data][Signal.Event.d]，参数 raw 则为接收到的原始事件信令的JSON字符串。
      */
     @JvmSynthetic
     public fun processor(
         processorType: ProcessorType = ProcessorType.NORMAL,
-        processor: suspend Signal.Event<*>.(Event<*>) -> Unit
+        processor: suspend Event<*>.(raw: String) -> Unit
     )
 }
 
@@ -65,6 +65,19 @@ public expect interface PlatformBot : CoroutineScope, KookApiRequestor {
  *
  * [Bot] 承载了通过 `WebSocket` 的方式与 KOOK 服务器连接并订阅事件的能力，
  * 以及通过各种 [KOOK HTTP API][love.forte.simbot.kook.api.KookApi] 进行功能交互的能力。
+ *
+ * ### 日志
+ *
+ * [Bot] 中主要提供了两个日志命名：
+ * - `love.forte.simbot.kook.bot.${ticket.clickId}`
+ * - `love.forte.simbot.kook.event.${ticket.clickId}`
+ *
+ * (其中 `ticket.clickId` 对应了当前 bot 的 [Bot.ticket] 中的实际信息)
+ *
+ * 其中，前缀为 `love.forte.simbot.kook.event` 的日志命名会主要输出与事件有较大关系的信息，例如每次收到的事件原始JSON等。
+ * 而其他的日志则主要由前缀为 `love.forte.simbot.kook.bot` 的日志命名输出。
+ *
+ * 大部分日志都是 `DEBUG` 或 `TRACE` 级别的。
  *
  * @author ForteScarlet
  */
@@ -260,11 +273,11 @@ private data class BotWsTicket(override val clickId: String, override val token:
  * @param EX 事件内容 [Event.extra] 的具体类型。
  *
  */
-public inline fun <reified EX : EventExtra> Bot.processor(crossinline processor: suspend Signal.Event<EX>.(Event<EX>) -> Unit) {
-    processor { event ->
-        if (event.extra is EX) {
+public inline fun <reified EX : EventExtra> Bot.processor(crossinline processor: suspend Event<EX>.(raw: String) -> Unit) {
+    processor { raw ->
+        if (extra is EX) {
             @Suppress("UNCHECKED_CAST")
-            processor.invoke(this as Signal.Event<EX>, event as Event<EX>)
+            processor.invoke(this as Event<EX>, raw)
         }
     }
 }
@@ -274,10 +287,10 @@ public inline fun <reified EX : EventExtra> Bot.processor(crossinline processor:
  *
  * @param type 事件类型。
  */
-public inline fun Bot.processor(type: Event.Type, crossinline processor: suspend Signal.Event<*>.(Event<*>) -> Unit) {
-    processor { event ->
-        if (event.type == type) {
-            processor(event)
+public inline fun Bot.processor(type: Event.Type, crossinline processor: suspend Event<*>.(raw: String) -> Unit) {
+    processor { raw ->
+        if (this.type == type) {
+            processor(raw)
         }
     }
 }
