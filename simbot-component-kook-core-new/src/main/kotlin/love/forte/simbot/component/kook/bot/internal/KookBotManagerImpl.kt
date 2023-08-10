@@ -25,7 +25,10 @@ import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.KookBotConfiguration
 import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.component.kook.bot.KookBotManagerConfiguration
+import love.forte.simbot.component.kook.event.KookBotRegisteredEvent
+import love.forte.simbot.component.kook.event.internal.KookBotRegisteredEventImpl
 import love.forte.simbot.event.EventProcessor
+import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kook.BotFactory
 import love.forte.simbot.kook.Ticket
 import love.forte.simbot.literal
@@ -47,7 +50,7 @@ internal class KookBotManagerImpl(
     /**
      * 记录所有注册进来的 [KookBot] .
      */
-    private val botMap = ConcurrentHashMap<String, KookBot>()
+    private val botMap = ConcurrentHashMap<String, KookBotImpl>()
 
     override fun invokeOnCompletion(handler: CompletionHandler) {
         supervisorJob.invokeOnCompletion(handler)
@@ -78,7 +81,7 @@ internal class KookBotManagerImpl(
 
     override fun register(ticket: Ticket, configuration: KookBotConfiguration): KookBot {
         val clientId = ticket.clientId
-        fun createBot(): KookBot {
+        fun createBot(): KookBotImpl {
             val botConfiguration = configuration.botConfiguration
             val botCoroutineContext = botConfiguration.coroutineContext
             var botJob: Job? = botCoroutineContext[Job]
@@ -95,7 +98,7 @@ internal class KookBotManagerImpl(
 
 
             val sourceBot = BotFactory.create(ticket, botConfiguration)
-            return KookBotImpl(eventProcessor, sourceBot, component, this)
+            return KookBotImpl(eventProcessor, sourceBot, component, this, configuration)
         }
 
         return botMap.compute(clientId) { id, old ->
@@ -109,10 +112,12 @@ internal class KookBotManagerImpl(
                 botMap.remove(clientId, newBot)
             }
 
-            // TODO launch publish BotRegisteredEvent
-//            launch {
-//
-//            }
+            // Publish BotRegisteredEvent
+            launch {
+                eventProcessor.pushIfProcessable(KookBotRegisteredEvent) {
+                    KookBotRegisteredEventImpl(newBot)
+                }
+            }
         }
     }
 

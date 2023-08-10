@@ -203,9 +203,12 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
 
         val raw = response.bodyAsText()
 
+        apiLogger.debug("API[{}] <====== raw result: {}", apiContext?.apiId, raw)
+
         val result = DEFAULT_JSON.decodeFromString(ApiResult.serializer(), raw)
         result.httpStatus = response.status
         result.raw = raw
+
 
         val rateLimit = response.headers.createRateLimit().also {
             apiLogger.debug("API[{}] <====== rate limit: {}", apiContext?.apiId, it)

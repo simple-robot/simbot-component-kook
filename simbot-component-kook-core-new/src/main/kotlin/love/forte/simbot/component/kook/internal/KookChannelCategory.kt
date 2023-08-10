@@ -15,14 +15,22 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.component.kook
+package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.definition.Category
+import love.forte.simbot.ID
+import love.forte.simbot.component.kook.KookChannelCategory
+import love.forte.simbot.component.kook.bot.internal.KookBotImpl
+import love.forte.simbot.delegate.getValue
+import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.channel.ChannelInfo
 
+internal class KookChannelCategoryImpl(
+    val bot: KookBotImpl,
+    override val source: ChannelInfo,
+    val _guildId: String,
+) : KookChannelCategory {
+    override val id: ID by stringID { source.id }
 
-/**
- * KOOK 组件中对于 [频道类型(分组)][Category] 的定义。
- *
- * @author ForteScarlet
- */
-public interface KookChannelCategory : Category, KookChannelBased
+    override val name: String
+        get() = source.name
+}

@@ -18,9 +18,7 @@
 package love.forte.simbot.component.kook
 
 import kotlinx.coroutines.CoroutineScope
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.ID
-import love.forte.simbot.JST
+import love.forte.simbot.*
 import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.definition.Guild
 import love.forte.simbot.definition.Organization
@@ -51,6 +49,8 @@ public interface KookGuild : Guild, CoroutineScope {
 
     /**
      * 得到对应所属的 bot
+     *
+     * @throws KookGuildNotExistsException 当频道已经不存在时
      */
     override val bot: KookGuildBot
 
@@ -65,6 +65,34 @@ public interface KookGuild : Guild, CoroutineScope {
      */
     override val name: String
         get() = source.name
+
+    /**
+     * KOOK Guild 不支持获取创建时间。始终得到 [Timestamp]。
+     */
+    override val createTime: Timestamp
+        get() = Timestamp.notSupport()
+
+    /**
+     * KOOK Guild 不支持获取最大频道上限。始终得到 `-1`。
+     */
+    override val maximumChannel: Int
+        get() = -1
+
+    /**
+     * KOOK Guild 不支持获取最大成员上限。始终得到 `-1`。
+     */
+    override val maximumMember: Int
+        get() = -1
+
+    /**
+     * 频道当前成员数量
+     */
+    override val currentMember: Int
+
+    /**
+     * 频道当前子频道数量
+     */
+    override val currentChannel: Int
 
     // TODO channels
 
@@ -116,7 +144,26 @@ public interface KookGuild : Guild, CoroutineScope {
     public fun getCategory(id: ID): KookChannelCategory?
 
     // TODO members
-    // TODO owner
+
+    /**
+     * 此频道下的成员序列。
+     */
+    override val members: Items<KookMember>
+
+    /**
+     * 根据ID寻找一个此频道下的成员。
+     */
+    @JST(blockingBaseName = "getMember", blockingSuffix = "", asyncBaseName = "getMember")
+    override suspend fun member(id: ID): KookMember?
+
+    /**
+     * 获取当前频道的创建人。
+     *
+     * @throws KookMemberNotExistsException 如果无法寻找到此成员时
+     */
+    @JSTP
+    override suspend fun owner(): KookMember
+
     // TODO roles
 
     // region mute api

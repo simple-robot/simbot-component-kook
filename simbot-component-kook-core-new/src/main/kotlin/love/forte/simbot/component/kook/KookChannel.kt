@@ -49,6 +49,8 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
 
     /**
      * 得到所属 bot。
+     *
+     * @throws KookGuildNotExistsException 如果频道已经不存在时
      */
     override val bot: KookGuildBot
 
@@ -63,16 +65,15 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     override val name: String get() = source.name
 
     /**
-     * 频道简介
+     * 频道简介。始终为空字符串 `""`
      */
     override val description: String
-        get() = source.topic
+        get() = ""
 
     /**
      * 所属频道ID
      */
     override val guildId: ID
-        get() = source.guildId.ID
 
     /**
      * 创建者ID

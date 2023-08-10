@@ -19,8 +19,10 @@ package love.forte.simbot.component.kook
 
 import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.ID
+import love.forte.simbot.JSTP
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
+import love.forte.simbot.definition.Guild
 import love.forte.simbot.definition.GuildMember
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.objects.User as KUser
@@ -90,7 +92,21 @@ public interface KookMember : GuildMember, CoroutineScope {
     override val joinTime: Timestamp
         get() = Timestamp.notSupport()
 
+    /**
+     * 此成员所属频道ID
+     */
+    public val guildId: ID
+
     // TODO guild
+
+    /**
+     * 获取此成员所属频道服务器。
+     *
+     * @throws KookGuildNotExistsException 如果频道已经不存在
+     */
+    @JSTP
+    override suspend fun guild(): KookGuild
+
     // TODO channel
     // TODO send
     // TODO mute

@@ -38,4 +38,6 @@ dependencies {
 
     testImplementation(simbotCore)
     testImplementation(simbotLoggerSlf4j)
+    testImplementation(simbotCore)
+    testImplementation(libs.ktor.client.cio)
 }

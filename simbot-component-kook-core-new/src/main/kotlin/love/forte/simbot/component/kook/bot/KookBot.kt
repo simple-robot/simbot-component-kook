@@ -20,10 +20,17 @@ package love.forte.simbot.component.kook.bot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.job
 import love.forte.simbot.ID
+import love.forte.simbot.JST
+import love.forte.simbot.JSTP
 import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.KookComponent
+import love.forte.simbot.component.kook.KookGuild
+import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.GuildBot
+import love.forte.simbot.definition.SocialRelationsContainer.Companion.COUNT_NOT_SUPPORTED
 import love.forte.simbot.kook.Ticket
+import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.Bot as KBot
 
@@ -56,6 +63,7 @@ public interface KookBot : Bot, CoroutineScope {
      */
     override val id: ID
         get() = sourceBot.ticket.clientId.ID
+
 
     /**
      * 判断此 ID 是否代表当前 bot。可以代表 bot 的 id 可能是 [clientId][Ticket.clientId],
@@ -97,6 +105,7 @@ public interface KookBot : Bot, CoroutineScope {
      * @throws IllegalStateException 尚未启动过时
      */
     override val avatar: String
+        get() = sourceBot.botUserInfo.avatar
 
     /**
      * 用户名称
@@ -106,12 +115,12 @@ public interface KookBot : Bot, CoroutineScope {
      * @throws IllegalStateException 尚未启动过时
      */
     override val username: String
+        get() = sourceBot.botUserInfo.username
 
     /**
      * [KookBot] 的所属管理器。
      */
     override val manager: KookBotManager
-
 
     override suspend fun cancel(reason: Throwable?): Boolean {
         sourceBot.close()
@@ -121,8 +130,64 @@ public interface KookBot : Bot, CoroutineScope {
     override suspend fun join() {
         sourceBot.join()
     }
-}
 
+    //region Guild APIs
+    /**
+     * KOOK 支持频道相关操作
+     */
+    override val isGuildsSupported: Boolean
+        get() = true
+
+    /**
+     * 获取所有的频道服务器序列
+     */
+    override val guilds: Items<KookGuild>
+
+    /**
+     * 根据ID寻找指定频道。如果找不到则返回 null。
+     */
+    @JST(blockingBaseName = "getGuild", blockingSuffix = "", asyncBaseName = "getGuild")
+    override suspend fun guild(id: ID): KookGuild?
+
+    /**
+     * 获取当前bot所处的频道服务器数量。
+     */
+    @JSTP
+    override suspend fun guildCount(): Int
+    //endregion
+
+
+    //region Group APIs
+    /**
+     * KOOK 中没有 "群"，不支持 group  相关操作
+     */
+    @Deprecated("'Group' is not supported in KOOK", ReplaceWith("null"))
+    @JvmSynthetic
+    @JST(blockingBaseName = "getGroup", blockingSuffix = "", asyncBaseName = "getGroup")
+    override suspend fun group(id: ID): Group? = null
+
+    /**
+     * KOOK 中没有 "群"，不支持 group  相关操作
+     */
+    @Deprecated("'Group' is not supported in KOOK", ReplaceWith("null"))
+    override val groups: Items<Group>
+        get() = emptyItems()
+
+    /**
+     * KOOK 中没有 "群"，不支持 group  相关操作
+     */
+    override val isGroupsSupported: Boolean
+        get() = false
+
+    /**
+     *  KOOK 中没有 "群"，不支持 group  相关操作
+     */
+    @JSTP
+    @JvmSynthetic
+    @Deprecated("'Group' is not supported in KOOK", ReplaceWith("null"))
+    override suspend fun groupCount(): Int = COUNT_NOT_SUPPORTED
+    //endregion
+}
 
 
 /**

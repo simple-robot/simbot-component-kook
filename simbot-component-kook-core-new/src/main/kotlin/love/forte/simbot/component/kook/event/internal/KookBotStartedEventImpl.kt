@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ * Copyright (c) 2022-2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -15,14 +15,13 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.component.kook
+package love.forte.simbot.component.kook.event.internal
 
-import love.forte.simbot.definition.Category
-
+import love.forte.simbot.component.kook.bot.internal.KookBotImpl
+import love.forte.simbot.component.kook.event.KookBotStartedEvent
 
 /**
- * KOOK 组件中对于 [频道类型(分组)][Category] 的定义。
  *
  * @author ForteScarlet
  */
-public interface KookChannelCategory : Category, KookChannelBased
+internal class KookBotStartedEventImpl(override val bot: KookBotImpl) : KookBotStartedEvent()
