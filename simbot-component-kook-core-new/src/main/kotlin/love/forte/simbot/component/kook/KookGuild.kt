@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.JST
+import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.definition.Guild
 import love.forte.simbot.definition.Organization
 import love.forte.simbot.utils.item.Items

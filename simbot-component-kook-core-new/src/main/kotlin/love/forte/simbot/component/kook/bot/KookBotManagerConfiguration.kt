@@ -15,19 +15,24 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.component.kook
+package love.forte.simbot.component.kook.bot
 
-import love.forte.simbot.bot.BotManager
-
+import kotlinx.coroutines.Job
+import love.forte.simbot.kook.BotConfiguration
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- *
- * [KookBot] 的 [BotManager] 实现。
- *
- * @author ForteScarlet
+ * 针对 [KookBotManager] 的配置信息。
  */
-public abstract class KookBotManager : BotManager<KookBot>() {
+public class KookBotManagerConfiguration {
 
-    // TODO
-
+    /**
+     * 提供给 [KookBotManager] 的协程上下文，会被分配给产生的 [KookBot]。
+     * 如果其中存在 [Job], 则会作为其下各个 [KookBot] 的 parent job。
+     * 如果 [KookBot.sourceBot] 中已经存在自身的独立 [Job] (通过 [BotConfiguration.coroutineContext] 配置),
+     * 则此 parent Job 会与其关联，在终止的同时关闭bot的 [Job]。
+     *
+     */
+    public var coroutineContext: CoroutineContext = EmptyCoroutineContext
 }

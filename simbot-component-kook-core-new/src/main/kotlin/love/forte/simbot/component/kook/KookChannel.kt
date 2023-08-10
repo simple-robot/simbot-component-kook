@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook
 import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
+import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.definition.Channel
 import kotlin.coroutines.CoroutineContext
 

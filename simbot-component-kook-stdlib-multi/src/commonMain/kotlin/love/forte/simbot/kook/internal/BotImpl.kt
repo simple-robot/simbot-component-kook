@@ -70,7 +70,7 @@ internal class BotImpl(
     }
 
     private val job = SupervisorJob(configuration.coroutineContext[Job])
-    override val coroutineContext: CoroutineContext = job + configuration.coroutineContext
+    override val coroutineContext: CoroutineContext = configuration.coroutineContext.minusKey(Job) + job
 
     override val apiClient: HttpClient = resolveHttpClient(
         configuration, configuration.clientEngine, configuration.clientEngineFactory, configuration.clientEngineConfig

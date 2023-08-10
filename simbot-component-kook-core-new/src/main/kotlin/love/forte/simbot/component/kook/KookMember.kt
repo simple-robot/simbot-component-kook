@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook
 import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
+import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.definition.GuildMember
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.objects.User as KUser
@@ -31,7 +32,6 @@ import love.forte.simbot.kook.objects.User as KUser
  * @author ForteScarlet
  */
 public interface KookMember : GuildMember, CoroutineScope {
-
     /**
      * 源于 [bot] 的上下文。
      */

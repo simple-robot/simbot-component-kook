@@ -15,15 +15,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.component.kook
+package love.forte.simbot.component.kook.bot
 
 import kotlinx.coroutines.CoroutineScope
-import love.forte.simbot.Component
+import kotlinx.coroutines.job
 import love.forte.simbot.ID
 import love.forte.simbot.bot.Bot
-import love.forte.simbot.bot.BotManager
+import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.definition.GuildBot
-import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kook.Ticket
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.Bot as KBot
@@ -35,7 +34,11 @@ import love.forte.simbot.kook.Bot as KBot
  * @author ForteScarlet
  */
 public interface KookBot : Bot, CoroutineScope {
+    /**
+     * 源自 [sourceBot] 的 [CoroutineContext]
+     */
     override val coroutineContext: CoroutineContext
+        get() = sourceBot.coroutineContext
 
     /**
      * 得到标准库中的 [Kook Bot][KBot] 源对象。
@@ -69,6 +72,24 @@ public interface KookBot : Bot, CoroutineScope {
     override val component: KookComponent
 
     /**
+     * bot 是否处于活跃状态
+     */
+    override val isActive: Boolean
+        get() = sourceBot.isActive
+
+    /**
+     * bot 是否已经被关闭
+     */
+    override val isCancelled: Boolean
+        get() = coroutineContext.job.isCancelled
+
+    /**
+     * bot 是否已经被启动过
+     */
+    override val isStarted: Boolean
+        get() = sourceBot.isStarted
+
+    /**
      * 头像信息
      *
      * 需要至少启动过一次（执行过 [start]）后才可获取。
@@ -92,8 +113,14 @@ public interface KookBot : Bot, CoroutineScope {
     override val manager: KookBotManager
 
 
+    override suspend fun cancel(reason: Throwable?): Boolean {
+        sourceBot.close()
+        return true
+    }
 
-
+    override suspend fun join() {
+        sourceBot.join()
+    }
 }
 
 
