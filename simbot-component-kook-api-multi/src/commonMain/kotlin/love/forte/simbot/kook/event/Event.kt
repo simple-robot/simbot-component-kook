@@ -40,7 +40,7 @@ public data class Event<out E : EventExtra>(
      * 消息通道类型, `GROUP` 为组播消息, `PERSON` 为单播消息, `BROADCAST` 为广播消息
      */
     @SerialName("channel_type")
-    public val channelType: String,
+    public val channelTypeValue: String,
 
     /**
      * 事件的类型。
@@ -166,6 +166,30 @@ public data class Event<out E : EventExtra>(
 
     }
 
+    /**
+     * 消息通道类型。
+     *
+     * 基于 [channelTypeValue] 的值映射的 [ChannelType] 元素。
+     * 当类型值未知时得到 `null` 。
+     */
+    public val channelType: ChannelType?
+        get() = when (channelTypeValue) {
+            ChannelType.GROUP.value -> ChannelType.GROUP
+            ChannelType.PERSON.value -> ChannelType.PERSON
+            ChannelType.BROADCAST.value -> ChannelType.BROADCAST
+            else -> null
+        }
+
+    /**
+     * 消息通道类型, `GROUP` 为组播消息, `PERSON` 为单播消息, `BROADCAST` 为广播消息
+     */
+    public enum class ChannelType(public val value: String) {
+        GROUP("GROUP"),
+        PERSON("PERSON"),
+        BROADCAST("BROADCAST"),
+
+    }
+
 }
 
 /**
@@ -262,7 +286,7 @@ public sealed class EventExtra {
  *
  * > 当 [`type`][Event.typeValue] 非系统消息(255)时
  *
- * 当此事件的频道类型 [Event.channelType] 为 `PERSON` 时，例如 [guildId] 等频道才有的属性可能会使用空内容填充。
+ * 当此事件的频道类型 [Event.channelType] 为 [Event.ChannelType.PERSON] 时，例如 [guildId] 等频道才有的属性可能会使用空内容填充。
  *
  *
  * @see TextEventExtra

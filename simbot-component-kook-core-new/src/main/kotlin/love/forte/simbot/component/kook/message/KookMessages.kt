@@ -21,7 +21,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.message.At
 
 /**
- * 提供 Kook 组件中一些会用到的信息。
+ * 提供 KOOK 组件中一些会用到的信息。
  *
  * @author ForteScarlet
  */
