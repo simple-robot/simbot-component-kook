@@ -93,7 +93,8 @@ public data class Event<out E : EventExtra>(
     public val nonce: String,
 
     /**
-     * 不同的消息类型，结构不一致
+     * 事件的数据内容。
+     * 不同的事件类型，结构不一致
      */
     public val extra: E
 ) {

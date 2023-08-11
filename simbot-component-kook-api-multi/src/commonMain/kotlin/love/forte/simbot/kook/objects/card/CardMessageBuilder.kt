@@ -32,7 +32,7 @@ public annotation class CardMsgBuildDsl
  * 通过 [CardMessageBuilder] 以 DSL 的方式构建一个 [CardMessage].
  */
 @CardMsgBuildDsl
-public fun buildCardMessage(action: CardMessageBuilder.() -> Unit): CardMessage {
+public inline fun buildCardMessage(action: CardMessageBuilder.() -> Unit): CardMessage {
     return CardMessageBuilder().also(action).build()
 }
 

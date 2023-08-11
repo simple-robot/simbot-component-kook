@@ -149,8 +149,17 @@ public class ListData<out T>(
 @Suppress("MemberVisibilityCanBePrivate")
 @Serializable
 public class ApiResult @ApiResultType constructor(
+    /**
+     * 错误码，`0`代表成功，非`0`代表失败，具体的错误码参见错误码一览
+     */
     public val code: Int,
+    /**
+     * 错误消息，具体的返回消息会根据Accept-Language来返回。
+     */
     public val message: String,
+    /**
+     * mixed, 具体的数据
+     */
     public val data: JsonElement = EMPTY_OBJECT,
 ) {
 
