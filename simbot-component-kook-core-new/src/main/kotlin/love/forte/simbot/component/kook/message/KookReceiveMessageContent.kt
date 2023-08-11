@@ -165,15 +165,11 @@ public fun Event<TextExtra>.toMessages(): Messages {
             extra.toMessages { listOf(extra.attachments.asMessage()) }
         }
 
-        // ImageEventExtra, FileEventExtra,VideoEventExtra
-//        is AttachmentsMessageEventExtra<*> -> {
-//            extra.toMessages { listOf(extra.attachments.asMessage()) }
-//        }
-
         is KMarkdownEventExtra -> {
             toMessagesByKMarkdown(content, extra.mention, extra.mentionRoles, extra.isMentionAll, extra.isMentionHere)
         }
 
+        // 文件消息已转为卡片消息，详情请直接参考卡片消息
         is CardEventExtra -> {
             // try decode
             extra.toMessages { tryDecodeCardContent(content, logger) }
