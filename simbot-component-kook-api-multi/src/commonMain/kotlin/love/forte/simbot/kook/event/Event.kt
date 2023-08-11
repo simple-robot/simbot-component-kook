@@ -303,7 +303,7 @@ public sealed class TextExtra : EventExtra() {
     /**
      * mention 用户角色的数组
      */
-    public abstract val mentionRoles: List<String>
+    public abstract val mentionRoles: List<Int>
 
     /**
      * 是否 mention 在线用户
@@ -332,7 +332,7 @@ public data class TextEventExtra(
     @SerialName("mention_all")
     override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
-    override val mentionRoles: List<String> = emptyList(),
+    override val mentionRoles: List<Int> = emptyList(),
     @SerialName("mention_here")
     override val isMentionHere: Boolean = false,
     override val author: SimpleUser
@@ -354,7 +354,7 @@ public data class ImageEventExtra(
     @SerialName("mention_all")
     override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
-    override val mentionRoles: List<String> = emptyList(),
+    override val mentionRoles: List<Int> = emptyList(),
     @SerialName("mention_here")
     override val isMentionHere: Boolean = false,
     override val author: SimpleUser,
@@ -381,7 +381,7 @@ public data class VideoEventExtra(
     @SerialName("mention_all")
     override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
-    override val mentionRoles: List<String> = emptyList(),
+    override val mentionRoles: List<Int> = emptyList(),
     @SerialName("mention_here")
     override val isMentionHere: Boolean = false,
     override val author: SimpleUser,
@@ -409,7 +409,7 @@ public data class KMarkdownEventExtra(
     @SerialName("mention_all")
     override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
-    override val mentionRoles: List<String> = emptyList(),
+    override val mentionRoles: List<Int> = emptyList(),
     @SerialName("mention_here")
     override val isMentionHere: Boolean = false,
     override val author: SimpleUser,
@@ -449,7 +449,7 @@ public data class CardEventExtra(
     @SerialName("mention_all")
     override val isMentionAll: Boolean = false,
     @SerialName("mention_roles")
-    override val mentionRoles: List<String> = emptyList(),
+    override val mentionRoles: List<Int> = emptyList(),
     @SerialName("mention_here")
     override val isMentionHere: Boolean = false,
     override val author: SimpleUser,

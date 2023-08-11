@@ -23,7 +23,8 @@ import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMess
 import love.forte.simbot.component.kook.util.requestResultBy
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
-import love.forte.simbot.kook.api.message.*
+import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
+import love.forte.simbot.kook.api.message.GetChannelMessageViewApi
 import love.forte.simbot.kook.messages.ChannelMessageDetails
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.logger.LoggerFactory
@@ -36,7 +37,7 @@ import love.forte.simbot.message.toText
  * 将 [ChannelMessageDetails] 作为消息正文实现。
  *
  * @see ChannelMessageDetails
- * @see MessageViewRequest
+ * @see GetChannelMessageViewApi
  * @author ForteScarlet
  */
 public data class KookChannelMessageDetailsContent(
@@ -97,24 +98,20 @@ public data class KookChannelMessageDetailsContent(
                 }
 
                 MessageType.KMARKDOWN.type -> {
-                    TODO()
-                    //return toMessagesByKMarkdown(content, mention, mentionRoles, isMentionAll, isMentionHere)
+                    return toMessagesByKMarkdown(content, mention, mentionRoles, isMentionAll, isMentionHere)
                 }
 
                 MessageType.CARD.type -> {
-                    TODO()
-//                    tryDecodeCardContent(content, logger)
+                    tryDecodeCardContent(content, logger)
                 }
 
                 else -> listOf(content.toText())
             }
 
-
-            TODO()
-//            return toMessages(
-//                initialList,
-//                mention, mentionRoles, isMentionAll, isMentionHere
-//            )
+            return toMessages(
+                initialList,
+                mention, mentionRoles, isMentionAll, isMentionHere
+            )
         }
 
         /**

@@ -215,12 +215,13 @@ internal fun tryDecodeCardContent(content: String, logger: Logger): List<Message
 private const val MET_NAME = "metId"
 private const val ROL_NAME = "rolId"
 private const val MET_REGEX_VALUE = "\\(met\\)(?<$MET_NAME>([a-zA-Z\\d]+|here|all))\\(met\\)"
-private const val ROL_REGEX_VALUE = "\\(rol\\)(?<$ROL_NAME>[a-zA-Z\\d]+)\\(rol\\)"
+private const val ROL_REGEX_VALUE = "\\(rol\\)(?<$ROL_NAME>\\d+)\\(rol\\)"
 
 private val matchRegex = Regex("($MET_REGEX_VALUE)|($ROL_REGEX_VALUE)")
 
 
 internal data class MentionCount(val id: String, var count: Int)
+internal data class RoleMentionCount(val id: Int, var count: Int)
 
 internal fun Collection<String>.toMentionCount(): MutableMap<String, MentionCount> {
     val map = mutableMapOf<String, MentionCount>()
@@ -232,9 +233,19 @@ internal fun Collection<String>.toMentionCount(): MutableMap<String, MentionCoun
     return map
 }
 
+internal fun Collection<Int>.toMentionCount(): MutableMap<Int, RoleMentionCount> {
+    val map = mutableMapOf<Int, RoleMentionCount>()
+    this.forEach { id ->
+        map.compute(id) { _, current ->
+            current?.also { it.count++ } ?: RoleMentionCount(id, 1)
+        }
+    }
+    return map
+}
+
 internal fun toMessages(
     contentMessage: List<Message.Element<*>>,
-    mention: Collection<String>, mentionRoles: Collection<String>,
+    mention: Collection<String>, mentionRoles: Collection<Int>,
     isMentionAll: Boolean, isMentionHere: Boolean,
 ): Messages {
     if (mention.isEmpty() && mentionRoles.isEmpty() && !isMentionAll && !isMentionHere) {
@@ -265,7 +276,7 @@ internal fun toMessages(
 
 internal fun toMessagesByKMarkdown(
     content: String,
-    mention: Collection<String>, mentionRoles: Collection<String>,
+    mention: Collection<String>, mentionRoles: Collection<Int>,
     isMentionAll: Boolean, isMentionHere: Boolean,
 ): Messages {
     if (mention.isEmpty() && mentionRoles.isEmpty() && !isMentionAll && !isMentionHere) {
@@ -376,7 +387,7 @@ internal fun toMessagesByKMarkdown(
                 val roleId = result.groups[ROL_NAME]
                 if (roleId != null) {
                     var skipText = false
-                    val id = roleId.value
+                    val id = roleId.value.toInt()
                     if (metRoleMap.isEmpty()) {
                         status = status and 0b1110
                     } else {
