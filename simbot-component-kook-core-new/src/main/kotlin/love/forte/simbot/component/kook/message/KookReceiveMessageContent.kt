@@ -23,11 +23,12 @@ import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMessage
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_USER
-import love.forte.simbot.component.kook.util.requestDataBy
+import love.forte.simbot.component.kook.util.requestResultBy
 import love.forte.simbot.component.kook.util.walk
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
 import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
+import love.forte.simbot.kook.api.message.DeleteDirectMessageApi
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.objects.card.CardMessage
 import love.forte.simbot.logger.Logger
@@ -60,6 +61,7 @@ public class KookReceiveMessageContent(
     /**
      * 消息接收到的原始消息内容。
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     public val sourceEvent: Event<TextExtra> get() = source
 
     /**
@@ -68,6 +70,7 @@ public class KookReceiveMessageContent(
      * @see sourceEvent
      * @see Event.content
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     public val rawContent: String get() = source.content
 
     /**
@@ -76,7 +79,7 @@ public class KookReceiveMessageContent(
      * messages 会对接收到的事件中的内容进行解析，并转化为各符合内容的消息链。
      *
      * ## [Event.content] 的处理
-     * 当 [Event.extra] 为 [KMarkdownEventExtra] 类型时，[Event.content] 被追加的时候会进行 **处理**。
+     * 当 [Event.extra] 为 [KMarkdownEventExtra] 类型时，[Event.content] 会在被追加的时候进行 **处理**。
      * 所谓处理，就是指根据 [TextExtra] 中的 [mention][TextExtra.mention]、
      * [mentionRoles][TextExtra.mentionRoles]、[isMentionAll][TextExtra.isMentionAll]、
      * [isMentionHere][TextExtra.isMentionHere] 的信息，根据各信息出现数量依次移除 [Event.content]
@@ -98,13 +101,13 @@ public class KookReceiveMessageContent(
      *  hello
      * ```
      *
-     * 需要注意的是，这种处理不会移除或清理任何的空字符，所以你可能会发现上面处理结束后的 ` hello` 前是有一个空格的。
+     * 需要注意的是，这种处理不会移除或清理任何的**空字符**，所以你可能会发现上面处理结束后的 ` hello` 前是有一个空格的。
      *
      * 如果你希望能够得到最原始的 [Event.content]，那么请通过 [原始事件对象][sourceEvent] 或 [rawContent] 获取，
      * 而不是通过 [KookReceiveMessageContent.plainText] 或 [messages] 中的 [PlainText] 集。
      *
      * ```kotlin
-     * val event: KookMessageEvent = ... // 一个Kook的消息事件
+     * val event: KookMessageEvent = ... // 一个KOOK的消息事件
      * val rawContent = event.sourceEvent.content
      * // ...
      * ```
@@ -120,20 +123,17 @@ public class KookReceiveMessageContent(
      */
     override suspend fun delete(): Boolean {
         val api = if (isDirect) {
-            TODO("Direct message delete")
-//            DirectMessageDeleteRequest.create(messageId)
+            DeleteDirectMessageApi.create(source.msgId)
         } else {
             DeleteChannelMessageApi.create(source.msgId)
         }
-        api.requestDataBy(bot)
 
-        return true
+        return api.requestResultBy(bot).isSuccess
     }
 
     override fun toString(): String {
         return "KookReceiveMessageContent(sourceEvent=$sourceEvent)"
     }
-
 }
 
 private val logger = LoggerFactory.getLogger("love.forte.simbot.component.kook.message.ReceiveMessageContent")
@@ -146,7 +146,7 @@ private val logger = LoggerFactory.getLogger("love.forte.simbot.component.kook.m
  * | [TextEventExtra] | 将 [Event.content] 转化为 [Text] |
  * | [ImageEventExtra] | 将 [ImageEventExtra.attachments] 转化为 [KookAttachmentMessage] |
  * | [VideoEventExtra] | 将 [VideoEventExtra.attachments] 转化为 [KookAttachmentMessage] |
- * | [CardEventExtra] | 将 [Event.content] 转化为 [Text] |
+ * | [CardEventExtra] | 尝试将 [Event.content] 转化为 [KookCardMessage]，如果失败则会输出相关日志并将 [Event.content] 转化为 [Text] |
  * | [KMarkdownEventExtra] | 将 [Event.content] 转化为 [Text]（会对特殊内容进行适当的移除）；<br /> 追加其他由 [mention][TextExtra.mention]、[mentionRoles][TextExtra.mentionRoles]、[isMentionAll][TextExtra.isMentionAll]、[isMentionHere][TextExtra.isMentionHere] 等信息而解析出来的 [At]、[AtAll]、[KookAtAllHere] 等信息。其中，[AtAll]、[KookAtAllHere] 至多只会各自出现一次。 |
  * | 其他 | 将 [Event.content] 转化为 [Text] |
  *
@@ -199,11 +199,8 @@ internal fun tryDecodeCardContent(content: String, logger: Logger): List<Message
     return runCatching {
         listOf(KookCardMessage(CardMessage.decode(content)))
     }.getOrElse { ex ->
-        if (logger.isDebugEnabled) {
-            logger.debug("Cannot decode card message content [{}] to CardMessage, as text.", content, ex)
-        } else {
-            logger.warn("Cannot decode card message content to CardMessage, as text.", ex)
-        }
+        logger.warn("Cannot decode card message content to CardMessage, as text.", ex)
+        logger.debug("Cannot decode card message content [{}] to CardMessage: {}", content, ex.localizedMessage, ex)
         listOf(content.toText())
     }
 }

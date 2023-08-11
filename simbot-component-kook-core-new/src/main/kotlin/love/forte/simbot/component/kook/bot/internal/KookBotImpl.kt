@@ -47,7 +47,6 @@ import love.forte.simbot.kook.objects.Guild
 import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.literal
 import love.forte.simbot.logger.LoggerFactory
-import love.forte.simbot.message.Image
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
 import org.slf4j.Logger
@@ -69,12 +68,6 @@ internal class KookBotImpl(
 ) : KookBot {
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
-
-
-    override suspend fun resolveImage(id: ID): Image<*> {
-        TODO("Not yet implemented")
-    }
-
 
     override fun isMe(id: ID): Boolean {
         if (id.literal == sourceBot.ticket.clientId) {

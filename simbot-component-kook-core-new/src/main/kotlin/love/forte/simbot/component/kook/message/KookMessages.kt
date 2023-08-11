@@ -17,22 +17,8 @@
 
 package love.forte.simbot.component.kook.message
 
-import io.ktor.client.request.forms.*
-import io.ktor.utils.io.streams.*
-import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.SimbotIllegalArgumentException
-import love.forte.simbot.component.kook.bot.KookBot
-import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.kook.api.KookApi
-import love.forte.simbot.kook.api.asset.CreateAssetApi
-import love.forte.simbot.kook.api.message.SendChannelMessageApi
-import love.forte.simbot.kook.messages.MessageType
-import love.forte.simbot.kook.objects.kmd.AtTarget
-import love.forte.simbot.kook.objects.kmd.buildRawKMarkdown
-import love.forte.simbot.literal
-import love.forte.simbot.message.*
-import java.net.URL
+import love.forte.simbot.message.At
 
 /**
  * 提供 Kook 组件中一些会用到的信息。
@@ -77,104 +63,3 @@ public object KookMessages {
     public fun atChannel(id: ID): At = At(target = id, type = AT_TYPE_CHANNEL, originContent = "(chn)$id(chn)")
 
 }
-
-
-/**
- * 尝试将一个消息元素转化为用于发送消息的请求。
- */
-@OptIn(ExperimentalSimbotApi::class)
-private suspend fun Message.Element<*>.elementToRequestOrNull(
-    bot: KookBot,
-    targetId: ID,
-    quote: ID? = null,
-    nonce: String? = null,
-    tempTargetId: ID? = null,
-): KookApi<*>? {
-    fun request(type: Int, content: String): SendChannelMessageApi {
-        return SendChannelMessageApi.create {
-            this.type = type
-            this.targetId = targetId.literal
-            this.content = content
-            this.quote = quote?.literal
-            this.nonce = nonce
-            this.tempTargetId = tempTargetId?.literal
-        }
-    }
-
-    return when (this) {
-        // 文本消息
-        is PlainText<*> -> request(MessageType.TEXT.type, text)
-
-        is KookMessageElement<*> -> when (this) {
-            // 媒体资源
-            is KookAssetMessage<*> -> request(type, asset.url)
-            // KMarkdown
-            is KookKMarkdownMessage -> request(MessageType.KMARKDOWN.type, kMarkdown.rawContent)
-            // card message
-            is KookCardMessage -> request(MessageType.CARD.type, cards.encode())
-
-            // TODO api message
-            // TODO ignore exception support
-            is KookApiMessage -> this.api
-
-            is KookAtAllHere -> {
-                val content = buildRawKMarkdown {
-                    at(AtTarget.Here)
-                }
-
-                request(MessageType.KMARKDOWN.type, content)
-            }
-
-            is KookAttachmentMessage -> {
-                val attachmentType = attachment.type.lowercase()
-                val type = when (attachment.type.lowercase()) {
-                    "file" -> MessageType.FILE.type
-                    "image" -> MessageType.IMAGE.type
-                    "video" -> MessageType.VIDEO.type
-                    else -> throw SimbotIllegalArgumentException("Unknown attachment type: $attachmentType")
-                }
-
-                val createRequest = CreateAssetApi.create(URL(attachment.url), attachment.name)
-                val asset = createRequest.requestDataBy(bot)
-
-                request(type, asset.url)
-            }
-
-
-            // other, ignore.
-            else -> null
-        }
-
-        // 需要上传的图片
-        is ResourceImage -> {
-            val resource = resource()
-            val asset = CreateAssetApi.create(InputProvider { resource.openStream().asInput() }).requestDataBy(bot)
-            request(MessageType.IMAGE.type, asset.url)
-        }
-
-        // 其他任意图片类型
-        is Image<*> -> request(MessageType.IMAGE.type, id.literal)
-
-        is At -> {
-            // buildRawKMarkdown {
-            //     // TODO
-            // }
-            // TODO
-            null
-        }
-
-        is Face -> {
-            // TODO
-            null
-        }
-
-        is Emoji -> {
-            // TODO
-            null
-        }
-
-
-        else -> null
-    }
-}
-

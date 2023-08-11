@@ -36,5 +36,5 @@ import love.forte.simbot.kook.api.ApiResultType
 public data class SendMessageResult @ApiResultType constructor(
     @SerialName("msg_id") val msgId: String,
     @SerialName("msg_timestamp") val msgTimestamp: Long,
-    val nonce: String,
+    val nonce: String? = null,
 )

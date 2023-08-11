@@ -28,40 +28,27 @@ import love.forte.simbot.message.doSafeCast
  *
  * 此消息会在发送时直接通过 [api] 发起一个请求，但是不会处理它的响应。
  *
- * 对此 API 请求过程中产生的异常的忽略性参考属性 [ignoreFailures]。
- * 默认情况下 [ignoreFailures] 为 `false`, 会直接抛出异常。这可能会影响并中断消息发送的流程。
- *
+ * 默认情况下此 API 请求过程中产生的异常会直接抛出。这可能会影响并中断消息发送的流程。
  *
  * 这是一个**仅用于发送**的消息，且**不支持**序列化。
- *
- * @property ignoreFailures 如果为 `true` 则会捕获并忽略api请求过程中产生的异常，否则会直接抛出。默认为 `false`。
  *
  * @see KookApi
  *
  * @author ForteScarlet
  */
 @KookSendOnlyMessage
-public data class KookApiMessage(
-    public val api: KookApi<*>,
-    public val ignoreFailures: Boolean = DEFAULT_IGNORE_FAILURES
-) :
-    KookMessageElement<KookApiMessage> {
-
+public data class KookApiMessage(public val api: KookApi<*>) : KookMessageElement<KookApiMessage> {
     override val key: Message.Key<KookApiMessage>
         get() = Key
 
     public companion object Key : Message.Key<KookApiMessage> {
-        internal const val DEFAULT_IGNORE_FAILURES = false
         override fun safeCast(value: Any): KookApiMessage? = doSafeCast(value)
 
         /**
          * 通过 [KookApi] 构建 [KookApiMessage].
-         *
-         * @param ignoreFailures 如果为 `true` 则会捕获并忽略api请求过程中产生的异常，否则会直接抛出。默认为 `false`。
          */
         @JvmStatic
-        @JvmOverloads
-        public fun KookApi<*>.toRequest(ignoreFailures: Boolean = DEFAULT_IGNORE_FAILURES): KookApiMessage =
+        public fun KookApi<*>.toRequest(): KookApiMessage =
             KookApiMessage(this)
 
     }

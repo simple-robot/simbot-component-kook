@@ -25,10 +25,19 @@ import love.forte.simbot.JSTP
 import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.KookGuild
+import love.forte.simbot.component.kook.message.KookAsset
+import love.forte.simbot.component.kook.message.KookAssetImage
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.GuildBot
 import love.forte.simbot.definition.SocialRelationsContainer.Companion.COUNT_NOT_SUPPORTED
 import love.forte.simbot.kook.Ticket
+import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.api.asset.Asset
+import love.forte.simbot.kook.api.asset.CreateAssetApi
+import love.forte.simbot.kook.messages.MessageType
+import love.forte.simbot.literal
+import love.forte.simbot.message.Image
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import kotlin.coroutines.CoroutineContext
@@ -121,6 +130,48 @@ public interface KookBot : Bot, CoroutineScope {
      * [KookBot] 的所属管理器。
      */
     override val manager: KookBotManager
+
+    /**
+     * 根据 "ID" 构建一个 Image. KOOK 中没有一个针对图片的“ID”，
+     * 因此这个 [id] 实际上即为通过 [CreateAssetApi] 上传得到的
+     * [Asset] 中的 [url][Asset.url]。
+     *
+     * [resolveImage] 通常用于自行上传图片并得到 [Asset] 后、
+     * 或者希望通过已有的 [KookAssetImage] 重新包装为一个新的 [Image] 类型。
+     *
+     * 如果是前者，可以考虑使用 [uploadAssetImage] 来提供 [CreateAssetApi]
+     * 上传图片并直接得到包装后的 [KookAssetImage]；
+     *
+     * 如果是后者，你并没有必要“重新包装”，直接使用原本的 [KookAssetImage] 即可。
+     * [resolveImage] 并不会产生任何网络请求，而仅仅只是使用一个新的对象包装URL而已。
+     *
+     * @see uploadAsset
+     * @see uploadAssetImage
+     */
+    @OptIn(ApiResultType::class)
+    @JvmSynthetic
+    override suspend fun resolveImage(id: ID): Image<*> {
+        return KookAssetImage(Asset(id.literal))
+    }
+
+    /**
+     * 提供一个 [CreateAssetApi], 通过此BOT上传将得到的 [Asset] 结果包装为 [KookAsset] .
+     *
+     * @param api 上传资源的请求
+     * @param type 构建的 [KookAsset] 的类型
+     */
+    @JST
+    public suspend fun uploadAsset(api: CreateAssetApi, type: MessageType): KookAsset =
+        KookAsset(api.requestDataBy(this), type)
+
+    /**
+     * 提供一个 [CreateAssetApi], 通过此BOT上传将得到的 [Asset] 结果包装为 [KookAssetImage] .
+     *
+     * @param api 上传资源的请求
+     */
+    @JST
+    public suspend fun uploadAssetImage(api: CreateAssetApi): KookAssetImage =
+        KookAssetImage(api.requestDataBy(this))
 
     override suspend fun cancel(reason: Throwable?): Boolean {
         sourceBot.close()
