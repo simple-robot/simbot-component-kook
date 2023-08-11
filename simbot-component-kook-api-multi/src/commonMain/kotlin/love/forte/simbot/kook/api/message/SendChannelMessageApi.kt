@@ -20,7 +20,6 @@ package love.forte.simbot.kook.api.message
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookPostApi
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
@@ -43,7 +42,7 @@ public class SendChannelMessageApi private constructor(
     private val quote: String? = null,
     private val nonce: String? = null,
     private val tempTargetId: String? = null,
-) : KookPostApi<SendChannelMessageResult>() {
+) : KookPostApi<SendMessageResult>() {
     public companion object Factory {
         private val PATH = ApiPath.create("message", "create")
 
@@ -120,28 +119,8 @@ public class SendChannelMessageApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<SendChannelMessageResult>
-        get() = SendChannelMessageResult.serializer()
-
-    /**
-     * 消息类型
-     */
-    public enum class Type(public val value: Int) {
-        /**
-         * 文本类型
-         */
-        TEXT(1),
-
-        /**
-         * kmarkdown 消息
-         */
-        KMARKDOWN(9),
-
-        /**
-         * 卡片消息
-         */
-        CARD(10),
-    }
+    override val resultDeserializer: DeserializationStrategy<SendMessageResult>
+        get() = SendMessageResult.serializer()
 
     /**
      * [发送频道聊天消息][SendChannelMessageApi] 构建器。
@@ -187,7 +166,7 @@ public class SendChannelMessageApi private constructor(
         /**
          * 消息类型
          */
-        public fun type(type: Type?): Builder = apply { this.type = type?.value }
+        public fun type(type: SendMessageType?): Builder = apply { this.type = type?.value }
 
         /**
          * 目标频道 id
@@ -248,17 +227,4 @@ public class SendChannelMessageApi private constructor(
 
 }
 
-/**
- * [发送频道聊天消息][SendChannelMessageApi] 响应实例。
- *
- * @property msgId 服务端生成的消息 id
- * @property msgTimestamp 消息发送时间(服务器时间戳)
- * @property nonce 随机字符串，见参数列表
- */
-@Serializable
-public data class SendChannelMessageResult @ApiResultType constructor(
-    @SerialName("msg_id") val msgId: String,
-    @SerialName("msg_timestamp") val msgTimestamp: Long,
-    val nonce: String,
-)
 

@@ -20,6 +20,7 @@ package love.forte.simbot.kook.api.message
 import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookGetApi
 import love.forte.simbot.kook.messages.ChannelMessageDetails
 import love.forte.simbot.kook.util.appendIfNotNull
@@ -41,7 +42,7 @@ public class GetChannelMessageListApi private constructor(
     private val pin: Boolean? = null,
     private val flag: String? = null,
     private val pageSize: Int? = null,
-) : KookGetApi<MessageList>() {
+) : KookGetApi<ChannelMessageList>() {
     public companion object Factory {
         private val PATH = ApiPath.create("message", "list")
 
@@ -77,7 +78,7 @@ public class GetChannelMessageListApi private constructor(
             targetId: String,
             msgId: String? = null,
             pin: Boolean? = null,
-            flag: Flag? = null,
+            flag: MessageQueryFlag? = null,
             pageSize: Int? = null,
         ): GetChannelMessageListApi = GetChannelMessageListApi(targetId, msgId, pin, flag?.value, pageSize)
 
@@ -108,8 +109,8 @@ public class GetChannelMessageListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<MessageList>
-        get() = MessageList.serializer()
+    override val resultDeserializer: DeserializationStrategy<ChannelMessageList>
+        get() = ChannelMessageList.serializer()
 
     override fun urlBuild(builder: URLBuilder) {
         builder.parameters {
@@ -166,7 +167,7 @@ public class GetChannelMessageListApi private constructor(
         /**
          * 查询模式，有三种模式可以选择。不传则默认查询最新的消息
          */
-        public fun flag(flag: Flag): Builder = apply { this.flag = flag.value }
+        public fun flag(flag: MessageQueryFlag): Builder = apply { this.flag = flag.value }
 
         /**
          * 当前分页消息数量, 默认 50
@@ -185,25 +186,6 @@ public class GetChannelMessageListApi private constructor(
         )
     }
 
-    /**
-     * 查询模式
-     */
-    public enum class Flag(public val value: String) {
-        /**
-         * 查询参考消息之前的消息，不包括参考消息
-         */
-        BEFORE("before"),
-
-        /**
-         * 查询以参考消息为中心，前后一定数量的消息
-         */
-        AROUND("around"),
-
-        /**
-         * 查询参考消息之后的消息，不包括参考消息
-         */
-        AFTER("after"),
-    }
 
 }
 
@@ -211,4 +193,6 @@ public class GetChannelMessageListApi private constructor(
  * [GetChannelMessageListApi] 的响应体
  */
 @Serializable
-public data class MessageList(val items: List<ChannelMessageDetails> = emptyList())
+public data class ChannelMessageList @ApiResultType constructor(val items: List<ChannelMessageDetails> = emptyList())
+
+
