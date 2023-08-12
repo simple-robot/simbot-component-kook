@@ -19,9 +19,18 @@ package love.forte.simbot.component.kook
 
 import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.ID
+import love.forte.simbot.JST
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.bot.KookGuildBot
+import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
+import love.forte.simbot.component.kook.message.KookMessageReceipt
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.definition.Channel
+import love.forte.simbot.kook.api.message.SendChannelMessageApi
+import love.forte.simbot.kook.messages.MessageType
+import love.forte.simbot.literal
+import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
 import kotlin.coroutines.CoroutineContext
 
 
@@ -101,6 +110,96 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     // TODO members
     // TODO roles
     // TODO send
+
+    // region send api
+    /**
+     * 根据 [SendChannelMessageApi] api 构建并发送消息。
+     */
+    @JST
+    public suspend fun send(request: SendChannelMessageApi): KookMessageReceipt {
+        return request.requestDataBy(bot).asReceipt(false, bot)
+    }
+
+    /**
+     * 根据 [SendChannelMessageApi] api 构建并发送消息。
+     */
+    @JST
+    public suspend fun send(
+        type: Int,
+        content: String,
+        quote: ID?,
+        nonce: String?,
+        tempTargetId: ID?,
+    ): KookMessageReceipt {
+        val request = SendChannelMessageApi.create(type, source.id, content, quote?.literal, nonce, tempTargetId?.literal)
+        return send(request)
+    }
+
+
+    /**
+     * 发送纯文本消息，并指定 [tempTargetId].
+     *
+     * @see SendChannelMessageApi.tempTargetId
+     */
+    @JST
+    public suspend fun send(text: String, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt {
+        return send(
+            MessageType.TEXT.type,
+            text,
+            quote, null, tempTargetId
+        )
+    }
+
+    /**
+     * 发送消息，并可选的指定 [quote] 和 [tempTargetId].
+     *
+     * @see SendChannelMessageApi.tempTargetId
+     * @see SendChannelMessageApi.quote
+     */
+    @JST
+    public suspend fun send(message: Message, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt
+
+    /**
+     * 发送消息，并可选的指定 [quote] 和 [tempTargetId].
+     *
+     * @see SendChannelMessageApi.tempTargetId
+     * @see SendChannelMessageApi.quote
+     */
+    @JST
+    public suspend fun send(
+        message: MessageContent,
+        quote: ID? = null,
+        tempTargetId: ID? = null,
+    ): KookMessageReceipt
+
+
+    /**
+     * 发送纯文本消息。
+     */
+    @JST
+    override suspend fun send(text: String): KookMessageReceipt {
+        return send(
+            MessageType.TEXT.type,
+            text,
+            null, null, null
+        )
+    }
+
+    /**
+     * 发送消息。
+     */
+    @JST
+    override suspend fun send(message: Message): KookMessageReceipt = send(message, null)
+
+    /**
+     * 发送消息。
+     */
+    @JST
+    override suspend fun send(message: MessageContent): KookMessageReceipt = send(message, null)
+
+    // endregion
+
+
     // TODO mute
 
 

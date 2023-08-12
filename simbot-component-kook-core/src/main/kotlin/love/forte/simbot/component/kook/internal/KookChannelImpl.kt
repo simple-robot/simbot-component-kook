@@ -83,8 +83,6 @@ internal class KookChannelImpl private constructor(
     
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
         return send0(message, quote, tempTargetId, null)
-//        return message.sendToChannel(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
-//            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
     }
 
     override suspend fun send(message: MessageContent, quote: ID?, tempTargetId: ID?): KookMessageReceipt {

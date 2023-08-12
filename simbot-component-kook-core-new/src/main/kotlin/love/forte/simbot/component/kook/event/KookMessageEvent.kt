@@ -17,13 +17,18 @@
 
 package love.forte.simbot.component.kook.event
 
+import love.forte.simbot.ID
 import love.forte.simbot.JST
 import love.forte.simbot.JSTP
+import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.message.KookReceiveMessageContent
+import love.forte.simbot.delegate.getValue
+import love.forte.simbot.delegate.stringID
+import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.TextExtra
 import love.forte.simbot.message.Message
@@ -55,6 +60,10 @@ import love.forte.simbot.kook.event.Event as KEvent
 public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>(), MessageEvent {
     override val key: Event.Key<out KookMessageEvent>
         get() = Key
+
+    override val id: ID by stringID { sourceEvent.msgId }
+
+    override val timestamp: Timestamp by timestamp { sourceEvent.msgTimestamp }
 
     /**
      * 接收到的消息体。
