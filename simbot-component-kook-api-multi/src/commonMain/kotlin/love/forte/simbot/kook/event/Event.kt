@@ -198,6 +198,7 @@ public data class Event<out E : EventExtra>(
  * @see Event.extra
  * @see TextExtra
  * @see SystemExtra
+ * @see UnknownExtra
  *
  */
 @Serializable

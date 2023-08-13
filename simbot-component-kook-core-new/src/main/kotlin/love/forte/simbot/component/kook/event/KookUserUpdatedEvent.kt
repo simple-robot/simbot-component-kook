@@ -17,51 +17,63 @@
 
 package love.forte.simbot.component.kook.event
 
+import love.forte.simbot.ID
+import love.forte.simbot.JSTP
+import love.forte.simbot.Timestamp
+import love.forte.simbot.delegate.getValue
+import love.forte.simbot.delegate.timestamp
+import love.forte.simbot.event.BaseEventKey
+import love.forte.simbot.event.ChangedEvent
+import love.forte.simbot.event.Event
+import love.forte.simbot.kook.event.UserUpdatedEventBody
+import love.forte.simbot.kook.event.UserUpdatedEventExtra
+import love.forte.simbot.message.doSafeCast
+import love.forte.simbot.kook.event.Event as KEvent
 
-///**
-// * Kook 用户信息更新事件。
-// * 此事件属于一个 [ChangedEvent],
-// * 变更的[源][ChangedEvent.source]为发送变更的用户 **的ID**
-// * （因为此事件不一定是某个具体频道服务器中的用户，只要有好友关系即会推送），
-// * 变更的 [前][ChangedEvent.before]由于无法获取而始终为null，
-// * [后][ChangedEvent.after] 为用户变更事件的内容本体，即 [UserUpdatedEventBody] 。
-// *
-// * @see UserUpdatedEvent
-// */
-//public abstract class KookUserUpdatedEvent : KookSystemEvent(),
-//    ChangedEvent {
-//    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
-//
-//    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<SystemExtra>
-//
-//    /**
-//     * 变化源。为发生变更的用户的id。
-//     */
-//    @JvmBlocking(asProperty = true, suffix = "")
-//    @JvmAsync(asProperty = true)
-//    override suspend fun source(): ID = sourceBody.userId
-//
-//    /**
-//     * before 无法确定，始终为null。
-//     */
-//    @JvmBlocking(asProperty = true, suffix = "")
-//    @JvmAsync(asProperty = true)
-//    override suspend fun before(): Any? = null
-//
-//    /**
-//     * 变化事件的主要内容。
-//     */
-//    @JvmBlocking(asProperty = true, suffix = "")
-//    @JvmAsync(asProperty = true)
-//    override suspend fun after(): UserUpdatedEventBody = sourceBody
-//
-//
-//    override val key: Event.Key<out KookUserUpdatedEvent>
-//        get() = Key
-//
-//    public companion object Key : BaseEventKey<KookUserUpdatedEvent>(
-//        "kook.user_updated", KookSystemEvent
-//    ) {
-//        override fun safeCast(value: Any): KookUserUpdatedEvent? = doSafeCast(value)
-//    }
-//}
+
+/**
+ * Kook 用户信息更新事件。
+ * 此事件属于一个 [ChangedEvent],
+ * [变更源][ChangedEvent.source] 为发送变更的用户 **的ID**
+ * （因为此事件不一定是某个具体频道服务器中的用户，只要有好友关系即会推送），
+ * [变更前][ChangedEvent.before] 由于无法获取而始终为null，
+ * [变更后][ChangedEvent.after] 为用户变更事件的内容本体，即 [sourceBody]。
+ *
+ * @see UserUpdatedEventExtra
+ */
+public abstract class KookUserUpdatedEvent : KookSystemEvent(), ChangedEvent {
+    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+
+    abstract override val sourceEvent: KEvent<UserUpdatedEventExtra>
+
+    override val sourceBody: UserUpdatedEventBody
+        get() = sourceEvent.extra.body
+
+    /**
+     * 变化源。为发生变更的用户的id。
+     */
+    @JSTP
+    override suspend fun source(): ID = sourceBody.userId.ID
+
+    /**
+     * before 无法确定，始终为null。
+     */
+    @JSTP
+    override suspend fun before(): Any? = null
+
+    /**
+     * 变化事件的主要内容。
+     */
+    @JSTP
+    override suspend fun after(): UserUpdatedEventBody = sourceBody
+
+
+    override val key: Event.Key<out KookUserUpdatedEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KookUserUpdatedEvent>(
+        "kook.user_updated", KookSystemEvent, ChangedEvent
+    ) {
+        override fun safeCast(value: Any): KookUserUpdatedEvent? = doSafeCast(value)
+    }
+}

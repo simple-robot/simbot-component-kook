@@ -520,14 +520,16 @@ private class Receiving(
                     return this
                 }
 
+                val event: Signal.Event<EventExtra>
 
                 val deserializer = EventExtra.eventSerializerOrNull(jsonDObj)
                 if (deserializer == null) {
                     eventLogger.warn("Cannot resolve event deserialization strategy via json property 'd' {}", jsonDObj)
                     return this
+                } else {
+                    event = json.decodeFromJsonElement(deserializer, jsonElement)
                 }
 
-                val event = json.decodeFromJsonElement(deserializer, jsonElement)
 
                 eventLogger.debug("Event signal value: {}", event)
 
@@ -576,7 +578,6 @@ private class Receiving(
         return updateAndGet { v -> max(newSn, v) }
     }
 }
-
 
 private data class Reconnect(
     override val bot: BotImpl,

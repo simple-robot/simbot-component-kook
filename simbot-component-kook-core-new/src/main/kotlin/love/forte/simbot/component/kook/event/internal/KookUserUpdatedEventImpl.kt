@@ -17,25 +17,13 @@
 
 package love.forte.simbot.component.kook.event.internal
 
-//import love.forte.simbot.component.kook.KookComponentBot
-//import love.forte.simbot.component.kook.event.KookUserUpdatedEvent
-//import love.forte.simbot.event.ChangedEvent
-//import love.forte.simbot.kook.event.Event.Extra.Sys
-//import love.forte.simbot.kook.event.system.user.UserUpdatedEvent
-//import love.forte.simbot.kook.event.system.user.UserUpdatedEventBody
-//import love.forte.simbot.kook.event.Event as KkEvent
-//
-///**
-// * Kook 用户信息更新事件。
-// * 此事件属于一个 [ChangedEvent],
-// * 变更的[源][ChangedEvent.source]为发送变更的用户 **的ID**
-// * （因为此事件不一定是某个具体频道服务器中的用户，只要有好友关系即会推送），
-// * 变更的 [前][ChangedEvent.before]由于无法获取而始终为null，
-// * [后][ChangedEvent.after] 为用户变更事件的内容本体，即 [UserUpdatedEventBody] 。
-// *
-// * @see UserUpdatedEvent
-// */
-//internal data class KookUserUpdatedEventImpl(
-//    override val bot: KookComponentBot,
-//    override val sourceEvent: KkEvent<Sys<UserUpdatedEventBody>>
-//) : KookUserUpdatedEvent()
+import love.forte.simbot.component.kook.bot.internal.KookBotImpl
+import love.forte.simbot.component.kook.event.KookUserUpdatedEvent
+import love.forte.simbot.kook.event.UserUpdatedEventExtra
+import love.forte.simbot.kook.event.Event as KEvent
+
+
+internal data class KookUserUpdatedEventImpl(
+    override val bot: KookBotImpl,
+    override val sourceEvent: KEvent<UserUpdatedEventExtra>
+) : KookUserUpdatedEvent()
