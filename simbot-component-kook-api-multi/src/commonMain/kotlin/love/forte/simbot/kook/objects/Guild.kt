@@ -117,6 +117,6 @@ public data class SimpleGuildWithRolesAndChannels(
     @SerialName("open_id") override val openId: String,
     @SerialName("default_channel_id") override val defaultChannelId: String,
     @SerialName("welcome_channel_id") override val welcomeChannelId: String,
-    override val roles: List<Role> = emptyList(),
-    override val channels: List<Channel> = emptyList()
+    override val roles: List<SimpleRole> = emptyList(),
+    override val channels: List<SimpleChannel> = emptyList()
 ) : GuildWithRolesAndChannels

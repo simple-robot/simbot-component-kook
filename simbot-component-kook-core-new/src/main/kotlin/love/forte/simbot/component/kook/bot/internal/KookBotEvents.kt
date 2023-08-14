@@ -18,16 +18,23 @@
 package love.forte.simbot.component.kook.bot.internal
 
 import kotlinx.coroutines.launch
-import love.forte.simbot.component.kook.event.KookMemberJoinedGuildEvent
+import love.forte.simbot.component.kook.event.*
+import love.forte.simbot.component.kook.event.internal.KookBotSelfJoinedGuildEventImpl
+import love.forte.simbot.component.kook.event.internal.KookMemberExitedChannelEventImpl
+import love.forte.simbot.component.kook.event.internal.KookMemberJoinedChannelEventImpl
 import love.forte.simbot.component.kook.event.internal.KookMemberJoinedGuildEventImpl
+import love.forte.simbot.component.kook.internal.KookChannelImpl
+import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.event.Event
+import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.api.channel.ChannelInfo
+import love.forte.simbot.kook.api.guild.GetGuildViewApi
 import love.forte.simbot.kook.api.user.GetUserViewApi
-import love.forte.simbot.kook.event.ExitedGuildEventExtra
-import love.forte.simbot.kook.event.JoinedGuildEventExtra
-import love.forte.simbot.kook.event.SystemExtra
-import love.forte.simbot.kook.event.TextExtra
+import love.forte.simbot.kook.event.*
+import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.kook.event.Event as KEvent
 
 
 internal fun KookBotImpl.registerEvent() {
@@ -48,8 +55,30 @@ internal fun KookBotImpl.registerEvent() {
                 when (ex) {
                     // 某人退出频道服务器
                     is ExitedGuildEventExtra -> {
+                        val guildId = event.targetId
+                        val guild = internalGuild(event.targetId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", guildId, event)
+                                return@processor
+                            }
 
+                        val removedMember = inCacheModify {
+                            members.remove(memberCacheId(guildId, ex.body.userId))
+                        } ?: run {
+                            logger.warn("No member ({}) removed in event {}", ex.body.userId, event)
+                            return@processor
+                        }
+
+                        pushIfProcessable(KookMemberExitedGuildEvent) {
+                            KookMemberJoinedGuildEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                removedMember
+                            )
+                        }
                     }
+
                     // 某人加入频道服务器
                     is JoinedGuildEventExtra -> {
                         val guildId = event.targetId
@@ -70,17 +99,107 @@ internal fun KookBotImpl.registerEvent() {
                             newMember
                         }
 
-                        @Suppress("UNCHECKED_CAST")
                         pushIfProcessable(KookMemberJoinedGuildEvent) {
                             KookMemberJoinedGuildEventImpl(
                                 thisBot,
-                                event as love.forte.simbot.kook.event.Event<JoinedGuildEventExtra>,
+                                event.doAs(),
                                 guild,
                                 newMember
                             )
                         }
                     }
 
+                    // 某成员进入某子频道
+                    is JoinedChannelEventExtra -> {
+                        val guildId = event.targetId
+                        val userId = ex.body.userId
+                        val channelId = ex.body.channelId
+
+                        val channel = internalChannel(channelId)
+                            ?: run {
+                                logger.warn("Unknown channel {} in event {}", channelId, event)
+                                return@processor
+                            }
+
+                        val member = thisBot.internalMember(guildId, userId)
+                            ?: run {
+                                logger.warn("Unknown member {} in event {}", userId, event)
+                                return@processor
+                            }
+
+                        pushIfProcessable(KookMemberJoinedChannelEvent) {
+                            KookMemberJoinedChannelEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                channel,
+                                member
+                            )
+                        }
+                    }
+
+                    // 某成员离开某子频道
+                    is ExitedChannelEventExtra -> {
+                        val guildId = event.targetId
+                        val userId = ex.body.userId
+                        val channelId = ex.body.channelId
+
+                        val channel = internalChannel(channelId)
+                            ?: run {
+                                logger.warn("Unknown channel {} in event {}", channelId, event)
+                                return@processor
+                            }
+
+                        val member = thisBot.internalMember(guildId, userId)
+                            ?: run {
+                                logger.warn("Unknown member {} in event {}", userId, event)
+                                return@processor
+                            }
+
+                        pushIfProcessable(KookMemberExitedChannelEvent) {
+                            KookMemberExitedChannelEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                channel,
+                                member
+                            )
+                        }
+                    }
+
+                    //
+                    is SelfJoinedGuildEventExtra -> {
+                        val guildId = ex.body.guildId
+                        val guildInfo = GetGuildViewApi.create(guildId).requestDataBy(thisBot)
+
+                        lateinit var botAsMember: KookMemberImpl
+
+                        val guild = inCacheModify {
+                            val guild = KookGuildImpl(thisBot, guildInfo)
+                            guilds[guildId] = guild
+                            guildInfo.channels.forEach {
+                                channels[it.id] = KookChannelImpl(thisBot, it.toChannelInfo(), guildId)
+                            }
+                            // TODO guild members sync
+                            //  set botAsMember
+
+                            guild
+                        }
+
+                        pushIfProcessable(KookBotSelfJoinedGuildEvent) {
+                            KookBotSelfJoinedGuildEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                botAsMember
+                            )
+                        }
+
+                        TODO("bot加入服务器")
+                    }
+
+                    //
+                    is SelfExitedGuildEventExtra -> {
+                        TODO("bot离开服务器")
+                    }
 
                     else -> TODO()
                 }
@@ -109,4 +228,23 @@ private suspend inline fun KookBotImpl.pushIfProcessable(
     }
 
     return false
+}
+
+@Throws(ClassCastException::class)
+@Suppress("UNCHECKED_CAST")
+private inline fun <reified T : EventExtra> KEvent<*>.doAs(): KEvent<T> = this as KEvent<T>
+
+// TODO
+@OptIn(ApiResultType::class)
+private fun Channel.toChannelInfo(): ChannelInfo {
+    return ChannelInfo(
+        id = this.id,
+        name = this.name,
+        isCategory = this.isCategory,
+        userId = this.userId,
+        parentId = this.parentId,
+        level = this.level,
+        type = this.type,
+        limitAmount = -1
+    )
 }

@@ -31,6 +31,8 @@ import love.forte.simbot.kook.objects.Channel as KChannel
  */
 public interface KookChannelBased {
 
+    // TODO use Channel?
+
     /**
      * 得到此实例内对应的 api 模块下的原始 channel 信息。
      *
