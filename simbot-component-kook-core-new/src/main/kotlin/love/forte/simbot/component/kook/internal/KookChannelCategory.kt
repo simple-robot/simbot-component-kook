@@ -22,11 +22,11 @@ import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
-import love.forte.simbot.kook.api.channel.ChannelInfo
+import love.forte.simbot.kook.objects.Channel
 
 internal class KookChannelCategoryImpl(
     val bot: KookBotImpl,
-    override val source: ChannelInfo,
+    override val source: Channel,
     val _guildId: String,
 ) : KookChannelCategory {
     override val id: ID by stringID { source.id }

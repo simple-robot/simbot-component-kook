@@ -41,6 +41,7 @@ import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kook.Bot
 import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.channel.GetChannelListApi
+import love.forte.simbot.kook.api.channel.toChannel
 import love.forte.simbot.kook.api.guild.GetGuildListApi
 import love.forte.simbot.kook.api.member.GetGuildMemberListApi
 import love.forte.simbot.kook.objects.Guild
@@ -169,6 +170,7 @@ internal class KookBotImpl(
         syncRequestGuilds(batchDelay)
             .buffer(100)
             .collect { guild ->
+                val guildId = guild.id
                 var botMember: KookMemberImpl? = null
                 var chc = 0
                 var cac = 0
@@ -177,15 +179,15 @@ internal class KookBotImpl(
                 coroutineScope {
                     // 单并发并发的异步
                     launch {
-                        requestGuildChannels(guild.id, batchDelay)
+                        requestGuildChannels(guildId, batchDelay)
                             .buffer(500)
                             .collect { channelInfo ->
                                 if (channelInfo.isCategory) {
-                                    val categoryImpl = KookChannelCategoryImpl(this@KookBotImpl, channelInfo, guild.id)
+                                    val categoryImpl = KookChannelCategoryImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId), guild.id)
                                     internalCache.categories[channelInfo.id] = categoryImpl
                                     cac++
                                 } else {
-                                    val channelImpl = KookChannelImpl(this@KookBotImpl, channelInfo, guild.id)
+                                    val channelImpl = KookChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId), guild.id)
                                     internalCache.channels[channelInfo.id] = channelImpl
                                     chc++
                                 }
@@ -315,6 +317,10 @@ internal class InternalCache {
     val members = ConcurrentHashMap<String, KookMemberImpl>()
 
     fun memberCacheId(guildId: String, userId: String): String = "$guildId$GUILD_MEMBER_INFIX$userId"
+
+    fun memberCacheIdGuildPrefix(guildId: String): String = "$guildId$GUILD_MEMBER_INFIX"
+
+    fun memberCacheIdUserSuffix(userId: String): String = "$GUILD_MEMBER_INFIX$userId"
 
     companion object {
         const val GUILD_MEMBER_INFIX = "$"

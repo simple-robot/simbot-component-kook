@@ -18,6 +18,8 @@
 package love.forte.simbot.kook.api.member
 
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -377,3 +379,36 @@ public data class GuildMemberList @ApiResultType constructor(
      */
     @SerialName("offline_count") val offlineCount: Int,
 ) : ListDataResponse<SimpleUser, Map<String, Int>>()
+
+
+/**
+ * 批次量的通过 [GetGuildMemberListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetGuildMemberListApi] 发起一次请求
+ */
+public suspend inline fun GetGuildMemberListApi.Factory.asFlow(
+    crossinline block: suspend GetGuildMemberListApi.Factory.(page: Int) -> GuildMemberList
+): Flow<GuildMemberList> = flow {
+    var page = 1
+    do {
+        val userList = block(page)
+        emit(userList)
+        page = userList.meta.page + 1
+    } while (userList.items.isNotEmpty() && userList.meta.page < userList.meta.pageTotal)
+}
+
+/**
+ * 批次量的通过 [GetGuildMemberListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetGuildMemberListApi] 发起一次请求
+ */
+public suspend inline fun GetGuildMemberListApi.Factory.asItemFlow(
+    crossinline block: suspend GetGuildMemberListApi.Factory.(page: Int) -> GuildMemberList
+): Flow<SimpleUser> = flow {
+    var page = 1
+    do {
+        val userList = block(page)
+        userList.items.forEach { emit(it) }
+        page = userList.meta.page + 1
+    } while (userList.items.isNotEmpty() && userList.meta.page < userList.meta.pageTotal)
+}

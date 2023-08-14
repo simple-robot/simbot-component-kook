@@ -17,7 +17,6 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.objects.Channel as KChannel
 
 
@@ -38,5 +37,5 @@ public interface KookChannelBased {
      *
      * @see KChannel
      */
-    public val source: ChannelInfo
+    public val source: KChannel
 }

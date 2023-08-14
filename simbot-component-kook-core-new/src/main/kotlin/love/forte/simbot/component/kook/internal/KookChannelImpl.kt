@@ -36,9 +36,9 @@ import love.forte.simbot.definition.Organization
 import love.forte.simbot.definition.Role
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
-import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
 import love.forte.simbot.kook.messages.MessageType
+import love.forte.simbot.kook.objects.Channel
 import love.forte.simbot.literal
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
@@ -52,7 +52,7 @@ import kotlin.time.Duration
  */
 internal class KookChannelImpl(
     private val baseBot: KookBotImpl,
-    override val source: ChannelInfo,
+    override val source: Channel,
     internal val _guildId: String
 ) : KookChannel {
     override val bot: KookGuildBot

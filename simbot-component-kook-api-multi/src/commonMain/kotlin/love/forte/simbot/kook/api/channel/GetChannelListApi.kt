@@ -24,6 +24,9 @@ import kotlinx.serialization.Serializable
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookGetApi
 import love.forte.simbot.kook.api.ListData
+import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.kook.objects.PermissionOverwrite
+import love.forte.simbot.kook.objects.PermissionUser
 import love.forte.simbot.kook.util.parameters
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
@@ -119,6 +122,88 @@ public data class ChannelInfo @ApiResultType constructor(
     public val limitAmount: Int,
 )
 
+/**
+ * 将 [ChannelInfo] 转化为 [Channel] 类型，
+ * 并可选的提供一些缺失字段的默认值。
+ */
+public fun ChannelInfo.toChannel(
+    guildId: String,
+    topic: String = "",
+    slowMode: Int = 0,
+    permissionOverwrites: List<PermissionOverwrite> = emptyList(),
+    permissionUsers: List<PermissionUser> = emptyList(),
+    permissionSync: Int = 0,
+    hasPassword: Boolean = false,
+): Channel = ChannelInfoChannel(
+    this,
+    guildId = guildId,
+    topic = topic,
+    slowMode = slowMode,
+    permissionOverwrites = permissionOverwrites,
+    permissionUsers = permissionUsers,
+    permissionSync = permissionSync,
+    hasPassword = hasPassword
+)
 
+
+private class ChannelInfoChannel(
+    private val channelInfo: ChannelInfo,
+    override val guildId: String,
+    override val topic: String,
+    override val slowMode: Int,
+    override val permissionOverwrites: List<PermissionOverwrite>,
+    override val permissionUsers: List<PermissionUser>,
+    override val permissionSync: Int,
+    override val hasPassword: Boolean,
+) : Channel {
+    override val id: String
+        get() = channelInfo.id
+    override val name: String
+        get() = channelInfo.name
+    override val userId: String
+        get() = channelInfo.userId
+    override val isCategory: Boolean
+        get() = channelInfo.isCategory
+    override val parentId: String
+        get() = channelInfo.parentId
+    override val level: Int
+        get() = channelInfo.level
+    override val type: Int
+        get() = channelInfo.type
+
+    override fun toString(): String {
+        return "ChannelInfoChannel(channelInfo=$channelInfo, guildId='$guildId', topic='$topic', slowMode=$slowMode, permissionOverwrites=$permissionOverwrites, permissionUsers=$permissionUsers, permissionSync=$permissionSync, hasPassword=$hasPassword)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ChannelInfoChannel) return false
+
+        if (channelInfo != other.channelInfo) return false
+        if (guildId != other.guildId) return false
+        if (topic != other.topic) return false
+        if (slowMode != other.slowMode) return false
+        if (permissionOverwrites != other.permissionOverwrites) return false
+        if (permissionUsers != other.permissionUsers) return false
+        if (permissionSync != other.permissionSync) return false
+        if (hasPassword != other.hasPassword) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = channelInfo.hashCode()
+        result = 31 * result + guildId.hashCode()
+        result = 31 * result + topic.hashCode()
+        result = 31 * result + slowMode
+        result = 31 * result + permissionOverwrites.hashCode()
+        result = 31 * result + permissionUsers.hashCode()
+        result = 31 * result + permissionSync
+        result = 31 * result + hasPassword.hashCode()
+        return result
+    }
+
+
+}
 
 

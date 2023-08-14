@@ -17,6 +17,7 @@
 
 package love.forte.simbot.component.kook.bot.internal
 
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.event.internal.KookBotSelfJoinedGuildEventImpl
@@ -31,6 +32,8 @@ import love.forte.simbot.event.Event
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.guild.GetGuildViewApi
+import love.forte.simbot.kook.api.member.GetGuildMemberListApi
+import love.forte.simbot.kook.api.member.asItemFlow
 import love.forte.simbot.kook.api.user.GetUserViewApi
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.objects.Channel
@@ -168,7 +171,14 @@ internal fun KookBotImpl.registerEvent() {
                     //
                     is SelfJoinedGuildEventExtra -> {
                         val guildId = ex.body.guildId
+
                         val guildInfo = GetGuildViewApi.create(guildId).requestDataBy(thisBot)
+
+                        // guild members sync
+                        val members = GetGuildMemberListApi.asItemFlow { page ->
+                            create(guildId = guildId, page = page)
+                                .requestDataBy(thisBot)
+                        }.buffer(200)
 
                         lateinit var botAsMember: KookMemberImpl
 
@@ -176,10 +186,17 @@ internal fun KookBotImpl.registerEvent() {
                             val guild = KookGuildImpl(thisBot, guildInfo)
                             guilds[guildId] = guild
                             guildInfo.channels.forEach {
-                                channels[it.id] = KookChannelImpl(thisBot, it.toChannelInfo(), guildId)
+                                channels[it.id] = KookChannelImpl(thisBot, it, guildId)
                             }
-                            // TODO guild members sync
-                            //  set botAsMember
+
+                            members.collect {
+                                val member = KookMemberImpl(thisBot, it, guildId)
+                                if (it.id == thisBot.sourceBot.botUserInfo.id) {
+                                    botAsMember = member
+                                }
+
+                                this.members[memberCacheId(guildId, it.id)] = member
+                            }
 
                             guild
                         }
@@ -192,14 +209,51 @@ internal fun KookBotImpl.registerEvent() {
                                 botAsMember
                             )
                         }
-
-                        TODO("bot加入服务器")
                     }
 
                     //
                     is SelfExitedGuildEventExtra -> {
-                        TODO("bot离开服务器")
+
+                        lateinit var botMember: KookMemberImpl
+
+                        val guild = inCacheModify {
+                            // remove guilds
+                            val guildId = ex.body.guildId
+                            val removedGuild = guilds.remove(guildId)
+                                ?: run {
+                                    logger.warn("Unknown guild {} in event {}", guildId, event)
+                                    return@inCacheModify null
+                                }
+                            // remove channels
+                            channels.entries.removeIf { (_, v) -> v._guildId == guildId }
+                            // remove members
+                            val memberCacheIdPrefix = memberCacheIdGuildPrefix(guildId)
+                            members.entries.removeIf { (k, v) ->
+                                if (k.startsWith(memberCacheIdPrefix)) {
+                                    // check botMember
+                                    if (v.source.id == thisBot.sourceBot.botUserInfo.id) {
+                                        botMember = v
+                                    }
+                                    return@removeIf true
+                                }
+
+                                false
+                            }
+
+                            removedGuild
+                        } ?: return@processor
+
+                        pushIfProcessable(KookBotSelfExitedGuildEvent) {
+                            KookBotSelfJoinedGuildEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                botMember
+                            )
+                        }
                     }
+
+                    // TODO
 
                     else -> TODO()
                 }
