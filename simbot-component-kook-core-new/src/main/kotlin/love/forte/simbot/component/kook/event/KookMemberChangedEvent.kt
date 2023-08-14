@@ -599,13 +599,13 @@ public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent(),
  * 当 [after] == `true` 时，代表此人由离线状态变为在线状态，反之同理。
  *
  * ## 变化主体
- * 因为用户在线/离线事件所提供的用户并未一个具体的频道用户，因此事件主体是一个基础的 [用户信息][UserInfo]
+ * 此事件主体是事件中的 [用户ID][GuildMemberOnlineStatusChangedEventBody.userId]
  *
  * ## 子类型
  * 此事件是密封的，如果你只想监听某人的上线或下线中的其中一种事件，则考虑监听此事件类的具体子类型。
  *
- * @see KookUserOnlineEvent
- * @see KookUserOfflineEvent
+ * @see KookMemberOnlineEvent
+ * @see KookMemberOfflineEvent
  *
  * @author forte
  */
@@ -613,10 +613,12 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
     abstract override val sourceBody: GuildMemberOnlineStatusChangedEventBody
 
     /**
-     * 发生变化的用户信息。
+     * 用户ID。
+     *
+     * @see GuildMemberOnlineStatusChangedEventBody.userId
      */
     @JSTP
-    abstract override suspend fun source(): UserInfo
+    override suspend fun source(): String = sourceBody.userId
 
 
     /**
@@ -677,7 +679,7 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
  * [KookUserOnlineStatusChangedEvent] 对于用户上线的事件子类型。
  *
  */
-public abstract class KookUserOnlineEvent : KookUserOnlineStatusChangedEvent() {
+public abstract class KookMemberOnlineEvent : KookUserOnlineStatusChangedEvent() {
     abstract override val sourceEvent: KkEvent<GuildMemberOnlineEventExtra>
 
     /**
@@ -695,8 +697,8 @@ public abstract class KookUserOnlineEvent : KookUserOnlineStatusChangedEvent() {
 
 
     public companion object Key :
-        BaseEventKey<KookUserOnlineEvent>("kook.member_online", KookUserOnlineStatusChangedEvent) {
-        override fun safeCast(value: Any): KookUserOnlineEvent? = doSafeCast(value)
+        BaseEventKey<KookMemberOnlineEvent>("kook.member_online", KookUserOnlineStatusChangedEvent) {
+        override fun safeCast(value: Any): KookMemberOnlineEvent? = doSafeCast(value)
     }
 }
 
@@ -704,7 +706,7 @@ public abstract class KookUserOnlineEvent : KookUserOnlineStatusChangedEvent() {
  * [KookUserOnlineStatusChangedEvent] 对于用户离线的事件子类型。
  *
  */
-public abstract class KookUserOfflineEvent : KookUserOnlineStatusChangedEvent() {
+public abstract class KookMemberOfflineEvent : KookUserOnlineStatusChangedEvent() {
     abstract override val sourceEvent: KkEvent<GuildMemberOfflineEventExtra>
 
     /**
@@ -721,7 +723,7 @@ public abstract class KookUserOfflineEvent : KookUserOnlineStatusChangedEvent() 
     override val guildIds: List<ID> get() = sourceBody.guilds.map { it.ID }
 
     public companion object Key :
-        BaseEventKey<KookUserOfflineEvent>("kook.member_offline", KookUserOnlineStatusChangedEvent) {
-        override fun safeCast(value: Any): KookUserOfflineEvent? = doSafeCast(value)
+        BaseEventKey<KookMemberOfflineEvent>("kook.member_offline", KookUserOnlineStatusChangedEvent) {
+        override fun safeCast(value: Any): KookMemberOfflineEvent? = doSafeCast(value)
     }
 }

@@ -52,32 +52,34 @@ public data class UpdatedChannelEventExtra(override val body: SimpleChannel) : S
 
 
 /**
+ * [DeletedChannelEventExtra] 事件体，被删除的子频道信息。
+ *
+ * @see DeletedChannelEventExtra
+ */
+@Serializable
+public data class DeletedChannelEventBody(
+    /**
+     * 被删掉的频道 id
+     */
+    val id: String,
+
+    /**
+     * 删除时间(毫秒)
+     */
+    val deletedAt: Long
+)
+
+/**
  * [删除频道](https://developer.kookapp.cn/doc/event/channel#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93)
  *
  * @author ForteScarlet
  */
 @Serializable
 @SerialName(DeletedChannelEventExtra.TYPE)
-public data class DeletedChannelEventExtra(override val body: Body) : SystemExtra() {
+public data class DeletedChannelEventExtra(override val body: DeletedChannelEventBody) : SystemExtra() {
     public companion object {
         public const val TYPE: String = "deleted_channel"
     }
-
-    /**
-     * 被删除的子频道信息
-     */
-    @Serializable
-    public data class Body(
-        /**
-         * 被删掉的频道 id
-         */
-        val id: String,
-
-        /**
-         * 删除时间(毫秒)
-         */
-        val deletedAt: Long
-    )
 }
 
 

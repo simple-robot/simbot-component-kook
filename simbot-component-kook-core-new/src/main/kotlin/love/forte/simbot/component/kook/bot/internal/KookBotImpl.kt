@@ -72,13 +72,15 @@ internal class KookBotImpl(
 
     internal val isNormalEventProcessAsync = sourceBot.configuration.isNormalEventProcessAsync
 
+    val botUserInfo get() = sourceBot.botUserInfo
+
     override fun isMe(id: ID): Boolean {
         if (id.literal == sourceBot.ticket.clientId) {
             return true
         }
 
         return try {
-            id.literal == sourceBot.botUserInfo.id
+            id.literal == botUserInfo.id
         } catch (e: IllegalStateException) {
             // ignore match and return true
             true
@@ -103,7 +105,7 @@ internal class KookBotImpl(
         internalCache.members[internalCache.memberCacheId(guildId, userId)]
 
     internal fun internalGuildChannelCount(guildId: String): Int =
-        internalCache.channels.values.count { it._guildId == guildId }
+        internalCache.channels.values.count { it.source.guildId == guildId }
 
 
     /**
@@ -187,7 +189,7 @@ internal class KookBotImpl(
                                     internalCache.categories[channelInfo.id] = categoryImpl
                                     cac++
                                 } else {
-                                    val channelImpl = KookChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId), guild.id)
+                                    val channelImpl = KookChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId))
                                     internalCache.channels[channelInfo.id] = channelImpl
                                     chc++
                                 }

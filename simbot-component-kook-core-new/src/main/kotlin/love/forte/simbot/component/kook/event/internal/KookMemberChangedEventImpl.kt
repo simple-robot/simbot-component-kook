@@ -22,7 +22,6 @@ import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.internal.KookChannelImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
-import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.effectedItemsBySequence
@@ -100,21 +99,15 @@ internal data class KookBotSelfJoinedGuildEventImpl(
 internal data class KookMemberOnlineEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<GuildMemberOnlineEventExtra>,
-    private val _source: UserInfo,
-) : KookUserOnlineEvent() {
+) : KookMemberOnlineEvent() {
     override val guilds: Items<KookGuildImpl>
         get() = effectedItemsBySequence { sourceBody.guilds.asSequence().map { bot.internalGuild(it) }.filterNotNull() }
-
-    override suspend fun source() = _source
 }
 
 internal data class KookMemberOfflineEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<GuildMemberOfflineEventExtra>,
-    private val _source: UserInfo,
-) : KookUserOfflineEvent() {
+) : KookMemberOfflineEvent() {
     override val guilds: Items<KookGuildImpl>
         get() = effectedItemsBySequence { sourceBody.guilds.asSequence().map { bot.internalGuild(it) }.filterNotNull() }
-
-    override suspend fun source() = _source
 }

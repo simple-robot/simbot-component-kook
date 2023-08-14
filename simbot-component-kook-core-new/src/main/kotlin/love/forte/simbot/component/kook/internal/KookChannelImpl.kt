@@ -53,13 +53,12 @@ import kotlin.time.Duration
 internal class KookChannelImpl(
     private val baseBot: KookBotImpl,
     override val source: Channel,
-    internal val _guildId: String
 ) : KookChannel {
     override val bot: KookGuildBot
-        get() = baseBot.internalGuild(_guildId)?.bot
-            ?: throw kookGuildNotExistsException(_guildId)
+        get() = baseBot.internalGuild(source.guildId)?.bot
+            ?: throw kookGuildNotExistsException(source.guildId)
 
-    override val guildId: ID by stringID { _guildId }
+    override val guildId: ID by stringID { source.guildId }
 
     override val currentMember: Int
         get() = TODO("Not yet implemented")
@@ -175,6 +174,6 @@ internal class KookChannelImpl(
         get() = TODO("Not yet implemented")
 
     override fun toString(): String {
-        return "KookChannel(id=${source.id}, name=${source.name}, guildId=${_guildId})"
+        return "KookChannel(id=${source.id}, name=${source.name}, guildId=${source.guildId})"
     }
 }

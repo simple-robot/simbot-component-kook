@@ -22,6 +22,7 @@ import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
+import love.forte.simbot.definition.Channel
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.*
@@ -155,6 +156,15 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), Chang
     @JSTP
     abstract override suspend fun channel(): KookChannel
 
+
+    /**
+     * 变更后的频道信息
+     *
+     * @see channel
+     */
+    @JSTP
+    override suspend fun organization(): Channel = channel()
+
     /**
      * 变更后的频道信息
      *
@@ -162,6 +172,12 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), Chang
      */
     @JSTP
     override suspend fun after(): KookChannel = channel()
+
+    /**
+     * 恒为null
+     */
+    @JSTP
+    override suspend fun before(): Any? = null
 
     override val key: Event.Key<out KookUpdatedChannelEvent>
         get() = Key
@@ -179,6 +195,11 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), Chang
  * @see DeletedChannelEventExtra
  */
 public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), DecreaseEvent {
+    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<DeletedChannelEventExtra>
+
+    override val sourceBody: DeletedChannelEventBody
+        get() = sourceEvent.extra.body
+
     /**
      * 已经被删除的频道。
      */
@@ -189,7 +210,7 @@ public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), Decre
      * 始终为 null
      */
     @JSTP
-    abstract override suspend fun after(): Any?
+    override suspend fun after(): Any? = null
 
     override val key: Event.Key<out KookDeletedChannelEvent>
         get() = Key

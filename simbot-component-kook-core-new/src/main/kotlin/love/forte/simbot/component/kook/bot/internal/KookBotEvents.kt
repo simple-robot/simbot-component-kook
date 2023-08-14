@@ -19,11 +19,9 @@ package love.forte.simbot.component.kook.bot.internal
 
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.component.kook.event.*
-import love.forte.simbot.component.kook.event.internal.KookBotSelfJoinedGuildEventImpl
-import love.forte.simbot.component.kook.event.internal.KookMemberExitedChannelEventImpl
-import love.forte.simbot.component.kook.event.internal.KookMemberJoinedChannelEventImpl
-import love.forte.simbot.component.kook.event.internal.KookMemberJoinedGuildEventImpl
+import love.forte.simbot.component.kook.event.internal.*
 import love.forte.simbot.component.kook.internal.KookChannelImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
@@ -44,17 +42,68 @@ internal fun KookBotImpl.registerEvent() {
     val thisBot = this
     sourceBot.processor {
         val event = this
-        // TODO 事件处理
 
         when (val ex = extra) {
             is TextExtra -> {
-                // TODO 消息事件
+                val isBotSelf = thisBot.botUserInfo.id == event.authorId
+                // 消息事件
+                when (channelType) {
+                    love.forte.simbot.kook.event.Event.ChannelType.PERSON -> {
+                        if (isBotSelf) {
+                            pushIfProcessable(KookBotSelfMessageEvent) {
+                                KookBotSelfMessageEventImpl(thisBot, this.doAs())
+                            }
+                        } else {
+                            pushIfProcessable(KookContactMessageEvent) {
+                                KookContactMessageEventImpl(thisBot, this.doAs())
+                            }
+                        }
+                    }
 
+                    love.forte.simbot.kook.event.Event.ChannelType.GROUP -> {
+                        val guildId = ex.guildId!!
+
+                        val channel = internalChannel(targetId)
+                            ?: run {
+                                logger.warn("Unknown channel {} in event {}", targetId, event)
+                                return@processor
+                            }
+
+                        val author = internalMember(guildId, authorId)
+                            ?: run {
+                                logger.warn("Unknown member {} in event {}", authorId, event)
+                                return@processor
+                            }
+
+                        if (isBotSelf) {
+                            pushIfProcessable(KookBotSelfChannelMessageEvent) {
+                                KookBotSelfChannelMessageEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    channel,
+                                    author
+                                )
+                            }
+                        } else {
+                            pushIfProcessable(KookChannelMessageEvent) {
+                                KookChannelMessageEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    author,
+                                    channel
+                                )
+                            }
+                        }
+
+                    }
+
+                    else -> {
+
+                    }
+                }
             }
 
             is SystemExtra -> {
-
-                // TODO 系统事件
                 when (ex) {
                     // 某人退出频道服务器
                     is ExitedGuildEventExtra -> {
@@ -168,7 +217,7 @@ internal fun KookBotImpl.registerEvent() {
                         }
                     }
 
-                    //
+                    // Bot 加入服务器
                     is SelfJoinedGuildEventExtra -> {
                         val guildId = ex.body.guildId
 
@@ -186,7 +235,7 @@ internal fun KookBotImpl.registerEvent() {
                             val guild = KookGuildImpl(thisBot, guildInfo)
                             guilds[guildId] = guild
                             guildInfo.channels.forEach {
-                                channels[it.id] = KookChannelImpl(thisBot, it, guildId)
+                                channels[it.id] = KookChannelImpl(thisBot, it)
                             }
 
                             members.collect {
@@ -211,34 +260,27 @@ internal fun KookBotImpl.registerEvent() {
                         }
                     }
 
-                    //
+                    // Bot 离开服务器
                     is SelfExitedGuildEventExtra -> {
-
-                        lateinit var botMember: KookMemberImpl
+                        val guildId = ex.body.guildId
+                        val botMember: KookMemberImpl = internalMember(ex.body.guildId, thisBot.botUserInfo.id)
+                            ?: run {
+                                logger.warn("unknown bot self {} as member in event {}", thisBot.botUserInfo.id, event)
+                                return@processor
+                            }
 
                         val guild = inCacheModify {
                             // remove guilds
-                            val guildId = ex.body.guildId
                             val removedGuild = guilds.remove(guildId)
                                 ?: run {
                                     logger.warn("Unknown guild {} in event {}", guildId, event)
                                     return@inCacheModify null
                                 }
                             // remove channels
-                            channels.entries.removeIf { (_, v) -> v._guildId == guildId }
+                            channels.entries.removeIf { (_, v) -> v.source.guildId == guildId }
                             // remove members
                             val memberCacheIdPrefix = memberCacheIdGuildPrefix(guildId)
-                            members.entries.removeIf { (k, v) ->
-                                if (k.startsWith(memberCacheIdPrefix)) {
-                                    // check botMember
-                                    if (v.source.id == thisBot.sourceBot.botUserInfo.id) {
-                                        botMember = v
-                                    }
-                                    return@removeIf true
-                                }
-
-                                false
-                            }
+                            members.entries.removeIf { (k, _) -> k.startsWith(memberCacheIdPrefix) }
 
                             removedGuild
                         } ?: return@processor
@@ -253,9 +295,156 @@ internal fun KookBotImpl.registerEvent() {
                         }
                     }
 
-                    // TODO
+                    // 成员上线
+                    is GuildMemberOnlineEventExtra -> {
+                        pushIfProcessable(KookMemberOnlineEvent) {
+                            KookMemberOnlineEventImpl(thisBot, event.doAs())
+                        }
+                    }
 
-                    else -> TODO()
+                    // 成员下线
+                    is GuildMemberOfflineEventExtra -> {
+                        pushIfProcessable(KookMemberOfflineEvent) {
+                            KookMemberOfflineEventImpl(thisBot, event.doAs())
+                        }
+                    }
+
+                    // 新增频道
+                    is AddedChannelEventExtra -> {
+                        val guild = internalGuild(ex.body.guildId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", ex.body.guildId, event)
+                                return@processor
+                            }
+
+                        val channel = inCacheModify {
+                            KookChannelImpl(thisBot, ex.body).also {
+                                channels[ex.body.id] = it
+                            }
+                        }
+
+                        pushIfProcessable(KookAddedChannelEvent) {
+                            KookAddedChannelEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                channel
+                            )
+                        }
+                    }
+
+                    // 更新频道
+                    is UpdatedChannelEventExtra -> {
+                        val guild = internalGuild(ex.body.guildId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", ex.body.guildId, event)
+                                return@processor
+                            }
+
+                        val channel = inCacheModify {
+                            KookChannelImpl(thisBot, ex.body).also {
+                                channels[ex.body.id] = it
+                            }
+                        }
+
+                        pushIfProcessable(KookUpdatedChannelEvent) {
+                            KookUpdatedChannelEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                channel
+                            )
+                        }
+                    }
+
+                    // 删除频道
+                    is DeletedChannelEventExtra -> {
+                        val guild = internalGuild(event.targetId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", event.targetId, event)
+                                return@processor
+                            }
+
+                        val removedChannel = inCacheModify {
+                            channels.remove(ex.body.id)
+                        } ?: run {
+                            logger.warn("No channel ({}) removed in event {}", ex.body.id, event)
+                            return@processor
+                        }
+
+                        pushIfProcessable(KookDeletedChannelEvent) {
+                            KookDeletedChannelEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                removedChannel
+                            )
+                        }
+                    }
+
+                    // 置顶消息
+                    is PinnedMessageEventExtra -> {
+                        val guild = internalGuild(event.targetId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", event.targetId, event)
+                                return@processor
+                            }
+
+                        val channelId = ex.body.channelId
+
+                        val channel = internalChannel(channelId)
+                            ?: run {
+                                logger.warn("Unknown channel {} in event {}", channelId, event)
+                                return@processor
+                            }
+
+                        pushIfProcessable(KookPinnedMessageEvent) {
+                            KookPinnedMessageEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                channel
+                            )
+                        }
+                    }
+
+                    // 取消置顶消息
+                    is UnpinnedMessageEventExtra -> {
+                        val guild = internalGuild(event.targetId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", event.targetId, event)
+                                return@processor
+                            }
+
+                        val channelId = ex.body.channelId
+
+                        val channel = internalChannel(channelId)
+                            ?: run {
+                                logger.warn("Unknown channel {} in event {}", channelId, event)
+                                return@processor
+                            }
+
+                        pushIfProcessable(KookUnpinnedMessageEvent) {
+                            KookUnpinnedMessageEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                channel
+                            )
+                        }
+                    }
+
+                    // 按钮点击
+                    is MessageBtnClickEventExtra -> {
+                        pushIfProcessable(KookMessageBtnClickEvent) {
+                            KookMessageBtnClickEventImpl(
+                                thisBot,
+                                event.doAs()
+                            )
+                        }
+                    }
+
+                    else -> pushUnsupported(event)
                 }
 
 
@@ -263,6 +452,16 @@ internal fun KookBotImpl.registerEvent() {
         }
 
 
+    }
+}
+
+@OptIn(DiscreetSimbotApi::class)
+private suspend fun KookBotImpl.pushUnsupported(event: KEvent<EventExtra>) {
+    pushIfProcessable(UnsupportedKookEvent) {
+        UnsupportedKookEvent(
+            this,
+            event
+        )
     }
 }
 
