@@ -198,7 +198,6 @@ public data class Event<out E : EventExtra>(
  * @see Event.extra
  * @see TextExtra
  * @see SystemExtra
- * @see UnknownExtra
  *
  */
 @Serializable
@@ -251,7 +250,7 @@ public sealed class EventExtra {
          *
          */
         @JvmStatic
-        public fun eventSerializerOrNull(json: JsonElement): KSerializer<out Signal.Event<out EventExtra>>? {
+        public fun eventSerializerOrNull(json: JsonElement): KSerializer<out Signal.Event<EventExtra>>? {
             val type = json.jsonObject["type"]?.jsonPrimitive?.intOrNull ?: return null
             return eventSerializerOrNull(type)
         }
@@ -261,7 +260,7 @@ public sealed class EventExtra {
          * 当无法获取时得到 `null`。
          */
         @JvmStatic
-        public fun eventSerializerOrNull(type: Int): KSerializer<out Signal.Event<out EventExtra>>? {
+        public fun eventSerializerOrNull(type: Int): KSerializer<out Signal.Event<EventExtra>>? {
             return when (type) {
                 Event.Type.TEXT.value -> TEXT_EVENT_SERIALIZER
                 Event.Type.IMAGE.value -> IMAGE_EVENT_SERIALIZER

@@ -69,6 +69,8 @@ internal class KookBotImpl(
     override val logger: Logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
 
+    internal val isNormalEventProcessAsync = sourceBot.configuration.isNormalEventProcessAsync
+
     override fun isMe(id: ID): Boolean {
         if (id.literal == sourceBot.ticket.clientId) {
             return true
@@ -109,12 +111,12 @@ internal class KookBotImpl(
      * 所有针对缓存的多步修改操作都应该在此处完成。
      */
     @OptIn(ExperimentalContracts::class)
-    internal suspend inline fun inCacheModify(crossinline block: suspend InternalCache.() -> Unit) {
+    internal suspend inline fun <reified T> inCacheModify(crossinline block: suspend InternalCache.() -> T): T {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
 
-        withContext(cacheModifyContext) {
+        return withContext(cacheModifyContext) {
             internalCache.block()
         }
     }
