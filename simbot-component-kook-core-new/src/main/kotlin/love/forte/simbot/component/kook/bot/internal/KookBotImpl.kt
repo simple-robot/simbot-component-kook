@@ -52,6 +52,7 @@ import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
 import org.slf4j.Logger
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -100,12 +101,28 @@ internal class KookBotImpl(
     internal fun internalChannel(channelId: String) = internalCache.channels[channelId]
     internal fun internalCategory(categoryId: String) = internalCache.categories[categoryId]
     internal fun internalChannels(): Collection<KookChannelImpl> = internalCache.channels.values
+    internal fun internalChannels(guildId: String): Sequence<KookChannelImpl> =
+        internalCache.channels.values.asSequence().filter { it.source.guildId == guildId }
+
+    internal fun internalMembers(guildId: String): Sequence<KookMemberImpl> {
+        val prefix = internalCache.memberCacheIdGuildPrefix(guildId)
+        return internalCache.members.entries.asSequence().filter { it.key.startsWith(prefix) }.map { it.value }
+    }
+
     internal fun internalCategories(): Collection<KookChannelCategoryImpl> = internalCache.categories.values
+    internal fun internalCategories(guildId: String): Sequence<KookChannelCategoryImpl> =
+        internalCache.categories.values.asSequence().filter { it.source.guildId == guildId }
+
     internal fun internalMember(guildId: String, userId: String) =
         internalCache.members[internalCache.memberCacheId(guildId, userId)]
 
     internal fun internalGuildChannelCount(guildId: String): Int =
         internalCache.channels.values.count { it.source.guildId == guildId }
+
+    internal fun internalGuildMemberCount(guildId: String): Int {
+        val prefix = internalCache.memberCacheIdGuildPrefix(guildId)
+        return internalCache.members.keys.count { it.startsWith(prefix) }
+    }
 
 
     /**
@@ -124,15 +141,20 @@ internal class KookBotImpl(
         }
     }
 
+    private val started = AtomicBoolean(false)
     private val startLock = Mutex()
     private var syncJob: Job? = null
 
     override suspend fun start(): Boolean = startLock.withLock {
         val (guildSyncPeriod, batchDelay) = configuration.syncPeriods.guild
+        val first = started.compareAndSet(false, true)
 
         inCacheModify {
             // TODO init event processor
             // 从 inCacheModify 中注册事件，防止一开始的事件对缓存有操作
+            if (first) {
+                registerEvent()
+            }
 
             sourceBot.start()
 
@@ -185,11 +207,15 @@ internal class KookBotImpl(
                             .buffer(500)
                             .collect { channelInfo ->
                                 if (channelInfo.isCategory) {
-                                    val categoryImpl = KookChannelCategoryImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId), guild.id)
+                                    val categoryImpl = KookChannelCategoryImpl(
+                                        this@KookBotImpl,
+                                        channelInfo.toChannel(guildId = guildId),
+                                    )
                                     internalCache.categories[channelInfo.id] = categoryImpl
                                     cac++
                                 } else {
-                                    val channelImpl = KookChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId))
+                                    val channelImpl =
+                                        KookChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId))
                                     internalCache.channels[channelInfo.id] = channelImpl
                                     chc++
                                 }

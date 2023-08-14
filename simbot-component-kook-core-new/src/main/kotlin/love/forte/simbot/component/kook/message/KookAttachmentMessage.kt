@@ -19,18 +19,20 @@ package love.forte.simbot.component.kook.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.JSTP
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMessage
 import love.forte.simbot.definition.ResourceContainer
 import love.forte.simbot.kook.objects.Attachments
 import love.forte.simbot.message.Image
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
+import love.forte.simbot.resources.Resource
 import love.forte.simbot.resources.Resource.Companion.toResource
 import love.forte.simbot.resources.URLResource
 import java.net.URL
+import java.util.concurrent.CompletableFuture
 
 
 /**
@@ -69,8 +71,16 @@ public sealed class KookAttachmentMessage<M : KookAttachmentMessage<M>> :
      *
      * @see urlResource
      */
-    @JSTP
+    @JvmSynthetic
     override suspend fun resource(): URLResource = urlResource
+
+    @Api4J
+    override val resourceAsync: CompletableFuture<out Resource>
+        get() = CompletableFuture.completedFuture(urlResource)
+
+    @Api4J
+    override val resource: Resource
+        get() = urlResource
 
     public companion object Key : Message.Key<KookAttachmentMessage<*>> {
         override fun safeCast(value: Any): KookAttachmentMessage<*>? = doSafeCast(value)

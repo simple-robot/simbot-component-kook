@@ -26,9 +26,6 @@ import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.message.KookReceiveMessageContent
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.TextExtra
 import love.forte.simbot.message.Message
@@ -61,9 +58,9 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
     override val key: Event.Key<out KookMessageEvent>
         get() = Key
 
-    override val id: ID by stringID { sourceEvent.msgId }
+    override val id: ID get() = sourceEvent.msgId.ID
 
-    override val timestamp: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
     /**
      * 接收到的消息体。
@@ -160,7 +157,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
     }
 
     public companion object Key : BaseEventKey<KookMessageEvent>(
-        "kook.message", MessageEvent
+        "kook.message", KookEvent, MessageEvent
     ) {
         override fun safeCast(value: Any): KookMessageEvent? = doSafeCast(value)
     }

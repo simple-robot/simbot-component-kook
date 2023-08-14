@@ -26,11 +26,14 @@ import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Compan
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.definition.Channel
+import love.forte.simbot.definition.GuildMember
+import love.forte.simbot.definition.Role
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.literal
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
+import love.forte.simbot.utils.item.Items
 import kotlin.coroutines.CoroutineContext
 
 
@@ -80,6 +83,12 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
         get() = ""
 
     /**
+     * 最大成员上限。始终得到 `-1`
+     */
+    override val maximumMember: Int
+        get() = -1
+
+    /**
      * 所属频道ID
      */
     override val guildId: ID
@@ -105,11 +114,31 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     )
     override val createTime: Timestamp get() = Timestamp.notSupport()
 
+    /**
+     * 此频道所属服务器
+     */
+    override suspend fun guild(): KookGuild
 
-    // TODO guild
+
+    /**
+     * 此频道所属服务器
+     */
+    override suspend fun previous(): KookGuild = guild()
+
     // TODO members
-    // TODO roles
-    // TODO send
+
+    /**
+     * 等同于 [KookGuild.member]
+     */
+    override suspend fun member(id: ID): GuildMember?
+
+    /**
+     * 等同于 [KookGuild.members]
+     */
+    override val members: Items<GuildMember>
+
+    override val roles: Items<Role>
+        get() = Items.emptyItems() // TODO channel roles
 
     // region send api
     /**
@@ -200,7 +229,7 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     // endregion
 
 
-    // TODO mute
+    // TODO mute API
 
 
 }

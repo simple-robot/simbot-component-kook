@@ -18,7 +18,6 @@
 package love.forte.simbot.component.kook.internal
 
 import love.forte.simbot.ID
-import love.forte.simbot.component.kook.KookGuildNotExistsException
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.kookGuildNotExistsException
@@ -43,6 +42,9 @@ internal class KookMemberImpl(
 ) : KookMember {
     override val guildId: ID by stringID { _guildId }
 
+    private val guildValue
+        get() = bot.internalGuild(_guildId) ?: throw kookGuildNotExistsException(_guildId)
+
     override suspend fun unmute(): Boolean {
         TODO("Not yet implemented")
     }
@@ -51,11 +53,10 @@ internal class KookMemberImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun guild(): KookGuildImpl =
-        bot.internalGuild(_guildId) ?: throw kookGuildNotExistsException(_guildId)
+    override suspend fun guild(): KookGuildImpl = guildValue
 
     override val roles: Items<Role>
-        get() = TODO("Not yet implemented")
+        get() = Items.emptyItems() // TODO roles
 
     override suspend fun mute(duration: Duration): Boolean {
         TODO("Not yet implemented")

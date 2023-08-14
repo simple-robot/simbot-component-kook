@@ -29,6 +29,7 @@ import love.forte.simbot.kook.objects.Guild
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.emptyItems
+import love.forte.simbot.utils.item.effectedItemsBySequence
 
 
 /**
@@ -51,16 +52,19 @@ internal class KookGuildImpl(
         }
 
     override val currentMember: Int
-        get() = TODO("Not yet implemented")
+        get() = baseBot.internalGuildMemberCount(source.id)
 
-    override val description: String
-        get() = TODO("Not yet implemented")
+    override val channels: Items<KookChannel>
+        get() = effectedItemsBySequence { baseBot.internalChannels(source.id) }
 
-    override val icon: String
-        get() = TODO("Not yet implemented")
+    override suspend fun channel(id: ID): KookChannel? =
+        baseBot.internalChannel(id.literal)
+
+    override val currentChannel: Int
+        get() = baseBot.internalGuildChannelCount(source.id)
 
     override val members: Items<KookMember>
-        get() = TODO("Not yet implemented")
+        get() = effectedItemsBySequence { baseBot.internalMembers(source.id) }
 
     override suspend fun owner(): KookMember {
         return baseBot.internalMember(source.id, id.literal)
@@ -72,18 +76,13 @@ internal class KookGuildImpl(
     override suspend fun member(id: ID): KookMember? =
         baseBot.internalMember(source.id, id.literal)
 
-    override val currentChannel: Int
-        get() = baseBot.internalGuildChannelCount(source.id)
-
     override val roles: Items<Role>
         get() = emptyItems() // TODO("Not yet implemented")
 
-    override suspend fun channel(id: ID): KookChannel? =
-        baseBot.internalChannel(id.literal)
 
     @ExperimentalSimbotApi
-    override val categories: List<KookChannelCategory>
-        get() = baseBot.internalCategories().filter { it._guildId == source.id }
+    override val categories: Items<KookChannelCategory>
+        get() = effectedItemsBySequence { baseBot.internalCategories(source.id) }
 
     @ExperimentalSimbotApi
     override fun getCategory(id: ID): KookChannelCategory? =

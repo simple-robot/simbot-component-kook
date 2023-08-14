@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook.event
 import love.forte.simbot.JSTP
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookChannel
+import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.definition.Channel
@@ -38,8 +39,6 @@ import love.forte.simbot.kook.event.Event as KEvent
  * - [AddedChannelEventExtra]
  * - [UpdatedChannelEventExtra]
  * - [DeletedChannelEventExtra]
- * - [PinnedMessageEventExtra]
- * - [UnpinnedMessageEventExtra]
  *
  * @author ForteScarlet
  *
@@ -226,6 +225,177 @@ public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), Decre
 // TODO KookDeletedCategoryEvent
 
 
+/**
+ * KOOK 系统事件中与 _频道分组变更_ 相关的事件的simbot事件基准类。
+ *
+ * 涉及的 KOOK 原始事件 (的 [SystemExtra] 子类型) 有：
+ * - [AddedChannelEventExtra]
+ * - [UpdatedChannelEventExtra]
+ * - [DeletedChannelEventExtra]
+ *
+ * @author ForteScarlet
+ *
+ * @see KookSystemEvent
+ * @see ChangedEvent
+ */
+public abstract class KookCategoryChangedEvent : KookSystemEvent(), ChangedEvent {
+    /**
+     * 事件涉及子频道所属的频道服务器。
+     */
+    @JSTP
+    abstract override suspend fun source(): KookGuild
+
+    /**
+     * @see KEvent.msgTimestamp
+     */
+    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+
+    abstract override val key: Event.Key<out KookCategoryChangedEvent>
+
+    public companion object Key : BaseEventKey<KookCategoryChangedEvent>(
+        "kook.category_changed", KookSystemEvent, ChangedEvent
+    ) {
+        override fun safeCast(value: Any): KookCategoryChangedEvent? = doSafeCast(value)
+    }
+}
+
+/**
+ * 某频道服务器中新增了一个频道分组后的事件。
+ *
+ * @see IncreaseEvent
+ * @see AddedChannelEventExtra
+ */
+public abstract class KookAddedCategoryEvent : KookCategoryChangedEvent(), IncreaseEvent {
+    /**
+     * 原事件对象
+     *
+     * @see AddedChannelEventExtra
+     */
+    abstract override val sourceEvent: KEvent<AddedChannelEventExtra>
+
+    /**
+     * @see AddedChannelEventExtra.body
+     */
+    override val sourceBody: SimpleChannel
+        get() = sourceEvent.extra.body
+
+    /**
+     * 操作者，即此频道的创建者。
+     *
+     * 创建者获取自 [sourceBody.userId][SimpleChannel.userId],
+     * 如果在此事件实例化的过程中此人离开频道服务器导致内置缓存被清理，则可能得到null。
+     *
+     */
+    public abstract val operator: KookMember?
+
+    /**
+     * 增加的频道分组。
+     */
+    @JSTP
+    public abstract suspend fun category(): KookChannelCategory
+
+    /**
+     * 增加的频道分组。
+     *
+     * @see channel
+     */
+    @JSTP
+    override suspend fun after(): KookChannelCategory = category()
+
+
+    override val key: Event.Key<out KookAddedCategoryEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KookAddedCategoryEvent>(
+        "kook.added_category", KookCategoryChangedEvent, IncreaseEvent
+    ) {
+        override fun safeCast(value: Any): KookAddedCategoryEvent? = doSafeCast(value)
+    }
+}
+
+/**
+ * 某频道分组发生了信息变更。
+ *
+ * _Note: 无法获取变更前的信息，[before] 恒为null_
+ *
+ * @see UpdatedChannelEventExtra
+ */
+public abstract class KookUpdatedCategoryEvent : KookCategoryChangedEvent(), ChangedEvent {
+
+    /**
+     * @see UpdatedChannelEventExtra.body
+     */
+    override val sourceBody: SimpleChannel
+        get() = sourceEvent.extra.body
+
+    /**
+     * @see UpdatedChannelEventExtra
+     */
+    abstract override val sourceEvent: KEvent<UpdatedChannelEventExtra>
+
+    /**
+     * 变更后的频道分组信息
+     */
+    @JSTP
+    public abstract suspend fun category(): KookChannelCategory
+
+    /**
+     * 变更后的频道分组信息
+     *
+     * @see channel
+     */
+    @JSTP
+    override suspend fun after(): KookChannelCategory = category()
+
+    /**
+     * 恒为null
+     */
+    @JSTP
+    override suspend fun before(): Any? = null
+
+    override val key: Event.Key<out KookUpdatedCategoryEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KookUpdatedCategoryEvent>(
+        "kook.updated_category", KookCategoryChangedEvent, ChangedEvent
+    ) {
+        override fun safeCast(value: Any): KookUpdatedCategoryEvent? = doSafeCast(value)
+    }
+}
+
+/**
+ * 某频道分组被删除的事件。
+ *
+ * @see DeletedChannelEventExtra
+ */
+public abstract class KookDeletedCategoryEvent : KookCategoryChangedEvent(), DecreaseEvent {
+    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<DeletedChannelEventExtra>
+
+    override val sourceBody: DeletedChannelEventBody
+        get() = sourceEvent.extra.body
+
+    /**
+     * 已经被删除的频道分组。
+     */
+    @JSTP
+    abstract override suspend fun before(): KookChannelCategory
+
+    /**
+     * 始终为 null
+     */
+    @JSTP
+    override suspend fun after(): Any? = null
+
+    override val key: Event.Key<out KookDeletedCategoryEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KookDeletedCategoryEvent>(
+        "kook.deleted_category", KookCategoryChangedEvent, DecreaseEvent
+    ) {
+
+        override fun safeCast(value: Any): KookDeletedCategoryEvent? = doSafeCast(value)
+    }
+}
 
 
 

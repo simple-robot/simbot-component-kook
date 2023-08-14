@@ -226,7 +226,7 @@ internal fun Collection<String>.toMentionCount(): MutableMap<String, MentionCoun
     return map
 }
 
-internal fun Collection<Int>.toMentionCount(): MutableMap<Int, RoleMentionCount> {
+internal fun Collection<Int>.toMentionRoleCount(): MutableMap<Int, RoleMentionCount> {
     val map = mutableMapOf<Int, RoleMentionCount>()
     this.forEach { id ->
         map.compute(id) { _, current ->
@@ -279,7 +279,7 @@ internal fun toMessagesByKMarkdown(
     var metAll = isMentionAll
     var metHere = isMentionHere
     val metMap = mention.toMentionCount()
-    val metRoleMap = mentionRoles.toMentionCount()
+    val metRoleMap = mentionRoles.toMentionRoleCount()
 
     val zeroMark: Byte = 0
     var status: Byte = 0

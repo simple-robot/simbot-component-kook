@@ -27,7 +27,6 @@ import love.forte.simbot.kook.objects.Channel
 internal class KookChannelCategoryImpl(
     val bot: KookBotImpl,
     override val source: Channel,
-    val _guildId: String,
 ) : KookChannelCategory {
     override val id: ID by stringID { source.id }
 

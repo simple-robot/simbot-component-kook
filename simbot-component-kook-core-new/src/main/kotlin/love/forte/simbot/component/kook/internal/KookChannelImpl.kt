@@ -19,21 +19,16 @@ package love.forte.simbot.component.kook.internal
 
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
-import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookChannelCategory
+import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
-import love.forte.simbot.component.kook.kookGuildNotExistsException
 import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.message.KookReceiveMessageContent
 import love.forte.simbot.component.kook.message.sendToChannel
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.definition.Guild
 import love.forte.simbot.definition.GuildMember
-import love.forte.simbot.definition.Organization
-import love.forte.simbot.definition.Role
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
@@ -54,6 +49,10 @@ internal class KookChannelImpl(
     private val baseBot: KookBotImpl,
     override val source: Channel,
 ) : KookChannel {
+    private val guildValue: KookGuild
+        get() = baseBot.internalGuild(source.guildId)
+            ?: throw kookGuildNotExistsException(source.guildId)
+
     override val bot: KookGuildBot
         get() = baseBot.internalGuild(source.guildId)?.bot
             ?: throw kookGuildNotExistsException(source.guildId)
@@ -61,32 +60,17 @@ internal class KookChannelImpl(
     override val guildId: ID by stringID { source.guildId }
 
     override val currentMember: Int
-        get() = TODO("Not yet implemented")
+        get() = baseBot.internalGuildMemberCount(source.guildId)
 
-    override suspend fun guild(): Guild {
-        TODO("Not yet implemented")
-    }
-
-    override val maximumMember: Int
-        get() = TODO("Not yet implemented")
+    override suspend fun guild(): KookGuild = guildValue
 
     override val members: Items<GuildMember>
-        get() = TODO("Not yet implemented")
+        get() = guildValue.members
 
-    override suspend fun owner(): GuildMember {
-        TODO("Not yet implemented")
-    }
+    override suspend fun owner(): GuildMember = baseBot.internalMember(source.guildId, source.userId)
+        ?: throw kookMemberNotExistsException(source.userId)
 
-    override suspend fun member(id: ID): GuildMember? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun previous(): Organization? {
-        TODO("Not yet implemented")
-    }
-
-    override val roles: Items<Role>
-        get() = TODO("Not yet implemented")
+    override suspend fun member(id: ID): GuildMember? = guildValue.member(id)
 
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
         return send(message, quote?.literal, tempTargetId?.literal)
@@ -96,7 +80,11 @@ internal class KookChannelImpl(
         return send(message, quote?.literal, tempTargetId?.literal)
     }
 
-    internal suspend fun send(message: Message, quote: String? = null, tempTargetId: String? = null): KookMessageReceipt {
+    internal suspend fun send(
+        message: Message,
+        quote: String? = null,
+        tempTargetId: String? = null
+    ): KookMessageReceipt {
         return message.sendToChannel(
             bot,
             targetId = source.id,
@@ -106,7 +94,11 @@ internal class KookChannelImpl(
         ) ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
     }
 
-    internal suspend fun send(message: MessageContent, quote: String? = null, tempTargetId: String? = null): KookMessageReceipt {
+    internal suspend fun send(
+        message: MessageContent,
+        quote: String? = null,
+        tempTargetId: String? = null
+    ): KookMessageReceipt {
         return when (message) {
             is KookReceiveMessageContent -> {
                 val source = message.source
@@ -171,7 +163,7 @@ internal class KookChannelImpl(
     }
 
     override val category: KookChannelCategory?
-        get() = TODO("Not yet implemented")
+        get() = source.parentId.takeIf { it.isNotBlank() }?.let { baseBot.internalCategory(it) }
 
     override fun toString(): String {
         return "KookChannel(id=${source.id}, name=${source.name}, guildId=${source.guildId})"

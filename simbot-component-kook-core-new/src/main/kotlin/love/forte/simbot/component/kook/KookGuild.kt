@@ -67,6 +67,18 @@ public interface KookGuild : Guild, CoroutineScope {
         get() = source.name
 
     /**
+     * 服务器主题
+     */
+    override val description: String
+        get() = source.topic
+
+    /**
+     * 服务器icon的地址
+     */
+    override val icon: String
+        get() = source.icon
+
+    /**
      * KOOK Guild 不支持获取创建时间。始终得到 [Timestamp]。
      */
     override val createTime: Timestamp
@@ -94,22 +106,18 @@ public interface KookGuild : Guild, CoroutineScope {
      */
     override val currentChannel: Int
 
-    // TODO channels
-
     /**
      * 获取当前频道服务器下的子频道序列。
      *
      * 子频道列表**不包含**分组类型的频道，这类"分类频道"请参考 [categories]。
      */
     override val channels: Items<KookChannel>
-        get() = TODO("Not yet implemented")
 
     /**
      * 尝试根据指定ID获取匹配的 [KookChannel]。未找到时得到null。
      */
     @JST(blockingBaseName = "getChannel", blockingSuffix = "", asyncBaseName = "getChannel")
     override suspend fun channel(id: ID): KookChannel?
-
 
     /**
      * 获取当前频道服务器下的子频道序列。
@@ -127,14 +135,13 @@ public interface KookGuild : Guild, CoroutineScope {
     @JST(blockingBaseName = "getChild", blockingSuffix = "", asyncBaseName = "getChild")
     override suspend fun child(id: ID): KookChannel? = channel(id)
 
-    // TODO categories
-
+    // categories
 
     /**
-     * 得到当前频道下所有的分组型频道的**列表快照**。
+     * 得到当前频道下所有的分组型频道。
      */
     @ExperimentalSimbotApi
-    public val categories: List<KookChannelCategory>
+    public val categories: Items<KookChannelCategory>
 
 
     /**
@@ -143,7 +150,7 @@ public interface KookGuild : Guild, CoroutineScope {
     @ExperimentalSimbotApi
     public fun getCategory(id: ID): KookChannelCategory?
 
-    // TODO members
+    // members
 
     /**
      * 此频道下的成员序列。

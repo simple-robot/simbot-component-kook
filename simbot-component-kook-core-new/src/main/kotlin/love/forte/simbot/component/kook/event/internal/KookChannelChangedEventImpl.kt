@@ -22,24 +22,21 @@ package love.forte.simbot.component.kook.event.internal
 import love.forte.simbot.Api4J
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.component.kook.KookChannel
+import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.event.*
-import love.forte.simbot.component.kook.internal.*
+import love.forte.simbot.component.kook.internal.KookChannelCategoryImpl
+import love.forte.simbot.component.kook.internal.KookChannelImpl
+import love.forte.simbot.component.kook.internal.KookGuildImpl
+import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent.Companion.toContent
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.event.IncreaseEvent
 import love.forte.simbot.kook.api.message.GetChannelMessageViewApi
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.kook.event.Event as KEvent
 
-/**
- * 某频道服务器中新增了一个频道后的事件。
- *
- * @see IncreaseEvent
- * @see AddedChannelEvent
- */
 internal data class KookAddedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<AddedChannelEventExtra>,
@@ -51,9 +48,6 @@ internal data class KookAddedChannelEventImpl(
     override suspend fun channel(): KookChannel = _after
 }
 
-/**
- * 频道更新事件impl
- */
 @Suppress("UnnecessaryOptInAnnotation")
 internal data class KookUpdatedChannelEventImpl(
     override val bot: KookBotImpl,
@@ -65,10 +59,6 @@ internal data class KookUpdatedChannelEventImpl(
     override suspend fun channel(): KookChannel = _channel
 }
 
-
-/**
- * 频道删除事件impl
- */
 @Suppress("UnnecessaryOptInAnnotation")
 @OptIn(Api4J::class, ExperimentalSimbotApi::class)
 internal data class KookDeletedChannelEventImpl(
@@ -81,9 +71,40 @@ internal data class KookDeletedChannelEventImpl(
     override suspend fun before(): KookChannel = _before
 }
 
-/**
- * 消息置顶事件impl。
- */
+internal data class KookAddedCategoryEventImpl(
+    override val bot: KookBotImpl,
+    override val sourceEvent: KEvent<AddedChannelEventExtra>,
+    private val _source: KookGuildImpl,
+    private val _category: KookChannelCategoryImpl,
+) : KookAddedCategoryEvent() {
+    override val operator: KookMemberImpl? = bot.internalMember(sourceBody.guildId, sourceBody.userId)
+    override suspend fun category(): KookChannelCategory = _category
+    override suspend fun source(): KookGuild = _source
+}
+
+@Suppress("UnnecessaryOptInAnnotation")
+internal data class KookUpdatedCategoryEventImpl(
+    override val bot: KookBotImpl,
+    override val sourceEvent: KEvent<UpdatedChannelEventExtra>,
+    private val _source: KookGuildImpl,
+    private val _category: KookChannelCategoryImpl,
+) : KookUpdatedCategoryEvent() {
+    override suspend fun category(): KookChannelCategory = _category
+    override suspend fun source(): KookGuild = _source
+}
+
+@Suppress("UnnecessaryOptInAnnotation")
+@OptIn(Api4J::class, ExperimentalSimbotApi::class)
+internal data class KookDeletedCategoryEventImpl(
+    override val bot: KookBotImpl,
+    override val sourceEvent: KEvent<DeletedChannelEventExtra>,
+    private val _source: KookGuildImpl,
+    private val _before: KookChannelCategoryImpl,
+) : KookDeletedCategoryEvent() {
+    override suspend fun source(): KookGuild = _source
+    override suspend fun before(): KookChannelCategory = _before
+}
+
 @Suppress("UnnecessaryOptInAnnotation")
 @OptIn(Api4J::class)
 internal data class KookPinnedMessageEventImpl(
@@ -102,9 +123,6 @@ internal data class KookPinnedMessageEventImpl(
     }
 }
 
-/**
- * 消息取消置顶事件impl。
- */
 @Suppress("UnnecessaryOptInAnnotation")
 @OptIn(Api4J::class)
 internal data class KookUnpinnedMessageEventImpl(

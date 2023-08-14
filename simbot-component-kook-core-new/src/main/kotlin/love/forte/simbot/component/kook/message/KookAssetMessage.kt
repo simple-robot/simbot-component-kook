@@ -19,8 +19,8 @@ package love.forte.simbot.component.kook.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.Api4J
 import love.forte.simbot.ID
-import love.forte.simbot.JSTP
 import love.forte.simbot.definition.ResourceContainer
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
@@ -30,9 +30,11 @@ import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.message.Image
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
+import love.forte.simbot.resources.Resource
 import love.forte.simbot.resources.Resource.Companion.toResource
 import love.forte.simbot.resources.URLResource
 import java.net.URL
+import java.util.concurrent.CompletableFuture
 
 /**
  * 与上传后的媒体资源相关的消息类型。
@@ -120,8 +122,16 @@ public data class KookAsset(
      *
      * @see urlResource
      */
-    @JSTP
+    @JvmSynthetic
     override suspend fun resource(): URLResource = urlResource
+
+    @Api4J
+    override val resource: URLResource
+        get() = urlResource
+
+    @Api4J
+    override val resourceAsync: CompletableFuture<out URLResource>
+        get() = CompletableFuture.completedFuture(urlResource)
 
     override val key: Message.Key<KookAsset>
         get() = Key
@@ -155,8 +165,16 @@ public data class KookAssetImage(override val asset: Asset) : KookAssetMessage<K
      *
      * @see urlResource
      */
-    @JSTP
+    @JvmSynthetic
     override suspend fun resource(): URLResource = urlResource
+
+    @Api4J
+    override val resource: Resource
+        get() = urlResource
+
+    @Api4J
+    override val resourceAsync: CompletableFuture<out Resource>
+        get() = CompletableFuture.completedFuture(urlResource)
 
     override val key: Message.Key<KookAssetImage>
         get() = Key

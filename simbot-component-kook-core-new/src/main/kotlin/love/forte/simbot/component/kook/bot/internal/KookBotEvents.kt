@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.event.internal.*
+import love.forte.simbot.component.kook.internal.KookChannelCategoryImpl
 import love.forte.simbot.component.kook.internal.KookChannelImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
@@ -311,50 +312,90 @@ internal fun KookBotImpl.registerEvent() {
 
                     // 新增频道
                     is AddedChannelEventExtra -> {
-                        val guild = internalGuild(ex.body.guildId)
+                        val channelBody = ex.body
+                        val guild = internalGuild(channelBody.guildId)
                             ?: run {
-                                logger.warn("Unknown guild {} in event {}", ex.body.guildId, event)
+                                logger.warn("Unknown guild {} in event {}", channelBody.guildId, event)
                                 return@processor
                             }
 
-                        val channel = inCacheModify {
-                            KookChannelImpl(thisBot, ex.body).also {
-                                channels[ex.body.id] = it
+                        if (channelBody.isCategory) {
+                            val category = inCacheModify {
+                                KookChannelCategoryImpl(thisBot, channelBody).also {
+                                    categories[channelBody.id] = it
+                                }
+                            }
+
+                            pushIfProcessable(KookAddedCategoryEvent) {
+                                KookAddedCategoryEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    guild,
+                                    category
+                                )
+                            }
+                        } else {
+                            val channel = inCacheModify {
+                                KookChannelImpl(thisBot, channelBody).also {
+                                    channels[channelBody.id] = it
+                                }
+                            }
+
+                            pushIfProcessable(KookAddedChannelEvent) {
+                                KookAddedChannelEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    guild,
+                                    channel
+                                )
                             }
                         }
 
-                        pushIfProcessable(KookAddedChannelEvent) {
-                            KookAddedChannelEventImpl(
-                                thisBot,
-                                event.doAs(),
-                                guild,
-                                channel
-                            )
-                        }
+
                     }
 
                     // 更新频道
                     is UpdatedChannelEventExtra -> {
-                        val guild = internalGuild(ex.body.guildId)
+                        val channelBody = ex.body
+                        val guild = internalGuild(channelBody.guildId)
                             ?: run {
-                                logger.warn("Unknown guild {} in event {}", ex.body.guildId, event)
+                                logger.warn("Unknown guild {} in event {}", channelBody.guildId, event)
                                 return@processor
                             }
 
-                        val channel = inCacheModify {
-                            KookChannelImpl(thisBot, ex.body).also {
-                                channels[ex.body.id] = it
+                        if (channelBody.isCategory) {
+                            val category = inCacheModify {
+                                KookChannelCategoryImpl(thisBot, channelBody).also {
+                                    categories[channelBody.id] = it
+                                }
+                            }
+
+                            pushIfProcessable(KookUpdatedCategoryEvent) {
+                                KookUpdatedCategoryEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    guild,
+                                    category
+                                )
+                            }
+                        } else {
+                            val channel = inCacheModify {
+                                KookChannelImpl(thisBot, channelBody).also {
+                                    channels[channelBody.id] = it
+                                }
+                            }
+
+                            pushIfProcessable(KookUpdatedChannelEvent) {
+                                KookUpdatedChannelEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    guild,
+                                    channel
+                                )
                             }
                         }
 
-                        pushIfProcessable(KookUpdatedChannelEvent) {
-                            KookUpdatedChannelEventImpl(
-                                thisBot,
-                                event.doAs(),
-                                guild,
-                                channel
-                            )
-                        }
+
                     }
 
                     // 删除频道
@@ -365,21 +406,33 @@ internal fun KookBotImpl.registerEvent() {
                                 return@processor
                             }
 
-                        val removedChannel = inCacheModify {
-                            channels.remove(ex.body.id)
+                        val removed = inCacheModify {
+                            channels.remove(ex.body.id) ?: categories.remove(ex.body.id)
                         } ?: run {
-                            logger.warn("No channel ({}) removed in event {}", ex.body.id, event)
+                            logger.warn("No channel or category ({}) removed in event {}", ex.body.id, event)
                             return@processor
                         }
 
-                        pushIfProcessable(KookDeletedChannelEvent) {
-                            KookDeletedChannelEventImpl(
-                                thisBot,
-                                event.doAs(),
-                                guild,
-                                removedChannel
-                            )
+                        if (removed is KookChannelImpl) {
+                            pushIfProcessable(KookDeletedChannelEvent) {
+                                KookDeletedChannelEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    guild,
+                                    removed
+                                )
+                            }
+                        } else if (removed is KookChannelCategoryImpl) {
+                            pushIfProcessable(KookDeletedCategoryEvent) {
+                                KookDeletedCategoryEventImpl(
+                                    thisBot,
+                                    event.doAs(),
+                                    guild,
+                                    removed
+                                )
+                            }
                         }
+
                     }
 
                     // 置顶消息

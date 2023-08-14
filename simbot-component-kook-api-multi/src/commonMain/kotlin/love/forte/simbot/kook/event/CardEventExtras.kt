@@ -54,7 +54,7 @@ public data class MessageBtnClickEventBody(
  * @author ForteScarlet
  */
 @Serializable
-@SerialName(UserUpdatedEventExtra.TYPE)
+@SerialName(MessageBtnClickEventExtra.TYPE)
 public data class MessageBtnClickEventExtra(override val body: MessageBtnClickEventBody) : SystemExtra() {
     public companion object {
         public const val TYPE: String = "message_btn_click"
