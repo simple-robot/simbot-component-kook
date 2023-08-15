@@ -18,11 +18,15 @@
 package love.forte.simbot.kook.api.userchat
 
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookGetApi
+import love.forte.simbot.kook.api.ListData
+import love.forte.simbot.kook.api.ListMeta
 import love.forte.simbot.kook.util.appendIfNotNull
 import love.forte.simbot.kook.util.parameters
 import kotlin.jvm.JvmOverloads
@@ -43,9 +47,11 @@ public class GetUserChatListApi private constructor(
      * 每页数据数量
      */
     private val pageSize: Int? = null,
-) : KookGetApi<UserChatListView>() {
+) : KookGetApi<ListData<UserChatListView>>() {
     public companion object Factory {
         private val PATH = ApiPath.create("user-chat", "list")
+
+        private val serializer = ListData.serializer(UserChatListView.serializer())
 
         private val EMPTY = GetUserChatListApi()
 
@@ -64,8 +70,8 @@ public class GetUserChatListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<UserChatListView>
-        get() = UserChatListView.serializer()
+    override val resultDeserializer: DeserializationStrategy<ListData<UserChatListView>>
+        get() = serializer
 
     override fun urlBuild(builder: URLBuilder) {
         builder.parameters {
@@ -100,3 +106,35 @@ public data class UserChatListView @ApiResultType constructor(
     @SerialName("target_info") val targetInfo: TargetInfo,
 )
 
+
+/**
+ * 批次量的通过 [GetUserChatListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetUserChatListApi] 发起一次请求
+ */
+public inline fun GetUserChatListApi.Factory.createFlow(
+    crossinline block: suspend GetUserChatListApi.Factory.(page: Int) -> ListData<UserChatListView>
+): Flow<ListData<UserChatListView>> = flow {
+    var page = 1
+    do {
+        val listData = block(page)
+        emit(listData)
+        page = listData.meta.page + 1
+    } while (listData.items.isNotEmpty() && listData.meta.page < listData.meta.pageTotal)
+}
+
+/**
+ * 批次量的通过 [GetUserChatListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetUserChatListApi] 发起一次请求
+ */
+public inline fun GetUserChatListApi.Factory.createItemFlow(
+    crossinline block: suspend GetUserChatListApi.Factory.(page: Int) -> ListData<UserChatListView>
+): Flow<UserChatListView> = flow {
+    var page = 1
+    do {
+        val listData = block(page)
+        listData.items.forEach { emit(it) }
+        page = listData.meta.page + 1
+    } while (listData.items.isNotEmpty() && listData.meta.page < listData.meta.pageTotal)
+}

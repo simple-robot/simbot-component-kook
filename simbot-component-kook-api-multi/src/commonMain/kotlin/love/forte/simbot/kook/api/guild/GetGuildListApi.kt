@@ -18,9 +18,12 @@
 package love.forte.simbot.kook.api.guild
 
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.DeserializationStrategy
 import love.forte.simbot.kook.api.KookGetApi
 import love.forte.simbot.kook.api.ListData
+import love.forte.simbot.kook.api.ListMeta
 import love.forte.simbot.kook.objects.SimpleGuild
 import love.forte.simbot.kook.util.parameters
 import kotlin.jvm.JvmField
@@ -92,4 +95,37 @@ public class GetGuildListApi private constructor(
             sort?.also { append("sort", it) }
         }
     }
+}
+
+
+/**
+ * 批次量的通过 [GetGuildListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetGuildListApi] 发起一次请求
+ */
+public inline fun GetGuildListApi.Factory.createFlow(
+    crossinline block: suspend GetGuildListApi.Factory.(page: Int) -> ListData<SimpleGuild>
+): Flow<ListData<SimpleGuild>> = flow {
+    var page = 1
+    do {
+        val listData = block(page)
+        emit(listData)
+        page = listData.meta.page + 1
+    } while (listData.items.isNotEmpty() && listData.meta.page < listData.meta.pageTotal)
+}
+
+/**
+ * 批次量的通过 [GetGuildListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetGuildListApi] 发起一次请求
+ */
+public inline fun GetGuildListApi.Factory.createItemFlow(
+    crossinline block: suspend GetGuildListApi.Factory.(page: Int) -> ListData<SimpleGuild>
+): Flow<SimpleGuild> = flow {
+    var page = 1
+    do {
+        val listData = block(page)
+        listData.items.forEach { emit(it) }
+        page = listData.meta.page + 1
+    } while (listData.items.isNotEmpty() && listData.meta.page < listData.meta.pageTotal)
 }

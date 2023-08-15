@@ -26,9 +26,6 @@ import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.definition.Organization
 import love.forte.simbot.definition.UserInfo
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.message.doSafeCast
@@ -74,7 +71,7 @@ public abstract class KookMemberChangedEvent : KookSystemEvent(), MemberChangedE
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
     /**
      * 本次变更涉及的频道成员信息。同 [user]
@@ -659,7 +656,7 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
 
     override val key: Event.Key<out KookUserOnlineStatusChangedEvent>
@@ -691,7 +688,7 @@ public abstract class KookMemberOnlineEvent : KookUserOnlineStatusChangedEvent()
     override val sourceBody: GuildMemberOnlineStatusChangedEventBody
         get() = sourceEvent.extra.body
 
-    public val userId: ID by stringID { sourceBody.userId }
+    public val userId: ID get() = sourceBody.userId.ID
 
     override val guildIds: List<ID> get() = sourceBody.guilds.map { it.ID }
 
@@ -718,7 +715,7 @@ public abstract class KookMemberOfflineEvent : KookUserOnlineStatusChangedEvent(
     override val sourceBody: GuildMemberOnlineStatusChangedEventBody
         get() = sourceEvent.extra.body
 
-    public val userId: ID by stringID { sourceBody.userId }
+    public val userId: ID get() = sourceBody.userId.ID
 
     override val guildIds: List<ID> get() = sourceBody.guilds.map { it.ID }
 

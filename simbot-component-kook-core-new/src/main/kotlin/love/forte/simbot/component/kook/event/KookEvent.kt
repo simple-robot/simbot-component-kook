@@ -20,8 +20,6 @@ package love.forte.simbot.component.kook.event
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.definition.BotContainer
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.EventExtra
 import love.forte.simbot.kook.event.SystemExtra
@@ -54,7 +52,7 @@ public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotCo
     public abstract val sourceEvent: E
 
     override fun toString(): String {
-        return "KookEvent(sourceEvent=$sourceEvent)"
+        return "KookEvent(type=${sourceEvent.type}, channelType=${sourceEvent.channelType}, source=${sourceEvent})"
     }
 
     abstract override val key: Event.Key<out KookEvent<*, *>>
@@ -76,7 +74,7 @@ public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotCo
 public abstract class KookSystemEvent :
     KookEvent<SystemExtra, KEvent<SystemExtra>>() {
 
-    override val id: ID by stringID { sourceEvent.msgId }
+    override val id: ID get() = sourceEvent.msgId.ID
 
     /**
      * [sourceEvent] 中的 `extra.body` 信息。

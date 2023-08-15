@@ -18,12 +18,15 @@
 package love.forte.simbot.kook.api.channel
 
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookGetApi
 import love.forte.simbot.kook.api.ListData
+import love.forte.simbot.kook.api.ListMeta
 import love.forte.simbot.kook.objects.Channel
 import love.forte.simbot.kook.objects.PermissionOverwrite
 import love.forte.simbot.kook.objects.PermissionUser
@@ -202,8 +205,38 @@ private class ChannelInfoChannel(
         result = 31 * result + hasPassword.hashCode()
         return result
     }
-
-
 }
 
+
+/**
+ * 批次量的通过 [GetChannelListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetChannelListApi] 发起一次请求
+ */
+public inline fun GetChannelListApi.Factory.createFlow(
+    crossinline block: suspend GetChannelListApi.Factory.(page: Int) -> ListData<ChannelInfo>
+): Flow<ListData<ChannelInfo>> = flow {
+    var page = 1
+    do {
+        val listData = block(page)
+        emit(listData)
+        page = listData.meta.page + 1
+    } while (listData.items.isNotEmpty() && listData.meta.page < listData.meta.pageTotal)
+}
+
+/**
+ * 批次量的通过 [GetChannelListApi] 查询所有结果直至最后一次响应的 [ListMeta.page] >= [ListMeta.pageTotal]。
+ *
+ * @param block 通过一个页码参数来通过 [GetChannelListApi] 发起一次请求
+ */
+public inline fun GetChannelListApi.Factory.createItemFlow(
+    crossinline block: suspend GetChannelListApi.Factory.(page: Int) -> ListData<ChannelInfo>
+): Flow<ChannelInfo> = flow {
+    var page = 1
+    do {
+        val listData = block(page)
+        listData.items.forEach { emit(it) }
+        page = listData.meta.page + 1
+    } while (listData.items.isNotEmpty() && listData.meta.page < listData.meta.pageTotal)
+}
 

@@ -23,7 +23,7 @@ import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.component.kook.bot.KookGuildBot
-import love.forte.simbot.definition.Contact
+import love.forte.simbot.component.kook.internal.KookUserChatImpl
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kook.Bot
@@ -52,12 +52,12 @@ internal class KookGuildBotImpl(
     override suspend fun start(): Boolean =
         bot.start()
 
-    override val contacts: Items<Contact>
-        get() = TODO("Not yet implemented")
+    override val contacts: Items<KookUserChatImpl>
+        get() = bot.contacts
 
-    override suspend fun contact(id: ID): Contact? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun contact(id: ID): KookUserChatImpl = bot.contact(id)
+
+    override suspend fun contactCount(): Int = bot.contactCount()
 
     override suspend fun asMember(): GuildMember = member
 
@@ -82,4 +82,8 @@ internal class KookGuildBotImpl(
     override suspend fun guild(id: ID): KookGuild? = bot.guild(id)
 
     override suspend fun guildCount(): Int = bot.guildCount()
+
+    override fun toString(): String {
+        return "KookGuildBot(clientId=${sourceBot.ticket.clientId}, memberId=${member.id}, guildId=${member.guildId}, isStarted=$isStarted, isActive=$isActive, isCancelled=$isCancelled)"
+    }
 }

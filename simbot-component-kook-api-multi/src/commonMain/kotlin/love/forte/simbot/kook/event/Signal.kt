@@ -285,6 +285,10 @@ public sealed class Signal {
 
         override val d: Unit
             get() = Unit
+
+        override fun toString(): String {
+            return "Pong(s=$S_PONG)"
+        }
     }
 
     /**

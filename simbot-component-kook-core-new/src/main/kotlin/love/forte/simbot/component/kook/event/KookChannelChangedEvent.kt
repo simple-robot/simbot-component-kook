@@ -24,8 +24,6 @@ import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.definition.Channel
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.objects.SimpleChannel
@@ -55,7 +53,7 @@ public abstract class KookChannelChangedEvent : KookSystemEvent(), ChangedEvent 
     /**
      * @see KEvent.msgTimestamp
      */
-    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
     abstract override val key: Event.Key<out KookChannelChangedEvent>
 
@@ -248,7 +246,7 @@ public abstract class KookCategoryChangedEvent : KookSystemEvent(), ChangedEvent
     /**
      * @see KEvent.msgTimestamp
      */
-    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
     abstract override val key: Event.Key<out KookCategoryChangedEvent>
 

@@ -19,9 +19,6 @@ package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.Event
 import love.forte.simbot.kook.event.MessageBtnClickEventBody
@@ -37,7 +34,7 @@ import love.forte.simbot.message.doSafeCast
  * @author ForteScarlet
  */
 public abstract class KookMessageBtnClickEvent : KookSystemEvent() {
-    override val timestamp: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<MessageBtnClickEventExtra>
 
@@ -57,7 +54,7 @@ public abstract class KookMessageBtnClickEvent : KookSystemEvent() {
      *
      * @see MessageBtnClickEventBody.userId
      */
-    public val userId: ID by stringID { sourceBody.userId }
+    public val userId: ID get() = sourceBody.userId.ID
 
 
     override val key: Event.Key<out KookMessageBtnClickEvent>

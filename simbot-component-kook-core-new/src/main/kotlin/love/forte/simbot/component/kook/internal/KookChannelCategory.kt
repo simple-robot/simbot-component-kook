@@ -32,4 +32,8 @@ internal class KookChannelCategoryImpl(
 
     override val name: String
         get() = source.name
+
+    override fun toString(): String {
+        return "KookChannelCategory(id=${source.id}, name=${source.name})"
+    }
 }

@@ -23,8 +23,6 @@ import love.forte.simbot.JSTP
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.definition.ChannelInfoContainer
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
 import love.forte.simbot.event.BaseEvent
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.ChangedEvent
@@ -139,18 +137,18 @@ public abstract class KookPinnedMessageEvent : KookMessagePinEvent() {
     /**
      * 涉及消息的ID。
      */
-    override val msgId: ID by stringID { sourceBody.msgId }
+    override val msgId: ID get() = sourceBody.msgId.ID
 
 
     /**
      * 操作者ID。
      */
-    override val operatorId: ID by stringID { sourceBody.operatorId }
+    override val operatorId: ID get() = sourceBody.operatorId.ID
 
     /**
      * 频道ID。
      */
-    override val channelId: ID by stringID { sourceBody.channelId }
+    override val channelId: ID get() = sourceBody.channelId.ID
 
     /**
      * 始终为null。
@@ -191,11 +189,11 @@ public abstract class KookUnpinnedMessageEvent : KookMessagePinEvent() {
     override val sourceBody: PingEventExtraBody
         get() = sourceEvent.extra.body
 
-    override val msgId: ID by stringID { sourceBody.msgId }
+    override val msgId: ID get() = sourceBody.msgId.ID
 
-    override val operatorId: ID by stringID { sourceBody.operatorId }
+    override val operatorId: ID get() = sourceBody.operatorId.ID
 
-    override val channelId: ID by stringID { sourceBody.channelId }
+    override val channelId: ID get() = sourceBody.channelId.ID
 
     /**
      * 同 [msgId].

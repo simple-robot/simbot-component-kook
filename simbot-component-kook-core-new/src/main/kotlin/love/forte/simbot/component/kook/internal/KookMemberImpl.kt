@@ -45,9 +45,6 @@ internal class KookMemberImpl(
     private val guildValue
         get() = bot.internalGuild(_guildId) ?: throw kookGuildNotExistsException(_guildId)
 
-    override suspend fun unmute(): Boolean {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun send(message: Message): MessageReceipt {
         TODO("Not yet implemented")
@@ -61,4 +58,11 @@ internal class KookMemberImpl(
     override suspend fun mute(duration: Duration): Boolean {
         TODO("Not yet implemented")
     }
+
+    override suspend fun unmute(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    private suspend fun asContact(): KookUserChatImpl = bot.contact(id)
+
 }

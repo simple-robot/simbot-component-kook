@@ -21,9 +21,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import love.forte.simbot.ID
+import love.forte.simbot.SimbotIllegalStateException
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.bot.KookBot
@@ -31,25 +33,26 @@ import love.forte.simbot.component.kook.bot.KookBotConfiguration
 import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.component.kook.event.KookBotStartedEvent
 import love.forte.simbot.component.kook.event.internal.KookBotStartedEventImpl
-import love.forte.simbot.component.kook.internal.KookChannelCategoryImpl
-import love.forte.simbot.component.kook.internal.KookChannelImpl
-import love.forte.simbot.component.kook.internal.KookGuildImpl
-import love.forte.simbot.component.kook.internal.KookMemberImpl
-import love.forte.simbot.definition.Contact
+import love.forte.simbot.component.kook.internal.*
+import love.forte.simbot.component.kook.util.requestData
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kook.Bot
+import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.channel.GetChannelListApi
 import love.forte.simbot.kook.api.channel.toChannel
 import love.forte.simbot.kook.api.guild.GetGuildListApi
 import love.forte.simbot.kook.api.member.GetGuildMemberListApi
+import love.forte.simbot.kook.api.userchat.*
 import love.forte.simbot.kook.objects.Guild
 import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.literal
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.Items.Companion.asItems
+import love.forte.simbot.utils.item.effectedItemsByFlow
 import org.slf4j.Logger
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -105,8 +108,7 @@ internal class KookBotImpl(
         internalCache.channels.values.asSequence().filter { it.source.guildId == guildId }
 
     internal fun internalMembers(guildId: String): Sequence<KookMemberImpl> {
-        val prefix = internalCache.memberCacheIdGuildPrefix(guildId)
-        return internalCache.members.entries.asSequence().filter { it.key.startsWith(prefix) }.map { it.value }
+        return internalCache.members.entries.asSequence().filter { it.key.guildId == guildId }.map { it.value }
     }
 
     internal fun internalCategories(): Collection<KookChannelCategoryImpl> = internalCache.categories.values
@@ -114,14 +116,13 @@ internal class KookBotImpl(
         internalCache.categories.values.asSequence().filter { it.source.guildId == guildId }
 
     internal fun internalMember(guildId: String, userId: String) =
-        internalCache.members[internalCache.memberCacheId(guildId, userId)]
+        internalCache.member(guildId, userId)
 
     internal fun internalGuildChannelCount(guildId: String): Int =
         internalCache.channels.values.count { it.source.guildId == guildId }
 
     internal fun internalGuildMemberCount(guildId: String): Int {
-        val prefix = internalCache.memberCacheIdGuildPrefix(guildId)
-        return internalCache.members.keys.count { it.startsWith(prefix) }
+        return internalCache.members.keys.count { it.guildId == guildId }
     }
 
 
@@ -228,7 +229,7 @@ internal class KookBotImpl(
                             .buffer(500)
                             .collect { user ->
                                 val memberImpl = KookMemberImpl(this@KookBotImpl, user, guild.id)
-                                internalCache.members[internalCache.memberCacheId(guild.id, user.id)] = memberImpl
+                                internalCache.setMember(guild.id, user.id, memberImpl)
                                 if (user.id == sourceBot.botUserInfo.id) {
                                     // bot self
                                     botMember = memberImpl
@@ -315,13 +316,6 @@ internal class KookBotImpl(
         }
     }
 
-    override val contacts: Items<Contact>
-        get() = TODO("Not yet implemented")
-
-    override suspend fun contact(id: ID): Contact? {
-        TODO("Not yet implemented")
-    }
-
     override val guilds: Items<KookGuild>
         get() = internalCache.guilds.values.asItems()
 
@@ -330,27 +324,82 @@ internal class KookBotImpl(
     override suspend fun guildCount(): Int = internalCache.guilds.size
 
 
+    override val contacts: Items<KookUserChatImpl>
+        get() = effectedItemsByFlow {
+            GetUserChatListApi.createItemFlow { page -> create(page = page).requestDataBy(this@KookBotImpl) }
+                .map {
+                    KookUserChatImpl(this, it.toUserChatView())
+                }
+        }
+
+
+    @OptIn(ApiResultType::class)
+    private fun UserChatListView.toUserChatView(
+        isFriend: Boolean = false,
+        isBlocked: Boolean = false,
+        isTargetBlocked: Boolean = false,
+    ): UserChatView = UserChatView(
+        code = code,
+        lastReadTime = lastReadTime,
+        latestMsgTime = latestMsgTime,
+        unreadCount = unreadCount,
+        isFriend = isFriend,
+        isBlocked = isBlocked,
+        isTargetBlocked = isTargetBlocked,
+        targetInfo = targetInfo
+    )
+
+    override suspend fun contact(id: ID): KookUserChatImpl {
+        val chat = try {
+            requestData(CreateUserChatApi.create(id.literal))
+        } catch (e: Exception) {
+            val stack = SimbotIllegalStateException("Cannot create user chat for user(id=$id)")
+            e.addSuppressed(stack)
+            throw e
+        }
+
+        return KookUserChatImpl(this, chat)
+    }
+
+    override suspend fun contactCount(): Int {
+        val list = try {
+            requestData(GetUserChatListApi.create())
+        } catch (e: Exception) {
+            val stack = SimbotIllegalStateException("Cannot query user chat list: ${e.localizedMessage}")
+            e.addSuppressed(stack)
+            throw e
+        }
+
+        return list.meta.total
+    }
+
+
+    override fun toString(): String {
+        return "KookBot(clientId=${sourceBot.ticket.clientId}, isStarted=$isStarted, isActive=$isActive, isCancelled=$isCancelled)"
+    }
+
     companion object
 }
 
 
 internal class InternalCache {
+    data class MemberCacheId(val guildId: String, val userId: String)
+
     val guilds = ConcurrentHashMap<String, KookGuildImpl>()
     val channels = ConcurrentHashMap<String, KookChannelImpl>()
     val categories = ConcurrentHashMap<String, KookChannelCategoryImpl>()
 
     /**
-     * member key: guildId + '$' + userId
+     * member key: guildId & userId
      */
-    val members = ConcurrentHashMap<String, KookMemberImpl>()
+    val members = ConcurrentHashMap<MemberCacheId, KookMemberImpl>()
 
-    fun memberCacheId(guildId: String, userId: String): String = "$guildId$GUILD_MEMBER_INFIX$userId"
+    private fun memberCacheId(guildId: String, userId: String): MemberCacheId = MemberCacheId(guildId, userId)
 
-    fun memberCacheIdGuildPrefix(guildId: String): String = "$guildId$GUILD_MEMBER_INFIX"
+    fun member(guildId: String, userId: String): KookMemberImpl? = members[memberCacheId(guildId, userId)]
 
-    fun memberCacheIdUserSuffix(userId: String): String = "$GUILD_MEMBER_INFIX$userId"
+    fun setMember(guildId: String, userId: String, value: KookMemberImpl): KookMemberImpl? =
+        members.put(memberCacheId(guildId, userId), value)
 
-    companion object {
-        const val GUILD_MEMBER_INFIX = "$"
-    }
+    fun removeMember(guildId: String, userId: String): KookMemberImpl? = members.remove(memberCacheId(guildId, userId))
 }

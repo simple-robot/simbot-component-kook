@@ -386,7 +386,7 @@ public data class GuildMemberList @ApiResultType constructor(
  *
  * @param block 通过一个页码参数来通过 [GetGuildMemberListApi] 发起一次请求
  */
-public suspend inline fun GetGuildMemberListApi.Factory.asFlow(
+public inline fun GetGuildMemberListApi.Factory.createFlow(
     crossinline block: suspend GetGuildMemberListApi.Factory.(page: Int) -> GuildMemberList
 ): Flow<GuildMemberList> = flow {
     var page = 1
@@ -402,7 +402,7 @@ public suspend inline fun GetGuildMemberListApi.Factory.asFlow(
  *
  * @param block 通过一个页码参数来通过 [GetGuildMemberListApi] 发起一次请求
  */
-public suspend inline fun GetGuildMemberListApi.Factory.asItemFlow(
+public inline fun GetGuildMemberListApi.Factory.createItemFlow(
     crossinline block: suspend GetGuildMemberListApi.Factory.(page: Int) -> GuildMemberList
 ): Flow<SimpleUser> = flow {
     var page = 1

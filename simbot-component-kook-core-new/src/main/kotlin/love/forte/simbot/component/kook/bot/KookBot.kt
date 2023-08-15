@@ -25,6 +25,7 @@ import love.forte.simbot.JSTP
 import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.KookGuild
+import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookAsset
 import love.forte.simbot.component.kook.message.KookAssetImage
 import love.forte.simbot.component.kook.util.requestDataBy
@@ -32,9 +33,12 @@ import love.forte.simbot.definition.Group
 import love.forte.simbot.definition.GuildBot
 import love.forte.simbot.definition.SocialRelationsContainer.Companion.COUNT_NOT_SUPPORTED
 import love.forte.simbot.kook.Ticket
+import love.forte.simbot.kook.api.ApiResponseException
+import love.forte.simbot.kook.api.ApiResultException
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.asset.Asset
 import love.forte.simbot.kook.api.asset.CreateAssetApi
+import love.forte.simbot.kook.api.userchat.GetUserChatListApi
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.literal
 import love.forte.simbot.message.Image
@@ -207,6 +211,42 @@ public interface KookBot : Bot, CoroutineScope {
     override suspend fun guildCount(): Int
     //endregion
 
+    /**
+     * KOOK 组件以 [KookUserChat] 的形式支持对联系人API的操作。
+     *
+     * @see KookUserChat
+     */
+    override val isContactsSupported: Boolean
+        get() = true
+
+    /**
+     * 查询并获取**聊天会话**序列。
+     *
+     * @throws ApiResponseException API 请求过程中产生的异常
+     *  @throws ApiResultException API 请求过程中产生的异常
+     */
+    override val contacts: Items<KookUserChat>
+
+    /**
+     * 通过 [id] 寻找（创建）一个 [KookUserChat]。
+     * 只要提供的 [id] 与当前 Bot 能够建立联系便一定会得到 [KookUserChat] 实例，
+     * 否则在API请求过程中可能产生异常。
+     *
+     * @throws ApiResponseException API 请求过程中产生的异常
+     * @throws ApiResultException API 请求过程中产生的异常
+     */
+    override suspend fun contact(id: ID): KookUserChat
+
+    /**
+     * 查询并获取**聊天会话**的数量。
+     *
+     * 会通过[聊天会话列表查询API][GetUserChatListApi]查询当前聊天会话的数量。
+     *
+     * @throws ApiResponseException API 请求过程中产生的异常
+     * @throws ApiResultException API 请求过程中产生的异常
+     */
+    @JvmSynthetic
+    override suspend fun contactCount(): Int
 
     //region Group APIs
     /**

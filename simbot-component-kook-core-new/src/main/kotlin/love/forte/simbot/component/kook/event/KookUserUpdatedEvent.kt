@@ -20,8 +20,6 @@ package love.forte.simbot.component.kook.event
 import love.forte.simbot.ID
 import love.forte.simbot.JSTP
 import love.forte.simbot.Timestamp
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.ChangedEvent
 import love.forte.simbot.event.Event
@@ -42,7 +40,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  * @see UserUpdatedEventExtra
  */
 public abstract class KookUserUpdatedEvent : KookSystemEvent(), ChangedEvent {
-    override val changedTime: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
     abstract override val sourceEvent: KEvent<UserUpdatedEventExtra>
 

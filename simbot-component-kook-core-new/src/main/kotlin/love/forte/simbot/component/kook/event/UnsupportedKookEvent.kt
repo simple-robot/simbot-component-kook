@@ -23,7 +23,6 @@ import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventExtra
@@ -58,7 +57,7 @@ public class UnsupportedKookEvent(
     /**
      * 事件时间。
      */
-    override val timestamp: Timestamp by timestamp { sourceEvent.msgTimestamp }
+    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
 
 
     override fun toString(): String {

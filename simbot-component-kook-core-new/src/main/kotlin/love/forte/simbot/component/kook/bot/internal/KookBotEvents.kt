@@ -28,20 +28,18 @@ import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.event.Event
-import love.forte.simbot.kook.api.ApiResultType
-import love.forte.simbot.kook.api.channel.ChannelInfo
+import love.forte.simbot.kook.ProcessorType
 import love.forte.simbot.kook.api.guild.GetGuildViewApi
 import love.forte.simbot.kook.api.member.GetGuildMemberListApi
-import love.forte.simbot.kook.api.member.asItemFlow
+import love.forte.simbot.kook.api.member.createItemFlow
 import love.forte.simbot.kook.api.user.GetUserViewApi
 import love.forte.simbot.kook.event.*
-import love.forte.simbot.kook.objects.Channel
 import love.forte.simbot.kook.event.Event as KEvent
 
 
 internal fun KookBotImpl.registerEvent() {
     val thisBot = this
-    sourceBot.processor {
+    sourceBot.processor(ProcessorType.PREPARE) {
         val event = this
 
         when (val ex = extra) {
@@ -116,7 +114,7 @@ internal fun KookBotImpl.registerEvent() {
                             }
 
                         val removedMember = inCacheModify {
-                            members.remove(memberCacheId(guildId, ex.body.userId))
+                            removeMember(guildId, ex.body.userId)
                         } ?: run {
                             logger.warn("No member ({}) removed in event {}", ex.body.userId, event)
                             return@processor
@@ -148,7 +146,7 @@ internal fun KookBotImpl.registerEvent() {
 
                         val newMember = inCacheModify {
                             val newMember = KookMemberImpl(thisBot, userInfo, guildId)
-                            this.members[memberCacheId(guildId, userId)] = newMember
+                            setMember(guildId, userId, newMember)
                             newMember
                         }
 
@@ -225,7 +223,7 @@ internal fun KookBotImpl.registerEvent() {
                         val guildInfo = GetGuildViewApi.create(guildId).requestDataBy(thisBot)
 
                         // guild members sync
-                        val members = GetGuildMemberListApi.asItemFlow { page ->
+                        val members = GetGuildMemberListApi.createItemFlow { page ->
                             create(guildId = guildId, page = page)
                                 .requestDataBy(thisBot)
                         }.buffer(200)
@@ -245,7 +243,7 @@ internal fun KookBotImpl.registerEvent() {
                                     botAsMember = member
                                 }
 
-                                this.members[memberCacheId(guildId, it.id)] = member
+                                setMember(guildId, it.id, member)
                             }
 
                             guild
@@ -280,14 +278,13 @@ internal fun KookBotImpl.registerEvent() {
                             // remove channels
                             channels.entries.removeIf { (_, v) -> v.source.guildId == guildId }
                             // remove members
-                            val memberCacheIdPrefix = memberCacheIdGuildPrefix(guildId)
-                            members.entries.removeIf { (k, _) -> k.startsWith(memberCacheIdPrefix) }
+                            members.entries.removeIf { (k, _) -> k.guildId == guildId }
 
                             removedGuild
                         } ?: return@processor
 
                         pushIfProcessable(KookBotSelfExitedGuildEvent) {
-                            KookBotSelfJoinedGuildEventImpl(
+                            KookBotSelfExitedGuildEventImpl(
                                 thisBot,
                                 event.doAs(),
                                 guild,
@@ -540,17 +537,3 @@ private suspend inline fun KookBotImpl.pushIfProcessable(
 @Suppress("UNCHECKED_CAST")
 private inline fun <reified T : EventExtra> KEvent<*>.doAs(): KEvent<T> = this as KEvent<T>
 
-// TODO
-@OptIn(ApiResultType::class)
-private fun Channel.toChannelInfo(): ChannelInfo {
-    return ChannelInfo(
-        id = this.id,
-        name = this.name,
-        isCategory = this.isCategory,
-        userId = this.userId,
-        parentId = this.parentId,
-        level = this.level,
-        type = this.type,
-        limitAmount = -1
-    )
-}

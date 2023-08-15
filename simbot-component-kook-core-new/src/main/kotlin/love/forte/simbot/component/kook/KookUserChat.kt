@@ -43,24 +43,26 @@ import love.forte.simbot.message.MessageContent
  */
 public interface KookUserChat : Stranger, Contact, DeleteSupport {
     /**
-     * 私聊会话的会话 `code` , 同 [source.code][UserChatView.code] 。
+     * 私聊会话对应用户的用户ID，同 [source.targetInfo.id][TargetInfo.id] 。
      *
-     * 如果需要此会话对应的目标用户id，使用 [targetId]。
+     * 如果需要此会话的会话 `code`，使用 [chatCode] 来获取。
      *
-     * @see UserChatView.code
-     * @see targetId
-     */
-    override val id: ID
-
-    /**
-     * 私聊会话的会话对应的目标用户id , 同 [source.targetInfo.id][TargetInfo.id] 。
-     *
-     * 如果需要此会话的会话 `code`，使用 [id] 来获取。
-     *
-     * @see id
+     * @see chatCode
      * @see TargetInfo.id
      */
-    public val targetId: ID
+    override val id: ID
+        get() = source.targetInfo.id.ID
+
+    /**
+     * 私聊会话的会话 `code` , 同 [source.code][UserChatView.code] 。
+     *
+     * 如果需要此会话对应的目标用户id，使用 [id]。
+     *
+     * @see id
+     * @see UserChatView.code
+     */
+    public val chatCode: String
+        get() = source.code
 
     override val bot: KookBot
 

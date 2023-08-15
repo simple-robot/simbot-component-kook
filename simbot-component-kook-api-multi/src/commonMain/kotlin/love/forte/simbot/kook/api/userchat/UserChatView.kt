@@ -36,12 +36,12 @@ public data class UserChatView @ApiResultType constructor(
      * 上次阅读消息的时间 (毫秒)
      */
     @SerialName("last_read_time")
-    val lastReadTime: Int,
+    val lastReadTime: Long,
     /**
      * 最新消息时间 (毫秒)
      */
     @SerialName("latest_msg_time")
-    val latestMsgTime: Int,
+    val latestMsgTime: Long,
     /**
      * 未读消息数
      */
