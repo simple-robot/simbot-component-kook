@@ -20,9 +20,9 @@ import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
     kotlin("multiplatform")
-    `kook-multiplatform-maven-publish` // TODO
+    `kook-multiplatform-maven-publish`
     kotlin("plugin.serialization")
-    `kook-dokka-partial-configure` // TODO
+    `kook-dokka-partial-configure`
 }
 
 setup(P)

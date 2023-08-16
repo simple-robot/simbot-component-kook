@@ -23,7 +23,7 @@ package love.forte.simbot.kook.api.guild
  * @see CreateGuildMuteApi
  * @see DeleteGuildMuteApi
  */
-public enum class MuteType(internal val value: Int) {
+public enum class MuteType(public val value: Int) {
     /**
      * 麦克风闭麦
      */

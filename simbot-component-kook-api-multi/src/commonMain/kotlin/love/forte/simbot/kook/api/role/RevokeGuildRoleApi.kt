@@ -32,7 +32,7 @@ import kotlin.jvm.JvmStatic
 public class RevokeGuildRoleApi private constructor(
     private val guildId: String,
     private val userId: String,
-    private val roleId: String,
+    private val roleId: Long,
 ) : KookPostApi<UserRoleOperated>() {
     public companion object Factory {
         private val PATH = ApiPath.create("guild-role", "revoke")
@@ -45,7 +45,7 @@ public class RevokeGuildRoleApi private constructor(
          * @param roleId 角色id
          */
         @JvmStatic
-        public fun create(guildId: String, userId: String, roleId: String): RevokeGuildRoleApi =
+        public fun create(guildId: String, userId: String, roleId: Long): RevokeGuildRoleApi =
             RevokeGuildRoleApi(guildId, userId, roleId)
     }
 
@@ -61,7 +61,7 @@ public class RevokeGuildRoleApi private constructor(
     private data class Body(
         @SerialName("guild_id") val guildId: String,
         @SerialName("user_id") val userId: String,
-        @SerialName("role_id") val roleId: String,
+        @SerialName("role_id") val roleId: Long,
     )
 
 

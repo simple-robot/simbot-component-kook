@@ -115,7 +115,6 @@ public data class KookBotVerifyInfoConfiguration(
             config.isCompress?.also { configuration.botConfiguration.isCompress = it }
             config.syncPeriods?.also { configuration.syncPeriods = it }
         }
-        // TODO
     }
 
 

@@ -60,4 +60,4 @@ public expect inline fun <T> EventProcessorQueue<T>.forEach(block: (T) -> Unit)
  *
  * @see EventProcessorQueue.isEmpty
  */
-public inline fun <T> EventProcessorQueue<T>.isNotEmpty(): Boolean = !isEmpty()
+public fun <T> EventProcessorQueue<T>.isNotEmpty(): Boolean = !isEmpty()

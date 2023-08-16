@@ -33,8 +33,6 @@ import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.kook.event.Event as KEvent
 
-// TODO impl
-
 /**
  * KOOK 中与消息相关的事件, 即当 [KEvent.extra] 类型为 [TextExtra] 时所触发的事件。
  *

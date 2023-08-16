@@ -27,6 +27,7 @@ import love.forte.simbot.kook.objects.SimpleRole
 import love.forte.simbot.kook.util.BooleanToIntSerializer
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 
 /**
@@ -36,7 +37,7 @@ import kotlin.jvm.JvmStatic
  */
 public class UpdateGuildRoleApi private constructor(
     guildId: String,
-    roleId: String,
+    roleId: Long,
     name: String? = null,
     color: Int? = null,
     isHoist: Boolean? = null,
@@ -55,7 +56,7 @@ public class UpdateGuildRoleApi private constructor(
          * @see builder
          */
         @JvmStatic
-        public fun create(guildId: String, roleId: String): UpdateGuildRoleApi =
+        public fun create(guildId: String, roleId: Long): UpdateGuildRoleApi =
             UpdateGuildRoleApi(guildId, roleId)
 
         /**
@@ -65,7 +66,20 @@ public class UpdateGuildRoleApi private constructor(
          * @param roleId 角色id
          */
         @JvmStatic
-        public fun builder(guildId: String, roleId: String): Builder = Builder(guildId, roleId)
+        public fun builder(guildId: String, roleId: Long): Builder = Builder(guildId, roleId)
+
+
+        /**
+         * 构建一个 [更新服务器角色][UpdateGuildRoleApi] 请求.
+         *
+         * @param guildId 服务器id
+         * @param roleId 角色id
+         *
+         * @see builder
+         */
+        @JvmSynthetic
+        public inline fun build(guildId: String, roleId: Long, block: Builder.() -> Unit): UpdateGuildRoleApi =
+            builder(guildId, roleId).also(block).build()
     }
 
     override val apiPath: ApiPath
@@ -79,7 +93,7 @@ public class UpdateGuildRoleApi private constructor(
      *
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    public class Builder internal constructor(public val guildId: String, public val roleId: String) {
+    public class Builder internal constructor(public val guildId: String, public val roleId: Long) {
         /**
          * 角色名称
          */
@@ -153,7 +167,7 @@ public class UpdateGuildRoleApi private constructor(
     @Serializable
     private data class Body(
         @SerialName("guild_id") val guildId: String,
-        @SerialName("role_id") val roleId: String,
+        @SerialName("role_id") val roleId: Long,
         val name: String? = null,
         val color: Int? = null,
         @Serializable(with = BooleanToIntSerializer::class)

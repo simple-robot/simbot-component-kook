@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalStateException
 import love.forte.simbot.component.kook.KookComponent
@@ -40,6 +42,7 @@ import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.event.pushIfProcessable
 import love.forte.simbot.kook.Bot
 import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.api.KookApi
 import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.channel.GetChannelListApi
 import love.forte.simbot.kook.api.channel.toChannel
@@ -151,7 +154,6 @@ internal class KookBotImpl(
         val first = started.compareAndSet(false, true)
 
         inCacheModify {
-            // TODO init event processor
             // 从 inCacheModify 中注册事件，防止一开始的事件对缓存有操作
             if (first) {
                 registerEvent()
@@ -242,7 +244,7 @@ internal class KookBotImpl(
                 val guildImpl = KookGuildImpl(this, guild)
                 val bm = botMember
                 if (bm != null) {
-                    guildImpl._bot = KookGuildBotImpl(this, bm)
+                    guildImpl.internalBot = KookGuildBotImpl(this, bm)
                 }
 
                 internalCache.guilds[guild.id] = guildImpl
@@ -256,9 +258,9 @@ internal class KookBotImpl(
      * 以 flow 的方式查询guild列表
      */
     private fun syncRequestGuilds(batchDelay: Long = 0): Flow<Guild> = flow {
-        var page = 1
+        var page = KookApi.DEFAULT_START_PAGE
         do {
-            if (page > 1) {
+            if (page > KookApi.DEFAULT_START_PAGE) {
                 delay(batchDelay)
             }
             logger.debug("Sync guild data ... page {}", page)
@@ -273,9 +275,9 @@ internal class KookBotImpl(
     }
 
     private fun requestGuildChannels(guildId: String, batchDelay: Long): Flow<ChannelInfo> = flow {
-        var page = 1
+        var page = KookApi.DEFAULT_START_PAGE
         do {
-            if (page > 1) {
+            if (page > KookApi.DEFAULT_START_PAGE) {
                 delay(batchDelay)
             }
             logger.debug("Sync channel data for guild {} ... page {}", guildId, page)
@@ -290,9 +292,9 @@ internal class KookBotImpl(
     }
 
     private fun requestGuildMembers(guildId: String, batchDelay: Long): Flow<SimpleUser> = flow {
-        var page = 1
+        var page = KookApi.DEFAULT_START_PAGE
         do {
-            if (page > 1) {
+            if (page > KookApi.DEFAULT_START_PAGE) {
                 delay(batchDelay)
             }
             logger.debug("Sync member data for guild {} ... page {}", guildId, page)
@@ -378,7 +380,20 @@ internal class KookBotImpl(
         return "KookBot(clientId=${sourceBot.ticket.clientId}, isStarted=$isStarted, isActive=$isActive, isCancelled=$isCancelled)"
     }
 
-    companion object
+    companion object {
+        @OptIn(ExperimentalSerializationApi::class)
+        internal val DEFAULT_JSON = Json {
+            isLenient = true
+            encodeDefaults = true
+            ignoreUnknownKeys = true
+            allowSpecialFloatingPointValues = true
+            allowStructuredMapKeys = true
+            prettyPrint = false
+            useArrayPolymorphism = false
+            // see https://github.com/kaiheila/api-docs/issues/174
+            explicitNulls = false
+        }
+    }
 }
 
 
@@ -393,6 +408,8 @@ internal class InternalCache {
      * member key: guildId & userId
      */
     val members = ConcurrentHashMap<MemberCacheId, KookMemberImpl>()
+
+    // TODO member mute Job
 
     private fun memberCacheId(guildId: String, userId: String): MemberCacheId = MemberCacheId(guildId, userId)
 

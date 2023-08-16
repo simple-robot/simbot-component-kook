@@ -32,7 +32,7 @@ import kotlin.jvm.JvmStatic
  */
 public class DeleteGuildRoleApi private constructor(
     private val guildId: String,
-    private val roleId: String,
+    private val roleId: Long,
 ) : KookPostApi<Unit>() {
     public companion object Factory {
         private val PATH = ApiPath.create("guild-role", "delete")
@@ -44,7 +44,7 @@ public class DeleteGuildRoleApi private constructor(
          * @param roleId 角色ID
          */
         @JvmStatic
-        public fun create(guildId: String, roleId: String): DeleteGuildRoleApi = DeleteGuildRoleApi(guildId, roleId)
+        public fun create(guildId: String, roleId: Long): DeleteGuildRoleApi = DeleteGuildRoleApi(guildId, roleId)
     }
 
 
@@ -62,7 +62,7 @@ public class DeleteGuildRoleApi private constructor(
         @SerialName("guild_id")
         val guildId: String,
         @SerialName("role_id")
-        val roleId: String,
+        val roleId: Long,
     )
 
 }

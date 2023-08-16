@@ -139,7 +139,7 @@ public interface KookGuildRole : KookRole {
      * @throws ClassCastException [member] 的类型不是 [KookMember] 时
      */
     public suspend fun grantTo(member: GuildMember): KookMemberRole {
-        // KookGuildRole.grantTo 只支持 KookGuildMember 类型的 member
+        // KookGuildRole.grantTo 只支持 KookMember 类型的 member
         val kookMember = member as? KookMember
             ?: throw ClassCastException("KookGuildRole.grantTo only support member of type KookGuildMember, but ${member::class}")
         return grantTo(kookMember)

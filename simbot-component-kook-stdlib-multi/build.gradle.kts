@@ -20,9 +20,9 @@ import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
     kotlin("multiplatform")
-//    `kook-multiplatform-maven-publish` // TODO
+    `kook-multiplatform-maven-publish`
     kotlin("plugin.serialization")
-//    `kook-dokka-partial-configure` // TODO
+    `kook-dokka-partial-configure`
     `simbot-kook-suspend-transform`
     id("kotlinx-atomicfu")
 }
@@ -120,7 +120,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":simbot-component-kook-api-multi"))
+                api(project(":simbot-component-kook-api"))
                 api(simbotLogger)
                 api(simbotUtilLoop)
                 api(simbotUtilSuspendTransformer)

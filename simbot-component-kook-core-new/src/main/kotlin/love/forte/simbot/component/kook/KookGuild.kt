@@ -20,6 +20,10 @@ package love.forte.simbot.component.kook
 import kotlinx.coroutines.CoroutineScope
 import love.forte.simbot.*
 import love.forte.simbot.component.kook.bot.KookGuildBot
+import love.forte.simbot.component.kook.role.KookGuildRole
+import love.forte.simbot.component.kook.role.KookGuildRoleCreator
+import love.forte.simbot.component.kook.role.KookRole
+import love.forte.simbot.component.kook.role.KookRoleOperator
 import love.forte.simbot.definition.Guild
 import love.forte.simbot.definition.Organization
 import love.forte.simbot.utils.item.Items
@@ -33,7 +37,7 @@ import love.forte.simbot.kook.objects.Guild as KGuild
  *
  * @author ForteScarlet
  */
-public interface KookGuild : Guild, CoroutineScope {
+public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     /**
      * 源于 [bot] 的上下文。
      */
@@ -171,21 +175,38 @@ public interface KookGuild : Guild, CoroutineScope {
     @JSTP
     override suspend fun owner(): KookMember
 
-    // TODO roles
+
+    //region roles API
+
+    /**
+     * 获取当前频道服务器中配置的所有角色信息。
+     *
+     * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
+     *
+     * @see KookRole
+     * @see KookGuildRole
+     */
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRole>
+
+
+    @ExperimentalSimbotApi
+    override fun roleCreator(): KookGuildRoleCreator
+    //endregion
 
     // region mute api
     /**
      * 频道服务器不支持整体禁言
      */
     @JvmSynthetic
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    @Deprecated("Guild mute is not supported in KOOK", ReplaceWith("false"))
     override suspend fun mute(duration: Duration): Boolean = false
 
     /**
      * 频道服务器不支持整体禁言
      */
     @JvmSynthetic
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    @Deprecated("Guild mute is not supported in KOOK", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
     // endregion
 

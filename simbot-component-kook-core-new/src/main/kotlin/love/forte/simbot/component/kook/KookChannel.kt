@@ -18,23 +18,21 @@
 package love.forte.simbot.component.kook
 
 import kotlinx.coroutines.CoroutineScope
-import love.forte.simbot.ID
-import love.forte.simbot.JST
-import love.forte.simbot.Timestamp
+import love.forte.simbot.*
 import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
+import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.definition.Channel
 import love.forte.simbot.definition.GuildMember
-import love.forte.simbot.definition.Role
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
 import love.forte.simbot.kook.messages.MessageType
-import love.forte.simbot.literal
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
 
 
 /**
@@ -125,8 +123,6 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
      */
     override suspend fun previous(): KookGuild = guild()
 
-    // TODO members
-
     /**
      * 等同于 [KookGuild.member]
      */
@@ -137,8 +133,12 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
      */
     override val members: Items<GuildMember>
 
-    override val roles: Items<Role>
-        get() = Items.emptyItems() // TODO channel roles
+
+    /**
+     * 等同于 [KookGuild.members]
+     */
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRole>
 
     // region send api
     /**
@@ -229,7 +229,18 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     // endregion
 
 
-    // TODO mute API
+    /**
+     * Deprecated: KOOK 中不支持 Channel 级别的禁言。
+     */
+    @Deprecated("Channel mute is not supported in KOOK", ReplaceWith("false"))
+    override suspend fun mute(duration: Duration): Boolean = false
+
+
+    /**
+     * Deprecated: KOOK 中不支持 Channel 级别的禁言。
+     */
+    @Deprecated("Channel mute is not supported in KOOK", ReplaceWith("false"))
+    override suspend fun unmute(): Boolean = false
 
 
 }

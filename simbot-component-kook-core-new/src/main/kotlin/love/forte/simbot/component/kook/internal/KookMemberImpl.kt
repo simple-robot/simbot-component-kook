@@ -17,17 +17,28 @@
 
 package love.forte.simbot.component.kook.internal
 
+import kotlinx.coroutines.flow.flow
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.JavaDuration
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.kookGuildNotExistsException
-import love.forte.simbot.definition.Role
+import love.forte.simbot.component.kook.message.KookMessageReceipt
+import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
+import love.forte.simbot.component.kook.role.internal.KookMemberRoleImpl
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.guild.CreateGuildMuteApi
+import love.forte.simbot.kook.api.guild.DeleteGuildMuteApi
+import love.forte.simbot.kook.api.user.GetUserViewApi
 import love.forte.simbot.kook.objects.User
 import love.forte.simbot.message.Message
-import love.forte.simbot.message.MessageReceipt
+import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
+import love.forte.simbot.utils.item.effectedItemsByFlow
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
 
@@ -38,31 +49,71 @@ import kotlin.time.Duration
 internal class KookMemberImpl(
     override val bot: KookBotImpl,
     override val source: User,
-    private val _guildId: String
+    internal val guildIdValue: String
 ) : KookMember {
-    override val guildId: ID by stringID { _guildId }
+    override val guildId: ID by stringID { guildIdValue }
 
     private val guildValue
-        get() = bot.internalGuild(_guildId) ?: throw kookGuildNotExistsException(_guildId)
+        get() = bot.internalGuild(guildIdValue) ?: throw kookGuildNotExistsException(guildIdValue)
 
 
-    override suspend fun send(message: Message): MessageReceipt {
-        TODO("Not yet implemented")
+    override suspend fun send(message: Message): KookMessageReceipt {
+        return asContact().send(message)
+    }
+
+    override suspend fun send(message: MessageContent): KookMessageReceipt {
+        return asContact().send(message)
+    }
+
+    override suspend fun send(text: String): KookMessageReceipt {
+        return asContact().send(text)
     }
 
     override suspend fun guild(): KookGuildImpl = guildValue
 
-    override val roles: Items<Role>
-        get() = Items.emptyItems() // TODO roles
+    @ExperimentalSimbotApi
+    override val roles: Items<KookMemberRoleImpl>
+        get() = effectedItemsByFlow {
+            flow {
+                val view = GetUserViewApi.create(source.id, guildIdValue).requestDataBy(bot)
+                val guildRoleMap = mutableMapOf<Long, KookGuildRoleImpl>()
 
-    override suspend fun mute(duration: Duration): Boolean {
+                guildValue.roles.collect { r ->
+                    guildRoleMap[r.source.roleId] = r
+                }
+
+                view.roles?.forEach { rid ->
+                    val role = guildRoleMap[rid] ?: return@forEach
+                    emit(KookMemberRoleImpl(bot, this@KookMemberImpl, guildIdValue, role))
+                }
+            }
+        }
+
+    // TODO
+    private suspend fun mute0(type: Int, milli: Long): Boolean {
+        val api = CreateGuildMuteApi.create(guildIdValue, source.id, type)
+
         TODO("Not yet implemented")
     }
 
-    override suspend fun unmute(): Boolean {
-        TODO("Not yet implemented")
+
+    override suspend fun mute(type: Int): Boolean = mute0(type, 0L)
+
+    @ExperimentalSimbotApi
+    override suspend fun mute(type: Int, duration: Duration): Boolean = mute0(type, duration.inWholeMilliseconds)
+
+    @ExperimentalSimbotApi
+    override suspend fun mute(type: Int, duration: JavaDuration): Boolean = mute0(type, duration.toMillis())
+
+    @ExperimentalSimbotApi
+    override suspend fun mute(type: Int, time: Long, timeUnit: TimeUnit): Boolean = mute0(type, timeUnit.toMillis(time))
+
+    override suspend fun unmute(type: Int): Boolean {
+        //  TODO cancel MuteJob?
+        DeleteGuildMuteApi.create(guildIdValue, source.id, type).requestDataBy(bot)
+
+        return true
     }
 
     private suspend fun asContact(): KookUserChatImpl = bot.contact(id)
-
 }

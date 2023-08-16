@@ -17,6 +17,7 @@
 
 package love.forte.simbot.component.kook.internal
 
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.*
@@ -27,6 +28,7 @@ import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Compan
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.message.KookReceiveMessageContent
 import love.forte.simbot.component.kook.message.sendToChannel
+import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.delegate.getValue
@@ -38,7 +40,6 @@ import love.forte.simbot.literal
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
-import kotlin.time.Duration
 
 
 /**
@@ -154,13 +155,9 @@ internal class KookChannelImpl(
         return send(request)
     }
 
-    override suspend fun mute(duration: Duration): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun unmute(): Boolean {
-        TODO("Not yet implemented")
-    }
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRole>
+        get() = guildValue.roles
 
     override val category: KookChannelCategory?
         get() = source.parentId.takeIf { it.isNotBlank() }?.let { baseBot.internalCategory(it) }

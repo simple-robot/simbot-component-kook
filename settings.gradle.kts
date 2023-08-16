@@ -17,13 +17,22 @@
 
 rootProject.name = "simbot-component-kook"
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-api-multi")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-stdlib-multi")
-include("simbot-component-kook-core")
-include("simbot-component-kook-core-new")
+//include("simbot-component-kook-api")
+include(":simbot-component-kook-api-multi")
+findProject(":simbot-component-kook-api-multi")?.apply {
+    name = "simbot-component-kook-api"
+}
 
-//
+//include("simbot-component-kook-stdlib")
+include(":simbot-component-kook-stdlib-multi")
+findProject(":simbot-component-kook-stdlib-multi")?.apply {
+    name = "simbot-component-kook-stdlib"
+}
 
-include("simbot-component-kook-stdlib-test")
+//include("simbot-component-kook-core")
+include(":simbot-component-kook-core-new")
+findProject(":simbot-component-kook-core-new")?.apply {
+    name = "simbot-component-kook-core"
+}
+
+//include("simbot-component-kook-stdlib-test")

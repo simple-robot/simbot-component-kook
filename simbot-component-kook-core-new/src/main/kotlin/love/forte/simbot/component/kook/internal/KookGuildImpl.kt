@@ -17,19 +17,29 @@
 
 package love.forte.simbot.component.kook.internal
 
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.bot.internal.KookGuildBotImpl
-import love.forte.simbot.definition.Role
+import love.forte.simbot.component.kook.role.KookGuildRole
+import love.forte.simbot.component.kook.role.KookGuildRoleCreator
+import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.KookApi
+import love.forte.simbot.kook.api.role.CreateGuildRoleApi
+import love.forte.simbot.kook.api.role.GetGuildRoleListApi
 import love.forte.simbot.kook.objects.Guild
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
-import love.forte.simbot.utils.item.Items.Companion.emptyItems
 import love.forte.simbot.utils.item.effectedItemsBySequence
+import love.forte.simbot.utils.item.itemsByFlow
 
 
 /**
@@ -40,14 +50,13 @@ internal class KookGuildImpl(
     private val baseBot: KookBotImpl,
     override val source: Guild,
 ) : KookGuild {
-
-    internal var _bot: KookGuildBotImpl? = null
+    internal var internalBot: KookGuildBotImpl? = null
 
     override val bot: KookGuildBotImpl
         get() {
-            return _bot ?: (baseBot.internalMember(source.id, baseBot.sourceBot.botUserInfo.id)
+            return internalBot ?: (baseBot.internalMember(source.id, baseBot.sourceBot.botUserInfo.id)
                 ?: throw kookGuildNotExistsException(source.id)).let {
-                KookGuildBotImpl(baseBot, it).also { b -> _bot = b }
+                KookGuildBotImpl(baseBot, it).also { b -> internalBot = b }
             }
         }
 
@@ -76,9 +85,41 @@ internal class KookGuildImpl(
     override suspend fun member(id: ID): KookMember? =
         baseBot.internalMember(source.id, id.literal)
 
-    override val roles: Items<Role>
-        get() = emptyItems() // TODO("Not yet implemented")
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRoleImpl>
+        get() = itemsByFlow { prop ->
+            val pageSize = prop.batch.takeIf { it > 0 } ?: KookApi.DEFAULT_MAX_PAGE_SIZE
+            val limit = prop.limit.takeIf { it > 0 }
+            val offset = prop.offset.takeIf { it > 0 }
+            val startPage = offset?.div(pageSize) ?: KookApi.DEFAULT_START_PAGE
+            val drop = offset?.mod(pageSize) ?: 0
 
+            flow {
+                var page = startPage
+                do {
+                    val result = GetGuildRoleListApi
+                        .create(source.id, page = page, pageSize = pageSize)
+                        .requestDataBy(bot)
+                    val items = result.items
+                    items.forEach {
+                        emit(it)
+                    }
+                    page = result.meta.page + 1
+
+                } while (items.isNotEmpty() && result.meta.page < result.meta.pageTotal)
+            }.drop(drop).let { flow ->
+                if (limit != null) {
+                    flow.take(limit)
+                } else {
+                    flow
+                }
+            }.map { r ->
+                KookGuildRoleImpl(baseBot, this, r)
+            }
+        }
+
+    @ExperimentalSimbotApi
+    override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(baseBot, this)
 
     @ExperimentalSimbotApi
     override val categories: Items<KookChannelCategory>
@@ -90,5 +131,19 @@ internal class KookGuildImpl(
 
     override fun toString(): String {
         return "KookGuild(id=${source.id}, name=${source.name})"
+    }
+}
+
+
+@OptIn(ExperimentalSimbotApi::class)
+private class KookGuildRoleCreatorImpl(
+    private val baseBot: KookBotImpl,
+    private val guild: KookGuildImpl,
+) : KookGuildRoleCreator {
+    override var name: String? = null
+
+    override suspend fun create(): KookGuildRole {
+        val role = CreateGuildRoleApi.create(guild.source.id, name).requestDataBy(guild.bot)
+        return KookGuildRoleImpl(baseBot, guild, role)
     }
 }

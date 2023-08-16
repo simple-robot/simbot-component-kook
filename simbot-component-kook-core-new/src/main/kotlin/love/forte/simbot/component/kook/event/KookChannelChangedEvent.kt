@@ -220,9 +220,6 @@ public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), Decre
     }
 }
 
-// TODO KookDeletedCategoryEvent
-
-
 /**
  * KOOK 系统事件中与 _频道分组变更_ 相关的事件的simbot事件基准类。
  *
@@ -295,7 +292,7 @@ public abstract class KookAddedCategoryEvent : KookCategoryChangedEvent(), Incre
     /**
      * 增加的频道分组。
      *
-     * @see channel
+     * @see category
      */
     @JSTP
     override suspend fun after(): KookChannelCategory = category()
@@ -340,7 +337,7 @@ public abstract class KookUpdatedCategoryEvent : KookCategoryChangedEvent(), Cha
     /**
      * 变更后的频道分组信息
      *
-     * @see channel
+     * @see category
      */
     @JSTP
     override suspend fun after(): KookChannelCategory = category()

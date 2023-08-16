@@ -52,7 +52,7 @@ public sealed interface KookRole : Role, DeleteSupport {
     /**
      * 得到当前Role对应的原始API返回类型 [Role][love.forte.simbot.kook.objects.Role].
      */
-    public val sourceRole: love.forte.simbot.kook.objects.Role
+    public val source: love.forte.simbot.kook.objects.Role
 
     /**
      * 角色ID

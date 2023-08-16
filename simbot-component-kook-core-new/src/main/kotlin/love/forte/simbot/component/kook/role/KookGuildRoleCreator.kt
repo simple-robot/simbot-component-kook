@@ -61,21 +61,3 @@ public interface KookGuildRoleCreator {
     public suspend fun create(): KookGuildRole
 }
 
-
-
-/**
- * 使用 DSL 风格API创建一个 [KookGuildRole].
- *
- * ```kotlin
- * val newRole = guild.createRole {
- *    name = "武旦"
- * }
- * ```
- *
- * @see KookGuild.roleCreator
- */
-@ExperimentalSimbotApi
-public suspend inline fun KookGuild.createRole(block: KookGuildRoleCreator.() -> Unit): KookGuildRole {
-    TODO("Guild.roleCreator")
-//    return roleCreator().also(block).create()
-}

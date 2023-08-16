@@ -102,7 +102,6 @@ public expect abstract class PlatformKookApi<T>() : API<KookApiRequestor, T> {
  * @author ForteScarlet
  */
 public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>() {
-
     /**
      * 此请求最终的url。
      */
@@ -251,6 +250,16 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
 
 
     public companion object {
+        /**
+         * 常规情况下分页API的默认最大值。
+         */
+        public const val DEFAULT_MAX_PAGE_SIZE: Int = 50
+
+        /**
+         * 常规情况下分页API的默认起始页码
+         */
+        public const val DEFAULT_START_PAGE: Int = 1
+
         @JvmField
         internal val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
 

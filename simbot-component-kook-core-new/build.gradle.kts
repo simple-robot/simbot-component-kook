@@ -32,7 +32,7 @@ kotlin {
 }
 
 dependencies {
-    api(project(":simbot-component-kook-stdlib-multi"))
+    api(project(":simbot-component-kook-stdlib"))
     compileOnly(simbotCore)
     compileOnly(libs.jetbrains.annotations)
 
