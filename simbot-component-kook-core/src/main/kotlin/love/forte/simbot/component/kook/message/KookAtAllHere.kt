@@ -28,7 +28,7 @@ import love.forte.simbot.message.Message
  *
  * 行为与概念与 [AtAll] 类似。
  *
- * @see love.forte.simbot.kook.objects.AtTarget.Here
+ * @see love.forte.simbot.kook.objects.kmd.AtTarget.Here
  */
 @SerialName("kook.AtAllHere")
 @Serializable

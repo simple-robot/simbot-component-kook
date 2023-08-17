@@ -31,6 +31,7 @@ import love.forte.simbot.kook.event.*
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.kook.event.Event as KkEvent
+import love.forte.simbot.kook.objects.User as KUser
 
 /**
  * KOOK 的频道成员变更事件。
@@ -40,6 +41,7 @@ import love.forte.simbot.kook.event.Event as KkEvent
  * - [JoinedChannelEventExtra]
  * - [JoinedGuildEventExtra]
  * - [ExitedGuildEventExtra]
+ * - [UpdatedGuildMemberEventExtra]
  * - [SelfExitedGuildEventExtra]
  * - [SelfJoinedGuildEventExtra]
  *
@@ -49,15 +51,19 @@ import love.forte.simbot.kook.event.Event as KkEvent
  * 事件类型来进行更精准的事件监听。
  *
  * ## 相关事件
- * ### 频道成员变更事件
+ * ### 成员的频道变更事件
  * [KookMemberChannelChangedEvent] 事件及其子类型
  * [KookMemberJoinedChannelEvent]、[KookMemberExitedChannelEvent]
  * 代表了一个频道服务器中的某个群成员加入、离开某一个频道（通常为语音频道）的事件。
  *
- * ### 频道服务器成员变更事件
+ * ### 成员的服务器变更事件
  * [KookMemberGuildChangedEvent] 事件及其子类型
  * [KookMemberJoinedGuildEvent]、[KookMemberExitedGuildEvent]
  * 代表了一个频道服务器中有新群成员加入、旧成员离开此服务器的事件。
+ *
+ * ### 成员的信息变更事件
+ * [KookMemberUpdatedEvent] 事件
+ * 代表了一个成员的信息发生了变更的事件。
  *
  * ### Bot频道服务器事件
  * [KookBotMemberChangedEvent] 事件及其子类型
@@ -439,7 +445,83 @@ public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent()
     }
 }
 
+
 // endregion
+
+
+/**
+ * KOOK 频道成员信息更新事件。
+ *
+ * @see UpdatedGuildMemberEventExtra
+ * @author forte
+ */
+public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), GuildEvent {
+
+    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<UpdatedGuildMemberEventExtra>
+
+    override val sourceBody: UpdatedGuildMemberEventBody
+        get() = sourceEvent.extra.body
+
+    /**
+     * 发生变更前的用户信息。
+     * 从变更前用户信息中的 [KookMember.source] 中取得。
+     */
+    public abstract val beforeSource: KUser
+
+    /**
+     * 涉及的相关频道服务器。
+     */
+    @JSTP
+    abstract override suspend fun guild(): KookGuild
+
+    /**
+     * 涉及的相关频道服务器。
+     */
+    @JSTP
+    override suspend fun organization(): KookGuild = guild()
+
+    /**
+     * 涉及的相关频道服务器。同 [guild]
+     */
+    @JSTP
+    override suspend fun source(): KookGuild = guild()
+
+    /**
+     * 已经发生变更后的成员。
+     */
+    @JSTP
+    abstract override suspend fun member(): KookMember
+
+    /**
+     * 已经发生变更后的成员。同 [member].
+     *
+     * @see member
+     */
+    @JSTP
+    override suspend fun after(): KookMember = member()
+
+    /**
+     * 发生变更前的成员。
+     */
+    @JSTP
+    abstract override suspend fun before(): KookMember
+
+    /**
+     * 无法得知操作者，始终为 `null`。
+     */
+    @JSTP
+    override suspend fun operator(): KookMember? = null
+
+
+    override val key: Event.Key<out KookMemberUpdatedEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KookMemberUpdatedEvent>(
+        "kook.member_updated", KookMemberChangedEvent, GuildEvent
+    ) {
+        override fun safeCast(value: Any): KookMemberUpdatedEvent? = doSafeCast(value)
+    }
+}
 
 
 // endregion

@@ -89,7 +89,7 @@ public data class UpdatedGuildMemberEventBody(
     /**
      * 昵称
      */
-    val nickname: Long
+    val nickname: String
 )
 
 /**

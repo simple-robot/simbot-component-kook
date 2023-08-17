@@ -34,7 +34,9 @@ import love.forte.simbot.kook.api.member.GetGuildMemberListApi
 import love.forte.simbot.kook.api.member.createItemFlow
 import love.forte.simbot.kook.api.user.GetUserViewApi
 import love.forte.simbot.kook.event.*
+import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.kook.event.Event as KEvent
+import love.forte.simbot.kook.objects.User as KUser
 
 
 internal fun KookBotImpl.registerEvent() {
@@ -121,7 +123,7 @@ internal fun KookBotImpl.registerEvent() {
                         }
 
                         pushIfProcessable(KookMemberExitedGuildEvent) {
-                            KookMemberJoinedGuildEventImpl(
+                            KookMemberExitedGuildEventImpl(
                                 thisBot,
                                 event.doAs(),
                                 guild,
@@ -494,6 +496,58 @@ internal fun KookBotImpl.registerEvent() {
                         }
                     }
 
+                    // 服务器成员信息更新
+                    is UpdatedGuildMemberEventExtra -> {
+                        val guild = internalGuild(event.targetId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", event.targetId, event)
+                                return@processor
+                            }
+
+
+                        var oldMember: KookMemberImpl? = null
+                        val newNickname = ex.body.nickname
+
+                        val newMember = thisBot.inCacheModify {
+                            val key = memberCacheId(event.targetId, ex.body.userId)
+                            members.compute(key) { k, old ->
+                                if (old == null) {
+                                    return@compute null
+                                }
+
+                                // copy source
+                                oldMember = old
+                                val newSource = old.source.copyWithNewNickname(newNickname)
+                                KookMemberImpl(thisBot, newSource, old.guildIdValue)
+                            }
+                        }
+
+                        if (oldMember == null || newMember == null) {
+                            logger.warn("Unknown member {} in event {} for update.", event.targetId, event)
+                            return@processor
+                        }
+
+                        pushIfProcessable(KookMemberUpdatedEvent) {
+                            KookMemberUpdatedEventImpl(
+                                thisBot,
+                                event.doAs(),
+                                guild,
+                                newMember,
+                                oldMember!!
+                            )
+                        }
+                    }
+
+                    // 用户信息更新
+                    is UserUpdatedEventExtra -> {
+                        pushIfProcessable(KookUserUpdatedEvent) {
+                            KookUserUpdatedEventImpl(
+                                thisBot,
+                                event.doAs()
+                            )
+                        }
+                    }
+
                     else -> pushUnsupported(event)
                 }
 
@@ -537,3 +591,17 @@ private suspend inline fun KookBotImpl.pushIfProcessable(
 @Suppress("UNCHECKED_CAST")
 private inline fun <reified T : EventExtra> KEvent<*>.doAs(): KEvent<T> = this as KEvent<T>
 
+
+private fun KUser.copyWithNewNickname(nickname: String): KUser {
+    if (this is UserCopyWithNewNickname) {
+        return copy(nickname = nickname)
+    }
+
+    if (this is SimpleUser) {
+        return copy(nickname = nickname)
+    }
+
+    return UserCopyWithNewNickname(nickname, this)
+}
+
+private data class UserCopyWithNewNickname(override val nickname: String, val source: KUser) : KUser by source

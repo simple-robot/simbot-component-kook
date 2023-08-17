@@ -40,6 +40,7 @@ public class CreateInviteApi private constructor(
         // /api/v3/invite/create	POST
         private val PATH = ApiPath.create("invite", "list")
 
+        // TODO Empty CreateInviteApi
         private val EMPTY = CreateInviteApi()
 
         /**

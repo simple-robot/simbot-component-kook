@@ -2,7 +2,7 @@ name: Publish Release
 on:
   push:
     tags:
-      - v3.**.**.**
+      - v**
 
 env:
   IS_CI: true

@@ -25,8 +25,8 @@ import love.forte.simbot.kook.api.ApiResultType
  *
  * 对用户角色的操作结果响应体。
  *
- * @see GuildRoleGrantRequest
- * @see GuildRoleRevokeRequest
+ * @see GrantGuildRoleApi
+ * @see RevokeGuildRoleApi
  *
  *
  */
