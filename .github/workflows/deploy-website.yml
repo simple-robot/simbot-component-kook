@@ -8,7 +8,7 @@ on:
     paths:
       - 'website/**'
     tags-ignore:
-      - 'v3.**.**.**'
+      - 'v**'
 
 jobs:
   deploy-website:
