@@ -24,8 +24,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalStateException
 import love.forte.simbot.component.kook.KookComponent
@@ -106,7 +104,6 @@ internal class KookBotImpl(
     internal fun internalGuild(guildId: String) = internalCache.guilds[guildId]
     internal fun internalChannel(channelId: String) = internalCache.channels[channelId]
     internal fun internalCategory(categoryId: String) = internalCache.categories[categoryId]
-    internal fun internalChannels(): Collection<KookChannelImpl> = internalCache.channels.values
     internal fun internalChannels(guildId: String): Sequence<KookChannelImpl> =
         internalCache.channels.values.asSequence().filter { it.source.guildId == guildId }
 
@@ -114,7 +111,6 @@ internal class KookBotImpl(
         return internalCache.members.entries.asSequence().filter { it.key.guildId == guildId }.map { it.value }
     }
 
-    internal fun internalCategories(): Collection<KookChannelCategoryImpl> = internalCache.categories.values
     internal fun internalCategories(guildId: String): Sequence<KookChannelCategoryImpl> =
         internalCache.categories.values.asSequence().filter { it.source.guildId == guildId }
 
@@ -128,6 +124,21 @@ internal class KookBotImpl(
         return internalCache.members.keys.count { it.guildId == guildId }
     }
 
+    internal fun internalSetMuteJob(guildId: String, userId: String, value: MuteJob): MuteJob? {
+        val key = internalCache.memberCacheId(guildId, userId)
+        return internalCache.memberMutes.put(key, value)
+    }
+
+    internal fun internalRemoveMuteJob(guildId: String, userId: String, target: MuteJob? = null): MuteJob? {
+        val key = internalCache.memberCacheId(guildId, userId)
+        if (target != null) {
+            val removed = internalCache.memberMutes.remove(key, target)
+            return if (removed) target else null
+        }
+
+        return internalCache.memberMutes.remove(key)
+    }
+
 
     /**
      * 在从 [Dispatchers.IO] 中的单线程作用域中进行数据更新操作。
@@ -139,6 +150,8 @@ internal class KookBotImpl(
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
+
+        // TODO inCacheModify 并不能完全保证更新同步的安全.
 
         return withContext(cacheModifyContext) {
             internalCache.block()
@@ -380,20 +393,7 @@ internal class KookBotImpl(
         return "KookBot(clientId=${sourceBot.ticket.clientId}, isStarted=$isStarted, isActive=$isActive, isCancelled=$isCancelled)"
     }
 
-    companion object {
-        @OptIn(ExperimentalSerializationApi::class)
-        internal val DEFAULT_JSON = Json {
-            isLenient = true
-            encodeDefaults = true
-            ignoreUnknownKeys = true
-            allowSpecialFloatingPointValues = true
-            allowStructuredMapKeys = true
-            prettyPrint = false
-            useArrayPolymorphism = false
-            // see https://github.com/kaiheila/api-docs/issues/174
-            explicitNulls = false
-        }
-    }
+    companion object
 }
 
 
@@ -409,14 +409,32 @@ internal class InternalCache {
      */
     val members = ConcurrentHashMap<MemberCacheId, KookMemberImpl>()
 
-    // TODO member mute Job
+    val memberMutes = ConcurrentHashMap<MemberCacheId, MuteJob>()
 
-    private fun memberCacheId(guildId: String, userId: String): MemberCacheId = MemberCacheId(guildId, userId)
+    fun memberCacheId(guildId: String, userId: String): MemberCacheId = MemberCacheId(guildId, userId)
 
     fun member(guildId: String, userId: String): KookMemberImpl? = members[memberCacheId(guildId, userId)]
 
     fun setMember(guildId: String, userId: String, value: KookMemberImpl): KookMemberImpl? =
         members.put(memberCacheId(guildId, userId), value)
 
-    fun removeMember(guildId: String, userId: String): KookMemberImpl? = members.remove(memberCacheId(guildId, userId))
+    fun removeMember(guildId: String, userId: String, removeAndCancelMuteJob: Boolean = true): KookMemberImpl? {
+        val key = memberCacheId(guildId, userId)
+        val removed = members.remove(key)
+        if (removeAndCancelMuteJob) {
+            memberMutes.remove(key)?.cancel()
+        }
+        return removed
+    }
+}
+
+
+
+/**
+ * @author ForteScarlet
+ */
+internal class MuteJob(val job: Job) {
+    fun cancel() {
+        job.cancel()
+    }
 }

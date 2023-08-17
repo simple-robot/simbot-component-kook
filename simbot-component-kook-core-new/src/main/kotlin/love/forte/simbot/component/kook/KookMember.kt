@@ -155,8 +155,6 @@ public interface KookMember : GuildMember, CoroutineScope {
     override suspend fun send(text: String): KookMessageReceipt
 
 
-    // TODO mute
-
     //region mute API
 
     /**
@@ -198,6 +196,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * - 程序中断
      * - Bot终止
      * - 成员退出服务器（如果在有效期内再次返回频道，不会恢复静音状态，也不会有取消静音的任务被执行）
+     * - 取消禁言时BOT已经不再拥有相关权限
      * - 其他预料之外的情况
      *
      * @throws ApiResultException API 请求过程中产生的异常
@@ -223,6 +222,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * - 程序中断
      * - Bot终止
      * - 成员退出服务器（如果在有效期内再次返回频道，不会恢复静音状态，也不会有取消静音的任务被执行）
+     * - 取消禁言时BOT已经不再拥有相关权限
      * - 其他预料之外的情况
      *
      * @throws ApiResultException API 请求过程中产生的异常
@@ -248,6 +248,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * - 程序中断
      * - Bot终止
      * - 成员退出服务器（如果在有效期内再次返回频道，不会恢复静音状态，也不会有取消静音的任务被执行）
+     * - 取消禁言时BOT已经不再拥有相关权限
      * - 其他预料之外的情况
      *
      * @throws ApiResultException API 请求过程中产生的异常
@@ -273,6 +274,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * - 程序中断
      * - Bot终止
      * - 成员退出服务器（如果在有效期内再次返回频道，不会恢复静音状态，也不会有取消静音的任务被执行）
+     * - 取消禁言时BOT已经不再拥有相关权限
      * - 其他预料之外的情况
      *
      * @throws ApiResultException API 请求过程中产生的异常
@@ -298,6 +300,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * - 程序中断
      * - Bot终止
      * - 成员退出服务器（如果在有效期内再次返回频道，不会恢复静音状态，也不会有取消静音的任务被执行）
+     * - 取消禁言时BOT已经不再拥有相关权限
      * - 其他预料之外的情况
      *
      * @throws ApiResultException API 请求过程中产生的异常
@@ -323,6 +326,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * - 程序中断
      * - Bot终止
      * - 成员退出服务器（如果在有效期内再次返回频道，不会恢复静音状态，也不会有取消静音的任务被执行）
+     * - 取消禁言时BOT已经不再拥有相关权限
      * - 其他预料之外的情况
      *
      * @throws ApiResultException API 请求过程中产生的异常
@@ -415,9 +419,6 @@ public interface KookMember : GuildMember, CoroutineScope {
      */
     @ExperimentalSimbotApi
     override val roles: Items<KookMemberRole>
-
-
-    // TODO SystemUser
 
 
     public companion object {

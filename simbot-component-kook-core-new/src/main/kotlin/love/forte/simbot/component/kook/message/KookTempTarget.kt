@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ID
+import love.forte.simbot.component.kook.event.KookChannelMessageEvent
 import love.forte.simbot.component.kook.message.KookTempTarget.Key.byId
 import love.forte.simbot.component.kook.message.KookTempTarget.Key.current
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
@@ -75,12 +76,16 @@ public sealed class KookTempTarget : KookMessageElement<KookTempTarget> {
     /**
      * 指定具体的用户ID
      */
+    @Serializable
+    @SerialName("kook.temp.target.std")
     internal data class Target(val id: ID) : KookTempTarget()
 
 
     /**
      * 尝试自动使用可获取到的目标用户ID
      */
+    @Serializable
+    @SerialName("kook.temp.target.curr")
     internal object Current : KookTempTarget() {
         override fun equals(other: Any?): Boolean = this === other
         override fun toString(): String = "Current"

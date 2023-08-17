@@ -25,6 +25,7 @@ import love.forte.simbot.JSTP
 import love.forte.simbot.bot.Bot
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.KookGuild
+import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookAsset
 import love.forte.simbot.component.kook.message.KookAssetImage
@@ -291,5 +292,12 @@ public interface KookBot : Bot, CoroutineScope {
  * @see GuildBot
  */
 public interface KookGuildBot : KookBot, GuildBot {
-    // TODO
+
+    /**
+     * 将当前 bot 转化为 [KookMember]
+     */
+    override suspend fun asMember(): KookMember
+
+
+
 }

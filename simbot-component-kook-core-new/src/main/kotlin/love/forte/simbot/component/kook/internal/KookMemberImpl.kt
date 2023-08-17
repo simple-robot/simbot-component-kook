@@ -17,12 +17,16 @@
 
 package love.forte.simbot.component.kook.internal
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.JavaDuration
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
+import love.forte.simbot.component.kook.bot.internal.MuteJob
 import love.forte.simbot.component.kook.kookGuildNotExistsException
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
@@ -40,6 +44,7 @@ import love.forte.simbot.utils.item.Items
 import love.forte.simbot.utils.item.effectedItemsByFlow
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -89,29 +94,63 @@ internal class KookMemberImpl(
             }
         }
 
-    // TODO
-    private suspend fun mute0(type: Int, milli: Long): Boolean {
-        val api = CreateGuildMuteApi.create(guildIdValue, source.id, type)
+    private suspend fun mute0(type: Int, milli: Long) {
+        val userId = source.id
+        val guildIdStr = guildIdValue
 
-        TODO("Not yet implemented")
+        val api = CreateGuildMuteApi.create(guildIdStr, userId, type)
+        api.requestDataBy(bot)
+
+        if (milli <= 0) {
+            return
+        }
+
+        val logger = bot.logger
+        val name = source.username
+        val delayJob = bot.launch(start = CoroutineStart.LAZY) {
+            delay(milli)
+            // delay and do unmute
+            runCatching {
+                if (logger.isDebugEnabled) {
+                    logger.debug("After a delay of {}, unmute(type={}) for member(id={}, username={}) in guild(id={})", milli.milliseconds.toString(), type, userId, name, guildIdStr)
+                }
+                DeleteGuildMuteApi.create(guildIdStr, userId, type).requestDataBy(bot)
+            }.onFailure { e ->
+                logger.error("Can not unmute(type={}) for member(id={}, username={}) in guild(id={}) because of: {}", userId, name, guildIdStr, e.localizedMessage, e)
+            }
+        }
+
+        val muteJob = MuteJob(delayJob)
+
+        bot.internalSetMuteJob(guildIdStr, userId, muteJob)?.cancel()
+
+        delayJob.invokeOnCompletion {
+            bot.internalRemoveMuteJob(guildIdStr, userId, muteJob)
+        }
+
+        delayJob.start()
+
     }
 
 
-    override suspend fun mute(type: Int): Boolean = mute0(type, 0L)
+    override suspend fun mute(type: Int): Boolean = true.also { mute0(type, 0L) }
 
     @ExperimentalSimbotApi
-    override suspend fun mute(type: Int, duration: Duration): Boolean = mute0(type, duration.inWholeMilliseconds)
+    override suspend fun mute(type: Int, duration: Duration): Boolean =
+        true.also { mute0(type, duration.inWholeMilliseconds) }
 
     @ExperimentalSimbotApi
-    override suspend fun mute(type: Int, duration: JavaDuration): Boolean = mute0(type, duration.toMillis())
+    override suspend fun mute(type: Int, duration: JavaDuration): Boolean =
+        true.also { mute0(type, duration.toMillis()) }
 
     @ExperimentalSimbotApi
-    override suspend fun mute(type: Int, time: Long, timeUnit: TimeUnit): Boolean = mute0(type, timeUnit.toMillis(time))
+    override suspend fun mute(type: Int, time: Long, timeUnit: TimeUnit): Boolean =
+        true.also { mute0(type, timeUnit.toMillis(time)) }
 
     override suspend fun unmute(type: Int): Boolean {
-        //  TODO cancel MuteJob?
-        DeleteGuildMuteApi.create(guildIdValue, source.id, type).requestDataBy(bot)
-
+        val userId = source.id
+        DeleteGuildMuteApi.create(guildIdValue, userId, type).requestDataBy(bot)
+        bot.internalRemoveMuteJob(guildIdValue, userId)?.cancel()
         return true
     }
 

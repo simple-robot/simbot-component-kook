@@ -19,6 +19,7 @@ package love.forte.simbot.kook.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.objects.SystemUser.id
 
 
 /**
@@ -140,7 +141,8 @@ public data class SimpleUser(
      * 没有 `identify_num` 的情况下，会**尝试**从 [username] 中切割 `#` 并解析出 identifyNum 的值，
      * 无法得到结果时使用空字符串。
      */
-    @SerialName("identify_num") override val identifyNum: String = username.split("#", limit = 2).let { if (it.size < 2) it[0] else "" },
+    @SerialName("identify_num") override val identifyNum: String = username.split("#", limit = 2)
+        .let { if (it.size < 2) it[0] else "" },
     /**
      * 当前是否在线，默认为 `false`
      */
@@ -166,3 +168,98 @@ public data class SimpleUser(
      */
     override val roles: List<Long>? = null
 ) : User
+
+
+/**
+ *
+ * 当 [id] == `1` 的时候，用户代表为 _系统用户_ 。
+ *
+ * 参考 [事件结构/格式说明](https://developer.kaiheila.cn/doc/event/event-introduction) 中事件结构的 `author_id` 字段说明。
+ *
+ * @see User
+ */
+public object SystemUser : User {
+    /**
+     * 系统用户的默认ID值。
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public const val SYSTEM_USER_ID: String = "1"
+
+    /**
+     * 系统用户的默认用户名与昵称。
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public const val SYSTEM_USER_NAME: String = "System"
+
+    /**
+     * 系统用户的默认 `identifyNum`
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public const val SYSTEM_USER_IDENTIFY_NUM: String = "0000"
+
+    /**
+     * 系统用户ID，始终为 [SYSTEM_USER_ID]。
+     */
+    override val id: String = SYSTEM_USER_ID
+
+    /**
+     * 系统用户名称，始终为 [SYSTEM_USER_NAME]
+     */
+    override val username: String
+        get() = SYSTEM_USER_NAME
+
+    /**
+     * 系统用户昵称，始终为 [SYSTEM_USER_NAME]
+     */
+    override val nickname: String
+        get() = SYSTEM_USER_NAME
+
+    /**
+     * 系统用户的 `identifyNum`，始终为 [SYSTEM_USER_IDENTIFY_NUM]
+     */
+    override val identifyNum: String
+        get() = SYSTEM_USER_IDENTIFY_NUM
+
+    /**
+     * 系统用户始终在线
+     */
+    override val isOnline: Boolean
+        get() = true
+
+    /**
+     * 系统用户不算 `bot`，值为 `false`
+     */
+    override val isBot: Boolean
+        get() = false
+
+    /**
+     * 系统用户状态，始终为 `0`
+     */
+    override val status: Int
+        get() = 0
+
+    /**
+     * 系统用户头像，始终为空字符串 `""`
+     */
+    override val avatar: String
+        get() = ""
+
+    /**
+     * 系统用户 `vipAvatar` ，始终为 `null`
+     */
+    override val vipAvatar: String?
+        get() = null
+
+    /**
+     * 系统用户手机号始终为未验证，值为 `false`
+     */
+    override val isMobileVerified: Boolean
+        get() = false
+
+    /**
+     * 系统用户持有角色列表始终为 `null`
+     */
+    override val roles: List<Long>?
+        get() = null
+}
+
