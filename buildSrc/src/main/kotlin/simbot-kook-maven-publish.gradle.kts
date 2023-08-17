@@ -16,10 +16,10 @@
  */
 
 import love.forte.gradle.common.core.Gpg
-import love.forte.gradle.common.core.property.systemProp
-import love.forte.gradle.common.publication.configure.commonConfigMavenPublication
 import love.forte.gradle.common.publication.configure.jvmConfigPublishing
 import util.checkPublishConfigurable
+import util.isCi
+import util.isLinux
 
 /*
  *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
@@ -50,43 +50,45 @@ logger.info("isSnapshotOnly: $isSnapshotOnly")
 logger.info("isReleaseOnly: $isReleaseOnly")
 logger.info("isPublishConfigurable: $isPublishConfigurable")
 
-checkPublishConfigurable {
-    jvmConfigPublishing {
-        project = P
-        publicationName = "kookDist"
-        val jarSources by tasks.registering(Jar::class) {
-            archiveClassifier.set("sources")
-            from(sourceSets["main"].allSource)
+if (!isCi || isLinux) {
+    checkPublishConfigurable {
+        jvmConfigPublishing {
+            project = P
+            publicationName = "kookDist"
+            val jarSources by tasks.registering(Jar::class) {
+                archiveClassifier.set("sources")
+                from(sourceSets["main"].allSource)
+            }
+
+            val jarJavadoc by tasks.registering(Jar::class) {
+                archiveClassifier.set("javadoc")
+            }
+
+            artifact(jarSources)
+            artifact(jarJavadoc)
+
+            isSnapshot = isSnapshot()
+            releasesRepository = ReleaseRepository
+            snapshotRepository = SnapshotRepository
+            gpg = if (isSnapshot()) null else Gpg.ofSystemPropOrNull()
         }
 
-        val jarJavadoc by tasks.registering(Jar::class) {
-            archiveClassifier.set("javadoc")
-        }
-
-        artifact(jarSources)
-        artifact(jarJavadoc)
-
-        isSnapshot = isSnapshot()
-        releasesRepository = ReleaseRepository
-        snapshotRepository = SnapshotRepository
-        gpg = if (isSnapshot()) null else Gpg.ofSystemPropOrNull()
-    }
-
-    if (isSnapshot()) {
-        publishing {
-            publications.withType<MavenPublication> {
-                version = P.snapshotVersion.toString()
+        if (isSnapshot()) {
+            publishing {
+                publications.withType<MavenPublication> {
+                    version = P.snapshotVersion.toString()
+                }
             }
         }
-    }
 
-    publishing {
-        publications.withType<MavenPublication> {
-            show()
+        publishing {
+            publications.withType<MavenPublication> {
+                show()
+            }
         }
+
+
     }
-
-
 }
 
 

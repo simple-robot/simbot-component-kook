@@ -1,3 +1,5 @@
+import love.forte.gradle.common.core.project.setup
+
 /*
  * Copyright (c) 2022-2023. ForteScarlet.
  *
@@ -22,6 +24,8 @@ plugins {
     `simbot-kook-suspend-transform`
     `kook-dokka-partial-configure`
 }
+
+setup(P)
 
 kotlin {
     sourceSets.configureEach {
