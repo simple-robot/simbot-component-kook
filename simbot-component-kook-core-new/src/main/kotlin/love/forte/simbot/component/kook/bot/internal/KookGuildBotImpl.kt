@@ -24,7 +24,6 @@ import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.component.kook.internal.KookUserChatImpl
-import love.forte.simbot.definition.GuildMember
 import love.forte.simbot.event.EventProcessor
 import love.forte.simbot.kook.Bot
 import love.forte.simbot.message.Image
@@ -59,7 +58,7 @@ internal class KookGuildBotImpl(
 
     override suspend fun contactCount(): Int = bot.contactCount()
 
-    override suspend fun asMember(): GuildMember = member
+    override suspend fun asMember(): KookMember = member
 
     override val sourceBot: Bot
         get() = bot.sourceBot
