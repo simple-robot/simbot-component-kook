@@ -26,6 +26,9 @@ plugins {
 }
 
 setup(P)
+if (isSnapshot()) {
+    version = P.snapshotVersion.toString()
+}
 
 kotlin {
     sourceSets.configureEach {

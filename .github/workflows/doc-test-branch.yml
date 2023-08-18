@@ -1,0 +1,28 @@
+name: Test Doc Branch
+on:
+  pull_request:
+    branches:
+      - 'dev/**'
+    paths:
+      - 'website/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-website:
+    name: Build Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+          cache-dependency-path: ./website/package-lock.json
+
+      - run: |
+          npm ci
+          npm run build
+        working-directory: ./website

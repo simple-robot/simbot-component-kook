@@ -26,6 +26,9 @@ plugins {
 }
 
 setup(P)
+if (isSnapshot()) {
+    version = P.snapshotVersion.toString()
+}
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"
