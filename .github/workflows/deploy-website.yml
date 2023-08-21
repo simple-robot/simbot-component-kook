@@ -1,6 +1,7 @@
 name: Deploy Website
 on:
-  push:
+   workflow_dispatch:
+   push:
     branches:
       - main
       - dev/ver/**
