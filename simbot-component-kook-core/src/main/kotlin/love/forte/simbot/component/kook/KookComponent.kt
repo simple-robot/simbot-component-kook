@@ -102,7 +102,8 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
                 subclass(KookCardMessage::class, KookCardMessage.serializer())
                 subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer())
 
-                subclass(KookTempTarget::class, KookTempTarget.serializer())
+                subclass(KookTempTarget.Current::class, KookTempTarget.Current.serializer())
+                subclass(KookTempTarget.Target::class, KookTempTarget.Target.serializer())
             }
 
             polymorphic(KMarkdown::class) {

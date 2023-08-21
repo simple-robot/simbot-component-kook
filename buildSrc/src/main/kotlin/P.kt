@@ -68,7 +68,7 @@ object P : ProjectDetail() {
         0, 0
     )
 
-    private val alphaSuffix = v("alpha", 8) - v("dev", 2)
+    private val alphaSuffix = v("alpha", 8) - v("dev", 3)
 
     override val version: Version = baseVersion - alphaSuffix
 
