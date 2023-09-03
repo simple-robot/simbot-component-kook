@@ -553,6 +553,11 @@ internal fun KookBotImpl.registerEvent() {
 
 
             }
+
+            is UnknownExtra -> {
+                //  TODO 对应的事件
+                pushUnsupported(event)
+            }
         }
 
 

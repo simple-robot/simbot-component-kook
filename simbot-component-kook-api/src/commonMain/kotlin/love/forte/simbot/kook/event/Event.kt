@@ -20,10 +20,12 @@ package love.forte.simbot.kook.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.objects.SimpleAttachments
 import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.kook.objects.kmd.RawValueKMarkdown
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 
 /**
@@ -509,4 +511,46 @@ public sealed class SystemExtra : EventExtra() {
      */
     @Contextual
     public abstract val body: Any?
+}
+
+
+/**
+ * 当一个事件反序列化失败的时候，会被**尝试**使用 [UnknownExtra] 作为 `extra` 的序列化目标。
+ * 如果是因为一个未知的事件导致的这次失败，则 [UnknownExtra] 便会反序列化成功并被推送。
+ *
+ */
+@Serializable
+@SerialName("$\$UNKNOWN")
+public class UnknownExtra : EventExtra() {
+    @Transient
+    private lateinit var _source: String
+
+    /**
+     * 接收到的完整的原始事件JSON字符串
+     */
+    public val source: String
+        get() = _source
+
+    /**
+     * @suppress 内部使用，用于初始化 [source] 值
+     */
+    @InternalSimbotApi
+    @JvmSynthetic
+    public fun initSource(source: String) {
+        if (sourceInitialized) {
+            throw IllegalStateException("'source' has already initialized")
+        }
+
+        _source = source
+    }
+
+    private val sourceInitialized get() = ::_source.isInitialized
+
+    override fun toString(): String {
+        if (!sourceInitialized) {
+            return "UnknownExtra(source=<UNINITIALIZED>)"
+        }
+
+        return "UnknownExtra(source=$source)"
+    }
 }

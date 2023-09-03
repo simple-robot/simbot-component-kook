@@ -29,6 +29,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.KookBotClientCloseException
@@ -37,6 +38,7 @@ import love.forte.simbot.kook.api.Gateway
 import love.forte.simbot.kook.api.GetGatewayApi
 import love.forte.simbot.kook.event.EventExtra
 import love.forte.simbot.kook.event.Signal
+import love.forte.simbot.kook.event.UnknownExtra
 import love.forte.simbot.logger.Logger
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
@@ -527,7 +529,18 @@ private class Receiving(
                     eventLogger.warn("Cannot resolve event deserialization strategy via json property 'd' {}", jsonDObj)
                     return this
                 } else {
-                    event = json.decodeFromJsonElement(deserializer, jsonElement)
+                    event = try {
+                        json.decodeFromJsonElement(deserializer, jsonElement)
+                    } catch (se: SerializationException) {
+                        try {
+                            json.decodeFromJsonElement(Signal.Event.serializer(UnknownExtra.serializer()), jsonElement).also {
+                                it.data.extra.initSource(eventString)
+                            }
+                        } catch (e1: Exception) {
+                            se.addSuppressed(e1)
+                            throw se
+                        }
+                    }
                 }
 
 
