@@ -21,6 +21,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.bot.BotVerifyInfo
 import love.forte.simbot.component.kook.bot.KookBotVerifyInfoConfiguration.Ticket
+import love.forte.simbot.kook.BotConfiguration
+import love.forte.simbot.kook.ProcessorType
 import love.forte.simbot.kook.TokenType
 
 /**
@@ -54,7 +56,22 @@ import love.forte.simbot.kook.TokenType
  *              "syncPeriod": 180000,
  *              "batchDelay": 0
  *          }
- *       }
+ *       },
+ *       "clientEngineConfig": {
+ *            "threadsCount": null,
+ *            "pipelining": null
+ *       },
+ *       "wsEngineConfig": {
+ *            "threadsCount": null,
+ *            "pipelining": null
+ *       },
+ *       "timeout": {
+ *           "connectTimeoutMillis": 5000,
+ *           "requestTimeoutMillis": 5000,
+ *           "socketTimeoutMillis": null
+ *       },
+ *       "wsConnectTimeout": null,
+ *       "isNormalEventProcessAsync": null
  *    }
  * }
  * ```
@@ -104,24 +121,65 @@ public data class KookBotVerifyInfoConfiguration(
          */
         val syncPeriods: KookBotConfiguration.SyncPeriods? = null,
 
+        /**
+         * 参考 [BotConfiguration.clientEngineConfig]
+         * @see BotConfiguration.clientEngineConfig
+         */
+        val clientEngineConfig: BotConfiguration.EngineConfiguration? = null,
+
+        /**
+         * 参考 [BotConfiguration.wsEngineConfig]
+         * @see BotConfiguration.wsEngineConfig
+         */
+        val wsEngineConfig: BotConfiguration.EngineConfiguration? = null,
+
+        /**
+         * 参考 [BotConfiguration.timeout]
+         *
+         * @see BotConfiguration.timeout
+         *
+         */
+        val timeout: BotConfiguration.TimeoutConfiguration? = null,
+
+        /**
+         * ws连接超时时间，单位 ms 。
+         *
+         * 更多说明参考 [BotConfiguration.wsConnectTimeout]
+         *
+         * @see BotConfiguration.wsConnectTimeout
+         */
+        val wsConnectTimeout: Long? = null,
+
+
+        /**
+         * [ProcessorType.NORMAL] 类型的事件处理器是否在异步中执行。
+         *
+         * 更多说明参考 [BotConfiguration.isNormalEventProcessAsync]
+         *
+         * @see BotConfiguration.isNormalEventProcessAsync
+         */
+        val isNormalEventProcessAsync: Boolean? = null,
+
         ) {
         public companion object
-
     }
 
 
     internal fun includeConfig(configuration: KookBotConfiguration) {
         if (config != null) {
-            config.isCompress?.also { configuration.botConfiguration.isCompress = it }
             config.syncPeriods?.also { configuration.syncPeriods = it }
+
+            config.isCompress?.also { configuration.botConfiguration.isCompress = it }
+            config.clientEngineConfig?.also { configuration.botConfiguration.clientEngineConfig = it }
+            config.wsEngineConfig?.also { configuration.botConfiguration.wsEngineConfig = it }
+            config.timeout?.also { configuration.botConfiguration.timeout = it }
+
+            config.wsConnectTimeout?.also { configuration.botConfiguration.wsConnectTimeout = it }
+            config.isNormalEventProcessAsync?.also { configuration.botConfiguration.isNormalEventProcessAsync = it }
         }
     }
 
 
-    public companion object {
-        // TODO
-//        internal val serializersModule = SerializersModule {
-
-//        }
-    }
+    public companion object
 }
+

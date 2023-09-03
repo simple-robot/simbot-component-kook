@@ -18,6 +18,7 @@
 package love.forte.simbot.kook
 
 import io.ktor.client.engine.*
+import kotlinx.serialization.Serializable
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -94,8 +95,23 @@ public class BotConfiguration {
      * 针对 [HttpClientEngineConfig] 中的通用默认属性的配置。
      *
      */
+    @Serializable
     public data class EngineConfiguration(
+        /**
+         * 参考 [HttpClientEngineConfig.threadsCount][io.ktor.client.engine.HttpClientEngineConfig.threadsCount]
+         *
+         * 默认为 `null`。为 `null` 时不进行显示配置。
+         *
+         * @see io.ktor.client.engine.HttpClientEngineConfig.threadsCount
+         */
         public var threadsCount: Int? = null,
+        /**
+         * 参考 [HttpClientEngineConfig.pipelining][io.ktor.client.engine.HttpClientEngineConfig.pipelining]
+         *
+         * 默认为 `null`。为 `null` 时不进行显示配置。
+         *
+         * @see io.ktor.client.engine.HttpClientEngineConfig.pipelining
+         */
         public var pipelining: Boolean? = null,
 
         // TODO proxy support?
@@ -124,9 +140,25 @@ public class BotConfiguration {
     /**
      * api请求的统一超时时间配置。
      */
+    @Serializable
     public data class TimeoutConfiguration(
+        /**
+         * 参考 [HttpTimeout.connectTimeoutMillis][io.ktor.client.plugins.HttpTimeout.connectTimeoutMillis]
+         *
+         * @see io.ktor.client.plugins.HttpTimeout.connectTimeoutMillis
+         */
         var connectTimeoutMillis: Long? = null,
+        /**
+         * 参考 [HttpTimeout.requestTimeoutMillis][io.ktor.client.plugins.HttpTimeout.requestTimeoutMillis]
+         *
+         * @see io.ktor.client.plugins.HttpTimeout.requestTimeoutMillis
+         */
         var requestTimeoutMillis: Long? = null,
+        /**
+         * 参考 [HttpTimeout.socketTimeoutMillis][io.ktor.client.plugins.HttpTimeout.socketTimeoutMillis]
+         *
+         * @see io.ktor.client.plugins.HttpTimeout.socketTimeoutMillis
+         */
         var socketTimeoutMillis: Long? = null,
     ) {
         public constructor() : this(null, null, null)

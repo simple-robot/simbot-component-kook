@@ -49,7 +49,7 @@ public class KookBotConfiguration(
      */
     @Serializable
     public data class SyncPeriods(
-            val guild: GuildSyncPeriod
+            val guild: GuildSyncPeriod = GuildSyncPeriod()
         )
 
     /**
