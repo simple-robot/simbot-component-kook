@@ -318,3 +318,7 @@ public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
         override fun safeCast(value: Any): KookBotSelfMessageEvent? = doSafeCast(value)
     }
 }
+
+
+
+// TODO 消息更新、消息删除
