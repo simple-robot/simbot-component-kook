@@ -1,3 +1,22 @@
+# v3.2.0.0-alpha.8-dev.4
+
+> Release & Pull Notes: [v3.2.0.0-alpha.8-dev.4](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8-dev.4) 
+
+- feat: core模块下 `KookEvent`追加属性 `sourceEventContent` 来支持获取原始的JSON事件字符串 ([`0e3a4c5`](https://github.com/simple-robot/simpler-robot/commit/0e3a4c5))
+- feat: api和core支持私聊消息更新、频道消息更新 ([`fe39082`](https://github.com/simple-robot/simpler-robot/commit/fe39082))
+- feat: api和core支持私聊消息撤回、频道消息撤回 ([`015dfde`](https://github.com/simple-robot/simpler-robot/commit/015dfde))
+- feat: 一些针对未知事件的处理 ([`2a5ac0d`](https://github.com/simple-robot/simpler-robot/commit/2a5ac0d))
+- pref(core): simbot-component-kook-107 core模块bot配置文件增加更多属性支持 ([`1b7173a..7b6c404`](https://github.com/simple-robot/simpler-robot/compare/1b7173a..5712572))
+
+    <details><summary><code>1b7173a..7b6c404</code></summary>
+
+    - [`1b7173a`](https://github.com/simple-robot/simpler-robot/commit/1b7173a)
+    - [`7b6c404`](https://github.com/simple-robot/simpler-robot/commit/7b6c404)
+
+    </details>
+
+- CI: website deploy ([`5712572`](https://github.com/simple-robot/simpler-robot/commit/5712572))
+
 # v3.2.0.0-alpha.8-dev.3
 
 > Release & Pull Notes: [v3.2.0.0-alpha.8-dev.3](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8-dev.3) 
