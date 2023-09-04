@@ -29,7 +29,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
+import love.forte.simbot.FragileSimbotApi
 import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.KookBotClientCloseException
 import love.forte.simbot.kook.KookBotConnectException
@@ -37,6 +39,7 @@ import love.forte.simbot.kook.api.Gateway
 import love.forte.simbot.kook.api.GetGatewayApi
 import love.forte.simbot.kook.event.EventExtra
 import love.forte.simbot.kook.event.Signal
+import love.forte.simbot.kook.event.UnknownExtra
 import love.forte.simbot.logger.Logger
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
@@ -527,7 +530,39 @@ private class Receiving(
                     eventLogger.warn("Cannot resolve event deserialization strategy via json property 'd' {}", jsonDObj)
                     return this
                 } else {
-                    event = json.decodeFromJsonElement(deserializer, jsonElement)
+                    event = try {
+                        json.decodeFromJsonElement(deserializer, jsonElement)
+                    } catch (se: SerializationException) {
+                        var throwIt = false
+
+                        @OptIn(FragileSimbotApi::class)
+                        val event0: Signal.Event<EventExtra>? = try {
+                            json.decodeFromJsonElement(Signal.Event.serializer(UnknownExtra.serializer()), jsonElement).also {
+                                it.data.extra.initSource(eventString)
+                            }
+                        } catch (e1: Exception) {
+                            se.addSuppressed(e1)
+                            throwIt = true
+                            null
+                        }
+
+                        if (event0 == null) {
+                            // try to get sn and update
+                            val sn = ((jsonElement as? JsonObject)?.get("sn") as? JsonPrimitive)?.longOrNull
+                            if (sn != null) {
+                                updateSn(sn)
+                            } else {
+                                val snEx = IllegalStateException("'sn' not found in event json, can not update sn for it")
+                                se.addSuppressed(snEx)
+                            }
+                        }
+
+                        if (throwIt) {
+                            throw se
+                        }
+
+                        event0!!
+                    }
                 }
 
 
@@ -535,7 +570,7 @@ private class Receiving(
 
                 // 更新 sn, 保留最大值
                 val eventSn = event.sn.toLong()
-                val currentSn = client.sn.updateSn(eventSn)
+                val currentSn = updateSn(eventSn)
                 if (eventSn < currentSn) {
                     eventLogger.debug("Event sn {} < current sn {}, ignore and skip this event.", eventSn, currentSn)
                     return this
@@ -573,6 +608,8 @@ private class Receiving(
 
         return this
     }
+
+    private fun updateSn(eventSn: Long) = client.sn.updateSn(eventSn)
 
     private fun AtomicLongRef.updateSn(newSn: Long): Long {
         return updateAndGet { v -> max(newSn, v) }

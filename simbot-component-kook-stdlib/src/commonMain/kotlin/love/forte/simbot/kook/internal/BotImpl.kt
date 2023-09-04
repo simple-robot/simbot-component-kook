@@ -57,6 +57,8 @@ internal class BotImpl(
     private val botLogger = LoggerFactory.getLogger("love.forte.simbot.kook.bot.${ticket.clientId}")
     internal val eventLogger = LoggerFactory.getLogger("love.forte.simbot.kook.event.${ticket.clientId}")
 
+    // TODO 异常处理器或未知事件处理
+
     override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
     private val queueMap = ActualEnumMap.create<ProcessorType, EventProcessorQueue<EventProcessor>> {

@@ -20,10 +20,13 @@ package love.forte.simbot.kook.event
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.FragileSimbotApi
+import love.forte.simbot.InternalSimbotApi
 import love.forte.simbot.kook.objects.SimpleAttachments
 import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.kook.objects.kmd.RawValueKMarkdown
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 
 /**
@@ -195,9 +198,15 @@ public data class Event<out E : EventExtra>(
 /**
  * 事件的消息 `extra`。
  *
+ * ### [UnknownExtra]
+ *
+ * [UnknownExtra] 与其他子类型有所不同。[UnknownExtra] 是由框架定义并实现的特殊类型，
+ * 它用来承载那些接收后无法被解析或尚未支持的事件类型。
+ *
  * @see Event.extra
  * @see TextExtra
  * @see SystemExtra
+ * @see UnknownExtra
  *
  */
 @Serializable
@@ -509,4 +518,57 @@ public sealed class SystemExtra : EventExtra() {
      */
     @Contextual
     public abstract val body: Any?
+}
+
+
+/**
+ * 当一个事件反序列化失败的时候，会被**尝试**使用 [UnknownExtra] 作为 `extra` 的序列化目标。
+ * 如果是因为一个未知的事件导致的这次失败，则 [UnknownExtra] 便会反序列化成功并被推送。
+ *
+ *  [UnknownExtra] 不会提供任何可反序列化的属性，
+ *  取而代之的是提供了 [source] 来获取本次反序列化失败的的原始JSON字符串信息。
+ *  你可以通过 [source] 来做一些临时性处理，例如解析并获取其中的信息。
+ *
+ *
+ *  ### FragileSimbotApi
+ *
+ *  [UnknownExtra] 类型的事件会随着支持的事件类型的增多而减少。
+ *  对可能造成 [UnknownExtra] 出现概率降低的更新不会做专门的提示。
+ *  因此使用 [UnknownExtra] 时应当明确了解其可能出现的内容，同时不可过分依赖它。
+ */
+@FragileSimbotApi
+@Serializable
+@SerialName("$\$UNKNOWN")
+public class UnknownExtra : EventExtra() {
+    @Transient
+    private lateinit var _source: String
+
+    /**
+     * 接收到的完整的原始事件JSON字符串
+     */
+    public val source: String
+        get() = _source
+
+    /**
+     * @suppress 内部使用，用于初始化 [source] 值
+     */
+    @InternalSimbotApi
+    @JvmSynthetic
+    public fun initSource(source: String) {
+        if (sourceInitialized) {
+            throw IllegalStateException("'source' has already initialized")
+        }
+
+        _source = source
+    }
+
+    private val sourceInitialized get() = ::_source.isInitialized
+
+    override fun toString(): String {
+        if (!sourceInitialized) {
+            return "UnknownExtra(source=<UNINITIALIZED>)"
+        }
+
+        return "UnknownExtra(source=$source)"
+    }
 }

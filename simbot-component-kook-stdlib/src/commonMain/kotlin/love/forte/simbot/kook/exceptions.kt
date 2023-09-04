@@ -18,6 +18,7 @@
 package love.forte.simbot.kook
 
 import io.ktor.websocket.*
+import kotlinx.serialization.SerializationException
 
 /**
  * bot启动过程中、连接失败（比如多次重试仍无法连接）时抛出的异常。
@@ -52,4 +53,14 @@ public class KookBotClientCloseException : KookException {
     }
 }
 
-
+/**
+ * 事件接收中因为事件无法反序列化而导致的错误。
+ *
+ */
+public class EventDeserializationException(
+    /**
+     * 接收到的原始消息字符串
+     */
+    public val source: String,
+    message: String, cause: SerializationException
+) : KookException(message, cause)

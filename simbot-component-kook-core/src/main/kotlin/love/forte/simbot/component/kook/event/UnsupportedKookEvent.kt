@@ -26,6 +26,7 @@ import love.forte.simbot.delegate.stringID
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventExtra
+import love.forte.simbot.kook.event.UnknownExtra
 import love.forte.simbot.message.doSafeCast
 
 
@@ -42,6 +43,11 @@ import love.forte.simbot.message.doSafeCast
  *
  * 因此你应当首先查看 [KookEvent] 下是否有所需的已经实现的事件类型，并且不应当过分依赖 [UnsupportedKookEvent].
  *
+ * ### [UnknownExtra]
+ *
+ * [`sourceEvent.extra`][Event.extra] 中（理所应当地）有可能会出现 [UnknownExtra]。
+ * [UnknownExtra] 的含义与其他 [EventExtra] 的含义略有区别。详细说明可参考 [UnknownExtra] 的文档描述。
+ *
  * @author ForteScarlet
  */
 @DiscreetSimbotApi
@@ -49,6 +55,7 @@ public class UnsupportedKookEvent(
     override val bot: KookBot,
     override val sourceEvent: Event<EventExtra>,
 ) : KookEvent<EventExtra, Event<EventExtra>>() {
+
     /**
      * 事件ID。
      */
