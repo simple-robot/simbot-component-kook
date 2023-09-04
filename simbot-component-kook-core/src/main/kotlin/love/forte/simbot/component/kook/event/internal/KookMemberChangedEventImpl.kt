@@ -31,6 +31,7 @@ internal data class KookMemberExitedChannelEventImpl(
     override val sourceEvent: Event<JoinedChannelEventExtra>,
     private val _source: KookChannelImpl,
     private val _before: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookMemberExitedChannelEvent() {
     override suspend fun source() = _source
     override suspend fun member() = _before
@@ -43,6 +44,7 @@ internal data class KookMemberJoinedChannelEventImpl(
     override val sourceEvent: Event<ExitedChannelEventExtra>,
     private val _source: KookChannelImpl,
     private val _after: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookMemberJoinedChannelEvent() {
     override suspend fun source() = _source
     override suspend fun member() = _after
@@ -55,6 +57,7 @@ internal data class KookMemberExitedGuildEventImpl(
     override val sourceEvent: Event<ExitedGuildEventExtra>,
     private val _source: KookGuildImpl,
     private val _before: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookMemberExitedGuildEvent() {
     override suspend fun guild() = _source
     override suspend fun member() = _before
@@ -66,6 +69,7 @@ internal data class KookMemberJoinedGuildEventImpl(
     override val sourceEvent: Event<JoinedGuildEventExtra>,
     private val _source: KookGuildImpl,
     private val _after: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookMemberJoinedGuildEvent() {
     override suspend fun guild() = _source
     override suspend fun member() = _after
@@ -77,6 +81,7 @@ internal data class KookBotSelfExitedGuildEventImpl(
     override val sourceEvent: Event<SelfExitedGuildEventExtra>,
     private val _source: KookGuildImpl,
     private val _before: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookBotSelfExitedGuildEvent() {
     override suspend fun member() = _before
     override suspend fun source() = _source
@@ -89,6 +94,7 @@ internal data class KookBotSelfJoinedGuildEventImpl(
     override val sourceEvent: Event<SelfJoinedGuildEventExtra>,
     private val _source: KookGuildImpl,
     private val _after: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookBotSelfJoinedGuildEvent() {
     override suspend fun member() = _after
     override suspend fun source() = _source
@@ -99,6 +105,7 @@ internal data class KookBotSelfJoinedGuildEventImpl(
 internal data class KookMemberOnlineEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<GuildMemberOnlineEventExtra>,
+    override val sourceEventContent: String
 ) : KookMemberOnlineEvent() {
     override val guilds: Items<KookGuildImpl>
         get() = effectedItemsBySequence { sourceBody.guilds.asSequence().map { bot.internalGuild(it) }.filterNotNull() }
@@ -107,6 +114,7 @@ internal data class KookMemberOnlineEventImpl(
 internal data class KookMemberOfflineEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<GuildMemberOfflineEventExtra>,
+    override val sourceEventContent: String
 ) : KookMemberOfflineEvent() {
     override val guilds: Items<KookGuildImpl>
         get() = effectedItemsBySequence { sourceBody.guilds.asSequence().map { bot.internalGuild(it) }.filterNotNull() }

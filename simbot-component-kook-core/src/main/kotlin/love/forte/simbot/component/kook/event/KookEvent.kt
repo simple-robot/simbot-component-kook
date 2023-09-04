@@ -51,6 +51,11 @@ public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotCo
      */
     public abstract val sourceEvent: E
 
+    /**
+     * 当前事件对应的原始事件JSON字符串。
+     */
+    public abstract val sourceEventContent: String
+
     override fun toString(): String {
         return "KookEvent(type=${sourceEvent.type}, channelType=${sourceEvent.channelType}, source=${sourceEvent})"
     }

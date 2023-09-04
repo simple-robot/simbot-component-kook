@@ -24,5 +24,6 @@ import love.forte.simbot.kook.event.Event as KEvent
 
 internal data class KookUserUpdatedEventImpl(
     override val bot: KookBotImpl,
-    override val sourceEvent: KEvent<UserUpdatedEventExtra>
+    override val sourceEvent: KEvent<UserUpdatedEventExtra>,
+    override val sourceEventContent: String
 ) : KookUserUpdatedEvent()

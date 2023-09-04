@@ -88,7 +88,7 @@ public interface KookMessageContent : DeleteSupport {
      * (met)123456(met) hello
      * ```
      *
-     * 而由于 [TextExtra.mention] 出现过一次上述的 `123456` 的信息，因此依次移除掉一个 `(met)123456(met)`，而最终的 [plainText] 结果则为：
+     * 而由于 [TextExtra.mention] 出现过一次上述的 `123456` 的信息，因此依次移除掉一个 `(met)123456(met)`，而最终的 [ReceivedMessageContent.plainText] 结果则为：
      *
      * ```
      *  hello
@@ -96,8 +96,8 @@ public interface KookMessageContent : DeleteSupport {
      *
      * 需要注意的是，这种处理不会移除或清理任何的**空字符**，所以你可能会发现上面处理结束后的 ` hello` 前是有一个空格的。
      *
-     * 如果你希望能够得到最原始的 [Event.content]，那么请通过 [原始事件对象][sourceEvent] 或 [rawContent] 获取，
-     * 而不是通过 [KookReceiveMessageContent.plainText] 或 [messages] 中的 [PlainText] 集。
+     * 如果你希望能够得到最原始的 [Event.content]，那么请通过原始事件对象（如果有） 或 [rawContent] 获取，
+     * 而不是通过 [ReceivedMessageContent.plainText] 或 [messages] 中的 [PlainText] 集。
      *
      * ```kotlin
      * val event: KookMessageEvent = ... // 一个KOOK的消息事件

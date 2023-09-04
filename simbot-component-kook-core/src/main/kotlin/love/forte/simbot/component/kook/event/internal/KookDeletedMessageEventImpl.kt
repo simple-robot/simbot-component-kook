@@ -28,9 +28,11 @@ import love.forte.simbot.kook.event.Event
 internal class KookDeletedChannelMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<DeletedMessageEventExtra>,
+    override val sourceEventContent: String
 ) : KookDeletedChannelMessageEvent()
 
 internal class KookDeletedPrivateMessageEventImpl(
     override val bot: KookBotImpl,
-    override val sourceEvent: Event<DeletedPrivateMessageEventExtra>
+    override val sourceEvent: Event<DeletedPrivateMessageEventExtra>,
+    override val sourceEventContent: String
 ) : KookDeletedPrivateMessageEvent()
