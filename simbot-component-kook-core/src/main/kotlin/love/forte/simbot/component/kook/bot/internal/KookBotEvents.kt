@@ -488,6 +488,13 @@ internal fun KookBotImpl.registerEvent() {
                         }
                     }
 
+                    // 频道消息删除
+                    is DeletedMessageEventExtra -> {
+                        pushIfProcessable(KookDeletedChannelMessageEvent) {
+                            KookDeletedChannelMessageEventImpl(thisBot, event.doAs())
+                        }
+                    }
+
                     // 按钮点击
                     is MessageBtnClickEventExtra -> {
                         pushIfProcessable(KookMessageBtnClickEvent) {
@@ -544,6 +551,16 @@ internal fun KookBotImpl.registerEvent() {
                     is UserUpdatedEventExtra -> {
                         pushIfProcessable(KookUserUpdatedEvent) {
                             KookUserUpdatedEventImpl(
+                                thisBot,
+                                event.doAs()
+                            )
+                        }
+                    }
+
+                    // 私聊消息删除
+                    is DeletedPrivateMessageEventExtra -> {
+                        pushIfProcessable(KookDeletedPrivateMessageEvent) {
+                            KookDeletedPrivateMessageEventImpl(
                                 thisBot,
                                 event.doAs()
                             )
