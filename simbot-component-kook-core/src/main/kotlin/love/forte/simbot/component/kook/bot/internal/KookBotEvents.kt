@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook.bot.internal
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import love.forte.simbot.DiscreetSimbotApi
+import love.forte.simbot.FragileSimbotApi
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.event.internal.*
 import love.forte.simbot.component.kook.internal.KookChannelCategoryImpl
@@ -39,6 +40,7 @@ import love.forte.simbot.kook.event.Event as KEvent
 import love.forte.simbot.kook.objects.User as KUser
 
 
+@OptIn(FragileSimbotApi::class)
 internal fun KookBotImpl.registerEvent() {
     val thisBot = this
     sourceBot.processor(ProcessorType.PREPARE) {
@@ -555,7 +557,6 @@ internal fun KookBotImpl.registerEvent() {
             }
 
             is UnknownExtra -> {
-                //  TODO 对应的事件
                 pushUnsupported(event)
             }
         }
