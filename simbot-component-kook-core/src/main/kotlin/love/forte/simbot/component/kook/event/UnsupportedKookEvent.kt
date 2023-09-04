@@ -54,6 +54,7 @@ import love.forte.simbot.message.doSafeCast
 public class UnsupportedKookEvent(
     override val bot: KookBot,
     override val sourceEvent: Event<EventExtra>,
+    override val sourceEventContent: String
 ) : KookEvent<EventExtra, Event<EventExtra>>() {
 
     /**

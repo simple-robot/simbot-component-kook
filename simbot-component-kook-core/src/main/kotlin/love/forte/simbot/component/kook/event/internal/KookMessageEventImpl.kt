@@ -49,6 +49,7 @@ internal class KookChannelMessageEventImpl(
     override val sourceEvent: KEvent<TextExtra>,
     private val _author: KookMemberImpl,
     private val _channel: KookChannelImpl,
+    override val sourceEventContent: String
 ) : KookChannelMessageEvent() {
 
     override suspend fun author(): KookMember = _author
@@ -81,6 +82,7 @@ internal class KookChannelMessageEventImpl(
 internal class KookContactMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<TextExtra>,
+    override val sourceEventContent: String
 ) : KookContactMessageEvent() {
 
     //
@@ -123,6 +125,7 @@ internal class KookBotSelfChannelMessageEventImpl(
     override val sourceEvent: KEvent<TextExtra>,
     private val _channel: KookChannelImpl,
     private val _member: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookBotSelfChannelMessageEvent() {
     override suspend fun channel(): KookChannel = _channel
 
@@ -148,6 +151,7 @@ internal class KookBotSelfChannelMessageEventImpl(
 internal class KookBotSelfMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<TextExtra>,
+    override val sourceEventContent: String
 ) : KookBotSelfMessageEvent() {
 
     private val userChatView = lazyValue {

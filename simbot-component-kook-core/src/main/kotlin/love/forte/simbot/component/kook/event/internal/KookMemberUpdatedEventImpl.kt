@@ -37,7 +37,8 @@ internal class KookMemberUpdatedEventImpl(
     override val sourceEvent: Event<UpdatedGuildMemberEventExtra>,
     private val sourceGuild: KookGuildImpl,
     private val newMember: KookMemberImpl,
-    private val beforeMember: KookMemberImpl
+    private val beforeMember: KookMemberImpl,
+    override val sourceEventContent: String
 ) : KookMemberUpdatedEvent() {
     override val beforeSource: User
         get() = beforeMember.source

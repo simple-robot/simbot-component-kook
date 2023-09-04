@@ -30,4 +30,5 @@ import love.forte.simbot.kook.event.Event as KEvent
 internal class KookMessageBtnClickEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<MessageBtnClickEventExtra>,
+    override val sourceEventContent: String
 ) : KookMessageBtnClickEvent()

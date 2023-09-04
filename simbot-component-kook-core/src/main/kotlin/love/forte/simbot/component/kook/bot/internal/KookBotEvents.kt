@@ -54,11 +54,11 @@ internal fun KookBotImpl.registerEvent() {
                     love.forte.simbot.kook.event.Event.ChannelType.PERSON -> {
                         if (isBotSelf) {
                             pushIfProcessable(KookBotSelfMessageEvent) {
-                                KookBotSelfMessageEventImpl(thisBot, this.doAs())
+                                KookBotSelfMessageEventImpl(thisBot, this.doAs(), rawEvent)
                             }
                         } else {
                             pushIfProcessable(KookContactMessageEvent) {
-                                KookContactMessageEventImpl(thisBot, this.doAs())
+                                KookContactMessageEventImpl(thisBot, this.doAs(), rawEvent)
                             }
                         }
                     }
@@ -84,7 +84,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     channel,
-                                    author
+                                    author,
+                                    rawEvent
                                 )
                             }
                         } else {
@@ -93,7 +94,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     author,
-                                    channel
+                                    channel,
+                                    rawEvent
                                 )
                             }
                         }
@@ -129,7 +131,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                removedMember
+                                removedMember,
+                                rawEvent
                             )
                         }
                     }
@@ -159,7 +162,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                newMember
+                                newMember,
+                                rawEvent
                             )
                         }
                     }
@@ -187,7 +191,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 channel,
-                                member
+                                member,
+                                rawEvent
                             )
                         }
                     }
@@ -215,7 +220,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 channel,
-                                member
+                                member,
+                                rawEvent
                             )
                         }
                     }
@@ -258,7 +264,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                botAsMember
+                                botAsMember,
+                                rawEvent
                             )
                         }
                     }
@@ -292,7 +299,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                botMember
+                                botMember,
+                                rawEvent
                             )
                         }
                     }
@@ -300,14 +308,14 @@ internal fun KookBotImpl.registerEvent() {
                     // 成员上线
                     is GuildMemberOnlineEventExtra -> {
                         pushIfProcessable(KookMemberOnlineEvent) {
-                            KookMemberOnlineEventImpl(thisBot, event.doAs())
+                            KookMemberOnlineEventImpl(thisBot, event.doAs(), rawEvent)
                         }
                     }
 
                     // 成员下线
                     is GuildMemberOfflineEventExtra -> {
                         pushIfProcessable(KookMemberOfflineEvent) {
-                            KookMemberOfflineEventImpl(thisBot, event.doAs())
+                            KookMemberOfflineEventImpl(thisBot, event.doAs(), rawEvent)
                         }
                     }
 
@@ -332,7 +340,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     guild,
-                                    category
+                                    category,
+                                    rawEvent
                                 )
                             }
                         } else {
@@ -347,7 +356,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     guild,
-                                    channel
+                                    channel,
+                                    rawEvent
                                 )
                             }
                         }
@@ -376,7 +386,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     guild,
-                                    category
+                                    category,
+                                    rawEvent
                                 )
                             }
                         } else {
@@ -391,7 +402,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     guild,
-                                    channel
+                                    channel,
+                                    rawEvent
                                 )
                             }
                         }
@@ -420,7 +432,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     guild,
-                                    removed
+                                    removed,
+                                    rawEvent
                                 )
                             }
                         } else if (removed is KookChannelCategoryImpl) {
@@ -429,7 +442,8 @@ internal fun KookBotImpl.registerEvent() {
                                     thisBot,
                                     event.doAs(),
                                     guild,
-                                    removed
+                                    removed,
+                                    rawEvent
                                 )
                             }
                         }
@@ -457,7 +471,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                channel
+                                channel,
+                                rawEvent
                             )
                         }
                     }
@@ -483,7 +498,8 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                channel
+                                channel,
+                                rawEvent
                             )
                         }
                     }
@@ -491,14 +507,14 @@ internal fun KookBotImpl.registerEvent() {
                     // 频道消息删除
                     is DeletedMessageEventExtra -> {
                         pushIfProcessable(KookDeletedChannelMessageEvent) {
-                            KookDeletedChannelMessageEventImpl(thisBot, event.doAs())
+                            KookDeletedChannelMessageEventImpl(thisBot, event.doAs(), rawEvent)
                         }
                     }
 
                     // 频道消息更新
                     is UpdatedMessageEventExtra -> {
                         pushIfProcessable(KookUpdatedChannelMessageEvent) {
-                            KookUpdatedChannelMessageEventImpl(thisBot, event.doAs())
+                            KookUpdatedChannelMessageEventImpl(thisBot, event.doAs(), rawEvent)
                         }
                     }
 
@@ -507,7 +523,8 @@ internal fun KookBotImpl.registerEvent() {
                         pushIfProcessable(KookMessageBtnClickEvent) {
                             KookMessageBtnClickEventImpl(
                                 thisBot,
-                                event.doAs()
+                                event.doAs(),
+                                rawEvent
                             )
                         }
                     }
@@ -549,7 +566,8 @@ internal fun KookBotImpl.registerEvent() {
                                 event.doAs(),
                                 guild,
                                 newMember,
-                                oldMember!!
+                                oldMember!!,
+                                rawEvent
                             )
                         }
                     }
@@ -559,7 +577,8 @@ internal fun KookBotImpl.registerEvent() {
                         pushIfProcessable(KookUserUpdatedEvent) {
                             KookUserUpdatedEventImpl(
                                 thisBot,
-                                event.doAs()
+                                event.doAs(),
+                                rawEvent
                             )
                         }
                     }
@@ -569,7 +588,8 @@ internal fun KookBotImpl.registerEvent() {
                         pushIfProcessable(KookDeletedPrivateMessageEvent) {
                             KookDeletedPrivateMessageEventImpl(
                                 thisBot,
-                                event.doAs()
+                                event.doAs(),
+                                rawEvent
                             )
                         }
                     }
@@ -579,19 +599,20 @@ internal fun KookBotImpl.registerEvent() {
                         pushIfProcessable(KookUpdatedPrivateMessageEvent) {
                             KookUpdatedPrivateMessageEventImpl(
                                 thisBot,
-                                event.doAs()
+                                event.doAs(),
+                                rawEvent
                             )
                         }
                     }
 
-                    else -> pushUnsupported(event)
+                    else -> pushUnsupported(event, rawEvent)
                 }
 
 
             }
 
             is UnknownExtra -> {
-                pushUnsupported(event)
+                pushUnsupported(event, rawEvent)
             }
         }
 
@@ -600,11 +621,12 @@ internal fun KookBotImpl.registerEvent() {
 }
 
 @OptIn(DiscreetSimbotApi::class)
-private suspend fun KookBotImpl.pushUnsupported(event: KEvent<EventExtra>) {
+private suspend fun KookBotImpl.pushUnsupported(event: KEvent<EventExtra>, sourceEventJson: String) {
     pushIfProcessable(UnsupportedKookEvent) {
         UnsupportedKookEvent(
             this,
-            event
+            event,
+            sourceEventJson
         )
     }
 }

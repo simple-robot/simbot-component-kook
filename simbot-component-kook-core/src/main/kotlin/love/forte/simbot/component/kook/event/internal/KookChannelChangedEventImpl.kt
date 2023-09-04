@@ -42,6 +42,7 @@ internal data class KookAddedChannelEventImpl(
     override val sourceEvent: KEvent<AddedChannelEventExtra>,
     private val _source: KookGuildImpl,
     private val _after: KookChannelImpl,
+    override val sourceEventContent: String
 ) : KookAddedChannelEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceBody.guildId, sourceBody.userId)
     override suspend fun source(): KookGuild = _source
@@ -54,6 +55,7 @@ internal data class KookUpdatedChannelEventImpl(
     override val sourceEvent: KEvent<UpdatedChannelEventExtra>,
     private val _source: KookGuildImpl,
     private val _channel: KookChannelImpl,
+    override val sourceEventContent: String
 ) : KookUpdatedChannelEvent() {
     override suspend fun source(): KookGuild = _source
     override suspend fun channel(): KookChannel = _channel
@@ -66,6 +68,7 @@ internal data class KookDeletedChannelEventImpl(
     override val sourceEvent: KEvent<DeletedChannelEventExtra>,
     private val _source: KookGuildImpl,
     private val _before: KookChannelImpl,
+    override val sourceEventContent: String
 ) : KookDeletedChannelEvent() {
     override suspend fun source(): KookGuild = _source
     override suspend fun before(): KookChannel = _before
@@ -76,6 +79,7 @@ internal data class KookAddedCategoryEventImpl(
     override val sourceEvent: KEvent<AddedChannelEventExtra>,
     private val _source: KookGuildImpl,
     private val _category: KookChannelCategoryImpl,
+    override val sourceEventContent: String
 ) : KookAddedCategoryEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceBody.guildId, sourceBody.userId)
     override suspend fun category(): KookChannelCategory = _category
@@ -88,6 +92,7 @@ internal data class KookUpdatedCategoryEventImpl(
     override val sourceEvent: KEvent<UpdatedChannelEventExtra>,
     private val _source: KookGuildImpl,
     private val _category: KookChannelCategoryImpl,
+    override val sourceEventContent: String
 ) : KookUpdatedCategoryEvent() {
     override suspend fun category(): KookChannelCategory = _category
     override suspend fun source(): KookGuild = _source
@@ -100,6 +105,7 @@ internal data class KookDeletedCategoryEventImpl(
     override val sourceEvent: KEvent<DeletedChannelEventExtra>,
     private val _source: KookGuildImpl,
     private val _before: KookChannelCategoryImpl,
+    override val sourceEventContent: String
 ) : KookDeletedCategoryEvent() {
     override suspend fun source(): KookGuild = _source
     override suspend fun before(): KookChannelCategory = _before
@@ -112,6 +118,7 @@ internal data class KookPinnedMessageEventImpl(
     override val sourceEvent: KEvent<PinnedMessageEventExtra>,
     private val _source: KookGuildImpl,
     private val _channel: KookChannelImpl,
+    override val sourceEventContent: String
 ) : KookPinnedMessageEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceEvent.targetId, sourceBody.operatorId)
 
@@ -130,6 +137,7 @@ internal data class KookUnpinnedMessageEventImpl(
     override val sourceEvent: KEvent<UnpinnedMessageEventExtra>,
     private val _source: KookGuildImpl,
     private val _channel: KookChannelImpl,
+    override val sourceEventContent: String
 ) : KookUnpinnedMessageEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceEvent.targetId, sourceBody.operatorId)
 

@@ -27,10 +27,12 @@ import love.forte.simbot.kook.event.UpdatedPrivateMessageEventExtra
 
 internal class KookUpdatedChannelMessageEventImpl(
     override val bot: KookBot,
-    override val sourceEvent: Event<UpdatedMessageEventExtra>
+    override val sourceEvent: Event<UpdatedMessageEventExtra>,
+    override val sourceEventContent: String
 ) : KookUpdatedChannelMessageEvent()
 
 internal class KookUpdatedPrivateMessageEventImpl(
     override val bot: KookBot,
-    override val sourceEvent: Event<UpdatedPrivateMessageEventExtra>
+    override val sourceEvent: Event<UpdatedPrivateMessageEventExtra>,
+    override val sourceEventContent: String
 ) : KookUpdatedPrivateMessageEvent()
