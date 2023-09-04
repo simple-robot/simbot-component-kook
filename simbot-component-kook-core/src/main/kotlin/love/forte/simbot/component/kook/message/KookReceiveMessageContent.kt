@@ -19,6 +19,7 @@ package love.forte.simbot.component.kook.message
 
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMessage
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_ROLE
@@ -27,6 +28,7 @@ import love.forte.simbot.component.kook.util.requestResultBy
 import love.forte.simbot.component.kook.util.walk
 import love.forte.simbot.delegate.getValue
 import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
 import love.forte.simbot.kook.api.message.DeleteDirectMessageApi
 import love.forte.simbot.kook.event.*
@@ -38,45 +40,36 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 
 /**
- * Kook 消息事件所收到的消息正文类型。
+ * KOOK 中的消息正文类型的抽象接口类型。
  *
- * 在 Kook 中，一个完整的接收消息所得到 [messages] 中的元素可能是经过拆解/解析/冗余、扩展的。
+ * 在 Kook 中，以接收到的消息事件为例，
+ * 一个完整的接收消息所得到 [messages] 中的元素可能是经过拆解/解析/冗余、扩展的。
  * 如果你希望直接根据真实消息进行**复读**，则请直接使用 [KookReceiveMessageContent]
  * 本身作为消息发送的实体而不是获取其中的 [messages]；同样的原因，如果你需要先对消息进行处理，
  * 请注意消息链中的冗余消息。
  *
+ * ### DeleteSupport
+ *
+ * 存在消息ID即可以被删除，因此 [KookMessageContent] 支持 [delete] 操作，
+ * 不过可能需要考虑权限问题。
+ *
  * @author ForteScarlet
  */
-public class KookReceiveMessageContent(
-    private val isDirect: Boolean,
-    internal val source: Event<TextExtra>,
-    private val bot: KookBot,
-) : ReceivedMessageContent() {
-
+public interface KookMessageContent : DeleteSupport {
     /**
      * 消息ID。
      */
-    override val messageId: ID by stringID { source.msgId }
+    public val messageId: ID
 
     /**
-     * 消息接收到的原始消息内容。
+     * raw content
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    public val sourceEvent: Event<TextExtra> get() = source
+    public val rawContent: String
 
     /**
-     * 得到消息的原始正文信息。同 `sourceEvent.content`。
+     * KOOK 消息事件中所收到的消息列表。
      *
-     * @see sourceEvent
-     * @see Event.content
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    public val rawContent: String get() = source.content
-
-    /**
-     * Kook 消息事件中所收到的消息列表。
-     *
-     * messages 会对接收到的事件中的内容进行解析，并转化为各符合内容的消息链。
+     * [messages] 会对接收到的事件中的内容进行解析，并转化为各符合内容的消息链。
      *
      * ## [Event.content] 的处理
      * 当 [Event.extra] 为 [KMarkdownEventExtra] 类型时，[Event.content] 会在被追加的时候进行 **处理**。
@@ -116,11 +109,60 @@ public class KookReceiveMessageContent(
      * 将消息转化为一个消息链（尤其是转化kmarkdown类型的消息）的过程中有可能会丢失一部分原有的格式。因此当你直接通过 [messages] 重复发送消息时有可能会产生与收到的消息不一致的效果。
      *
      */
-    override val messages: Messages by lazy(LazyThreadSafetyMode.PUBLICATION) { source.toMessages() }
+    public val messages: Messages
 
     /**
-     * 删除当前消息。
+     * 尝试根据当前消息ID删除目标。
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
      */
+    @JvmSynthetic
+    override suspend fun delete(): Boolean
+}
+
+/**
+ * KOOK 中通过事件接收得到的消息正文类型的抽象类型。
+ *
+ * @see KookMessageContent
+ */
+public abstract class BaseKookReceiveMessageContent : ReceivedMessageContent(), KookMessageContent
+
+
+/**
+ * KOOK 消息事件所收到的消息正文类型。
+ *
+ * 更多有关消息正文的统一性描述参考 [KookMessageContent] 的说明。
+ *
+ * @see KookMessageContent
+ *
+ * @author ForteScarlet
+ */
+public class KookReceiveMessageContent(
+    private val isDirect: Boolean,
+    internal val source: Event<TextExtra>,
+    private val bot: KookBot,
+) : BaseKookReceiveMessageContent() {
+
+    override val messageId: ID by stringID { source.msgId }
+
+    /**
+     * 消息接收到的原始消息内容。
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public val sourceEvent: Event<TextExtra> get() = source
+
+    /**
+     * 得到消息的原始正文信息。同 `sourceEvent.content`。
+     *
+     * @see sourceEvent
+     * @see Event.content
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    override val rawContent: String get() = source.content
+
+
+    override val messages: Messages by lazy(LazyThreadSafetyMode.PUBLICATION) { source.toMessages() }
+
     override suspend fun delete(): Boolean {
         val api = if (isDirect) {
             DeleteDirectMessageApi.create(source.msgId)
@@ -135,6 +177,41 @@ public class KookReceiveMessageContent(
         return "KookReceiveMessageContent(sourceEvent=$sourceEvent)"
     }
 }
+
+/**
+ * KOOK 中消息更新等非消息事件推送得到的消息正文。
+ *
+ * 更多有关消息正文的统一性描述参考 [KookMessageContent] 的说明。
+ *
+ * @see KookMessageContent
+ */
+public class KookUpdatedMessageContent(
+    private val bot: KookBot,
+    private val isDirect: Boolean,
+    override val rawContent: String,
+    private val msgId: String,
+    private val mention: List<String>,
+    private val mentionRoles: List<Int>,
+    private val isMentionAll: Boolean,
+    private val isMentionHere: Boolean,
+) : BaseKookReceiveMessageContent() {
+    override val messageId: ID get() = msgId.ID
+
+    override val messages: Messages by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        toMessagesByKMarkdown(rawContent, mention, mentionRoles, isMentionAll, isMentionHere)
+    }
+
+    override suspend fun delete(): Boolean {
+        val api = if (isDirect) {
+            DeleteDirectMessageApi.create(msgId)
+        } else {
+            DeleteChannelMessageApi.create(msgId)
+        }
+
+        return api.requestResultBy(bot).isSuccess
+    }
+}
+
 
 private val logger = LoggerFactory.getLogger("love.forte.simbot.component.kook.message.ReceiveMessageContent")
 

@@ -320,5 +320,4 @@ public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
 }
 
 
-
 // TODO 消息更新、消息删除

@@ -43,7 +43,7 @@ import love.forte.simbot.kook.objects.User as KUser
 @OptIn(FragileSimbotApi::class)
 internal fun KookBotImpl.registerEvent() {
     val thisBot = this
-    sourceBot.processor(ProcessorType.PREPARE) {
+    sourceBot.processor(ProcessorType.PREPARE) { rawEvent ->
         val event = this
 
         when (val ex = extra) {
@@ -488,6 +488,20 @@ internal fun KookBotImpl.registerEvent() {
                         }
                     }
 
+                    // 频道消息删除
+                    is DeletedMessageEventExtra -> {
+                        pushIfProcessable(KookDeletedChannelMessageEvent) {
+                            KookDeletedChannelMessageEventImpl(thisBot, event.doAs())
+                        }
+                    }
+
+                    // 频道消息更新
+                    is UpdatedMessageEventExtra -> {
+                        pushIfProcessable(KookUpdatedChannelMessageEvent) {
+                            KookUpdatedChannelMessageEventImpl(thisBot, event.doAs())
+                        }
+                    }
+
                     // 按钮点击
                     is MessageBtnClickEventExtra -> {
                         pushIfProcessable(KookMessageBtnClickEvent) {
@@ -544,6 +558,26 @@ internal fun KookBotImpl.registerEvent() {
                     is UserUpdatedEventExtra -> {
                         pushIfProcessable(KookUserUpdatedEvent) {
                             KookUserUpdatedEventImpl(
+                                thisBot,
+                                event.doAs()
+                            )
+                        }
+                    }
+
+                    // 私聊消息删除
+                    is DeletedPrivateMessageEventExtra -> {
+                        pushIfProcessable(KookDeletedPrivateMessageEvent) {
+                            KookDeletedPrivateMessageEventImpl(
+                                thisBot,
+                                event.doAs()
+                            )
+                        }
+                    }
+
+                    // 私聊消息更新
+                    is UpdatedPrivateMessageEventExtra -> {
+                        pushIfProcessable(KookUpdatedPrivateMessageEvent) {
+                            KookUpdatedPrivateMessageEventImpl(
                                 thisBot,
                                 event.doAs()
                             )
