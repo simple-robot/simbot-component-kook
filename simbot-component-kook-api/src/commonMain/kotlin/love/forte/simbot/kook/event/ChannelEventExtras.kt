@@ -196,7 +196,7 @@ public data class UpdatedMessageEventExtra(override val body: Body) : SystemExtr
          * 提及的角色 id 组成的列表
          */
         @SerialName("mention_roles")
-        val mentionRoles: List<String> = emptyList(),
+        val mentionRoles: List<Int> = emptyList(),
 
         /**
          * 更新时间戳(毫秒)

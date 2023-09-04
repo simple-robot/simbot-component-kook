@@ -59,7 +59,7 @@ public abstract class KookDeletedMessageEvent : KookSystemEvent() {
      */
     abstract override val timestamp: Timestamp
 
-    abstract override val key: love.forte.simbot.event.Event.Key<out KookSystemEvent>
+    abstract override val key: love.forte.simbot.event.Event.Key<out KookDeletedMessageEvent>
 
     public companion object Key : BaseEventKey<KookDeletedMessageEvent>(
         "kook.deleted_message_event", KookSystemEvent
