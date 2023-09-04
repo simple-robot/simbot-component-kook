@@ -6,7 +6,7 @@
 
 了解**simbot3**: [simbot3官网](https://simbot.forte.love)
 
-KOOK组件**的组件官网**: [组件官网](https://simple-robot.github.io/simbot-component-kook/) 
+KOOK组件的**组件手册**: [组件手册](https://simple-robot.github.io/simbot-component-kook/) 
 
 > 版本进入稳定后考虑配置域名，目前暂未配置。
 
@@ -17,13 +17,7 @@ KOOK组件**的组件官网**: [组件官网](https://simple-robot.github.io/sim
 
 ## 支持情况
 
-已经基本完成。
-
-> **Warning**
-> 当前版本处于 **`ALPHA`** 版本阶段，即代表：
-> - 可能存在诸多[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)和未知问题，
-> - 不保证API的稳定与兼容（可能随时发布存在不兼容内容的更新）
-> - 需要[**反馈**](https://github.com/simple-robot/simbot-component-kook/issues)或[**协助**](https://github.com/simple-robot/simbot-component-kook/pulls)
+前往查看 [支持列表](support-list.md)
 
 ## 使用
 
