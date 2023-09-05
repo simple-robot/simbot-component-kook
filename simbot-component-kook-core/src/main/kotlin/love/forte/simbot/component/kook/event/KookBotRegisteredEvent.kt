@@ -19,7 +19,8 @@ package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.component.kook.KookComponentBot
+import love.forte.simbot.component.kook.bot.KookBot
+import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.event.internal.BaseInternalKey
 import love.forte.simbot.event.internal.BotRegisteredEvent
 import love.forte.simbot.event.internal.InternalEvent
@@ -27,6 +28,7 @@ import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.randomID
 
 /**
+ * 当一个 [KookBot] 在 [KookBotManager] 中被_注册_时。
  *
  * @author ForteScarlet
  */
@@ -34,7 +36,7 @@ public abstract class KookBotRegisteredEvent : BotRegisteredEvent() {
 
     override val id: ID = randomID()
     override val timestamp: Timestamp = Timestamp.now()
-    abstract override val bot: KookComponentBot
+    abstract override val bot: KookBot
     override val key: InternalEvent.Key<KookBotRegisteredEvent>
         get() = Key
 

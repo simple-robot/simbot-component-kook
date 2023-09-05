@@ -17,17 +17,17 @@
 
 package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.KookUserChat
+import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.message.*
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
-import love.forte.simbot.component.kook.util.requestBy
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.kook.api.message.DirectMessageCreateRequest
-import love.forte.simbot.kook.api.message.MessageType
-import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
+import love.forte.simbot.component.kook.util.requestResultBy
+import love.forte.simbot.kook.api.message.SendDirectMessageApi
+import love.forte.simbot.kook.api.userchat.DeleteUserChatApi
 import love.forte.simbot.kook.api.userchat.UserChatView
+import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 
@@ -36,68 +36,56 @@ import love.forte.simbot.message.MessageContent
  * @author ForteScarlet
  */
 internal class KookUserChatImpl(
-    override val bot: KookComponentBotImpl, override val source: UserChatView,
+    override val bot: KookBotImpl, override val source: UserChatView,
 ) : KookUserChat {
-    override val id: ID
-        get() = source.targetInfo.id
-    
+
     override fun toString(): String {
-        return "KookUserChat(source=$source, bot=$bot)"
+        return "KookUserChat(code=${source.code}, target=${source.targetInfo})"
     }
-    
+
     override suspend fun send(text: String): KookMessageCreatedReceipt {
-        return DirectMessageCreateRequest.byTargetId(
-            source.targetInfo.id, text, MessageType.TEXT, null, null
-        ).requestDataBy(bot).asReceipt(true, bot)
+        return SendDirectMessageApi
+            .createByTargetId(source.targetInfo.id, text, MessageType.TEXT.type, null, null)
+            .requestDataBy(bot)
+            .asReceipt(true, bot)
     }
-    
+
     override suspend fun send(message: Message): KookMessageReceipt {
         return message.sendToDirectByTargetId(bot, source.targetInfo.id, null, null, null)
             ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-        // var request = message.toRequest(bot, source.targetInfo.id, null, null, null)
-        //     ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
-        //
-        // if (request is MessageCreateRequest) {
-        //     request = request.toDirect()
-        // }
-        //
-        // val result = request.requestDataBy(bot)
-        // return if (result is MessageCreated) {
-        //     result.asReceipt(true, bot)
-        // } else {
-        //     KookApiRequestedReceipt(result, true, bot)
-        // }
     }
-    
+
     override suspend fun send(message: MessageContent): KookMessageReceipt {
         return when (message) {
             is KookReceiveMessageContent -> {
                 val source = message.source
-                DirectMessageCreateRequest.byTargetId(
-                    targetId = this.id,
+                SendDirectMessageApi.createByTargetId(
+                    targetId = this.source.targetInfo.id,
                     content = source.content,
-                    type = source.type.type,
+                    type = source.type?.value,
                     quote = null,
                     nonce = null,
                 ).requestDataBy(bot).asReceipt(true, bot)
             }
+
             is KookChannelMessageDetailsContent -> {
                 val details = message.details
-                DirectMessageCreateRequest.byTargetId(
-                    targetId = this.id,
+                SendDirectMessageApi.createByTargetId(
+                    targetId = this.source.targetInfo.id,
                     content = details.content,
                     type = details.type,
                     quote = details.quote?.id,
                     nonce = null,
                 ).requestDataBy(bot).asReceipt(true, bot)
             }
+
             else -> {
                 send(message.messages)
             }
         }
     }
-    
+
     override suspend fun delete(): Boolean {
-        return UserChatDeleteRequest.create(id).requestBy(bot).isSuccess
+        return DeleteUserChatApi.create(source.code).requestResultBy(bot).isSuccess
     }
 }

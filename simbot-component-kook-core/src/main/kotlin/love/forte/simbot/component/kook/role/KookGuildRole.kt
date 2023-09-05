@@ -21,10 +21,12 @@ import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
+import love.forte.simbot.JST
 import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.definition.GuildMember
-import love.forte.simbot.kook.api.KookApiException
+import love.forte.simbot.kook.api.ApiResponseException
+import love.forte.simbot.kook.api.ApiResultException
 import love.forte.simbot.kook.objects.PermissionType
 import love.forte.simbot.kook.objects.Permissions
 
@@ -104,8 +106,7 @@ import love.forte.simbot.kook.objects.Permissions
  * @author ForteScarlet
  */
 @ExperimentalSimbotApi
-@JvmBlocking
-@JvmAsync
+@JST
 public interface KookGuildRole : KookRole {
 
     /**
@@ -116,27 +117,31 @@ public interface KookGuildRole : KookRole {
     /**
      * 将当前角色赋予给指定 [memberId] 的用户。
      *
-     * @throws KookApiException API请求过程中产生的任何异常
+     * @throws ApiResultException API请求过程中产生的任何异常
+     * @throws ApiResponseException API请求过程中产生的任何异常
      */
     public suspend fun grantTo(memberId: ID): KookMemberRole
 
     /**
      * 将当前角色赋予给指定用户 [member] 。
      *
-     * @throws KookApiException API请求过程中产生的任何异常
+     * @throws ApiResultException API请求过程中产生的任何异常
+     * @throws ApiResponseException API请求过程中产生的任何异常
      */
-    public suspend fun grantTo(member: KookGuildMember): KookMemberRole
+    public suspend fun grantTo(member: KookMember): KookMemberRole
 
 
     /**
      * 将当前角色赋予给指定用户 [member] 。
      *
-     * @throws KookApiException API请求过程中产生的任何异常
-     * @throws ClassCastException [member] 的类型不是 [KookGuildMember] 时
+     * @throws ApiResultException API请求过程中产生的任何异常
+     * @throws ApiResponseException API请求过程中产生的任何异常
+     * @throws ClassCastException [member] 的类型不是 [KookMember] 时
      */
     public suspend fun grantTo(member: GuildMember): KookMemberRole {
-        // KookGuildRole.grantTo 只支持 KookGuildMember 类型的 member
-        val kookMember = member as? KookGuildMember ?: throw ClassCastException("KookGuildRole.grantTo only support member of type KookGuildMember, but ${member::class}")
+        // KookGuildRole.grantTo 只支持 KookMember 类型的 member
+        val kookMember = member as? KookMember
+            ?: throw ClassCastException("KookGuildRole.grantTo only support member of type KookGuildMember, but ${member::class}")
         return grantTo(kookMember)
     }
 
@@ -145,7 +150,8 @@ public interface KookGuildRole : KookRole {
      *
      * 删除一个 [KookGuildRole] 后不应再进行其他操作。组件目前不会进行过多判断，但是可能会造成任何预期外的异常。
      *
-     * @throws KookApiException API请求过程中产生的任何异常
+     * @throws ApiResultException API请求过程中产生的任何异常
+     * @throws ApiResponseException API请求过程中产生的任何异常
      */
     @JvmSynthetic
     override suspend fun delete(): Boolean
@@ -250,7 +256,8 @@ public interface KookGuildRoleUpdater {
      *
      * _Note: [permissionsValue] 会被转化为 [Kotlin UInt][UInt]_
      */
-    public fun permissions(permissionsValue: Int): KookGuildRoleUpdater = also { permissions = Permissions(permissionsValue.toUInt()) }
+    public fun permissions(permissionsValue: Int): KookGuildRoleUpdater =
+        also { permissions = Permissions(permissionsValue.toUInt()) }
     //endregion
 
     /**

@@ -21,10 +21,12 @@ import love.forte.simbot.ability.CompletionPerceivable
 import love.forte.simbot.application.Application
 import love.forte.simbot.application.ApplicationBuilder
 import love.forte.simbot.application.ApplicationBuilderDsl
+import love.forte.simbot.component.kook.bot.KookBotManager
+import love.forte.simbot.component.kook.bot.KookBotManagerConfiguration
 
 
 /**
- * 注册 [ Kook 组件][KookComponent] 信息。
+ * 注册 [KOOK组件][KookComponent] 信息。
  *
  * usage:
  * ```kotlin
@@ -52,7 +54,7 @@ public fun <A : Application> ApplicationBuilder<A>.useKookComponent(configurator
 
 
 /**
- * 注册使用 [ Kook botManager][KookBotManager]。
+ * 注册使用 [KookBotManager]。
  *
  * usage:
  * ```kotlin
@@ -79,17 +81,15 @@ public fun <A : Application> ApplicationBuilder<A>.useKookBotManager(configurato
     install(KookBotManager, configurator)
 }
 
-
 /**
  * 通过 [KookComponentUsageBuilder] 来同时配置使用
- * [ Kook 组件][KookComponent] 和
- * [ Kook botManager][KookBotManager]。
+ * [KOOK组件][KookComponent] 和 [KookBotManager]。
  *
  * usage:
  * ```kotlin
  * simbotApplication(Foo) {
  *    useKook()
- *    // 或
+ *    // 或:
  *    useKook {
  *        // 配置组件
  *        component {
@@ -116,10 +116,6 @@ public fun <A : Application> ApplicationBuilder<A>.useKookBotManager(configurato
  *    }
  * }
  * ```
- *
- *
- *
- *
  */
 @ApplicationBuilderDsl
 public fun <A : Application> ApplicationBuilder<A>.useKook(usageBuilder: KookComponentUsageBuilder<A>.() -> Unit = {}) {
@@ -136,8 +132,7 @@ internal annotation class KookComponentUsageBuilderDsl
 
 
 /**
- * 同时配置 [ Kook 组件][KookComponent] 和 [ Kook botManager][KookBotManager]
- * 的构建器。
+ * 同时配置 [KOOK组件][KookComponent] 和 [KookBotManager] 的构建器。
  *
  * 应用于 [useKook] 中。
  *
@@ -146,28 +141,28 @@ internal annotation class KookComponentUsageBuilderDsl
  */
 @KookComponentUsageBuilderDsl
 public interface KookComponentUsageBuilder<A : Application> {
-    
+
     /**
-     * 提供针对 [ Kook 组件][KookComponent] 的配置。
+     * 提供针对 [KOOK组件][KookComponent] 的配置。
      *
      */
     @KookComponentUsageBuilderDsl
     public fun component(configurator: KookComponentConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit)
-    
-    
+
+
     /**
-     * 提供针对 [ Kook BotManager][KookBotManager] 的配置。
+     * 提供针对 [KookBotManager] 的配置。
      */
     @KookComponentUsageBuilderDsl
     public fun botManager(configurator: KookBotManagerConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit)
-    
+
 }
 
 
 private class KookComponentUsageBuilderImpl<A : Application> : KookComponentUsageBuilder<A> {
     private var compConf: (KookComponentConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit) = {}
     private var bmConf: (KookBotManagerConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit) = {}
-    
+
     override fun component(configurator: KookComponentConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit) {
         compConf.also { old ->
             compConf = {
@@ -176,8 +171,8 @@ private class KookComponentUsageBuilderImpl<A : Application> : KookComponentUsag
             }
         }
     }
-    
-    
+
+
     override fun botManager(configurator: KookBotManagerConfiguration.(perceivable: CompletionPerceivable<A>) -> Unit) {
         bmConf.also { old ->
             bmConf = {
@@ -186,9 +181,12 @@ private class KookComponentUsageBuilderImpl<A : Application> : KookComponentUsag
             }
         }
     }
-    
+
     fun use(b: ApplicationBuilder<A>) {
         b.useKookComponent(compConf)
         b.useKookBotManager(bmConf)
     }
 }
+
+
+

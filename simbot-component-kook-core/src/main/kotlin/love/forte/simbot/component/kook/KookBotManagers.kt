@@ -19,22 +19,24 @@ package love.forte.simbot.component.kook
 
 import love.forte.simbot.FragileSimbotApi
 import love.forte.simbot.application.Application
-import love.forte.simbot.application.ApplicationBuilder
-import love.forte.simbot.application.BotRegistrar
+import love.forte.simbot.application.BotManagers
 import love.forte.simbot.application.EventProvider
+import love.forte.simbot.application.bots
 import love.forte.simbot.bot.OriginBotManager
+import love.forte.simbot.component.kook.bot.KookBotManager
 
 
 /**
- * 在 [ApplicationBuilder.bots] 作用域中寻找并使用 [KookBotManager].
+ * 在 [Application.bots] 作用域中寻找并使用 [KookBotManager].
  *
  * ```kotlin
- * simpleApplication {
- *     kookBots {
- *         val bot = register("client id", "token") {
- *             // config...
- *         }
- *         bot.start()
+ * val app = createSimpleApplication {
+ *     useKook()
+ *     // ...
+ * }
+ *
+ * app.kookBots {
+ *   // ...
  * }
  * ```
  *
@@ -43,98 +45,42 @@ import love.forte.simbot.bot.OriginBotManager
  * @throws NoSuchElementException 如果当前环境中不存在任何 [KookBotManager]
  *
  */
-public inline fun ApplicationBuilder<*>.kookBots(
-    crossinline block: suspend KookBotManager.(BotRegistrar) -> Unit,
+public inline fun Application.kookBots(
+    block: KookBotManager.(BotManagers) -> Unit,
 ) {
     bots {
         val manager = providers.firstKookBotManagerOrNull()
             ?: throw NoSuchElementException("No event provider of type [KookBotManager] in providers: $providers")
-        
+
         manager.block(this)
     }
 }
 
 /**
- * 在 [ApplicationBuilder.bots] 作用域中寻找并使用 [KookBotManager].
+ * 在 [Application.bots] 作用域中寻找并使用 [KookBotManager].
  *
  * ```kotlin
- * simpleApplication {
- *    kookBots {
- *        val bot = register("client id", "token") {
- *            // config...
- *        }
- *        bot.start()
- *    }
+ * val app = createSimpleApplication {
+ *    useKook()
+ *    // ...
+ * }
+ *
+ * app.kookBotsIfSupport {
+ *    // ...
  * }
  * ```
  *
  * 如果当前环境中不存在任何 [KookBotManager], 则不会执行 [block]。
  *
  */
-public inline fun ApplicationBuilder<*>.kookBotsIfSupport(
-    crossinline block: suspend KookBotManager.(BotRegistrar) -> Unit,
+public inline fun Application.kookBotsIfSupport(
+    block: KookBotManager.(BotManagers) -> Unit,
 ) {
     bots {
         val manager = providers.firstKookBotManagerOrNull() ?: return@bots
         manager.block(this)
     }
 }
-
-/**
- * 在 [ApplicationBuilder.bots] 作用域中寻找并使用 [KookBotManager].
- *
- * ```kotlin
- * simpleApplication {
- *     bots {
- *        Kook {
- *             val bot = register("client id", "token") {
- *                 // config...
- *             }
- *             bot.start()
- *         }
- *     }
- * }
- * ```
- *
- * 如果当前环境中不存在任何 [KookBotManager], 则会抛出 [NoSuchElementException]。
- *
- * @throws NoSuchElementException 如果当前环境中不存在任何 [KookBotManager]
- *
- */
-public suspend inline fun BotRegistrar.kook(
-    crossinline block: suspend KookBotManager.() -> Unit,
-) {
-    val manager = providers.firstKookBotManagerOrNull()
-        ?: throw NoSuchElementException("No event provider of type [KookBotManager] in providers: $providers")
-    manager.block()
-}
-
-/**
- * 在 [ApplicationBuilder.bots] 作用域中寻找并使用 [KookBotManager].
- *
- * ```kotlin
- * simpleApplication {
- *     bots {
- *        Kook {
- *             val bot = register("client id", "token") {
- *                 // config...
- *             }
- *             bot.start()
- *         }
- *     }
- * }
- * ```
- *
- * 如果当前环境中不存在任何 [KookBotManager], 则不会执行 [block]。
- *
- */
-public suspend inline fun BotRegistrar.kookIfSupport(
-    crossinline block: suspend KookBotManager.() -> Unit,
-) {
-    val manager = providers.firstKookBotManagerOrNull() ?: return
-    manager.block()
-}
-
 
 // region bot manager 获取扩展
 /**

@@ -1,16 +1,17 @@
 [versions]
-kotlinx-coroutines = "1.6.4"
+kotlinx-coroutines = "1.7.0"
 kotlinx-serialization = "1.5.0"
 spring-boot = "2.7.5"
 openjdk-jmh = "1.35"
 forte-di = "0.0.3"
 forte-annotationTool = "0.6.3"
-ktor = "2.2.3"
-log4j = "2.14.1"
+ktor = "2.3.0"
+log4j = "2.20.0"
+atomicfu = "0.20.1"
 
 [libraries]
 # jetbrains-annotation
-jetbrains-annotations = "org.jetbrains:annotations:23.0.0"
+jetbrains-annotations = "org.jetbrains:annotations:24.0.1"
 
 # kotlinx-coroutines
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -46,6 +47,10 @@ ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref
 ktor-server-jetty = { group = "io.ktor", name = "ktor-server-jetty", version.ref = "ktor" }
 ktor-server-tomcat = { group = "io.ktor", name = "ktor-server-tomcat", version.ref = "ktor" }
 ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "ktor" }
+# compression
+## 似乎也支持 client
+ktor-server-compression = { group = "io.ktor", name = "ktor-server-compression", version.ref = "ktor" }
+
 ## client
 ktor-client-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
@@ -57,6 +62,7 @@ ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref =
 ktor-client-jetty = { group = "io.ktor", name = "ktor-client-jetty", version.ref = "ktor" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-ws = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktor" }
 
 ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor" }
 
@@ -96,3 +102,4 @@ forte-annotationTool-kcore = { group = "love.forte.annotation-tool", name = "kco
 log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
 log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
 log4j-slf4jImpl = { group = "org.apache.logging.log4j", name = "log4j-slf4j-impl", version.ref = "log4j" }
+log4j-slf4j2Impl = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version.ref = "log4j" }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -17,132 +17,152 @@
 
 package love.forte.simbot.component.kook.internal
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
+import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
-import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookComponentGuildBot
-import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.component.kook.KookGuildMember
+import love.forte.simbot.component.kook.*
+import love.forte.simbot.component.kook.bot.KookGuildBot
+import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.message.KookReceiveMessageContent
 import love.forte.simbot.component.kook.message.sendToChannel
-import love.forte.simbot.component.kook.model.ChannelModel
+import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.kook.api.message.MessageCreateRequest
+import love.forte.simbot.definition.GuildMember
+import love.forte.simbot.delegate.getValue
+import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.message.SendChannelMessageApi
+import love.forte.simbot.kook.messages.MessageType
+import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.literal
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
-import kotlin.coroutines.CoroutineContext
-
-
-internal interface MutableChannelModelContainer {
-    var source: ChannelModel
-}
 
 
 /**
  *
  * @author ForteScarlet
  */
-internal class KookChannelImpl private constructor(
-    private val baseBot: KookComponentBotImpl,
-    private val _guild: KookGuildImpl,
-    @Volatile
-    override var category: KookChannelCategoryImpl?,
-    @Volatile override var source: ChannelModel,
-) : KookChannel, CoroutineScope, MutableChannelModelContainer {
-    
-    override val bot: KookComponentGuildBot
-        get() = _guild.bot
-    
-    private val job = SupervisorJob(_guild.job)
-    override val coroutineContext: CoroutineContext = _guild.coroutineContext + job
-    
-    override val guildId: ID
-        get() = _guild.id
-    
+internal class KookChannelImpl(
+    private val baseBot: KookBotImpl,
+    override val source: Channel,
+) : KookChannel {
+    private val guildValue: KookGuild
+        get() = baseBot.internalGuild(source.guildId)
+            ?: throw kookGuildNotExistsException(source.guildId)
+
+    override val bot: KookGuildBot
+        get() = baseBot.internalGuild(source.guildId)?.bot
+            ?: throw kookGuildNotExistsException(source.guildId)
+
+    override val guildId: ID by stringID { source.guildId }
+
     override val currentMember: Int
-        get() = _guild.currentMember
-    
-    override val maximumMember: Int
-        get() = _guild.maximumMember
-    
-    override val ownerId: ID
-        get() = _guild.ownerId
-    
-    override val members: Items<KookGuildMember>
-        get() = _guild.members
-    
-    override suspend fun owner(): KookGuildMember = _guild.owner()
-    
-    override suspend fun guild(): KookGuild = _guild
-    
-    override suspend fun member(id: ID): KookGuildMember? = _guild.member(id)
-    
+        get() = baseBot.internalGuildMemberCount(source.guildId)
+
+    override suspend fun guild(): KookGuild = guildValue
+
+    override val members: Items<GuildMember>
+        get() = guildValue.members
+
+    override suspend fun owner(): GuildMember = baseBot.internalMember(source.guildId, source.userId)
+        ?: throw kookMemberNotExistsException(source.userId)
+
+    override suspend fun member(id: ID): GuildMember? = guildValue.member(id)
+
     override suspend fun send(message: Message, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
-        return send0(message, quote, tempTargetId, null)
-//        return message.sendToChannel(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId)
-//            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+        return send(message, quote?.literal, tempTargetId?.literal)
     }
 
     override suspend fun send(message: MessageContent, quote: ID?, tempTargetId: ID?): KookMessageReceipt {
+        return send(message, quote?.literal, tempTargetId?.literal)
+    }
+
+    internal suspend fun send(
+        message: Message,
+        quote: String? = null,
+        tempTargetId: String? = null
+    ): KookMessageReceipt {
+        return message.sendToChannel(
+            bot,
+            targetId = source.id,
+            quote = quote,
+            tempTargetId = tempTargetId,
+            defaultTempTargetId = null
+        ) ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+    }
+
+    internal suspend fun send(
+        message: MessageContent,
+        quote: String? = null,
+        tempTargetId: String? = null
+    ): KookMessageReceipt {
         return when (message) {
             is KookReceiveMessageContent -> {
                 val source = message.source
-                MessageCreateRequest.create(
-                    type = source.type.type,
-                    targetId = this.id,
+                SendChannelMessageApi.create(
+                    type = source.type?.value,
+                    targetId = this.source.id,
                     content = source.content,
                     quote = quote,
                     nonce = null,
                     tempTargetId = tempTargetId,
                 ).requestDataBy(baseBot).asReceipt(false, baseBot)
             }
-            
+
             is KookChannelMessageDetailsContent -> {
                 val details = message.details
-                MessageCreateRequest.create(
+                SendChannelMessageApi.create(
                     type = details.type,
-                    targetId = this.id,
+                    targetId = this.source.id,
                     content = details.content,
                     quote = quote ?: details.quote?.id,
                     nonce = null,
                     tempTargetId = tempTargetId,
                 ).requestDataBy(baseBot).asReceipt(false, baseBot)
             }
-            
+
             else -> {
                 send(message.messages)
             }
         }
     }
 
+    internal suspend fun send(text: String, quote: String? = null, tempTargetId: String? = null): KookMessageReceipt {
+        return send(
+            MessageType.TEXT.type,
+            text,
+            quote,
+            null,
+            tempTargetId
+        )
+    }
 
-    internal suspend fun send0(message: Message, quote: ID?, tempTargetId: ID?, defaultTempTargetId: ID?): KookMessageReceipt {
-        return message.sendToChannel(bot, targetId = source.id, quote = quote, tempTargetId = tempTargetId, defaultTempTargetId = defaultTempTargetId)
-            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+    /**
+     * 根据 [SendChannelMessageApi] api 构建并发送消息。
+     */
+    private suspend fun send(
+        type: Int,
+        content: String,
+        quote: String? = null,
+        nonce: String? = null,
+        tempTargetId: String? = null,
+    ): KookMessageReceipt {
+        val request = SendChannelMessageApi.create(type, source.id, content, quote, nonce, tempTargetId)
+        return send(request)
     }
-    
+
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRole>
+        get() = guildValue.roles
+
+    override val category: KookChannelCategory?
+        get() = source.parentId.takeIf { it.isNotBlank() }?.let { baseBot.internalCategory(it) }
+
     override fun toString(): String {
-        return "KookChannelImpl(id=$id, name=$name, source=$source, category=$category)"
-    }
-    
-    
-    companion object {
-        internal fun ChannelModel.toKookChannel(
-            baseBot: KookComponentBotImpl,
-            guild: KookGuildImpl,
-            category: KookChannelCategoryImpl?,
-        ): KookChannelImpl {
-            return KookChannelImpl(baseBot, guild, category, this)
-        }
+        return "KookChannel(id=${source.id}, name=${source.name}, guildId=${source.guildId})"
     }
 }
-
-
-
-

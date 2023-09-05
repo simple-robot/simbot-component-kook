@@ -17,69 +17,86 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.plugin.suspendtrans.annotation.JvmAsync
-import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ID
+import love.forte.simbot.JST
 import love.forte.simbot.action.DeleteSupport
+import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.definition.Contact
 import love.forte.simbot.definition.Stranger
-import love.forte.simbot.kook.api.userchat.UserChatDeleteRequest
+import love.forte.simbot.kook.api.userchat.DeleteUserChatApi
+import love.forte.simbot.kook.api.userchat.TargetInfo
 import love.forte.simbot.kook.api.userchat.UserChatView
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 
 /**
- * Kook 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
+ * KOOK 的 [user-chat 私聊会话](https://developer.kaiheila.cn/doc/http/user-chat)。
  *
- * Kook 组件会将 [私聊会话][KookUserChat] 视为 [Stranger] 处理，同时实现 [Contact] 来提供可交流的联系人能力。
+ * KOOK 组件会将 [私聊会话][KookUserChat] 视为 [Stranger] 处理，同时实现 [Contact] 来提供可交流的联系人能力。
  *
  * ## 可删除的
- * Kook 中的聊天会话是可以通过 [UserChatDeleteRequest] 进行删除的。因此 [KookUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
+ * KOOK 中的聊天会话是可以通过 [DeleteUserChatApi] 进行删除的。因此 [KookUserChat] 实现了 [DeleteSupport] 来支持 [删除操作][delete]。
  *
+ * @author ForteScarlet
  */
-public interface KookUserChat : Stranger, Contact, KookComponentDefinition<UserChatView>, DeleteSupport {
+public interface KookUserChat : Stranger, Contact, DeleteSupport {
     /**
-     * 私聊会话对应用户ID。
+     * 私聊会话对应用户的用户ID，同 [source.targetInfo.id][TargetInfo.id] 。
      *
-     * 如果需要此会话的会话code而不是用于id，使用 [source] 来获取 [UserChatView.code]。
+     * 如果需要此会话的会话 `code`，使用 [chatCode] 来获取。
      *
+     * @see chatCode
+     * @see TargetInfo.id
      */
     override val id: ID
-    override val bot: KookComponentBot
-    override val source: UserChatView
-    
+        get() = source.targetInfo.id.ID
+
+    /**
+     * 私聊会话的会话 `code` , 同 [source.code][UserChatView.code] 。
+     *
+     * 如果需要此会话对应的目标用户id，使用 [id]。
+     *
+     * @see id
+     * @see UserChatView.code
+     */
+    public val chatCode: String
+        get() = source.code
+
+    override val bot: KookBot
+
+    /**
+     * 用户会话源信息对象。
+     */
+    public val source: UserChatView
+
     override val avatar: String get() = source.targetInfo.avatar
     override val username: String get() = source.targetInfo.username
-    
+
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     override suspend fun send(message: Message): KookMessageReceipt
-    
+
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     override suspend fun send(text: String): KookMessageCreatedReceipt
-    
+
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     override suspend fun send(message: MessageContent): KookMessageReceipt
-    
-    // TODO Doc update.
+
     /**
      * 删除当前 [聊天会话][KookUserChat].
      *
-     * 通过 [UserChatDeleteRequest] 删除当前聊天会话。除非 [delete] 抛出异常，否则 [delete] 始终得到 `true`。
-     * 在删除的过程中会直接抛出请求 [UserChatDeleteRequest] 过程中可能产生的任何异常。
+     * 通过 [DeleteUserChatApi] 删除当前聊天会话。除非 [delete] 抛出异常，否则 [delete] 基本上总是会得到 `true`。
+     * 在删除的过程中会直接抛出 [DeleteUserChatApi] 在请求过程中可能产生的任何异常。
      *
      */
     @JvmSynthetic

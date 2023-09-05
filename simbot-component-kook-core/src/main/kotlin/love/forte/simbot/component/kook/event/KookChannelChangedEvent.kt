@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -17,63 +17,50 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.plugin.suspendtrans.annotation.JvmAsync
-import love.forte.plugin.suspendtrans.annotation.JvmBlocking
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.ID
+import love.forte.simbot.JSTP
 import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.component.kook.KookGuildMember
-import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent.Companion.toContent
-import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.definition.ChannelInfoContainer
+import love.forte.simbot.component.kook.KookMember
+import love.forte.simbot.definition.Channel
 import love.forte.simbot.event.*
-import love.forte.simbot.kook.api.message.MessageViewRequest
-import love.forte.simbot.kook.event.system.channel.*
-import love.forte.simbot.message.MessageContent
+import love.forte.simbot.kook.event.*
+import love.forte.simbot.kook.objects.SimpleChannel
 import love.forte.simbot.message.doSafeCast
+import love.forte.simbot.kook.event.Event as KEvent
 
 /**
+ * KOOK 系统事件中与 _频道变更_ 相关的事件的simbot事件基准类。
  *
- * Kook 系统事件中与频道变更事件相关的事件针对simbot标准事件的实现基准类。
- *
- * 涉及的相关 Kook **原始**事件有：
- * - [AddedChannelEvent]
- * - [UpdatedChannelEvent]
- * - [DeletedChannelEvent]
- * - [UnpinnedMessageEvent]
- * - [PinnedMessageEvent]
- *
- *
- * @see ChangedEvent
+ * 涉及的 KOOK 原始事件 (的 [SystemExtra] 子类型) 有：
+ * - [AddedChannelEventExtra]
+ * - [UpdatedChannelEventExtra]
+ * - [DeletedChannelEventExtra]
  *
  * @author ForteScarlet
+ *
+ * @see KookSystemEvent
+ * @see ChangedEvent
  */
-@BaseEvent
-public abstract class KookChannelChangedEvent<out Body : ChannelEventExtraBody> :
-    KookSystemEvent<Body>(), ChangedEvent {
-    
+public abstract class KookChannelChangedEvent : KookSystemEvent(), ChangedEvent {
     /**
-     * 此事件涉及的频道所属的频道服务器。
+     * 事件涉及子频道所属的频道服务器。
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
+    @JSTP
     abstract override suspend fun source(): KookGuild
-    
-    //// Impl
-    
-    
-    override val changedTime: Timestamp
-        get() = sourceEvent.msgTimestamp
-    
-    abstract override val key: Event.Key<out KookChannelChangedEvent<*>>
-    
-    public companion object Key : BaseEventKey<KookChannelChangedEvent<*>>(
+
+    /**
+     * @see KEvent.msgTimestamp
+     */
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+
+    abstract override val key: Event.Key<out KookChannelChangedEvent>
+
+    public companion object Key : BaseEventKey<KookChannelChangedEvent>(
         "kook.channel_changed", KookSystemEvent, ChangedEvent
     ) {
-        override fun safeCast(value: Any): KookChannelChangedEvent<*>? = doSafeCast(value)
+        override fun safeCast(value: Any): KookChannelChangedEvent? = doSafeCast(value)
     }
 }
 
@@ -81,36 +68,62 @@ public abstract class KookChannelChangedEvent<out Body : ChannelEventExtraBody> 
  * 某频道服务器中新增了一个频道后的事件。
  *
  * @see IncreaseEvent
- * @see AddedChannelEvent
+ * @see AddedChannelEventExtra
  */
-public abstract class KookAddedChannelChangedEvent :
-    KookChannelChangedEvent<AddedChannelExtraBody>(),
-    IncreaseEvent {
-    
+public abstract class KookAddedChannelEvent : KookChannelChangedEvent(), IncreaseEvent, ChannelEvent {
+
+    /**
+     * 原事件对象
+     *
+     * @see AddedChannelEventExtra
+     */
+    abstract override val sourceEvent: KEvent<AddedChannelEventExtra>
+
+    /**
+     * @see AddedChannelEventExtra.body
+     */
+    override val sourceBody: SimpleChannel
+        get() = sourceEvent.extra.body
+
     /**
      * 操作者，即此频道的创建者。
      *
-     * 创建者获取自 [AddedChannelExtraBody.masterId],
+     * 创建者获取自 [sourceBody.userId][SimpleChannel.userId],
      * 如果在此事件实例化的过程中此人离开频道服务器导致内置缓存被清理，则可能得到null。
      *
      */
-    public abstract val operator: KookGuildMember?
-    
+    public abstract val operator: KookMember?
+
     /**
      * 增加的频道。
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    abstract override suspend fun after(): KookChannel
-    
-    
-    override val key: Event.Key<out KookAddedChannelChangedEvent>
+    @JSTP
+    abstract override suspend fun channel(): KookChannel
+
+    /**
+     * 增加的频道。
+     *
+     * @see channel
+     */
+    @JSTP
+    override suspend fun after(): KookChannel = channel()
+
+    /**
+     * 增加的频道。
+     *
+     * @see channel
+     */
+    @JSTP
+    override suspend fun organization(): KookChannel = channel()
+
+
+    override val key: Event.Key<out KookAddedChannelEvent>
         get() = Key
-    
-    public companion object Key : BaseEventKey<KookAddedChannelChangedEvent>(
-        "kook.added_channel_changed", KookChannelChangedEvent, IncreaseEvent
+
+    public companion object Key : BaseEventKey<KookAddedChannelEvent>(
+        "kook.added_channel", KookChannelChangedEvent, IncreaseEvent, ChannelEvent
     ) {
-        override fun safeCast(value: Any): KookAddedChannelChangedEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KookAddedChannelEvent? = doSafeCast(value)
     }
 }
 
@@ -119,275 +132,270 @@ public abstract class KookAddedChannelChangedEvent :
  *
  * _Note: 无法获取变更前的信息，[before] 恒为null_
  *
- * @see UpdatedChannelEvent
+ * @see UpdatedChannelEventExtra
  */
-public abstract class KookUpdatedChannelChangedEvent :
-    KookChannelChangedEvent<UpdatedChannelExtraBody>(),
-    ChangedEvent,
-    ChannelInfoContainer {
-    
+public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), ChangedEvent, ChannelEvent {
+
     /**
-     * 频道信息。
+     * @see UpdatedChannelEventExtra.body
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
+    override val sourceBody: SimpleChannel
+        get() = sourceEvent.extra.body
+
+    /**
+     * @see UpdatedChannelEventExtra
+     */
+    abstract override val sourceEvent: KEvent<UpdatedChannelEventExtra>
+
+    /**
+     * 变更后的频道信息
+     */
+    @JSTP
     abstract override suspend fun channel(): KookChannel
-    
+
+
     /**
-     * 无法获取变更前的信息，[before] 恒为null。
+     * 变更后的频道信息
+     *
+     * @see channel
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun before(): UpdatedChannelExtraBody? = null
-    
+    @JSTP
+    override suspend fun organization(): Channel = channel()
+
     /**
-     * 信息变更内容。
+     * 变更后的频道信息
+     *
+     * @see channel
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun after(): UpdatedChannelExtraBody = sourceBody
-    
-    override val key: Event.Key<out KookUpdatedChannelChangedEvent>
+    @JSTP
+    override suspend fun after(): KookChannel = channel()
+
+    /**
+     * 恒为null
+     */
+    @JSTP
+    override suspend fun before(): Any? = null
+
+    override val key: Event.Key<out KookUpdatedChannelEvent>
         get() = Key
-    
-    public companion object Key : BaseEventKey<KookUpdatedChannelChangedEvent>(
-        "kook.updated_channel_changed", KookChannelChangedEvent, ChangedEvent
+
+    public companion object Key : BaseEventKey<KookUpdatedChannelEvent>(
+        "kook.updated_channel", KookChannelChangedEvent, ChangedEvent, ChannelEvent
     ) {
-        override fun safeCast(value: Any): KookUpdatedChannelChangedEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KookUpdatedChannelEvent? = doSafeCast(value)
     }
 }
 
 /**
  * 某频道被删除的事件。
  *
- * ## _ExperimentalSimbotApi_
- * 此事件未来会细化为区分"类型频道（[KookChannelCategory]）" 和 "普通频道（[KookChannel]）"的相关事件，
- * 因此目前此事件的定义仅供参考，未来会发生变更，且不保证变更兼容性。
- *
- * @see DeletedChannelEvent
+ * @see DeletedChannelEventExtra
  */
-@ExperimentalSimbotApi
-public abstract class KookDeletedChannelChangedEvent :
-    KookChannelChangedEvent<DeletedChannelExtraBody>(),
-    DecreaseEvent {
-    
+public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), DecreaseEvent {
+    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<DeletedChannelEventExtra>
+
+    override val sourceBody: DeletedChannelEventBody
+        get() = sourceEvent.extra.body
+
     /**
-     * 被删除的频道。
+     * 已经被删除的频道。
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
+    @JSTP
     abstract override suspend fun before(): KookChannel
-    
-    
+
     /**
-     * 始终为null。
+     * 始终为 null
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun after(): KookChannel? = null
-    
-    
-    override val key: Event.Key<out KookDeletedChannelChangedEvent>
+    @JSTP
+    override suspend fun after(): Any? = null
+
+    override val key: Event.Key<out KookDeletedChannelEvent>
         get() = Key
-    
-    public companion object Key : BaseEventKey<KookDeletedChannelChangedEvent>(
-        "kook.deleted_channel_changed", KookChannelChangedEvent, DecreaseEvent
+
+    public companion object Key : BaseEventKey<KookDeletedChannelEvent>(
+        "kook.deleted_channel", KookChannelChangedEvent, DecreaseEvent
     ) {
-        
-        override fun safeCast(value: Any): KookDeletedChannelChangedEvent? = doSafeCast(value)
+
+        override fun safeCast(value: Any): KookDeletedChannelEvent? = doSafeCast(value)
     }
 }
 
+/**
+ * KOOK 系统事件中与 _频道分组变更_ 相关的事件的simbot事件基准类。
+ *
+ * 涉及的 KOOK 原始事件 (的 [SystemExtra] 子类型) 有：
+ * - [AddedChannelEventExtra]
+ * - [UpdatedChannelEventExtra]
+ * - [DeletedChannelEventExtra]
+ *
+ * @author ForteScarlet
+ *
+ * @see KookSystemEvent
+ * @see ChangedEvent
+ */
+public abstract class KookCategoryChangedEvent : KookSystemEvent(), ChangedEvent {
+    /**
+     * 事件涉及子频道所属的频道服务器。
+     */
+    @JSTP
+    abstract override suspend fun source(): KookGuild
+
+    /**
+     * @see KEvent.msgTimestamp
+     */
+    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+
+    abstract override val key: Event.Key<out KookCategoryChangedEvent>
+
+    public companion object Key : BaseEventKey<KookCategoryChangedEvent>(
+        "kook.category_changed", KookSystemEvent, ChangedEvent
+    ) {
+        override fun safeCast(value: Any): KookCategoryChangedEvent? = doSafeCast(value)
+    }
+}
 
 /**
- * 与频道消息置顶相关的事件。
- * 涉及的原始事件有：
- * - [PinnedMessageEvent]
- * - [UnpinnedMessageEvent]
+ * 某频道服务器中新增了一个频道分组后的事件。
  *
- * 此事件为 [ChangedEvent], 事件源为发生事件的频道服务器，变动主体为被设置为置顶消息 **的ID**。
- * 由于事件无法确定变更前的消息，因此此事件的实现子事件中，[before] 和 [after] 只可能有一个不为null。
- *
- * 如果你只关心相关消息的ID，可以直接使用 [msgId] 属性获取。
- *
+ * @see IncreaseEvent
+ * @see AddedChannelEventExtra
  */
-@BaseEvent
-public abstract class KookMessagePinEvent<Body : ChannelEventExtraBody> :
-    KookChannelChangedEvent<Body>(),
-    ChangedEvent, ChannelInfoContainer {
-    
+public abstract class KookAddedCategoryEvent : KookCategoryChangedEvent(), IncreaseEvent {
     /**
-     * 此事件涉及的频道信息。
-     */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    abstract override suspend fun channel(): KookChannel
-    
-    
-    /**
-     * 此事件涉及的操作者。会通过 [operatorId] 获取。
+     * 原事件对象
      *
-     * 假若在此事件触发前的瞬间此人离开频道，则可能造成无法获取的情况。
+     * @see AddedChannelEventExtra
      */
-    public abstract val operator: KookGuildMember?
-    
-    /**
-     * 涉及消息的ID
-     */
-    public abstract val msgId: ID
-    
-    /**
-     * 操作人ID
-     */
-    public abstract val operatorId: ID
-    
-    /**
-     * 涉及频道ID
-     */
-    public abstract val channelId: ID
-    
-    /**
-     * 变更前ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
-     * 有值时同 [msgId].
-     */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    abstract override suspend fun before(): ID?
-    
-    /**
-     * 变更后ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
-     * 有值时同 [msgId].
-     */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    abstract override suspend fun after(): ID?
-    
-    
-    //// Api
-    
-    /**
-     * 通过 [msgId] 查询这条被置顶的消息。
-     */
-    @JvmBlocking
-    @JvmAsync
-    public suspend fun queryMsg(): MessageContent {
-        val messageView = MessageViewRequest.create(msgId).requestDataBy(bot)
-        return messageView.toContent(bot)
-    }
-    
-    override val key: Event.Key<out KookMessagePinEvent<*>>
-        get() = Key
-    
-    public companion object Key : BaseEventKey<KookMessagePinEvent<*>>(
-        "kook.message_pin", KookChannelChangedEvent, ChangedEvent
-    ) {
-        override fun safeCast(value: Any): KookMessagePinEvent<*>? = doSafeCast(value)
-    }
-}
+    abstract override val sourceEvent: KEvent<AddedChannelEventExtra>
 
-
-/**
- *
- * 新消息置顶事件。此事件的body也属于 [ChannelEventExtraBody] 类型的自类型，
- * 代表一个新的消息被设置为了目标频道的置顶消息。
- *
- * 此事件为 [ChangedEvent], 事件源为发生事件的频道服务器，变动主体为被设置为置顶消息 **的ID**。
- * 由于事件无法确定变更前的消息，因此只能获取到 **变更后的**，而 [before] 恒为null。
- *
- * @see ChannelEventExtraBody
- * @see PinnedMessageEvent
- */
-public abstract class KookPinnedMessageEvent :
-    KookMessagePinEvent<PinnedMessageExtraBody>() {
-    
     /**
-     * 涉及消息的ID。
+     * @see AddedChannelEventExtra.body
+     */
+    override val sourceBody: SimpleChannel
+        get() = sourceEvent.extra.body
+
+    /**
+     * 操作者，即此频道的创建者。
+     *
+     * 创建者获取自 [sourceBody.userId][SimpleChannel.userId],
+     * 如果在此事件实例化的过程中此人离开频道服务器导致内置缓存被清理，则可能得到null。
      *
      */
-    override val msgId: ID
-        get() = sourceBody.msgId
-    
-    
+    public abstract val operator: KookMember?
+
     /**
-     * 操作者ID。
+     * 增加的频道分组。
      */
-    override val operatorId: ID
-        get() = sourceBody.operatorId
-    
+    @JSTP
+    public abstract suspend fun category(): KookChannelCategory
+
     /**
-     * 频道ID。
+     * 增加的频道分组。
+     *
+     * @see category
      */
-    override val channelId: ID
-        get() = sourceBody.channelId
-    
-    /**
-     * 始终为null。
-     */
-    @JvmSynthetic
-    override suspend fun before(): ID? = null
-    
-    /**
-     * 同 [msgId].
-     */
-    @JvmSynthetic
-    override suspend fun after(): ID = msgId
-    
-    override val key: Event.Key<out KookPinnedMessageEvent>
+    @JSTP
+    override suspend fun after(): KookChannelCategory = category()
+
+
+    override val key: Event.Key<out KookAddedCategoryEvent>
         get() = Key
-    
-    public companion object Key : BaseEventKey<KookPinnedMessageEvent>(
-        "kook.pinned_message", KookMessagePinEvent
+
+    public companion object Key : BaseEventKey<KookAddedCategoryEvent>(
+        "kook.added_category", KookCategoryChangedEvent, IncreaseEvent
     ) {
-        override fun safeCast(value: Any): KookPinnedMessageEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KookAddedCategoryEvent? = doSafeCast(value)
     }
-    
 }
 
 /**
+ * 某频道分组发生了信息变更。
  *
- * 消息取消置顶事件。此事件的body也属于 [ChannelEventExtraBody] 类型的自类型，
- * 代表一个新的消息被设置为了目标频道的置顶消息。
+ * _Note: 无法获取变更前的信息，[before] 恒为null_
  *
- * 此事件为 [ChangedEvent], 事件源为发生事件的频道服务器，变动主体为被设置为置顶消息 **的ID**。
- * 由于事件无法确定变更前的消息，因此只能获取到 **删除前的** 消息ID，而 [after] 恒为null。
- *
- * @see ChannelEventExtraBody
- * @see UnpinnedMessageEvent
+ * @see UpdatedChannelEventExtra
  */
-public abstract class KookUnpinnedMessageEvent :
-    KookMessagePinEvent<UnpinnedMessageExtraBody>() {
-    
-    //// Impl
-    override val msgId: ID
-        get() = sourceBody.msgId
-    
-    override val operatorId: ID
-        get() = sourceBody.operatorId
-    
-    override val channelId: ID
-        get() = sourceBody.channelId
-    
+public abstract class KookUpdatedCategoryEvent : KookCategoryChangedEvent(), ChangedEvent {
+
     /**
-     * 同 [msgId].
+     * @see UpdatedChannelEventExtra.body
      */
-    @JvmSynthetic
-    override suspend fun before(): ID = msgId
-    
+    override val sourceBody: SimpleChannel
+        get() = sourceEvent.extra.body
+
     /**
-     * 始终为null。
+     * @see UpdatedChannelEventExtra
      */
-    @JvmSynthetic
-    override suspend fun after(): ID? = null
-    
-    
-    override val key: Event.Key<out KookUnpinnedMessageEvent>
+    abstract override val sourceEvent: KEvent<UpdatedChannelEventExtra>
+
+    /**
+     * 变更后的频道分组信息
+     */
+    @JSTP
+    public abstract suspend fun category(): KookChannelCategory
+
+    /**
+     * 变更后的频道分组信息
+     *
+     * @see category
+     */
+    @JSTP
+    override suspend fun after(): KookChannelCategory = category()
+
+    /**
+     * 恒为null
+     */
+    @JSTP
+    override suspend fun before(): Any? = null
+
+    override val key: Event.Key<out KookUpdatedCategoryEvent>
         get() = Key
-    
-    public companion object Key : BaseEventKey<KookUnpinnedMessageEvent>(
-        "kook.unpinned_message", KookMessagePinEvent
+
+    public companion object Key : BaseEventKey<KookUpdatedCategoryEvent>(
+        "kook.updated_category", KookCategoryChangedEvent, ChangedEvent
     ) {
-        override fun safeCast(value: Any): KookUnpinnedMessageEvent? = doSafeCast(value)
+        override fun safeCast(value: Any): KookUpdatedCategoryEvent? = doSafeCast(value)
     }
-    
 }
+
+/**
+ * 某频道分组被删除的事件。
+ *
+ * @see DeletedChannelEventExtra
+ */
+public abstract class KookDeletedCategoryEvent : KookCategoryChangedEvent(), DecreaseEvent {
+    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<DeletedChannelEventExtra>
+
+    override val sourceBody: DeletedChannelEventBody
+        get() = sourceEvent.extra.body
+
+    /**
+     * 已经被删除的频道分组。
+     */
+    @JSTP
+    abstract override suspend fun before(): KookChannelCategory
+
+    /**
+     * 始终为 null
+     */
+    @JSTP
+    override suspend fun after(): Any? = null
+
+    override val key: Event.Key<out KookDeletedCategoryEvent>
+        get() = Key
+
+    public companion object Key : BaseEventKey<KookDeletedCategoryEvent>(
+        "kook.deleted_category", KookCategoryChangedEvent, DecreaseEvent
+    ) {
+
+        override fun safeCast(value: Any): KookDeletedCategoryEvent? = doSafeCast(value)
+    }
+}
+
+
+
+
+
+
+
 

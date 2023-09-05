@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -17,125 +17,142 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.plugin.suspendtrans.annotation.JvmAsync
-import love.forte.plugin.suspendtrans.annotation.JvmBlocking
-import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
+import kotlinx.coroutines.CoroutineScope
+import love.forte.simbot.*
+import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.message.KookMessageReceipt
+import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.definition.*
-import love.forte.simbot.kook.api.message.MessageCreateRequest
-import love.forte.simbot.kook.api.message.MessageType
+import love.forte.simbot.definition.Channel
+import love.forte.simbot.definition.GuildMember
+import love.forte.simbot.kook.api.message.SendChannelMessageApi
+import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.utils.item.Items
-import love.forte.simbot.utils.item.Items.Companion.emptyItems
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
-import love.forte.simbot.kook.objects.Channel as KkChannel
 
 
 /**
- *
- * Kook 组件的子频道类型定义。
+ * 一个 KOOK 中的子频道。
  *
  * @author ForteScarlet
  */
-public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
-    
+public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     /**
-     * 得到当前频道所对应的api模块下的频道对象。
+     * 源于 [bot] 的上下文。
      */
-    override val source: KkChannel
-    
+    override val coroutineContext: CoroutineContext
+        get() = bot.coroutineContext
+
     /**
-     * 此频道对应的分组类型。
+     * 此频道的分组。
      *
-     * 如果当前频道是属于“顶层分类”的频道（即 [source.parentId][KkChannel.parentId] 为空），则 [category] 结果为null。
-     *
+     * 如果当前频道是属于“顶层分类”的频道（即没有分类、 [source.parentId][love.forte.simbot.kook.objects.Channel.parentId] 为空），
+     * 则 [category] 结果为null。
      *
      * @see KookChannelCategory
      */
     override val category: KookChannelCategory?
-    
-    override val bot: KookComponentGuildBot
-    override val id: ID get() = source.id
-    override val icon: String get() = source.icon
-    override val name: String get() = source.name
-    override val createTime: Timestamp get() = Timestamp.notSupport()
-    override val description: String get() = source.description
-    
-    override val guildId: ID
-    override val currentMember: Int
-    override val maximumMember: Int
-    
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun owner(): KookGuildMember
-    
-    override val ownerId: ID
-    
+
     /**
-     * 获取当前频道中的成员列表。相当于获取 guild 的成员列表。
-     */
-    override val members: Items<KookGuildMember>
-    
-    /**
-     * 寻找当前频道中指定ID的成员。相当于在 guild 中寻找。
-     */
-    @JvmBlocking(baseName = "getMember", suffix = "")
-    @JvmAsync(baseName = "getMember")
-    override suspend fun member(id: ID): KookGuildMember?
-    
-    
-    // region guild api
-    /**
-     * 子频道所属频道服务器
-     */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun guild(): KookGuild
-    
-    /**
-     * 子频道所属频道服务器
-     */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun previous(): KookGuild = guild()
-    // endregion
-    
-    
-    // region roles api
-    
-    /**
-     * 获取当前子频道中的所有角色信息。
+     * 得到所属 bot。
      *
-     * Deprecated: 尚未支持
+     * @throws KookGuildNotExistsException 如果频道已经不存在时
+     */
+    override val bot: KookGuildBot
+
+    /**
+     * 频道ID
+     */
+    override val id: ID get() = source.id.ID
+
+    /**
+     * 频道名称
+     */
+    override val name: String get() = source.name
+
+    /**
+     * 频道简介。始终为空字符串 `""`
+     */
+    override val description: String
+        get() = ""
+
+    /**
+     * 最大成员上限。始终得到 `-1`
+     */
+    override val maximumMember: Int
+        get() = -1
+
+    /**
+     * 所属频道ID
+     */
+    override val guildId: ID
+
+    /**
+     * 创建者ID
+     */
+    override val ownerId: ID
+        get() = source.userId.ID
+
+    /**
+     * KOOK 中不存在“频道图标”，始终得到空字符串 （`""`）。
+     */
+    @Deprecated("'Channel icon' does not exist in KOOK", ReplaceWith("\"\""))
+    override val icon: String get() = ""
+
+    /**
+     * KOOK 中不支持获取子频道的创建时间。
      */
     @Deprecated(
-        "Not support yet.",
-        ReplaceWith("emptyItems()", "love.forte.simbot.utils.item.Items.Companion.emptyItems")
+        "'Channel createTime' does not supported in KOOK",
+        ReplaceWith("Timestamp.notSupport()", "love.forte.simbot.Timestamp")
     )
-    override val roles: Items<Role> get() = emptyItems()
-    
-    // endregion
-    
-    
+    override val createTime: Timestamp get() = Timestamp.notSupport()
+
+    /**
+     * 此频道所属服务器
+     */
+    override suspend fun guild(): KookGuild
+
+
+    /**
+     * 此频道所属服务器
+     */
+    override suspend fun previous(): KookGuild = guild()
+
+    /**
+     * 等同于 [KookGuild.member]
+     */
+    override suspend fun member(id: ID): GuildMember?
+
+    /**
+     * 等同于 [KookGuild.members]
+     */
+    override val members: Items<GuildMember>
+
+
+    /**
+     * 等同于 [KookGuild.members]
+     */
+    @ExperimentalSimbotApi
+    override val roles: Items<KookGuildRole>
+
     // region send api
     /**
-     * 根据 [MessageCreateRequest] api 构建并发送消息。
+     * 根据 [SendChannelMessageApi] api 构建并发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
-    public suspend fun send(request: MessageCreateRequest): KookMessageReceipt {
+    @JST
+    public suspend fun send(request: SendChannelMessageApi): KookMessageReceipt {
         return request.requestDataBy(bot).asReceipt(false, bot)
     }
-    
+
     /**
-     * 根据 [MessageCreateRequest] api 构建并发送消息。
+     * 根据 [SendChannelMessageApi] api 构建并发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     public suspend fun send(
         type: Int,
         content: String,
@@ -143,18 +160,17 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
         nonce: String?,
         tempTargetId: ID?,
     ): KookMessageReceipt {
-        val request = MessageCreateRequest.create(type, source.id, content, quote, nonce, tempTargetId)
+        val request = SendChannelMessageApi.create(type, source.id, content, quote?.literal, nonce, tempTargetId?.literal)
         return send(request)
     }
-    
-    
+
+
     /**
      * 发送纯文本消息，并指定 [tempTargetId].
      *
-     * @see MessageCreateRequest.tempTargetId
+     * @see SendChannelMessageApi.tempTargetId
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     public suspend fun send(text: String, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt {
         return send(
             MessageType.TEXT.type,
@@ -162,37 +178,34 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
             quote, null, tempTargetId
         )
     }
-    
+
     /**
      * 发送消息，并可选的指定 [quote] 和 [tempTargetId].
      *
-     * @see MessageCreateRequest.tempTargetId
-     * @see MessageCreateRequest.quote
+     * @see SendChannelMessageApi.tempTargetId
+     * @see SendChannelMessageApi.quote
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     public suspend fun send(message: Message, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt
-    
+
     /**
      * 发送消息，并可选的指定 [quote] 和 [tempTargetId].
      *
-     * @see MessageCreateRequest.tempTargetId
-     * @see MessageCreateRequest.quote
+     * @see SendChannelMessageApi.tempTargetId
+     * @see SendChannelMessageApi.quote
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     public suspend fun send(
         message: MessageContent,
         quote: ID? = null,
         tempTargetId: ID? = null,
     ): KookMessageReceipt
-    
-    
+
+
     /**
      * 发送纯文本消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     override suspend fun send(text: String): KookMessageReceipt {
         return send(
             MessageType.TEXT.type,
@@ -200,30 +213,34 @@ public interface KookChannel : Channel, KookComponentDefinition<KkChannel> {
             null, null, null
         )
     }
-    
+
     /**
      * 发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     override suspend fun send(message: Message): KookMessageReceipt = send(message, null)
-    
+
     /**
      * 发送消息。
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     override suspend fun send(message: MessageContent): KookMessageReceipt = send(message, null)
-    
+
     // endregion
-    
-    // region Invalid api
-    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
+
+
+    /**
+     * Deprecated: KOOK 中不支持 Channel 级别的禁言。
+     */
+    @Deprecated("Channel mute is not supported in KOOK", ReplaceWith("false"))
     override suspend fun mute(duration: Duration): Boolean = false
-    
-    @Deprecated("Channel mute is not supported", ReplaceWith("false"))
+
+
+    /**
+     * Deprecated: KOOK 中不支持 Channel 级别的禁言。
+     */
+    @Deprecated("Channel mute is not supported in KOOK", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
-    // endregion
+
+
 }
-
-

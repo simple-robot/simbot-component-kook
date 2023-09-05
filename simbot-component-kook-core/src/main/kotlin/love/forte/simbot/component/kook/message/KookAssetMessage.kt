@@ -21,19 +21,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.Api4J
 import love.forte.simbot.ID
-import love.forte.simbot.kook.api.asset.AssetCreateRequest
-import love.forte.simbot.kook.api.asset.AssetCreated
-import love.forte.simbot.kook.api.message.MessageType
+import love.forte.simbot.definition.ResourceContainer
+import love.forte.simbot.delegate.getValue
+import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.asset.Asset
+import love.forte.simbot.kook.api.asset.CreateAssetApi
+import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.message.Image
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.resources.Resource
+import love.forte.simbot.resources.Resource.Companion.toResource
 import love.forte.simbot.resources.URLResource
+import java.net.URL
+import java.util.concurrent.CompletableFuture
 
 /**
  * 与上传后的媒体资源相关的消息类型。
  *
- * @see KookSimpleAssetMessage
+ * @see KookAsset
  * @see KookAssetImage
  *
  */
@@ -44,7 +50,7 @@ public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageEleme
     /**
      * 创建的文件资源。
      */
-    public abstract val asset: AssetCreated
+    public abstract val asset: Asset
 
     /**
      * 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值，
@@ -59,42 +65,40 @@ public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageEleme
 
 
         /**
-         * 使用当前的 [AssetCreated] 构建一个 [KookAssetMessage] 实例。
+         * 使用当前的 [Asset] 构建一个 [KookAssetMessage] 实例。
          * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值，即 `2`、`3`、`4`。
          */
         @JvmStatic
-        public fun AssetCreated.asMessage(type: Int): KookSimpleAssetMessage = KookSimpleAssetMessage(this, type)
+        public fun Asset.asMessage(type: Int): KookAsset = KookAsset(this, type)
 
         /**
-         * 使用当前的 [AssetCreated] 构建一个 [KookAssetMessage] 实例。
+         * 使用当前的 [Asset] 构建一个 [KookAssetMessage] 实例。
          * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值。
          */
         @JvmStatic
-        public fun AssetCreated.asMessage(type: MessageType): KookSimpleAssetMessage = KookSimpleAssetMessage(this, type)
+        public fun Asset.asMessage(type: MessageType): KookAsset = KookAsset(this, type)
 
 
         /**
-         * 使用当前的 [AssetCreated] 构建一个 [KookAssetImage] 实例。
+         * 使用当前的 [Asset] 构建一个 [KookAssetImage] 实例。
          */
         @JvmStatic
-        public fun AssetCreated.asImage(): KookAssetImage = KookAssetImage(this)
+        public fun Asset.asImage(): KookAssetImage = KookAssetImage(this)
     }
 }
 
-
 /**
- *
- * Kook 组件中针对 [AssetCreateRequest] api 的请求响应的消息封装。
+ * Kook 组件中针对 [CreateAssetApi] api 的请求响应的消息封装。
  *
  * @author ForteScarlet
  */
 @SerialName("kook.asset.std")
 @Serializable
-public data class KookSimpleAssetMessage(
+public data class KookAsset(
     /**
      * 创建的文件资源。
      */
-    override val asset: AssetCreated,
+    override val asset: Asset,
 
     /**
      * 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值，
@@ -104,34 +108,73 @@ public data class KookSimpleAssetMessage(
      */
     @SerialName("assetType")
     override val type: Int
-) : KookAssetMessage<KookSimpleAssetMessage>() {
-    public constructor(asset: AssetCreated, type: MessageType) : this(asset, type.type)
+) : KookAssetMessage<KookAsset>(), ResourceContainer {
+    public constructor(asset: Asset, type: MessageType) : this(asset, type.type)
 
-    override val key: Message.Key<KookSimpleAssetMessage>
+    /**
+     * 通过 [Asset.url] 构建得到 [URLResource].
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public val urlResource: URLResource = URL(asset.url).toResource()
+
+    /**
+     * 通过 [Asset.url] 构建得到 [URLResource].
+     *
+     * @see urlResource
+     */
+    @JvmSynthetic
+    override suspend fun resource(): URLResource = urlResource
+
+    @Api4J
+    override val resource: URLResource
+        get() = urlResource
+
+    @Api4J
+    override val resourceAsync: CompletableFuture<out URLResource>
+        get() = CompletableFuture.completedFuture(urlResource)
+
+    override val key: Message.Key<KookAsset>
         get() = Key
 
-    public companion object Key : Message.Key<KookSimpleAssetMessage> {
-        override fun safeCast(value: Any): KookSimpleAssetMessage? = doSafeCast(value)
+    public companion object Key : Message.Key<KookAsset> {
+        override fun safeCast(value: Any): KookAsset? = doSafeCast(value)
     }
 }
 
 
 /**
- * 使用 [AssetCreated] 作为一个 [Image] 消息类型。当前消息的ID等同于 [AssetCreated.url].
+ * 使用 [Asset] 作为一个 [Image] 消息类型。当前消息的ID等同于 [Asset.url].
  */
 @SerialName("kook.asset.img")
 @Serializable
-public data class KookAssetImage(override val asset: AssetCreated) : KookAssetMessage<KookAssetImage>(), Image<KookAssetImage> {
+public data class KookAssetImage(override val asset: Asset) : KookAssetMessage<KookAssetImage>(),
+    Image<KookAssetImage> {
     override val type: Int
         get() = MessageType.IMAGE.type
 
-    override val id: ID = asset.url.ID
+    override val id: ID by stringID { asset.url }
 
-    @OptIn(Api4J::class)
-    override val resource: URLResource = asset.toResource()
+    /**
+     * 通过 [Asset.url] 构建得到 [URLResource].
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public val urlResource: URLResource = URL(asset.url).toResource()
 
+    /**
+     * 通过 [Asset.url] 构建得到 [URLResource].
+     *
+     * @see urlResource
+     */
     @JvmSynthetic
-    override suspend fun resource(): Resource = resource
+    override suspend fun resource(): URLResource = urlResource
+
+    @Api4J
+    override val resource: Resource
+        get() = urlResource
+
+    @Api4J
+    override val resourceAsync: CompletableFuture<out Resource>
+        get() = CompletableFuture.completedFuture(urlResource)
 
     override val key: Message.Key<KookAssetImage>
         get() = Key

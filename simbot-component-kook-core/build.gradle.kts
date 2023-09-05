@@ -1,3 +1,5 @@
+import love.forte.gradle.common.core.project.setup
+
 /*
  * Copyright (c) 2022-2023. ForteScarlet.
  *
@@ -23,14 +25,26 @@ plugins {
     `kook-dokka-partial-configure`
 }
 
+setup(P)
+if (isSnapshot()) {
+    version = P.snapshotVersion.toString()
+}
+
+kotlin {
+    sourceSets.configureEach {
+        languageSettings {
+            optIn("love.forte.simbot.InternalSimbotApi")
+        }
+    }
+}
 
 dependencies {
-    api(project(":simbot-component-kook-stdlib")) {
-        exclude("love.forte.simbot")
-    }
+    api(project(":simbot-component-kook-stdlib"))
     compileOnly(simbotCore)
     compileOnly(libs.jetbrains.annotations)
 
     testImplementation(simbotCore)
     testImplementation(simbotLoggerSlf4j)
+    testImplementation(simbotCore)
+    testImplementation(libs.ktor.client.cio)
 }

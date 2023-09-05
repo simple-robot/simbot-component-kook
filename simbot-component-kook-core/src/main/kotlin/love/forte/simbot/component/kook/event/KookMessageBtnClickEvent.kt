@@ -21,20 +21,25 @@ import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
 import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.event.Event
-import love.forte.simbot.kook.event.system.user.MessageBtnClickEventBody
+import love.forte.simbot.kook.event.MessageBtnClickEventBody
+import love.forte.simbot.kook.event.MessageBtnClickEventExtra
 import love.forte.simbot.message.doSafeCast
 
 
 /**
  * 一个 `Card` 中的按钮被按下的事件。
  *
- * @see MessageBtnClickEventBody
+ * @see MessageBtnClickEventExtra
  *
  * @author ForteScarlet
  */
-public abstract class KookMessageBtnClickEvent : KookSystemEvent<MessageBtnClickEventBody>() {
-    override val timestamp: Timestamp
-        get() = sourceEvent.msgTimestamp
+public abstract class KookMessageBtnClickEvent : KookSystemEvent() {
+    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+
+    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<MessageBtnClickEventExtra>
+
+    override val sourceBody: MessageBtnClickEventBody
+        get() = sourceEvent.extra.body
 
     /**
      * 按钮 `return-val` 时的返回值
@@ -49,7 +54,7 @@ public abstract class KookMessageBtnClickEvent : KookSystemEvent<MessageBtnClick
      *
      * @see MessageBtnClickEventBody.userId
      */
-    public val userId: ID get() = sourceBody.userId
+    public val userId: ID get() = sourceBody.userId.ID
 
 
     override val key: Event.Key<out KookMessageBtnClickEvent>

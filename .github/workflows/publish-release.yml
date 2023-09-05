@@ -2,7 +2,7 @@ name: Publish Release
 on:
   push:
     tags:
-      - v3.**.**.**
+      - 'v**'
 
 env:
   IS_CI: true
@@ -11,12 +11,15 @@ env:
   GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
   SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
   SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-  GRADLE_OPTS: "-Xmx8g -Xms2g -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: "-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
   run-test-and-publish:
     name: Run test and publish
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
       # 检出仓库代码
       - name: Check Out Repo
@@ -30,14 +33,13 @@ jobs:
           java-version: 11
           cache: 'gradle'
 
-      # setup Gradle
       - name: Gradle Run Test
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.6
-          arguments: clean assemble test
+#          arguments: clean assemble test
+          arguments: assemble test -Porg.gradle.daemon=false
 
-      # setup Gradle
       - name: Gradle Publish Release
         uses: gradle/gradle-build-action@v2
         with:
@@ -49,7 +51,7 @@ jobs:
             --warning-mode all
             -x test
             --build-cache
-            -Porg.gradle.jvmargs="-Xmx8g -XX:MaxPermSize=1g -Dfile.encoding=UTF-8"
+            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxPermSize=1g -Dfile.encoding=UTF-8"
             -Porg.gradle.daemon=false
 
         env:
