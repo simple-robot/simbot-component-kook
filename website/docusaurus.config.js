@@ -8,7 +8,7 @@ const firstYear = 2022
 const currentYear = new Date().getFullYear()
 const copyrightYear = currentYear === firstYear ? firstYear : firstYear + '-' + currentYear
 
-const keywords = ['simbot', 'kook', 'KOOK', 'KOOK机器人', 'KOOK-bot', 'KOOK BOT', 'simbot-kook', 'simbot组件', 'forte', 'forte scarlet', 'fortescarlet']
+const keywords = ['Simple Robot', 'simbot', 'kook', 'KOOK', 'KOOK机器人', 'KOOK-bot', 'KOOK BOT', 'simbot-kook', 'simbot组件', 'forte', 'forte scarlet', 'fortescarlet']
 
 /** @type {import('@docusaurus/types').Config} */
 async function config() {
@@ -18,7 +18,7 @@ async function config() {
         favicon: 'img/favicon.png',
 
         // Set the production url of your site here
-        // url: 'https://component-qqguild.simbot.forte.love',
+        // url: 'https://component-kook.simbot.forte.love',
         url: 'https://simple-robot.github.io',
 
         // Set the /<baseUrl>/ pathname under which your site is served
@@ -28,7 +28,7 @@ async function config() {
         // GitHub pages deployment config.
         // If you aren't using GitHub pages, you don't need these.
         organizationName: 'Simple Robot', // Usually your GitHub org/username.
-        projectName: 'simbot component tencent guild website', // Usually your repo name.
+        projectName: 'simbot component KOOK website', // Usually your repo name.
 
         onBrokenLinks: 'warn',
         onBrokenMarkdownLinks: 'warn',
@@ -59,6 +59,7 @@ async function config() {
                         breadcrumbs: true,
                         showLastUpdateTime: true,
                         lastVersion: '3.0.0.0-alpha.7',
+                        // lastVersion: 'current',
                         versions: {
                             current: {
                                 label: currentVersion,
@@ -128,7 +129,7 @@ async function config() {
                 // 公告
                 announcementBar: {
                   id: 'announcementBar-still_alpha',
-                  content: `⚒️🛠️👷KOOK组件仍处于ALPHA阶段, 并且有一项<b>大重构</b>正在等待推进(详情参考 <a href="https://github.com/simple-robot/simbot-component-kook/issues/82"><b>#82</b></a> ), 欢迎积极 <a href="https://github.com/simple-robot/simpler-robot/issues/new?template=bug-report.yml">反馈</a> 或 <a href="https://github.com/simple-robot/simbot-component-kook/pulls">协助我们</a>, 非常感谢🙇‍`,
+                  content: `⚒️🛠️👷KOOK组件仍处于ALPHA阶段, 欢迎积极 <a href="https://github.com/simple-robot/simpler-robot/issues/new?template=bug-report.yml">反馈</a> 或 <a href="https://github.com/simple-robot/simbot-component-kook/pulls">协助我们</a>, 非常感谢!🙇‍`,
                   // backgroundColor: '#FFB906',
                   // backgroundColor: 'linear-gradient(0deg,red 50%,green 50%)',
                   // textColor: '#142F48',

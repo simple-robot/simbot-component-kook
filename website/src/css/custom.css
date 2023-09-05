@@ -12,24 +12,37 @@
     src: url("/static/fonts/JetBrainsMono-SemiBold.woff2") format('woff');
 }
 
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: "iconfont";
-    src: url("/static/fonts/iconfont.ttf?t=1680524259075") format('truetype');
+    src:
+            url("/fonts/icons/iconfont.woff2") format('woff'),
+            url("/fonts/icons/iconfont.woff") format('woff'),
+            url("/fonts/icons/iconfont.ttf") format('truetype');
+}
+
+/*noinspection CssUnknownTarget*/
+@font-face {
+    font-family: "tab-iconfont-link";
+    src:
+            url("/fonts/tab/iconfont.woff2") format('woff'),
+            url("/fonts/tab/iconfont.woff") format('woff'),
+            url("/fonts/tab/iconfont.ttf") format('truetype');
 }
 
 @font-face {
     font-family: "LXGWNeoXiHeiScreen";
-    src: url("/static/fonts/LXGWNeoXiHeiScreen.ttf") format('truetype');
+    src: url("/fonts/LXGWNeoXiHeiScreen.ttf") format('truetype');
 }
 
 @font-face {
     font-family: "SmileySans-Oblique";
-    src: url("/static/fonts/SmileySans-Oblique.otf.woff2") format('woff');
+    src: url("/fonts/SmileySans-Oblique.otf.woff2") format('woff');
 }
 
 @font-face {
     font-family: "ZCOOLKuaiLe-Regular";
-    src: url("/static/fonts/ZCOOLKuaiLe-Regular.ttf") format('truetype');
+    src: url("/fonts/ZCOOLKuaiLe-Regular.ttf") format('truetype');
 }
 
 body {
@@ -48,14 +61,82 @@ header,h1,h2 {
     font-family: 'ZCOOLKuaiLe-Regular', 'LXGWNeoXiHeiScreen', serif;
 }
 
-a:not([class])::before {
-    content: '\f010b';
+/* 外链 */
+a[href^='http']:not([class])::before {
+    content: '\e600';
     font-family: "iconfont", serif !important;
     font-size: 0.75em;
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+/* 非外链 */
+a:not([class],[href^='http'])::after {
+    content: '\e685';
+    font-family: "iconfont", serif !important;
+    font-style: normal;
+    margin-right: 2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/*region TabItems icon*/
+/*TabItem Kotlin*/
+li[role='tab'][data-value^='Kotlin']::before {
+    /* &#xe67e; */
+    content: '\e67e';
+    /*content: url("/svg/Kotlin-icon.svg");*/
+    font-family: "tab-iconfont-link", serif !important;
+    font-style: normal;
+    margin-right: 2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+/*TabItem Kts*/
+li[role='tab'][data-value^='Kts']::before {
+    /* kts &#xe63c; */
+    content: '\e63c';
+    font-family: "tab-iconfont-link", serif !important;
+    font-style: normal;
+    margin-right: 2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/*TabItem Java*/
+li[role='tab'][data-value^='Java']::before {
+    /* &#xe639; */
+    content: '\e639';
+    font-family: "tab-iconfont-link", serif !important;
+    font-style: normal;
+    margin-right: 2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/*TabItem Gradle*/
+li[role='tab'][data-value^='Gradle']::before {
+    /* &#xe65a; */
+    content: '\e65a';
+    font-family: "tab-iconfont-link", serif !important;
+    font-style: normal;
+    margin-right: 2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/*TabItem Maven*/
+li[role='tab'][data-value^='Maven']::before {
+    /* maven &#xe605; */
+    content: '\e605';
+    font-family: "tab-iconfont-link", serif !important;
+    font-style: normal;
+    margin-right: 2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+/*endregion*/
 
 code:not([class]) {
     margin-left: 3px;

@@ -1,3 +1,8 @@
+# v3.2.0.0-alpha.8
+
+> Release & Pull Notes: [v3.2.0.0-alpha.8](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8) 
+
+
 # v3.2.0.0-alpha.8-dev.4
 
 > Release & Pull Notes: [v3.2.0.0-alpha.8-dev.4](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8-dev.4) 

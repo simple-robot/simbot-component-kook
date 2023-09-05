@@ -188,6 +188,11 @@ kotlin {
                 api(libs.ktor.client.js)
             }
         }
+        getByName("jsTest") {
+            dependencies {
+                api(libs.ktor.client.js)
+            }
+        }
 
         val nativeMain by creating {
             dependsOn(commonMain)
