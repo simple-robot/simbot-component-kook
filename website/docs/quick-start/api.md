@@ -1,6 +1,6 @@
 ---
 title: 使用API模块
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 import Tabs from '@theme/Tabs';
@@ -67,12 +67,14 @@ implementation 'love.forte.simbot.component:simbot-component-kook-api:${version}
 以 [`CIO`](https://ktor.io/docs/http-client-engines.html#cio) 引擎为例：
 
 ```kotlin
+// 或使用 runtimeOnly
 implementation("io.ktor:ktor-client-cio:<合适且较新的Ktor版本>")
 ```
 
 或者如果 Java 版本 `>= Java11`, 使用 [`Java`](https://ktor.io/docs/http-client-engines.html#java) 引擎：
 
 ```kotlin
+// 或使用 runtimeOnly
 implementation("io.ktor:ktor-client-java:<合适且较新的Ktor版本>")
 ```
 
@@ -92,7 +94,7 @@ implementation("io.ktor:ktor-client-js:<合适且较新的Ktor版本>")
 <Tabs groupId="use-dependency-kt-native">
 <TabItem value="WinHttp" label="WinHttp">
 
-> see [WinHttp](https://ktor.io/docs/http-client-engines.html#winhttp)
+> see [`WinHttp`](https://ktor.io/docs/http-client-engines.html#winhttp)
 
 ```kotlin
 implementation("io.ktor:ktor-client-winhttp:<合适且较新的Ktor版本>")
@@ -101,7 +103,7 @@ implementation("io.ktor:ktor-client-winhttp:<合适且较新的Ktor版本>")
 </TabItem>
 <TabItem value="Darwin" label="Darwin">
 
-> see [Darwin](https://ktor.io/docs/http-client-engines.html#darwin)
+> see [`Darwin`](https://ktor.io/docs/http-client-engines.html#darwin)
 
 ```kotlin
 implementation("io.ktor:ktor-client-darwin:<合适且较新的Ktor版本>")
@@ -110,7 +112,7 @@ implementation("io.ktor:ktor-client-darwin:<合适且较新的Ktor版本>")
 </TabItem>
 <TabItem value="Curl" label="Curl">
 
-> see [Curl](https://ktor.io/docs/http-client-engines.html#curl)
+> see [`Curl`](https://ktor.io/docs/http-client-engines.html#curl)
 
 ```kotlin
 implementation("io.ktor:ktor-client-curl:<合适且较新的Ktor版本>")
@@ -272,6 +274,40 @@ var guildListData = api.requestDataBlocking(client, authorization);
 for (var guild : guildListData) {
     System.out.println(guild);
 }
+```
+
+</TabItem>
+<TabItem value="Java Async" attributes={{'data-value': `Java`}}>
+
+```java
+// 在Java中构建或获取一个 Ktor 的 HttpClient。
+// 用于请求的 Ktor HttpClient，如有必要则需要自行引入并选择需要使用的引擎。
+// 参考：https://ktor.io/docs/http-client-engines.html
+// 此处以 ktor-cio 引擎为例。
+var client = HttpClientKt.HttpClient(CIO.INSTANCE, config -> {
+            // config...
+            return Unit.INSTANCE;
+        });
+
+// 鉴权信息
+// 'Bot' 后面跟的是bot的token，参考 https://developer.kookapp.cn/doc/reference
+var authorization = "Bot xxxxxxxxxx";
+
+// 构建要请求的API，大部分API都有一些可选或必须的参数。
+var api = GetGuildListApi.create();
+
+// requestDataAsync 会检测result，然后将真正的data结果返回 (或在验证失败的情况下抛出异常)
+CompletableFuture<ListData<SimpleGuild>> guildListDataFuture = api.requestDataAsync(client, authorization);
+
+// Use the future, or handle exception
+guildListDataFuture.thenAccept(listData -> {
+    for (var guild : listData) {
+        System.out.println(guild);
+    }
+}).exceptionally(err -> {
+    logger.error("err!", err);
+    return null;
+});
 ```
 
 </TabItem>
