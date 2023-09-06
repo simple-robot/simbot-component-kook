@@ -17,24 +17,28 @@
 
 package love.forte.simbot.component.kook.message
 
+import io.ktor.client.request.forms.*
+import io.ktor.utils.io.streams.*
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
-import love.forte.simbot.component.kook.KookComponentBot
+import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAggregatedMessageReceipt.Companion.merge
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.kook.api.KookApiRequest
-import love.forte.simbot.kook.api.asset.AssetCreateRequest
-import love.forte.simbot.kook.api.message.DirectMessageCreateRequest
-import love.forte.simbot.kook.api.message.MessageCreateRequest
-import love.forte.simbot.kook.api.message.MessageCreated
-import love.forte.simbot.kook.api.message.MessageType
-import love.forte.simbot.kook.objects.AtTarget
-import love.forte.simbot.kook.objects.KMarkdownBuilder
+import love.forte.simbot.kook.api.KookApi
+import love.forte.simbot.kook.api.asset.CreateAssetApi
+import love.forte.simbot.kook.api.message.SendChannelMessageApi
+import love.forte.simbot.kook.api.message.SendDirectMessageApi
+import love.forte.simbot.kook.api.message.SendMessageResult
+import love.forte.simbot.kook.messages.MessageType
+import love.forte.simbot.kook.objects.kmd.AtTarget
+import love.forte.simbot.kook.objects.kmd.KMarkdownBuilder
 import love.forte.simbot.literal
 import love.forte.simbot.message.*
-import love.forte.simbot.resources.Resource.Companion.toResource
+import love.forte.simbot.resources.ByteArrayResource
+import love.forte.simbot.resources.FileResource
+import love.forte.simbot.resources.PathResource
+import love.forte.simbot.resources.URLResource
 import love.forte.simbot.utils.view.isNotEmpty
 import java.net.URL
 
@@ -42,12 +46,12 @@ import java.net.URL
 private fun createRequest(
     type: Int,
     content: String,
-    targetId: ID,
-    quote: ID?,
+    targetId: String,
+    quote: String?,
     nonce: String?,
-    tempTargetId: ID?,
-): KookApiRequest<*> {
-    return MessageCreateRequest.create(
+    tempTargetId: String?,
+): KookApi<*> {
+    return SendChannelMessageApi.create(
         type = type,
         targetId = targetId,
         content = content,
@@ -72,12 +76,12 @@ private const val DIRECT_TYPE_BY_CODE = 2
  * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
  */
 public suspend fun Message.sendToChannel(
-    bot: KookComponentBot,
-    targetId: ID,
-    quote: ID? = null,
+    bot: KookBot,
+    targetId: String,
+    quote: String? = null,
     nonce: String? = null,
-    tempTargetId: ID? = null,
-    defaultTempTargetId: ID? = null,
+    tempTargetId: String? = null,
+    defaultTempTargetId: String? = null,
 ): KookMessageReceipt? = send0(bot, targetId, NOT_DIRECT, quote, nonce, tempTargetId, defaultTempTargetId)
 
 
@@ -92,11 +96,11 @@ public suspend fun Message.sendToChannel(
  * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
  */
 public suspend fun Message.sendToDirectByTargetId(
-    bot: KookComponentBot,
-    targetId: ID,
-    quote: ID? = null,
+    bot: KookBot,
+    targetId: String,
+    quote: String? = null,
     nonce: String? = null,
-    tempTargetId: ID? = null,
+    tempTargetId: String? = null,
 ): KookMessageReceipt? = send0(bot, targetId, DIRECT_TYPE_BY_TARGET, quote, nonce, tempTargetId)
 
 /**
@@ -110,11 +114,11 @@ public suspend fun Message.sendToDirectByTargetId(
  * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
  */
 public suspend fun Message.sendToDirectByChatCode(
-    bot: KookComponentBot,
-    chatCode: ID,
-    quote: ID? = null,
+    bot: KookBot,
+    chatCode: String,
+    quote: String? = null,
     nonce: String? = null,
-    tempTargetId: ID? = null,
+    tempTargetId: String? = null,
 ): KookMessageReceipt? = send0(bot, chatCode, DIRECT_TYPE_BY_CODE, quote, nonce, tempTargetId)
 
 
@@ -131,21 +135,21 @@ public suspend fun Message.sendToDirectByChatCode(
  */
 @OptIn(ExperimentalSimbotApi::class)
 private suspend fun Message.send0(
-    bot: KookComponentBot,
-    targetId: ID,
+    bot: KookBot,
+    targetId: String,
     directType: Int,
-    quote: ID? = null,
+    quote: String? = null,
     nonce: String? = null,
-    tempTargetId: ID? = null,
-    defaultTempTargetId: ID? = null,
+    tempTargetId: String? = null,
+    defaultTempTargetId: String? = null,
 ): KookMessageReceipt? {
-    data class TempTargetIdWrapper(var tempTargetId: ID?)
+    data class TempTargetIdWrapper(var tempTargetId: String?)
 
 //    var quote0 = quote
 
-    fun doRequest(type: Int, content: String, nonce: String?, quote: ID?, tempTargetId: ID?): KookApiRequest<*> {
+    fun doRequest(type: Int, content: String, nonce: String?, quote: String?, tempTargetId: String?): KookApi<*> {
         return when (directType) {
-            NOT_DIRECT -> MessageCreateRequest.create(
+            NOT_DIRECT -> SendChannelMessageApi.create(
                 type = type,
                 targetId = targetId,
                 content = content,
@@ -154,8 +158,8 @@ private suspend fun Message.send0(
                 tempTargetId = tempTargetId
             )
 
-            DIRECT_TYPE_BY_TARGET -> DirectMessageCreateRequest.byTargetId(targetId, content, type, quote, nonce)
-            DIRECT_TYPE_BY_CODE -> DirectMessageCreateRequest.byChatCode(targetId, content, type, quote, nonce)
+            DIRECT_TYPE_BY_TARGET -> SendDirectMessageApi.createByTargetId(targetId, content, type, quote, nonce)
+            DIRECT_TYPE_BY_CODE -> SendDirectMessageApi.createByChatCode(targetId, content, type, quote, nonce)
             else -> throw SimbotIllegalArgumentException("Unknown direct type: $directType")
         }
     }
@@ -166,55 +170,64 @@ private suspend fun Message.send0(
     val tempWrapper = TempTargetIdWrapper(tempTargetId)
 
 //    val requests: List<KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
-    val requests: List<() -> KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
-        // 清算 kmd
-        fun liquidationKmd() {
-            kMarkdownBuilder?.let { kmb ->
-                val currentQuote = quote0
-                quote0 = null
-                add { doRequest(MessageType.KMARKDOWN.type, kmb.buildRaw(), nonce, currentQuote, tempWrapper.tempTargetId) }
-                kMarkdownBuilder = null
+    val requests: List<() -> KookApi<*>> =
+        buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
+            // 清算 kmd
+            fun liquidationKmd() {
+                kMarkdownBuilder?.let { kmb ->
+                    val currentQuote = quote0
+                    quote0 = null
+                    add {
+                        doRequest(
+                            MessageType.KMARKDOWN.type,
+                            kmb.buildRaw(),
+                            nonce,
+                            currentQuote,
+                            tempWrapper.tempTargetId
+                        )
+                    }
+                    kMarkdownBuilder = null
+                }
             }
-        }
 
-        suspend fun process(isSingle: Boolean, message: Message.Element<*>) {
-            when (message) {
-                is KookRequestMessage -> {
-                    liquidationKmd()
-                    add { message.request }
-                }
-
-                is KookTempTarget -> when (message) {
-                    is KookTempTarget.Target -> tempWrapper.tempTargetId = message.id
-                    is KookTempTarget.Current -> tempWrapper.tempTargetId = defaultTempTargetId
-                }
-
-                else -> {
-                    message.elementToRequest(bot, isSingle, { type, content ->
+            suspend fun process(isSingle: Boolean, message: Message.Element<*>) {
+                when (message) {
+                    is KookApiMessage -> {
                         liquidationKmd()
-                        add { doRequest(type, content, nonce, null, tempWrapper.tempTargetId) }
-                    }) { block ->
-                        block(kMarkdownBuilder ?: KMarkdownBuilder().also { kMarkdownBuilder = it })
+                        add { message.api }
+                    }
+
+                    is KookTempTarget -> when (message) {
+                        is KookTempTarget.Target -> tempWrapper.tempTargetId = message.id.literal
+                        is KookTempTarget.Current -> tempWrapper.tempTargetId = defaultTempTargetId
+                    }
+
+                    else -> {
+                        message.elementToRequest(bot, isSingle, { type, content ->
+                            liquidationKmd()
+                            add { doRequest(type, content, nonce, null, tempWrapper.tempTargetId) }
+                        }) { block ->
+                            block(kMarkdownBuilder ?: KMarkdownBuilder().also { kMarkdownBuilder = it })
+                        }
                     }
                 }
             }
-        }
 
-        when (message) {
-            is Message.Element<*> -> process(true, message)
+            when (message) {
+                is Message.Element<*> -> process(true, message)
 
-            is Messages -> {
-                if (message.isNotEmpty()) {
-                    val isSingle = message.size == 1
-                    message.forEach { m ->
-                        process(isSingle, m)
+                is Messages -> {
+                    if (message.isNotEmpty()) {
+                        val isSingle = message.size == 1
+                        message.forEach { m ->
+                            process(isSingle, m)
+                        }
                     }
                 }
             }
-        }
 
-        liquidationKmd()
-    }
+            liquidationKmd()
+        }
 
 
     /*
@@ -226,24 +239,24 @@ private suspend fun Message.send0(
      */
 
     fun Any?.toReceipt(): SingleKookMessageReceipt {
-        return if (this is MessageCreated) {
+        return if (this is SendMessageResult) {
             this.asReceipt(false, bot)
         } else {
             KookApiRequestedReceipt(this, false, bot)
         }
     }
 
-    when {
+    return when {
         requests.isEmpty() -> {
-            return null
+            null
         }
 
         requests.size == 1 -> {
-            return requests.first()().requestDataBy(bot).toReceipt()
+            requests.first()().requestDataBy(bot).toReceipt()
         }
 
         else -> {
-            return requests.map { req -> req().requestDataBy(bot).toReceipt() }.merge(bot = bot)
+            requests.map { req -> req().requestDataBy(bot).toReceipt() }.merge(bot = bot)
         }
     }
 }
@@ -252,14 +265,14 @@ private suspend fun Message.send0(
 /**
  * 尝试将一个单独的消息元素转化为用于发送消息的请求。
  *
- * 如果 [isSingleElement] 为true，则消息元素类型为 [PlainText] 时将会使用 `doRequest(MessageType.TEXT.type, message.text)` 发送而不使用KMarkdown。
+ * 如果 [isSingleElement] 为 `true`，则消息元素类型为 [PlainText] 时将会使用 `doRequest(MessageType.TEXT.type, message.text)` 发送而不使用KMarkdown。
  *
- * 不需要处理 [KookRequestMessage], 外层自行处理。
+ * 不需要处理 [KookApiMessage], 外层自行处理。
  *
  */
 @OptIn(ExperimentalSimbotApi::class)
 private suspend inline fun Message.Element<*>.elementToRequest(
-    bot: KookComponentBot,
+    bot: KookBot,
 
     /**
      * 实际上的消息元素数量。如果需要发送的消息只有一个，那么处理时可能会选择直接使用 doRequest 而不是拼接内容到 kmd 中。
@@ -314,7 +327,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
 
             is KookAttachmentMessage -> {
                 val type: MessageType = when (message) {
-                    is SimpleKookAttachmentMessage -> when (val attType = message.attachment.type.lowercase()) {
+                    is KookAttachment -> when (val attType = message.attachment.type.lowercase()) {
                         "file" -> MessageType.FILE
                         "image" -> MessageType.IMAGE
                         "video" -> MessageType.VIDEO
@@ -330,7 +343,7 @@ private suspend inline fun Message.Element<*>.elementToRequest(
                 //  see https://github.com/simple-robot/simbot-component-kook/issues/75
 
                 val createRequest =
-                    AssetCreateRequest.create(URL(message.attachment.url).toResource(message.attachment.name))
+                    CreateAssetApi.create(URL(message.attachment.url), message.attachment.name)
                 val asset = createRequest.requestDataBy(bot)
 
                 doRequest(type.type, asset.url)
@@ -343,7 +356,15 @@ private suspend inline fun Message.Element<*>.elementToRequest(
 
         // 需要上传的图片
         is ResourceImage -> {
-            val asset = AssetCreateRequest.create(message.resource()).requestDataBy(bot)
+            val assetApi: CreateAssetApi = when (val resource = message.resource()) {
+                is URLResource -> CreateAssetApi.create(resource.url)
+                is FileResource -> CreateAssetApi.create(resource.file)
+                is PathResource -> CreateAssetApi.create(resource.path)
+                is ByteArrayResource -> CreateAssetApi.create(resource.bytes)
+                else -> CreateAssetApi.create(InputProvider { resource.openStream().asInput() }, resource.name)
+            }
+
+            val asset = assetApi.requestDataBy(bot)
             doRequest(MessageType.IMAGE.type, asset.url)
         }
 
@@ -363,8 +384,10 @@ private suspend inline fun Message.Element<*>.elementToRequest(
         }
 
         is Face -> {
-            // TODO guild emoji..?
-            //  serverEmoticons?
+            // TODO serverEmoticons?
+//            withinKmd {
+//                serverEmoticons(message.id.literal)
+//            }
         }
 
         is Emoji -> {

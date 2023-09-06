@@ -18,7 +18,7 @@
 package love.forte.simbot.component.kook.util
 
 /**
- * @return true if find([input]) != null
+ * @return `true` if find([input]) != null
  */
 public inline fun Regex.walk(input: String, onOther: (input: String, start: Int, end: Int) -> Unit, onMatch: (MatchResult) -> Unit): Boolean {
     var match: MatchResult? = find(input) ?: return false

@@ -1,5 +1,6 @@
 name: Deploy Website
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -8,7 +9,7 @@ on:
     paths:
       - 'website/**'
     tags-ignore:
-      - 'v3.**.**.**'
+      - 'v**'
 
 jobs:
   deploy-website:

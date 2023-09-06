@@ -17,7 +17,9 @@
 
 package util
 
+import Env
 import isSnapshot
+import love.forte.gradle.common.core.property.systemProp
 
 data class PublishConfigurableResult(
     val isSnapshotOnly: Boolean,
@@ -43,3 +45,8 @@ inline fun checkPublishConfigurable(block: PublishConfigurableResult.() -> Unit)
         v.block()
     }
 }
+
+
+inline val isCi: Boolean get() = systemProp(Env.IS_CI).toBoolean()
+
+inline val isLinux: Boolean get() = systemProp("os.name")?.contains("Linux", true) ?: false

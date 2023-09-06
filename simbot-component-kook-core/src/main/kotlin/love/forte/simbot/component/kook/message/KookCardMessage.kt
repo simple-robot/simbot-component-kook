@@ -20,10 +20,13 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.kook.objects.Card
+import love.forte.simbot.component.kook.message.KookCardMessage.Key.asMessage
+import love.forte.simbot.kook.objects.card.Card
+import love.forte.simbot.kook.objects.card.CardMessageBuilder
+import love.forte.simbot.kook.objects.card.buildCardMessage
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.kook.objects.CardMessage as KkCardMessage
+import love.forte.simbot.kook.objects.card.CardMessage as KkCardMessage
 
 
 /**
@@ -40,7 +43,6 @@ public data class KookCardMessage(public val cards: KkCardMessage) : KookMessage
     public companion object Key : Message.Key<KookCardMessage> {
         override fun safeCast(value: Any): KookCardMessage? = doSafeCast(value)
 
-
         /**
          * 将 [Card] 作为 [KookCardMessage] 使用。
          */
@@ -48,4 +50,15 @@ public data class KookCardMessage(public val cards: KkCardMessage) : KookMessage
         @ExperimentalSimbotApi
         public fun KkCardMessage.asMessage(): KookCardMessage = KookCardMessage(this)
     }
+}
+
+/**
+ * 通过 [buildCardMessage] 构建 [CardMessage][KkCardMessage] 并包装为 [KookCardMessage]。
+ *
+ * @see KookCardMessage
+ * @see buildCardMessage
+ */
+@ExperimentalSimbotApi
+public inline fun kookCard(action: CardMessageBuilder.() -> Unit): KookCardMessage {
+    return buildCardMessage(action).asMessage()
 }

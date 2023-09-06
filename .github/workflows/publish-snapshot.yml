@@ -15,7 +15,7 @@ on:
       - '**.kts'
 
     tags-ignore:
-      - 'v3.**.**.**'
+      - 'v**'
 
   # 手动触发工作流
   workflow_dispatch:
@@ -29,12 +29,15 @@ env:
   SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
   SIMBOT_IS_SNAPSHOT: true
   SIMBOT_SNAPSHOT_ONLY: true
-  GRADLE_OPTS: "-Xmx8g -Xms2g -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: "-Dfile.encoding=UTF-8"
 
 jobs:
   publish-snapshot:
     name: Publish snapshot
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
       # 检出仓库代码
       - name: Check out repo
@@ -52,8 +55,14 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.6
-          arguments: clean test publishToSonatype closeAndReleaseStagingRepository
-
+          arguments: |
+            test 
+            publishToSonatype
+            closeAndReleaseStagingRepository
+            --info
+            --warning-mode all
+            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" 
+            -Porg.gradle.daemon=false
 
   deploy-doc:
     name: Deploy snapshot doc

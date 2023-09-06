@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -17,166 +17,203 @@
 
 package love.forte.simbot.component.kook
 
-import love.forte.plugin.suspendtrans.annotation.JvmAsync
-import love.forte.plugin.suspendtrans.annotation.JvmBlocking
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.ID
+import kotlinx.coroutines.CoroutineScope
+import love.forte.simbot.*
+import love.forte.simbot.component.kook.bot.KookGuildBot
 import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleCreator
 import love.forte.simbot.component.kook.role.KookRole
-import love.forte.simbot.definition.*
+import love.forte.simbot.component.kook.role.KookRoleOperator
+import love.forte.simbot.definition.Guild
+import love.forte.simbot.definition.Organization
 import love.forte.simbot.utils.item.Items
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
-import love.forte.simbot.kook.objects.Guild as KkGuild
+import love.forte.simbot.kook.objects.Guild as KGuild
+
 
 /**
- *
- * Kook 组件中的频道服务器信息。
+ * 一个 KOOK 中的频道服务器。
  *
  * @author ForteScarlet
  */
-public interface KookGuild : Guild, KookComponentDefinition<KkGuild> {
-    
+public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     /**
-     * 得到当前频道服务器所对应的api模块下的服务器对象。
+     * 源于 [bot] 的上下文。
      */
-    override val source: KkGuild
-    
-    override val bot: KookComponentGuildBot
-    
-    override val currentMember: Int
-    override val maximumMember: Int
-    
-    override val description: String
-    override val icon: String
+    override val coroutineContext: CoroutineContext
+        get() = bot.coroutineContext
+
+    /**
+     * 得到此 Guild 内对应的 api 模块下的原始 guild 信息。
+     *
+     * @see KGuild
+     */
+    public val source: KGuild
+
+    /**
+     * 得到对应所属的 bot
+     *
+     * @throws KookGuildNotExistsException 当频道已经不存在时
+     */
+    override val bot: KookGuildBot
+
+    /**
+     * 频道服务器ID
+     */
     override val id: ID
+        get() = source.id.ID
+
+    /**
+     * 频道服务器名称
+     */
     override val name: String
-    
-    override val currentChannel: Int
+        get() = source.name
+
+    /**
+     * 服务器主题
+     */
+    override val description: String
+        get() = source.topic
+
+    /**
+     * 服务器icon的地址
+     */
+    override val icon: String
+        get() = source.icon
+
+    /**
+     * KOOK Guild 不支持获取创建时间。始终得到 [Timestamp]。
+     */
+    override val createTime: Timestamp
+        get() = Timestamp.notSupport()
+
+    /**
+     * KOOK Guild 不支持获取最大频道上限。始终得到 `-1`。
+     */
     override val maximumChannel: Int
-    
-    // region owner api
-    override val ownerId: ID
-    
+        get() = -1
+
     /**
-     * 频道服务器的创建人。
+     * KOOK Guild 不支持获取最大成员上限。始终得到 `-1`。
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
-    override suspend fun owner(): KookGuildMember
-    // endregion
-    
-    
+    override val maximumMember: Int
+        get() = -1
+
     /**
-     * 根据指定ID查询对应用户信息，或得到null。
+     * 频道当前成员数量
      */
-    @JvmBlocking(baseName = "getMember", suffix = "")
-    @JvmAsync(baseName = "getMember")
-    override suspend fun member(id: ID): KookGuildMember?
-    
+    override val currentMember: Int
+
     /**
-     * 直接获取用户列表的副本。
+     * 频道当前子频道数量
      */
-    public val memberList: List<KookGuildMember>
-    
-    /**
-     * 查询用户列表。
-     *
-     * @see memberList
-     */
-    override val members: Items<KookGuildMember>
-    
-    /**
-     * 直接获取当前频道服务器下的子频道列表的副本。
-     *
-     * 子频道列表不包含分组类型的频道，这类频道请参考 [categories]。
-     */
-    public val channelList: List<KookChannel>
-    
+    override val currentChannel: Int
+
     /**
      * 获取当前频道服务器下的子频道序列。
      *
-     * 子频道列表不包含分组类型的频道，这类频道请参考 [categories]。
-     *
-     * @see channelList
+     * 子频道列表**不包含**分组类型的频道，这类"分类频道"请参考 [categories]。
      */
     override val channels: Items<KookChannel>
-    
+
     /**
-     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
-     *
-     * 未找到时得到null。
+     * 尝试根据指定ID获取匹配的 [KookChannel]。未找到时得到null。
      */
-    @JvmBlocking(baseName = "getChannel", suffix = "")
-    @JvmAsync(baseName = "getChannel")
+    @JST(blockingBaseName = "getChannel", blockingSuffix = "", asyncBaseName = "getChannel")
     override suspend fun channel(id: ID): KookChannel?
-    
+
     /**
      * 获取当前频道服务器下的子频道序列。
-     *
-     * 子频道列表不包含分组类型的频道，这类"分类频道"请参考 [categories]。
      *
      * @see channels
      */
     override val children: Items<KookChannel>
         get() = channels
-    
+
     /**
-     * 尝试根据指定ID获取匹配的[子频道][KookChannel]。
+     * 尝试根据指定ID获取匹配的 [KookChannel]。未找到时得到null。
      *
-     * 未找到时得到null。
+     * @see channel
      */
-    @JvmBlocking(baseName = "getChild", suffix = "")
-    @JvmAsync(baseName = "getChild")
+    @JST(blockingBaseName = "getChild", blockingSuffix = "", asyncBaseName = "getChild")
     override suspend fun child(id: ID): KookChannel? = channel(id)
-    
+
+    // categories
+
     /**
      * 得到当前频道下所有的分组型频道。
      */
-    public val categories: List<KookChannelCategory>
-    
-    
+    @ExperimentalSimbotApi
+    public val categories: Items<KookChannelCategory>
+
+
     /**
      * 尝试根据ID获取匹配的分类对象。
      */
+    @ExperimentalSimbotApi
     public fun getCategory(id: ID): KookChannelCategory?
-    
-    // region role api
+
+    // members
+
+    /**
+     * 此频道下的成员序列。
+     */
+    override val members: Items<KookMember>
+
+    /**
+     * 根据ID寻找一个此频道下的成员。
+     */
+    @JST(blockingBaseName = "getMember", blockingSuffix = "", asyncBaseName = "getMember")
+    override suspend fun member(id: ID): KookMember?
+
+    /**
+     * 获取当前频道的创建人。
+     *
+     * @throws KookMemberNotExistsException 如果无法寻找到此成员时
+     */
+    @JSTP
+    override suspend fun owner(): KookMember
+
+
+    //region roles API
+
     /**
      * 获取当前频道服务器中配置的所有角色信息。
      *
      * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
      *
      * @see KookRole
+     * @see KookGuildRole
      */
     @ExperimentalSimbotApi
     override val roles: Items<KookGuildRole>
 
-    /**
-     * 构建一个针对当前频道服务器的角色创建器，用于构建一个新的角色 `Role`。
-     *
-     * @see KookGuildRoleCreator
-     */
-    @ExperimentalSimbotApi
-    public fun roleCreator(): KookGuildRoleCreator
 
-    // endregion
-    
+    @ExperimentalSimbotApi
+    override fun roleCreator(): KookGuildRoleCreator
+    //endregion
+
     // region mute api
-    
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+    /**
+     * 频道服务器不支持整体禁言
+     */
+    @JvmSynthetic
+    @Deprecated("Guild mute is not supported in KOOK", ReplaceWith("false"))
     override suspend fun mute(duration: Duration): Boolean = false
-    
-    @Deprecated("Guild mute is not supported", ReplaceWith("false"))
+
+    /**
+     * 频道服务器不支持整体禁言
+     */
+    @JvmSynthetic
+    @Deprecated("Guild mute is not supported in KOOK", ReplaceWith("false"))
     override suspend fun unmute(): Boolean = false
     // endregion
-    
-    
+
     /**
      * 频道服务器没有上层。
      */
-    @JvmBlocking(asProperty = true, suffix = "")
-    @JvmAsync(asProperty = true)
+    @JvmSynthetic
+    @Deprecated("The guild does not have previous", ReplaceWith("null"))
     override suspend fun previous(): Organization? = null
 }
-

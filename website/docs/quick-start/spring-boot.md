@@ -10,12 +10,12 @@ import {version} from '@site/static/version.json'
 
 ## 前言
 
-本编文档介绍在JVM环境下使用:
+本编文档介绍使用:
 
-- `simboot-core-spring-boot-starter` _(`simbot3` 的 Spring Boot Starter)_
-- `simbot-component-kook-core` _(`simbot3` KOOK组件)_
+- `simboot-core-spring-boot-starter`: `simbot3` 的 Spring Boot Starter
+- `simbot-component-kook-core`: `simbot3` 的 KOOK 组件
 
-来编写一个KOOK机器人。
+来编写搭建一个基于simbot和Spring的KOOK机器人项目。
 
 ## 前提准备
 
@@ -37,27 +37,27 @@ import {version} from '@site/static/version.json'
 :::
 
 <Tabs groupId="use-dependency">
-<TabItem value="Gradle Kotlin DSL">
+<TabItem value="Gradle Kotlin DSL" attributes={{'data-value': `Kts`}}>
 
 <CodeBlock language="kotlin">{`
 // simbot core starter  
 implementation("love.forte.simbot.boot:simboot-core-spring-boot-starter:$SIMBOT_VERSION") // 版本请参考前文的参考链接
 // KOOK组件  
-implementation("love.forte.simbot.component:simbot-component-kook-core:${version}") // 版本请参考前文的参考链接
+implementation("love.forte.simbot.component:simbot-component-kook-core:${version}") // 版本可参考前文的参考链接
 `.trim()}</CodeBlock>
 
 </TabItem>
-<TabItem value="Gradle Groovy">
+<TabItem value="Gradle Groovy" attributes={{'data-value': `Gradle`}}>
 
 <CodeBlock language="gradle">{`
 // simbot core starter
 implementation 'love.forte.simbot.boot:simboot-core-spring-boot-starter:$SIMBOT_VERSION' // 版本请参考前文的参考链接
 // KOOK组件
-implementation 'love.forte.simbot.component:simbot-component-kook-core:${version}' // 版本请参考前文的参考链接
+implementation 'love.forte.simbot.component:simbot-component-kook-core:${version}' // 版本可参考前文的参考链接
 `.trim()}</CodeBlock>
 
 </TabItem>
-<TabItem value="Maven">
+<TabItem value="Maven" attributes={{'data-value': `Maven`}}>
 
 <CodeBlock language="xml">{`
 <!-- simbot core starter -->
@@ -71,7 +71,7 @@ implementation 'love.forte.simbot.component:simbot-component-kook-core:${version
 <dependency>
     <groupId>love.forte.simbot.component</groupId>
     <artifactId>simbot-component-kook-core</artifactId>
-    <!-- 版本请参考前文的参考链接 -->
+    <!-- 版本可参考前文的参考链接 -->
     <version>${version}</version>
 </dependency>
 `.trim()}</CodeBlock>
@@ -128,8 +128,7 @@ simbot:
 像每一个 Spring Boot 应用一样，你需要一个启动类，并通过标注 `@EnableSimbot` 来启用 `simbot` ：
 
 <Tabs groupId="code">
-
-<TabItem value="Kotlin">
+<TabItem value="Kotlin" attributes={{'data-value': `Kotlin`}}>
 
 ```kotlin title='com.example.App.kt'
 @EnableSimbot
@@ -142,8 +141,7 @@ fun main(vararg args: String) {
 ```
 
 </TabItem>
-
-<TabItem value="Java">
+<TabItem value="Java" attributes={{'data-value': `Java`}}>
 
 :::tip 早有预防
 
@@ -184,8 +182,7 @@ BOT:
 ```
 
 <Tabs groupId="code">
-
-<TabItem value="Kotlin">
+<TabItem value="Kotlin" attributes={{'data-value': `Kotlin`}}>
 
 ```kotlin title='com.example.listener.ExampleListener.kt'
 import love.forte.simboot.annotation.ContentTrim
@@ -208,8 +205,7 @@ class ExampleListener {
 ```
 
 </TabItem>
-
-<TabItem value="Java" label="Java Blocking">
+<TabItem value="Java" label="Java Blocking" attributes={{'data-value': `Java`}}>
 
 
 ```java title='com.example.listener.ExampleListener.java'
@@ -225,7 +221,6 @@ public class ExampleListener {
     @Filter(value = "你好", targets = @Filter.Targets(atBot = true))
     @ContentTrim // 当匹配被at时，将'at'这个特殊消息移除后，剩余的文本消息大概率存在前后空格，通过此注解在匹配的时候忽略前后空格
     public void onChannelMessage(ChannelMessageEvent event) { // 将要监听的事件类型放在参数里，即代表监听此类型的消息
-        
         // Java中的阻塞式API
         event.replyBlocking("你也好!");
     }
@@ -234,9 +229,7 @@ public class ExampleListener {
 ```
 
 </TabItem>
-
-<TabItem value="Java Async">
-
+<TabItem value="Java Async" attributes={{'data-value': `Java`}}>
 
 ```java title='com.example.listener.ExampleListener.java'
 import love.forte.simboot.annotation.ContentTrim
@@ -251,7 +244,6 @@ public class ExampleListener {
     @Filter(value = "你好", targets = @Filter.Targets(atBot = true))
     @ContentTrim // 当匹配被at时，将'at'这个特殊消息移除后，剩余的文本消息大概率存在前后空格，通过此注解在匹配的时候忽略前后空格
     public CompletableFuture<?> onChannelMessage(ChannelMessageEvent event) { // 将要监听的事件类型放在参数里，即代表监听此类型的消息
-        
         // 将 CompletableFuture 作为返回值，simbot会以非阻塞的形式处理它
         return event.replyAsync("你也好!");
     }
@@ -260,13 +252,12 @@ public class ExampleListener {
 ```
 
 </TabItem>
-
-<TabItem value="Java Reactive">
+<TabItem value="Java Reactive" attributes={{'data-value': `Java`}}>
 
 :::tip 有要求
 
 如果返回值是需要第三方库的响应式类型，那么你的项目环境依赖中必须存在 `Kotlin courotines` 对其的支持库才可使用。
-你可以参考文档中  [_响应式的处理结果_](https://simbot.forte.love/docs/basic/event-listener#%E5%8F%AF%E5%93%8D%E5%BA%94%E5%BC%8F%E7%9A%84%E5%A4%84%E7%90%86%E7%BB%93%E6%9E%9C) 的内容。
+你可以参考simbot文档: [响应式的处理结果](https://simbot.forte.love/docs/basic/event-listener#%E5%8F%AF%E5%93%8D%E5%BA%94%E5%BC%8F%E7%9A%84%E5%A4%84%E7%90%86%E7%BB%93%E6%9E%9C) 。
 
 :::
 
@@ -283,7 +274,6 @@ public class ExampleListener {
     @Filter(value = "你好", targets = @Filter.Targets(atBot = true))
     @ContentTrim // 当匹配被at时，将'at'这个特殊消息移除后，剩余的文本消息大概率存在前后空格，通过此注解在匹配的时候忽略前后空格
     public Mono<?> onChannelMessage(ChannelMessageEvent event) { // 将要监听的事件类型放在参数里，即代表监听此类型的消息
-        
         // 将 Mono 等响应式类型作为返回值，simbot会以非阻塞的形式处理它
         return Mono.fromCompletionStage(event.replyAsync("你也好!"));
     }
@@ -292,7 +282,6 @@ public class ExampleListener {
 ```
 
 </TabItem>
-
 </Tabs>
 
 ## 启动

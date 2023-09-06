@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ * Copyright (c) 2023. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -17,187 +17,88 @@
 
 package love.forte.simbot.component.kook.internal
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
 import love.forte.simbot.component.kook.*
-import love.forte.simbot.component.kook.internal.KookComponentGuildBotImpl.Companion.toMemberBot
-import love.forte.simbot.component.kook.internal.role.KookGuildRoleImpl
-import love.forte.simbot.component.kook.model.GuildModel
-import love.forte.simbot.component.kook.model.toModel
+import love.forte.simbot.component.kook.bot.internal.KookBotImpl
+import love.forte.simbot.component.kook.bot.internal.KookGuildBotImpl
 import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleCreator
+import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.kook.api.PageRequestParameters
-import love.forte.simbot.kook.api.channel.ChannelInfo
-import love.forte.simbot.kook.api.channel.ChannelListRequest
-import love.forte.simbot.kook.api.guild.GuildUser
-import love.forte.simbot.kook.api.guild.GuildUserListRequest
-import love.forte.simbot.kook.api.guild.role.GuildRoleCreateRequest
-import love.forte.simbot.kook.api.guild.role.GuildRoleListRequest
-import love.forte.simbot.kook.api.user.UserViewRequest
+import love.forte.simbot.delegate.getValue
+import love.forte.simbot.delegate.stringID
+import love.forte.simbot.kook.api.KookApi
+import love.forte.simbot.kook.api.role.CreateGuildRoleApi
+import love.forte.simbot.kook.api.role.GetGuildRoleListApi
+import love.forte.simbot.kook.objects.Guild
 import love.forte.simbot.literal
 import love.forte.simbot.utils.item.Items
-import love.forte.simbot.utils.item.Items.Companion.asItems
+import love.forte.simbot.utils.item.effectedItemsBySequence
 import love.forte.simbot.utils.item.itemsByFlow
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.CoroutineContext
+
 
 /**
  *
  * @author ForteScarlet
  */
-internal class KookGuildImpl private constructor(
-    internal val baseBot: KookComponentBotImpl,
-    @Volatile override var source: GuildModel,
-) : KookGuild, CoroutineScope {
-    override val id: ID get() = source.id
-    internal val job = SupervisorJob(baseBot.job)
+internal class KookGuildImpl(
+    private val baseBot: KookBotImpl,
+    override val source: Guild,
+) : KookGuild {
+    internal var internalBot: KookGuildBotImpl? = null
 
-    override val coroutineContext: CoroutineContext = baseBot.coroutineContext + job
-
-    override val createTime: Timestamp get() = Timestamp.notSupport()
-    override val maximumMember: Int get() = source.maximumMember
-    override val description: String get() = source.description
-    override val maximumChannel: Int get() = source.maximumChannel
-
-    override val ownerId: ID get() = source.ownerId
-    override val name: String get() = source.name
-    override val icon: String get() = source.icon
-
-    internal val internalChannelCategories = ConcurrentHashMap<String, KookChannelCategoryImpl>()
-
-    internal val internalChannels = ConcurrentHashMap<String, KookChannelImpl>()
-
-    internal val internalMembers = ConcurrentHashMap<String, KookGuildMemberImpl>()
-
-    internal fun internalMember(id: ID): KookGuildMemberImpl? = internalMembers[id.literal]
-
-    private lateinit var botMember: KookComponentGuildBotImpl
-
-    override val bot: KookComponentGuildBotImpl
+    override val bot: KookGuildBotImpl
         get() {
-            // 不关心实例唯一性
-            if (::botMember.isInitialized) {
-                return botMember
-            }
-
-            return baseBot.toMemberBot(internalMember(baseBot.me.id)!!).also {
-                botMember = it
+            return internalBot ?: (baseBot.internalMember(source.id, baseBot.sourceBot.botUserInfo.id)
+                ?: throw kookGuildNotExistsException(source.id)).let {
+                KookGuildBotImpl(baseBot, it).also { b -> internalBot = b }
             }
         }
-
-    @Volatile
-    private lateinit var lastOwnerMember: KookGuildMemberImpl
-
-    @Volatile
-    internal var initTimestamp: Long = 0L
-
-    private suspend fun init() {
-        val guildId = source.id
-        var owner: KookGuildMemberImpl? = null
-
-        syncChannels()
-
-        baseBot.logger.info(
-            "Sync channels data and channel categories data finished. {} channels of data have been synchronized, {} channel categories of date have been synchronized.",
-            internalChannels.size,
-            internalChannelCategories.size
-        )
-
-        syncMembers { member ->
-            if (owner == null && member != null && member.id == ownerId) {
-                owner = member
-            }
-        }
-
-        baseBot.logger.info(
-            "Sync member data finished, {} members of data have been synchronized.",
-            internalMembers.size
-        )
-
-
-        this.lastOwnerMember = owner ?: KookGuildMemberImpl(
-            baseBot,
-            this,
-            UserViewRequest.create(ownerId, guildId).requestDataBy(baseBot).toModel()
-        )
-        initTimestamp = System.currentTimeMillis()
-    }
-
 
     override val currentMember: Int
-        get() = internalMembers.size
-
-    override val currentChannel: Int
-        get() = internalChannelCategories.size
-
-    private val ownerSyncLock = Mutex()
-
-    private suspend fun syncLastOwnerMember(id: String): KookGuildMemberImpl {
-        return internalMembers[id] ?: ownerSyncLock.withLock {
-            internalMembers[id] ?: run {
-                val member = KookGuildMemberImpl(
-                    baseBot,
-                    this@KookGuildImpl,
-                    UserViewRequest.create(ownerId, source.id).requestDataBy(baseBot).toModel()
-                )
-                internalMembers.merge(id, member) { _, cur -> cur }!!
-            }
-        }.also {
-            lastOwnerMember = it
-        }
-    }
-
-    override suspend fun owner(): KookGuildMember {
-        val ownerId = ownerId
-        if (lastOwnerMember.id == ownerId) {
-            return lastOwnerMember
-        }
-        return syncLastOwnerMember(ownerId.literal)
-    }
-
-    override val members: Items<KookGuildMember>
-        get() = internalMembers.values.asItems()
-
-    override val memberList: List<KookGuildMember>
-        get() = internalMembers.values.toList()
-
-    override suspend fun member(id: ID): KookGuildMember? = internalMembers[id.literal]
+        get() = baseBot.internalGuildMemberCount(source.id)
 
     override val channels: Items<KookChannel>
-        get() = internalChannels.values.asItems()
+        get() = effectedItemsBySequence { baseBot.internalChannels(source.id) }
 
-    override suspend fun channel(id: ID): KookChannel? = internalChannels[id.literal]
+    override suspend fun channel(id: ID): KookChannel? =
+        baseBot.internalChannel(id.literal)
 
-    override val channelList: List<KookChannel>
-        get() = internalChannels.values.toList()
+    override val currentChannel: Int
+        get() = baseBot.internalGuildChannelCount(source.id)
 
-    override val categories: List<KookChannelCategory>
-        get() = internalChannelCategories.values.toList()
+    override val members: Items<KookMember>
+        get() = effectedItemsBySequence { baseBot.internalMembers(source.id) }
 
-    override fun getCategory(id: ID): KookChannelCategory? = internalChannelCategories[id.literal]
+    override suspend fun owner(): KookMember {
+        return baseBot.internalMember(source.id, id.literal)
+            ?: throw kookMemberNotExistsException(source.id)
+    }
+
+    override val ownerId: ID by stringID { source.userId }
+
+    override suspend fun member(id: ID): KookMember? =
+        baseBot.internalMember(source.id, id.literal)
 
     @ExperimentalSimbotApi
     override val roles: Items<KookGuildRoleImpl>
         get() = itemsByFlow { prop ->
-            val pageSize = prop.batch.takeIf { it > 0 } ?: PageRequestParameters.DEFAULT_MAX_PAGE_SIZE
+            val pageSize = prop.batch.takeIf { it > 0 } ?: KookApi.DEFAULT_MAX_PAGE_SIZE
             val limit = prop.limit.takeIf { it > 0 }
             val offset = prop.offset.takeIf { it > 0 }
-            val startPage = offset?.div(pageSize) ?: PageRequestParameters.START_PAGE
+            val startPage = offset?.div(pageSize) ?: KookApi.DEFAULT_START_PAGE
             val drop = offset?.mod(pageSize) ?: 0
 
             flow {
                 var page = startPage
                 do {
-                    val result = GuildRoleListRequest
-                        .create(source.id, PageRequestParameters(page, pageSize))
+                    val result = GetGuildRoleListApi
+                        .create(source.id, page = page, pageSize = pageSize)
                         .requestDataBy(bot)
                     val items = result.items
                     items.forEach {
@@ -213,117 +114,36 @@ internal class KookGuildImpl private constructor(
                     flow
                 }
             }.map { r ->
-                KookGuildRoleImpl(this, r)
+                KookGuildRoleImpl(baseBot, this, r)
             }
         }
-
-    override fun toString(): String {
-        return "KookGuildImpl(id=$id, name=$name, source=$source)"
-    }
-
-    /**
-     * 同步当前频道服务器中的频道与成员信息。
-     */
-    internal suspend fun sync(batchDelay: Long) {
-        syncChannels(batchDelay)
-        syncMembers(batchDelay)
-    }
-
-
-    /**
-     * 同步频道列表。
-     */
-    private suspend fun syncChannels(batchDelay: Long = 0L) {
-        requestChannels(source.id, batchDelay = batchDelay)
-            .buffer(100)
-            .map(ChannelInfo::toModel)
-            .collect(::computeMergeChannelModel)
-    }
-
-    private suspend inline fun syncMembers(
-        batchDelay: Long = 0L,
-        crossinline onComputed: (KookGuildMemberImpl?) -> Unit = {},
-    ) {
-        requestGuildUsers(source.id, batchDelay = batchDelay)
-            .buffer(100)
-            .map(GuildUser::toModel)
-            .collect { model ->
-                val computed = internalMembers.compute(model.id.literal) { _, current ->
-                    if (current != null) {
-                        current.source = model
-                        current
-                    } else {
-                        KookGuildMemberImpl(baseBot, this, model)
-                    }
-                }
-
-                onComputed(computed)
-            }
-    }
-
-    private fun requestChannels(guildId: ID, type: Int? = null, batchDelay: Long = 0L): Flow<ChannelInfo> = flow {
-        var page = PageRequestParameters.START_PAGE
-        do {
-            if (page > 1) {
-                delay(batchDelay)
-            }
-            baseBot.logger.debug("Sync channel data ... page {}", page)
-            val result = ChannelListRequest.create(guildId = guildId, type = type, page = page).requestDataBy(baseBot)
-            val channels = result.items
-            baseBot.logger.debug("{} channel data synced in page {}", channels.size, page)
-            channels.forEach {
-                emit(it)
-            }
-            page = result.meta.page + 1
-
-        } while (channels.isNotEmpty() && result.meta.page < result.meta.pageTotal)
-    }
-
-
-    private fun requestGuildUsers(guildId: ID, batchDelay: Long = 0L): Flow<GuildUser> = flow {
-        var page = 1
-        do {
-            if (page > 1) {
-                delay(batchDelay)
-            }
-            baseBot.logger.debug("Sync member data ... page {}", page)
-            val usersResult = GuildUserListRequest.create(guildId = guildId, page = page).requestDataBy(baseBot)
-            val users = usersResult.items
-            baseBot.logger.debug("{} member data synced in page {}", users.size, page)
-            users.forEach {
-                emit(it)
-            }
-            page = usersResult.meta.page + 1
-            delay(batchDelay)
-        } while (users.isNotEmpty() && usersResult.meta.page < usersResult.meta.pageTotal)
-
-
-
-
-    }
 
     @ExperimentalSimbotApi
-    override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(this)
+    override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(baseBot, this)
 
+    @ExperimentalSimbotApi
+    override val categories: Items<KookChannelCategory>
+        get() = effectedItemsBySequence { baseBot.internalCategories(source.id) }
 
-    companion object {
-        internal suspend fun GuildModel.toKookGuild(
-            baseBot: KookComponentBotImpl,
-        ): KookGuildImpl {
-            return KookGuildImpl(baseBot, this).apply { init() }
-        }
+    @ExperimentalSimbotApi
+    override fun getCategory(id: ID): KookChannelCategory? =
+        baseBot.internalCategory(id.literal)
+
+    override fun toString(): String {
+        return "KookGuild(id=${source.id}, name=${source.name})"
     }
 }
 
 
 @OptIn(ExperimentalSimbotApi::class)
 private class KookGuildRoleCreatorImpl(
+    private val baseBot: KookBotImpl,
     private val guild: KookGuildImpl,
 ) : KookGuildRoleCreator {
     override var name: String? = null
 
     override suspend fun create(): KookGuildRole {
-        val role = GuildRoleCreateRequest.create(guild.id, name).requestDataBy(guild.bot)
-        return KookGuildRoleImpl(guild, role)
+        val role = CreateGuildRoleApi.create(guild.source.id, name).requestDataBy(guild.bot)
+        return KookGuildRoleImpl(baseBot, guild, role)
     }
 }

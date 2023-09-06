@@ -23,7 +23,7 @@ import love.forte.simbot.ID
 import love.forte.simbot.component.kook.event.KookChannelMessageEvent
 import love.forte.simbot.component.kook.message.KookTempTarget.Key.byId
 import love.forte.simbot.component.kook.message.KookTempTarget.Key.current
-import love.forte.simbot.kook.api.message.MessageCreateRequest
+import love.forte.simbot.kook.api.message.SendChannelMessageApi
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 
@@ -33,13 +33,13 @@ import love.forte.simbot.message.doSafeCast
  *
  * > `temp_target_id`: 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。用于在频道内针对用户的操作进行单独的回应通知等。
  *
- * 当消息链中存在时，会在最终产生的消息发送API中为 [MessageCreateRequest.tempTargetId] 填充用作临时消息ID的用户ID。
+ * 当消息链中存在时，会在最终产生的消息发送API中为 [SendChannelMessageApi.tempTargetId] 填充用作临时消息ID的用户ID。
  *
  * 一个消息链中只会有**一个** [KookTempTarget] 最终生效，非频道消息无效。
  *
  * _更多说明参考 [KOOK文档](https://developer.kookapp.cn/doc/http/message#%E5%8F%91%E9%80%81%E9%A2%91%E9%81%93%E8%81%8A%E5%A4%A9%E6%B6%88%E6%81%AF)_
  *
- * @see MessageCreateRequest
+ * @see SendChannelMessageApi
  * @see byId
  * @see current
  *
@@ -76,12 +76,16 @@ public sealed class KookTempTarget : KookMessageElement<KookTempTarget> {
     /**
      * 指定具体的用户ID
      */
+    @Serializable
+    @SerialName("kook.temp.target.std")
     internal data class Target(val id: ID) : KookTempTarget()
 
 
     /**
      * 尝试自动使用可获取到的目标用户ID
      */
+    @Serializable
+    @SerialName("kook.temp.target.curr")
     internal object Current : KookTempTarget() {
         override fun equals(other: Any?): Boolean = this === other
         override fun toString(): String = "Current"

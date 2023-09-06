@@ -18,15 +18,16 @@
 package love.forte.simbot.component.kook.role
 
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.component.kook.KookGuildMember
-import love.forte.simbot.kook.api.KookApiException
+import love.forte.simbot.component.kook.KookMember
+import love.forte.simbot.kook.api.ApiResponseException
+import love.forte.simbot.kook.api.ApiResultException
 
 /**
  * 代表一个频道中某个成员所拥有的某个角色。
  *
  * ## 查询
  *
- * [KookMemberRole] 是通过 [KookGuildMember.roles] 进行列表查询得到的，
+ * [KookMemberRole] 是通过 [KookMember.roles] 进行列表查询得到的，
  * 或者通过下述的**赋予**来 _"构建"_ 实例。
  *
  * ## 移除
@@ -53,7 +54,7 @@ public interface KookMemberRole : KookRole {
     /**
      * 此角色所属用户
      */
-    public val member: KookGuildMember
+    public val member: KookMember
 
     /**
      * 得到当前角色所代表的服务器角色信息。
@@ -65,9 +66,9 @@ public interface KookMemberRole : KookRole {
      *
      * 移除后不应再使用其他API，可能会产生任何预期外的问题。
      *
-     * @throws KookApiException API请求过程中产生的任何异常
+     * @throws ApiResultException 可能在API请求过程中产生的任何异常，包括权限验证等
+     * @throws ApiResponseException 可能在API请求过程中产生的任何异常，包括权限验证等
      */
     @JvmSynthetic
     override suspend fun delete(): Boolean
-
 }

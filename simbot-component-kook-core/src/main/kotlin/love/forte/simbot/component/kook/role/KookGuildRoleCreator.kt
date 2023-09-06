@@ -17,11 +17,11 @@
 
 package love.forte.simbot.component.kook.role
 
-import love.forte.plugin.suspendtrans.annotation.JvmAsync
-import love.forte.plugin.suspendtrans.annotation.JvmBlocking
 import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.JST
 import love.forte.simbot.component.kook.KookGuild
-import love.forte.simbot.kook.api.KookApiException
+import love.forte.simbot.kook.api.ApiResponseException
+import love.forte.simbot.kook.api.ApiResultException
 
 /**
  * 服务器频道角色创建器。提供 Kotlin DSL风格的API和Java的惯用API。
@@ -52,29 +52,12 @@ public interface KookGuildRoleCreator {
     /**
      * 创建一个新角色。
      *
-     * @throws KookApiException 任何在API请求过程中产生的异常
+     * @throws ApiResultException 可能在API请求过程中产生的任何异常，包括权限验证等
+     * @throws ApiResponseException 可能在API请求过程中产生的任何异常，包括权限验证等
      *
      * @return 创建的角色
      */
-    @JvmBlocking
-    @JvmAsync
+    @JST
     public suspend fun create(): KookGuildRole
 }
 
-
-
-/**
- * 使用 DSL 风格API创建一个 [KookGuildRole].
- *
- * ```kotlin
- * val newRole = guild.createRole {
- *    name = "武旦"
- * }
- * ```
- *
- * @see KookGuild.roleCreator
- */
-@ExperimentalSimbotApi
-public suspend inline fun KookGuild.createRole(block: KookGuildRoleCreator.() -> Unit): KookGuildRole {
-    return roleCreator().also(block).create()
-}

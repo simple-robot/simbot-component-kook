@@ -42,7 +42,7 @@ if (isSnapshot()) {
 val p = project
 multiplatformConfigPublishing {
     project = P
-
+    
     val jarJavadoc by tasks.registering(Jar::class) {
         group = "documentation"
         archiveClassifier.set("javadoc")

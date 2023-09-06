@@ -18,12 +18,13 @@
 package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.ID
-import love.forte.simbot.component.kook.KookComponentBot
+import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.definition.BotContainer
 import love.forte.simbot.event.*
-import love.forte.simbot.kook.event.Event.Extra.Sys
+import love.forte.simbot.kook.event.EventExtra
+import love.forte.simbot.kook.event.SystemExtra
 import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.kook.event.Event as KkEvent
+import love.forte.simbot.kook.event.Event as KEvent
 
 
 /**
@@ -33,26 +34,30 @@ import love.forte.simbot.kook.event.Event as KkEvent
  *
  * @see UnsupportedKookEvent
  *
- * @param E Kook api模块中所定义的原始 Kook 事件对象 [KkEvent].
- * @param EX Kook api模块中所定义的原始 Kook 事件对象的 [extra][KkEvent.Extra] 属性类型。
+ * @param E Kook api模块中所定义的原始 Kook 事件对象 [KEvent].
+ * @param EX Kook api模块中所定义的原始 Kook 事件对象的 [extra][EventExtra] 属性类型。
  *
  * @author ForteScarlet
  */
 @BaseEvent
-public abstract class KookEvent<out EX : KkEvent.Extra, out E : KkEvent<EX>> : BotContainer, Event {
+public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotContainer, Event {
     /**
      * 此事件对应的bot示例。
      */
-    abstract override val bot: KookComponentBot
+    abstract override val bot: KookBot
 
     /**
      * 当前事件内部对应的原始事件实体。
      */
     public abstract val sourceEvent: E
 
+    /**
+     * 当前事件对应的原始事件JSON字符串。
+     */
+    public abstract val sourceEventContent: String
 
     override fun toString(): String {
-        return "KookEvent(sourceEvent=$sourceEvent)"
+        return "KookEvent(type=${sourceEvent.type}, channelType=${sourceEvent.channelType}, source=${sourceEvent})"
     }
 
     abstract override val key: Event.Key<out KookEvent<*, *>>
@@ -69,26 +74,28 @@ public abstract class KookEvent<out EX : KkEvent.Extra, out E : KkEvent<EX>> : B
 
 /**
  * Kook 组件在simbot中的**系统事件**相关的事件总类。
- *
- * @param Body 事件消息的 [extra][KkEvent.Extra] 作为 [Sys] 时，其 [Sys.body] 的类型。
  */
 @BaseEvent
-public abstract class KookSystemEvent<out Body> :
-    KookEvent<Sys<Body>, KkEvent<Sys<Body>>>() {
+public abstract class KookSystemEvent :
+    KookEvent<SystemExtra, KEvent<SystemExtra>>() {
 
-    override val id: ID get() = sourceEvent.msgId
+    override val id: ID get() = sourceEvent.msgId.ID
 
     /**
      * [sourceEvent] 中的 `extra.body` 信息。
+     *
+     * 不同的系统事件的 body 类型可能是截然不同的。
+     * [sourceBody] 的具体类型由具体的实现类重写定义。
+     *
      */
-    public open val sourceBody: Body get() = sourceEvent.extra.body
+    public open val sourceBody: Any? get() = sourceEvent.extra.body
 
 
-    abstract override val key: Event.Key<out KookSystemEvent<*>>
+    abstract override val key: Event.Key<out KookSystemEvent>
 
-    public companion object Key : BaseEventKey<KookSystemEvent<*>>(
+    public companion object Key : BaseEventKey<KookSystemEvent>(
         "kook.system_event", KookEvent
     ) {
-        override fun safeCast(value: Any): KookSystemEvent<*>? = doSafeCast(value)
+        override fun safeCast(value: Any): KookSystemEvent? = doSafeCast(value)
     }
 }

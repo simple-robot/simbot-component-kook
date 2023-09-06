@@ -20,7 +20,10 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.kook.objects.KMarkdown
+import love.forte.simbot.component.kook.message.KookKMarkdownMessage.Key.asMessage
+import love.forte.simbot.kook.objects.kmd.KMarkdown
+import love.forte.simbot.kook.objects.kmd.KMarkdownBuilder
+import love.forte.simbot.kook.objects.kmd.buildKMarkdown
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.doSafeCast
 
@@ -31,7 +34,7 @@ import love.forte.simbot.message.doSafeCast
  */
 @SerialName("kook.kmd")
 @Serializable
-@OptIn(ExperimentalSimbotApi::class)
+@ExperimentalSimbotApi
 public data class KookKMarkdownMessage(public val kMarkdown: KMarkdown) : KookMessageElement<KookKMarkdownMessage> {
     override val key: Message.Key<KookKMarkdownMessage>
         get() = Key
@@ -45,7 +48,16 @@ public data class KookKMarkdownMessage(public val kMarkdown: KMarkdown) : KookMe
          */
         @JvmStatic
         public fun KMarkdown.asMessage(): KookKMarkdownMessage = KookKMarkdownMessage(this)
-
     }
 }
 
+/**
+ * 通过 [buildKMarkdown] 构建 [KMarkdown] 并包装为 [KookKMarkdownMessage]。
+ *
+ * @see buildKMarkdown
+ * @see KookKMarkdownMessage
+ */
+@ExperimentalSimbotApi
+public inline fun kookKMarkdown(block: KMarkdownBuilder.() -> Unit): KookKMarkdownMessage {
+    return buildKMarkdown(block).asMessage()
+}

@@ -22,7 +22,8 @@ import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.ID
 import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.definition.Role
-import love.forte.simbot.kook.api.KookApiException
+import love.forte.simbot.kook.api.ApiResponseException
+import love.forte.simbot.kook.api.ApiResultException
 import love.forte.simbot.kook.objects.PermissionType
 import love.forte.simbot.kook.objects.Permissions
 
@@ -51,7 +52,7 @@ public sealed interface KookRole : Role, DeleteSupport {
     /**
      * 得到当前Role对应的原始API返回类型 [Role][love.forte.simbot.kook.objects.Role].
      */
-    public val sourceRole: love.forte.simbot.kook.objects.Role
+    public val source: love.forte.simbot.kook.objects.Role
 
     /**
      * 角色ID
@@ -106,11 +107,11 @@ public sealed interface KookRole : Role, DeleteSupport {
     /**
      * 根据实现类型分别代表删除当前服务器中的角色或删除某用户对应的角色。
      *
-     * @throws KookApiException 可能在API请求过程中产生的任何异常，包括权限验证等
+     * @throws ApiResultException 可能在API请求过程中产生的任何异常，包括权限验证等
+     * @throws ApiResponseException 可能在API请求过程中产生的任何异常，包括权限验证等
      */
     @JvmSynthetic
     override suspend fun delete(): Boolean
-
 
     public companion object {
         private val ADMIN_PERMISSIONS: Permissions = PermissionType.values().mapNotNull { pt ->
