@@ -58,8 +58,8 @@ async function config() {
                             'https://github.com/simple-robot/simbot-component-kook/tree/dev/main/website',
                         breadcrumbs: true,
                         showLastUpdateTime: true,
-                        lastVersion: '3.0.0.0-alpha.7',
-                        // lastVersion: 'current',
+                        // lastVersion: '3.0.0.0-alpha.7',
+                        lastVersion: 'current',
                         versions: {
                             current: {
                                 label: currentVersion,

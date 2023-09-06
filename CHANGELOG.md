@@ -2,8 +2,8 @@
 
 > Release & Pull Notes: [v3.2.0.0-alpha.8](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8) 
 
+- pref(stdlib): Bot.[blocking/async]Processor 的参数提供为更便于Jav使用的函数式类型 ([`78d6341`](https://github.com/simple-robot/simpler-robot/commit/78d6341))
 
-# v3.2.0.0-alpha.8-dev.4
 
 > Release & Pull Notes: [v3.2.0.0-alpha.8-dev.4](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8-dev.4) 
 
