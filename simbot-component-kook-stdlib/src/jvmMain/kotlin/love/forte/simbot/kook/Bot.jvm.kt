@@ -25,6 +25,34 @@ import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventExtra
 import java.util.concurrent.CompletableFuture
 
+/**
+ * 对一个任意或指定 extra 类型的事件进行处理的函数接口
+ */
+@Api4J
+public fun interface BlockingEventProcessor<EX : EventExtra> {
+    /**
+     * 接收事件并对其进行处理。
+     *
+     * @param event 事件本体
+     * @param raw 事件订阅中接收到的原始的事件JSON字符串
+     */
+    public fun accept(event: Event<EX>, raw: String)
+}
+
+/**
+ * 对一个任意或指定 extra 类型的事件进行处理的函数接口
+ */
+@Api4J
+public fun interface AsyncEventProcessor<EX : EventExtra> {
+    /**
+     * 接收事件并对其进行处理。
+     *
+     * @param event 事件本体
+     * @param raw 事件订阅中接收到的原始的事件JSON字符串
+     */
+    public fun accept(event: Event<EX>, raw: String): CompletableFuture<Void?>
+}
+
 
 /**
  * 一个 JVM 平台 KOOK Bot。
@@ -52,8 +80,8 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      * @param processor 事件处理器
      */
     @Api4J
-    public fun blockingProcessor(processorType: ProcessorType, processor: Event<*>.(raw: String) -> Unit) {
-        processor { event -> processor(event) }
+    public fun blockingProcessor(processorType: ProcessorType, processor: BlockingEventProcessor<EventExtra>) {
+        processor(processorType) { raw -> processor.accept(this, raw) }
     }
 
     /**
@@ -65,9 +93,9 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     @Api4J
     public fun asyncProcessor(
         processorType: ProcessorType,
-        processor: Event<*>.(raw: String) -> CompletableFuture<Void?>
+        processor: AsyncEventProcessor<EventExtra>
     ) {
-        processor { event -> processor(event).await() }
+        processor { raw -> processor.accept(this, raw).await() }
     }
 
     /**
@@ -76,7 +104,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      * @param processor 事件处理器
      */
     @Api4J
-    public fun blockingProcessor(processor: Event<*>.(raw: String) -> Unit) {
+    public fun blockingProcessor(processor: BlockingEventProcessor<EventExtra>) {
         blockingProcessor(ProcessorType.NORMAL, processor)
     }
 
@@ -86,7 +114,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      * @param processor 事件处理器
      */
     @Api4J
-    public fun asyncProcessor(processor: Event<*>.(raw: String) -> CompletableFuture<Void?>) {
+    public fun asyncProcessor(processor: AsyncEventProcessor<EventExtra>) {
         asyncProcessor(ProcessorType.NORMAL, processor)
     }
 
@@ -101,12 +129,12 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     public fun <EX : EventExtra> blockingProcessor(
         extraType: Class<EX>,
         processorType: ProcessorType,
-        processor: Event<EX>.(raw: String) -> Unit
+        processor: BlockingEventProcessor<EX>
     ) {
         processor { raw ->
             if (extraType.isInstance(extra)) {
                 @Suppress("UNCHECKED_CAST")
-                processor(this as Event<EX>, raw)
+                processor.accept(this as Event<EX>, raw)
             }
         }
     }
@@ -118,12 +146,12 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     public fun <EX : EventExtra> asyncProcessor(
         extraType: Class<EX>,
         processorType: ProcessorType,
-        processor: Event<EX>.(raw: String) -> CompletableFuture<Void?>
+        processor: AsyncEventProcessor<EventExtra>
     ) {
         processor { raw ->
             if (extraType.isInstance(extra)) {
                 @Suppress("UNCHECKED_CAST")
-                processor(this as Event<EX>, raw).await()
+                processor.accept(this as Event<EX>, raw).await()
             }
         }
     }
@@ -137,7 +165,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     @Api4J
     public fun <EX : EventExtra> blockingProcessor(
         extraType: Class<EX>,
-        processor: Event<EX>.(raw: String) -> Unit
+        processor: BlockingEventProcessor<EX>
     ) {
         blockingProcessor(extraType, ProcessorType.NORMAL, processor)
     }
@@ -148,7 +176,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     @Api4J
     public fun <EX : EventExtra> asyncProcessor(
         extraType: Class<EX>,
-        processor: Event<EX>.(raw: String) -> CompletableFuture<Void?>
+        processor: AsyncEventProcessor<EventExtra>
     ) {
         asyncProcessor(extraType, ProcessorType.NORMAL, processor)
     }
@@ -164,11 +192,11 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     public fun blockingProcessor(
         eventType: Event.Type,
         processorType: ProcessorType,
-        processor: Event<*>.(raw: String) -> Unit
+        processor: BlockingEventProcessor<EventExtra>
     ) {
         processor { raw ->
             if (typeValue == eventType.value) {
-                processor(raw)
+                processor.accept(this, raw)
             }
         }
     }
@@ -184,11 +212,11 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     public fun asyncProcessor(
         eventType: Event.Type,
         processorType: ProcessorType,
-        processor: Event<*>.(raw: String) -> CompletableFuture<Void?>
+        processor: AsyncEventProcessor<EventExtra>
     ) {
         processor { raw ->
             if (typeValue == eventType.value) {
-                processor(raw)
+                processor.accept(this, raw)
             }
         }
     }
@@ -200,7 +228,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
      * @param processor 事件处理器
      */
     @Api4J
-    public fun blockingProcessor(eventType: Event.Type, processor: Event<*>.(raw: String) -> Unit) {
+    public fun blockingProcessor(eventType: Event.Type, processor: BlockingEventProcessor<EventExtra>) {
         blockingProcessor(eventType, ProcessorType.NORMAL, processor)
     }
 
@@ -213,7 +241,7 @@ public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
     @Api4J
     public fun asyncProcessor(
         eventType: Event.Type,
-        processor: Event<*>.(raw: String) -> CompletableFuture<Void?>
+        processor: AsyncEventProcessor<EventExtra>
     ) {
         asyncProcessor(eventType, ProcessorType.NORMAL, processor)
     }
