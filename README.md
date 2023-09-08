@@ -6,7 +6,7 @@
 
 了解**simbot3**: [simbot3官网](https://simbot.forte.love)
 
-KOOK组件的**组件手册**: [组件手册](https://simple-robot.github.io/simbot-component-kook/) 
+KOOK组件的**组件手册**: [组件手册][website]
 
 > 版本进入稳定后考虑配置域名，目前暂未配置。
 
@@ -17,17 +17,18 @@ KOOK组件的**组件手册**: [组件手册](https://simple-robot.github.io/sim
 
 ## 支持情况
 
-前往查看 [支持列表](support-list.md)
+前往查看 [支持列表](support-list.md)。
 
-## 使用
+## 快速开始
 
-前往 [组件官网](https://simple-robot.github.io/simbot-component-kook/) 参考 **快速开始** 相关章节。
+前往 [组件手册][website] 阅读 **快速开始** 相关章节。
 
 ## 走马观花
 
 <details>
 <summary>简单示例</summary>
 
+> 使用 Kotlin + `simbot-component-kook-core` 配合 `simboot-core-spring-boot-starter` 使用 `Spring Boot` 的情况下：
 
 ```kotlin
 // simbot-core / simbot-boot
@@ -107,3 +108,5 @@ program. If not, see <https://www.gnu.org/licenses/>.
 [m-stdlib]: simbot-component-kook-stdlib
 [m-core]: simbot-component-kook-core
 [simbot3]: https://github.com/simple-robot/simpler-robot
+
+[website]: https://simple-robot.github.io/simbot-component-kook

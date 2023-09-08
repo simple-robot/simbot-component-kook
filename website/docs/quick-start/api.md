@@ -1,5 +1,5 @@
 ---
-title: 使用API模块
+title: 使用API
 sidebar_position: 2
 ---
 
