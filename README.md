@@ -63,6 +63,7 @@ suspend fun KookChannelMessageEvent.onEvent(@FilterValue("name") name: String) {
 ```
 
 简单的完整示例：
+> (使用 Kotlin + `simbot-component-kook-core`, 非 Spring Boot 的情况下：)
 
 ```kotlin
 suspend fun main() {
