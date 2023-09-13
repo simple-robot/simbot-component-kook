@@ -1,6 +1,14 @@
-# Simple Robot KOOK 组件
+# Simple Robot - KOOK 组件
 
 此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK API](https://www.kookapp.cn/) 的组件支持。
+
+**Simple Robot - KOOK 组件** <small>以下简称KOOK组件</small> 
+是一个基于 [KMP](https://kotlinlang.org/docs/multiplatform.html)、
+支持多平台（`JVM`、`JS`、native）且JVM平台库对Java友好、
+（特定模块）实现simbot3标准API的 **KOOK 机器人API** 依赖库。
+
+**KOOK组件**提供多平台的KOOK API、bot事件订阅等功能实现的底层库，
+以及基于simbot3标准API的高级功能应用库。
 
 ## 文档
 
@@ -11,9 +19,6 @@ KOOK组件的**组件手册**: [组件手册][website]
 > 版本进入稳定后考虑配置域名，目前暂未配置。
 
 **API文档**: [API文档引导站](https://docs.simbot.forte.love)
-
-> **Warning**
-> README 施工中。。。
 
 ## 支持情况
 
@@ -27,6 +32,9 @@ KOOK组件的**组件手册**: [组件手册][website]
 
 <details>
 <summary>简单示例</summary>
+
+> **Note**
+> Java开发者可直接参考 [组件手册][website] 中**快速开始**相关示例的Java部分代码。
 
 > 使用 Kotlin + `simbot-component-kook-core` 配合 `simboot-core-spring-boot-starter` 使用 `Spring Boot` 的情况下：
 
