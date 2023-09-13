@@ -16,6 +16,10 @@
 
 KOOK组件的**组件手册**: [组件手册][website]
 
+> **Note**
+> 手册与simbot3官网均部署于GitHub Pages。
+> 为了更好的浏览体验，**推荐**开启魔法后访问。
+
 > 版本进入稳定后考虑配置域名，目前暂未配置。
 
 **API文档**: [API文档引导站](https://docs.simbot.forte.love)
