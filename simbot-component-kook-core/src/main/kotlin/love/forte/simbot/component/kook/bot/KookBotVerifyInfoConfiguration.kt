@@ -33,22 +33,26 @@ import love.forte.simbot.kook.TokenType
  * 作为 [config][KookBotVerifyInfoConfiguration.config] 属性使用。
  *
  * 简化json e.g.
+ *
  * ```json
  * {
  *   "component": "simbot.kook",
  *   "ticket": {
  *     "clientId": "Your client ID",
- *     "token": "Your ws token",
+ *     "token": "Your ws token"
  *   }
  * }
  * ```
  *
  * 完整json e.g.
+ *
  * ```json
  * {
  *  "component": "simbot.kook",
- *  "clientId": "Your client ID",
- *  "token": "Your ws token",
+ *  "ticket": {
+ *     "clientId": "Your client ID",
+ *     "token": "Your ws token"
+ *   },
  *  "config": {
  *      "isCompress": true,
  *      "syncPeriods": {

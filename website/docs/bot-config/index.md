@@ -6,8 +6,10 @@ title: BOT配置文件
 ```json title='xxx.bot.json'
 {
   "component": "simbot.kook",
-  "clientId": "Your client ID",
-  "token": "Your ws token",
+  "ticket": {
+    "clientId": "Your client ID",
+    "token": "Your ws token"
+  },
   "config": {
     "isCompress": true,
     "syncPeriods": {
@@ -39,11 +41,13 @@ title: BOT配置文件
 
 固定值 `simbot.kook`，**必填**，代表此配置文件为KOOK组件的。
 
-### `clientId`
+### `ticket`
+
+#### `ticket.clientId`
 
 BOT的 **`Client ID`**。
 
-### `token`
+#### `ticket.token`
 
 BOT使用 **websocket** 模式进行连接的 **`Token`** .
 
