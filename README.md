@@ -16,6 +16,10 @@
 
 KOOK组件的**组件手册**: [组件手册][website]
 
+> **Note**
+> 手册与simbot3官网均部署于GitHub Pages。
+> 为了更好的浏览体验，**推荐**开启魔法后访问。
+
 > 版本进入稳定后考虑配置域名，目前暂未配置。
 
 **API文档**: [API文档引导站](https://docs.simbot.forte.love)
@@ -63,6 +67,7 @@ suspend fun KookChannelMessageEvent.onEvent(@FilterValue("name") name: String) {
 ```
 
 简单的完整示例：
+> (使用 Kotlin + `simbot-component-kook-core`, 非 Spring Boot 的情况下：)
 
 ```kotlin
 suspend fun main() {
