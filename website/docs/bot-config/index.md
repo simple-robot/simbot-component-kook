@@ -2,6 +2,19 @@
 title: BOT配置文件
 ---
 
+本章节会提供 bot 的配置文件中各属性的含义以及示例。
+
+:::info 场景
+
+bot 的配置文件通常应用于多组件应用或 Spring Boot 项目中。
+
+对于使用Kotlin、不使用SpringBoot的开发者，也可以选择直接使用代码的形式进行配置。
+
+:::
+
+## 示例
+
+完整示例：
 
 ```json title='xxx.bot.json'
 {
@@ -37,33 +50,9 @@ title: BOT配置文件
 }
 ```
 
-### `component`
+最简示例：
 
-固定值 `simbot.kook`，**必填**，代表此配置文件为KOOK组件的。
-
-### `ticket`
-
-对 bot 身份进行校验、访问 KOOK API 以及连接KOOK服务器进行事件订阅时所需的 bot 票据信息。
-
-#### `ticket.clientId`
-
-BOT的 `Client ID`。
-
-#### `ticket.token`
-
-BOT使用 **websocket** 模式进行连接的 `token` .
-
-:::tip 在哪儿?
-
-可以在 [KOOK开发者平台-应用](https://developer.kookapp.cn/app/index) 中查看。
-
-:::
-
-:::caution 后日谈
-
-日后此类**票据信息**会整合到 `ticket` 字段内。
-
-```json
+```json title='xxx.bot.json'
 {
   "component": "simbot.kook",
   "ticket": {
@@ -73,7 +62,30 @@ BOT使用 **websocket** 模式进行连接的 `token` .
 }
 ```
 
+## 属性描述
+
+### `component`
+
+固定值 `simbot.kook`，**必填**，代表此配置文件为KOOK组件的。
+
+### `ticket`
+
+对 bot 身份进行校验、访问 KOOK API 以及连接KOOK服务器进行事件订阅时所需的 bot 票据信息。
+
+:::tip 在哪儿?
+
+可以在 [KOOK开发者平台-应用](https://developer.kookapp.cn/app/index) 中查看。
+
 :::
+
+#### `ticket.clientId`
+
+BOT的 `Client ID`。
+
+#### `ticket.token`
+
+BOT使用 **websocket** 模式进行连接的 `token` .
+
 
 ### `config`
 
@@ -102,22 +114,52 @@ BOT使用 **websocket** 模式进行连接的 `token` .
 }
 ```
 
-**`syncPeriods.guild`**
+<details><summary>试着关闭它！</summary>
+
+从 `v3.2.0.0-alpha.8` 重构之后，数据的同步机制比之前的版本而言更加稳定。
+如果你有兴趣，可以尝试直接**禁用定时同步**来观察数据是否会出现差错。
+
+```json
+{
+  "config": {
+    "syncPeriods": {
+      "guild": {
+        "syncPeriod": 0,
+        "batchDelay": 0
+      }
+    }
+  }
+}
+```
+
+> _将 `syncPeriod` 设置为 `0` 即可关闭_
+
+在预期中，仅通过事件的通知就应满足对内部缓存的同步更新。因此我们希望可以在完全禁用定时同步的情况下依旧可以保证缓存数据的准确性。
+但是目前测试或反馈的数据仍然不足，我们无法完全预判禁用定时同步可能造成的后果或如果因此而产生缓存数据不准确的可能原因。
+
+因此我们希望你在可控范围内更多的尝试**禁用定时同步**并在出现问题时及时[**反馈**](https://github.com/simple-robot/simpler-robot/issues/new/choose)，
+这可以帮助我们完善内部的缓存机制。
+
+感谢您的支持与贡献！
+
+</details>
+
+##### `syncPeriods.guild`
 
 对频道服务器进行同步的周期信息配置，单位毫秒。
 
-**`syncPeriod`**
+##### `syncPeriods.guild.syncPeriod`
 
-对频道服务器进行同步的周期，单位毫秒。 目前服务器同步的同时会去同步此服务器下的所有频道列表与成员列表。
+对频道服务器进行同步的周期，单位毫秒，大于`0`时有效。目前服务器同步的同时会去同步此服务器下的所有频道列表与成员列表。
 
 默认为 `180000`，即 `180000毫秒 -> 180秒 -> 3分钟`。
 
 进行配置的时候需要注意考虑调用频率上限等相关问题。
 
-**`batchDelay`**
+##### `syncPeriods.guild.batchDelay`
 
 同步数据是分页分批次的同步。`batchDelay` 配置每批次后进行挂起等待的时间，单位毫秒。
-可以通过调大此参数来减缓api的请求速率, 默认不等待。
+可以通过调大此参数来减缓 API 的请求速率, 默认不等待。
 
 配置此属性可一定程度上降低触发调用频率限制的风险。
 
@@ -136,13 +178,13 @@ BOT使用 **websocket** 模式进行连接的 `token` .
 
 它们的配置项都与 Ktor 的 `HttpClientEngineConfig` 的配置相同，没有额外的含义。
 
-**`threadsCount`**
+##### `threadsCount`
 
 > Specifies network threads count advice.
 
 更多参考 [Ktor文档](https://ktor.io/docs/http-client-engines.html#configure)
 
-**`pipelining`**
+##### `pipelining`
 
 > Enables HTTP pipelining advice.
 
@@ -184,19 +226,19 @@ BOT内进行API请求时候的超时时间配置。（基于 [Ktor HttpTimeout](
 
 :::
 
-**`connectTimeoutMillis`**
+##### `connectTimeoutMillis`
 
 > a time period required to process an HTTP call: from sending a request to receiving a response.
 
 更多参考 [Ktor HttpTimeout](https://ktor.io/docs/timeout.html#configure_plugin)
 
-**`requestTimeoutMillis`**
+##### `requestTimeoutMillis`
 
 > a time period in which a client should establish a connection with a server.
 
 更多参考 [Ktor HttpTimeout](https://ktor.io/docs/timeout.html#configure_plugin)
 
-**`socketTimeoutMillis`**
+##### `socketTimeoutMillis`
 
 > a maximum time of inactivity between two data packets when exchanging data with a server.
 
