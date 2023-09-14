@@ -43,13 +43,15 @@ title: BOT配置文件
 
 ### `ticket`
 
+对 bot 身份进行校验、访问 KOOK API 以及连接KOOK服务器进行事件订阅时所需的 bot 票据信息。
+
 #### `ticket.clientId`
 
-BOT的 **`Client ID`**。
+BOT的 `Client ID`。
 
 #### `ticket.token`
 
-BOT使用 **websocket** 模式进行连接的 **`Token`** .
+BOT使用 **websocket** 模式进行连接的 `token` .
 
 :::tip 在哪儿?
 
