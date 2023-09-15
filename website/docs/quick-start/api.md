@@ -19,16 +19,40 @@ API模块是**独立的**，实质上并不依赖 simbot API。你可以单独�
 <Tabs groupId="use-dependency">
 <TabItem value="Gradle Kotlin DSL" attributes={{'data-value': `Kts`}}>
 
+`Gradle` 的 [`Kotlin` 插件](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)：
+
 <CodeBlock language="kotlin">{`
-// 不要忘记使用 Gradle 的 kotlin 插件来允许自动选择对应平台，比如JVM或JS等。
+// 使用 Gradle 的 kotlin 插件来允许自动选择依赖的对应平台，比如JVM或JS等。
+plugin {
+    kotlin("jvm") version "合适且较新的版本"
+    // 或 multiplatform, 如果你使用多平台的话
+    // 如果你使用 Java，也最好添加此插件，因此它可以帮助你自动选择 -jvm 的依赖，而不需要主动添加此后缀
+}
+`.trim()}</CodeBlock>
+
+依赖：
+
+<CodeBlock language="kotlin">{`
 implementation("love.forte.simbot.component:simbot-component-kook-api:${version}") // 版本参考下文所述的 Releases
 `.trim()}</CodeBlock>
 
 </TabItem>
 <TabItem value="Gradle Groovy" attributes={{'data-value': `Gradle`}}>
 
+`Gradle` 的 [`Kotlin` 插件](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)：
+
 <CodeBlock language="gradle">{`
-// 不要忘记使用 Gradle 的 kotlin 插件来允许自动选择对应平台，比如JVM或JS等。
+// 使用 Gradle 的 kotlin 插件来允许自动选择依赖的对应平台，比如JVM或JS等。
+plugin {
+    id 'org.jetbrains.kotlin.jvm' version '合适且较新的版本'
+    // 或 org.jetbrains.kotlin.multiplatform, 如果你使用多平台的话
+    // 如果你使用 Java，也最好添加此插件，因此它可以帮助你自动选择 -jvm 的依赖，而不需要主动添加此后缀
+}
+`.trim()}</CodeBlock>
+
+依赖：
+
+<CodeBlock language="gradle">{`
 implementation 'love.forte.simbot.component:simbot-component-kook-api:${version}' // 版本参考下文所述的 Releases
 `.trim()}</CodeBlock>
 
@@ -37,11 +61,11 @@ implementation 'love.forte.simbot.component:simbot-component-kook-api:${version}
 
 <CodeBlock language="xml">{`
 <dependency>
-<groupId>love.forte.simbot.component</groupId>
-<!-- 在Maven中使用 '-jvm' 后缀来选择使用JVM平台库 -->
-<artifactId>simbot-component-kook-api-jvm</artifactId>
-<!-- 版本参考下文所述的 Releases -->
-<version>${version}</version>
+    <groupId>love.forte.simbot.component</groupId>
+    <!-- 在Maven中使用 '-jvm' 后缀来选择使用JVM平台库 -->
+    <artifactId>simbot-component-kook-api-jvm</artifactId>
+    <!-- 版本参考下文所述的 Releases -->
+    <version>${version}</version>
 </dependency>
 `.trim()}</CodeBlock>
 
@@ -141,7 +165,6 @@ implementation("io.ktor:ktor-client-curl:<合适且较新的Ktor版本>")
 或者如果 Java 版本 `>= Java11`, 使用 [`Java`](https://ktor.io/docs/http-client-engines.html#java) 引擎：
 
 ```xml
-
 <dependency>
     <groupId>io.ktor</groupId>
     <artifactId>ktor-client-java</artifactId>

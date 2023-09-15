@@ -23,7 +23,11 @@ import {version} from '@site/static/version.json'
 
 ## 项目构建
 
+**1. 准备 Spring Boot 项目**
+
 首先准备一个SpringBoot项目。可以考虑前往 [start.spring.io](https://start.spring.io) 或借助IDE等工具。
+
+**2. 添加 simbot 依赖**
 
 然后**额外添加**两个我们需要的依赖：
 - `love.forte.simbot.boot:simboot-core-spring-boot-starter` <br/> ([**版本参考**](https://github.com/simple-robot/simpler-robot/releases))
@@ -33,6 +37,8 @@ import {version} from '@site/static/version.json'
 
 注意，在使用 Spring Boot 的时候你需要一些能够使程序保持运行的组件，例如通过 `spring-web` 启用一个服务器，否则程序可能会自动终止。
 因为simbot的 starter 并不提供维持程序运行的能力。
+
+当然，你也可以选择使用一个线程来自行实现程序保活。
 
 :::
 
@@ -58,7 +64,6 @@ implementation 'love.forte.simbot.component:simbot-component-kook-core:${version
 
 </TabItem>
 <TabItem value="Maven" attributes={{'data-value': `Maven`}}>
-
 <CodeBlock language="xml">{`
 <!-- simbot core starter -->
 <dependency>
@@ -75,6 +80,102 @@ implementation 'love.forte.simbot.component:simbot-component-kook-core:${version
     <version>${version}</version>
 </dependency>
 `.trim()}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+**3. 选择并安装合适的 Ktor Client 依赖**
+
+前往 [Ktor: HTTP client Engines](https://ktor.io/docs/http-client-engines.html) 选择并使用一个合适的、支持 websocket 连接 的 HTTP Client 引擎。
+
+:::caution 限制条件
+
+**注意:** 你需要选择一个支持**HTTP 1.1**和**WS Client**的引擎。部分引擎可能不支持**WS Client**，请注意区分。
+
+各引擎实现的限制可参考 [Ktor文档](https://ktor.io/docs/http-client-engines.html#limitations)。
+
+:::
+
+例如：
+
+<Tabs groupId="use-dependency">
+<TabItem value="Gradle Kotlin DSL" attributes={{'data-value': `Kts`}}>
+
+以 [`CIO`](https://ktor.io/docs/http-client-engines.html#cio) 引擎为例：
+
+```kotlin
+// 或使用 runtimeOnly
+implementation("io.ktor:ktor-client-cio:<合适且较新的Ktor版本>")
+```
+
+如果没有使用 `Gradle` 的 [`Kotlin` 插件](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)，则主动分配平台后缀：
+
+```kotlin
+// 或使用 runtimeOnly
+implementation("io.ktor:ktor-client-cio-jvm:<合适且较新的Ktor版本>")
+```
+
+或者如果 Java 版本 `>= Java11`, 可以使用 [`Java`](https://ktor.io/docs/http-client-engines.html#java) 引擎：
+
+```kotlin
+// 或使用 runtimeOnly
+implementation("io.ktor:ktor-client-java:<合适且较新的Ktor版本>")
+```
+
+</TabItem>
+<TabItem value="Gradle Groovy" attributes={{'data-value': `Gradle`}}>
+
+以 [`CIO`](https://ktor.io/docs/http-client-engines.html#cio) 引擎为例：
+
+```groovy
+// 或使用 runtimeOnly
+implementation 'io.ktor:ktor-client-cio:<合适且较新的Ktor版本>'
+```
+
+如果没有使用 `Gradle` 的 [`Kotlin` 插件](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)，则主动分配平台后缀：
+
+```kotlin
+// 或使用 runtimeOnly
+implementation 'io.ktor:ktor-client-cio-jvm:<合适且较新的Ktor版本>'
+```
+
+或者如果 Java 版本 `>= Java11`, 可以使用 [`Java`](https://ktor.io/docs/http-client-engines.html#java) 引擎：
+
+```groovy
+// 或使用 runtimeOnly
+implementation 'io.ktor:ktor-client-java:<合适且较新的Ktor版本>'
+```
+
+</TabItem>
+<TabItem value="Maven" attributes={{'data-value': `Maven`}}>
+
+以 [`CIO`](https://ktor.io/docs/http-client-engines.html#cio) 引擎为例：
+
+```xml
+
+<dependency>
+    <groupId>io.ktor</groupId>
+    <artifactId>ktor-client-cio-jvm</artifactId>
+    <version>合适且较新的Ktor版本</version>
+    <!-- 在JVM平台下，如果只有一个引擎依赖，则默认会尝试通过 SPI 加载，因此可以使用 runtime 作用域 -->
+    <!-- 如果想要手动指定引擎或配置，移除此作用域配置 -->
+    <scope>runtime</scope>
+</dependency>
+```
+
+或者如果 Java 版本 `>= Java11`, 可以使用 [`Java`](https://ktor.io/docs/http-client-engines.html#java) 引擎：
+
+```xml
+
+<dependency>
+    <groupId>io.ktor</groupId>
+    <artifactId>ktor-client-java</artifactId>
+    <version>合适且较新的Ktor版本</version>
+    <!-- 在JVM平台下，如果只有一个引擎依赖，则默认会尝试通过 SPI 加载，因此可以使用 runtime 作用域 -->
+    <!-- 如果想要手动指定引擎或配置，移除此作用域配置 -->
+    <scope>runtime</scope>
+</dependency>
+```
 
 </TabItem>
 </Tabs>
