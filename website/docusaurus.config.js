@@ -19,11 +19,11 @@ async function config() {
 
         // Set the production url of your site here
         // url: 'https://component-kook.simbot.forte.love',
-        url: 'https://simple-robot.github.io',
+        url: 'https://component-kook.simbot.forte.love',
 
         // Set the /<baseUrl>/ pathname under which your site is served
         // For GitHub pages deployment, it is often '/<projectName>/'
-        baseUrl: '/simbot-component-kook/',
+        baseUrl: '/',
 
         // GitHub pages deployment config.
         // If you aren't using GitHub pages, you don't need these.

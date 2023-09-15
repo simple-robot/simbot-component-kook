@@ -20,8 +20,6 @@ KOOK组件的**组件手册**: [组件手册][website]
 > 手册与simbot3官网均部署于GitHub Pages。
 > 为了更好的浏览体验，**推荐**开启魔法后访问。
 
-> 版本进入稳定后考虑配置域名，目前暂未配置。
-
 **API文档**: [API文档引导站](https://docs.simbot.forte.love)
 
 ## 支持情况
@@ -122,4 +120,4 @@ program. If not, see <https://www.gnu.org/licenses/>.
 [m-core]: simbot-component-kook-core
 [simbot3]: https://github.com/simple-robot/simpler-robot
 
-[website]: https://simple-robot.github.io/simbot-component-kook
+[website]: https://component-kook.simbot.forte.love/

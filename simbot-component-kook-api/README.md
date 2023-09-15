@@ -4,7 +4,7 @@
 > 请先阅读 [模块说明](Module.md)
 
 > **Note**
-> 更详细的快速开始建议前往阅读 [组件手册](https://simple-robot.github.io/simbot-component-kook/docs/quick-start/api) 中的相关章节。
+> 更详细的快速开始建议前往阅读 [组件手册](https://component-kook.simbot.forte.love/docs/quick-start/api) 中的相关章节。
 
 
 api模块中，所有的API请求封装均在 `love.forte.simbot.kook.api` 中，它们通常以 `Api` 结尾，例如 `GetGuildListApi`。
