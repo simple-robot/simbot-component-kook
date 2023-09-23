@@ -97,6 +97,10 @@ suspend fun main() {
 
 </details>
 
+## 应用案例
+
+如果你想看看通过 simbot 开发的bot是什么样子，不妨添加我们亲爱的 [法欧莉斯卡雷特](https://www.kookapp.cn/app/oauth2/authorize?id=10250&permissions=197958144&client_id=jqdlyHK85xe1i5Bo&redirect_uri=&scope=bot) 并使用 `@法欧莉 今天的我` 来看看效果吧~
+
 
 ## License
 
