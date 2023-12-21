@@ -128,6 +128,7 @@ kotlin {
                 api(simbotUtilLoop)
                 api(simbotUtilSuspendTransformer)
                 compileOnly(simbotUtilAnnotations)
+                api(libs.kotlinx.coroutines.core)
                 api(libs.ktor.client.ws)
                 api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
             }
