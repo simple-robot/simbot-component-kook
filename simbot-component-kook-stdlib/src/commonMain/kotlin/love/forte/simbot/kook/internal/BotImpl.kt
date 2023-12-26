@@ -43,7 +43,6 @@ import love.forte.simbot.kook.event.Signal
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.util.stageloop.loop
 import kotlin.coroutines.CoroutineContext
-import kotlin.jvm.Volatile
 
 internal typealias EventProcessor = suspend Event<*>.(raw: String) -> Unit
 
@@ -184,7 +183,7 @@ internal class BotImpl(
 
     override var isStarted: Boolean by atomic(false)
 
-    @Volatile
+    @kotlin.concurrent.Volatile
     private lateinit var _me: Me
 
     override suspend fun me(): Me {
@@ -202,7 +201,7 @@ internal class BotImpl(
 
     private val startLock = Mutex()
 
-    @Volatile
+    @kotlin.concurrent.Volatile
     private var currentClientJob: Job? = null
 
     override suspend fun start(closeBotOnFailure: Boolean) {

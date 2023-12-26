@@ -16,7 +16,6 @@
  */
 
 import love.forte.gradle.common.core.project.setup
-import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
     kotlin("multiplatform")
@@ -42,6 +41,7 @@ repositories {
 
 kotlin {
     explicitApi()
+    applyDefaultHierarchyTemplate()
 
     sourceSets.configureEach {
         languageSettings {
@@ -69,85 +69,34 @@ kotlin {
     }
 
 
-    val mainPresets = mutableSetOf<org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet>()
-    val testPresets = mutableSetOf<org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet>()
+    // Tier 1
+    macosX64()
+    macosArm64()
+    iosSimulatorArm64()
+    iosX64()
 
-    // see https://kotlinlang.org/docs/native-target-supporsupportTargets = setOf(
-    ////        // Tier 1
-    ////        "linuxX64",
-    ////        "macosX64",
-    ////        "macosArm64",
-    ////        "iosSimulatorArm64",
-    ////        "iosX64",
-    ////
-    ////        // Tier 2
-    //////        "linuxArm64",
-    ////        "watchosSimulatorArm64",
-    ////        "watchosX64",
-    ////        "watchosArm32",
-    ////        "watchosArm64",
-    ////        "tvosSimulatorArm64",
-    ////        "tvosX64",
-    ////        "tvosArm64",
-    ////        "iosArm64",
-    ////
-    ////        // Tier 3
-    //////        "androidNativeArm32",
-    //////        "androidNativeArm64",
-    //////        "androidNativeX86",
-    //////        "androidNativeX64",
-    ////        "mingwX64",
-    //////        "watchosDeviceArm64",
-    ////    )t.html
-//    val
+    // Tier 2
+    linuxX64()
+//    linuxArm64()
+    watchosSimulatorArm64()
+    watchosX64()
+    watchosArm32()
+    watchosArm64()
+    tvosSimulatorArm64()
+    tvosX64()
+    tvosArm64()
+    iosArm64()
 
-    val targets = NativeTargets.Official.all.intersect(NativeTargets.KtorClient.all)
-
-
-    targets {
-        presets.filterIsInstance<org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeTargetPreset<*>>()
-            .filter { it.name in targets }
-            .forEach { presets ->
-                val target = fromPreset(presets, presets.name)
-                val mainSourceSet = target.compilations["main"].kotlinSourceSets.first()
-                val testSourceSet = target.compilations["test"].kotlinSourceSets.first()
-
-                val tn = target.name
-                when {
-                    // just for test
-                    // main中只使用HttpClient但用不到引擎，没必要指定
-
-                    // win
-                    tn.startsWith("mingw") -> {
-                        testSourceSet.dependencies {
-                            implementation(libs.ktor.client.winhttp)
-                        }
-                    }
-                    // linux: CIO..?
-                    tn.startsWith("linux") -> {
-                        testSourceSet.dependencies {
-                            implementation(libs.ktor.client.cio)
-                        }
-                    }
-
-                    // darwin based
-                    tn.startsWith("macos")
-                            || tn.startsWith("ios")
-                            || tn.startsWith("watchos")
-                            || tn.startsWith("tvos") -> {
-                        testSourceSet.dependencies {
-                            implementation(libs.ktor.client.darwin)
-                        }
-                    }
-                }
-
-                mainPresets.add(mainSourceSet)
-                testPresets.add(testSourceSet)
-            }
-    }
+    // Tier 3
+//    androidNativeArm32()
+//    androidNativeArm64()
+//    androidNativeX86()
+//    androidNativeX64()
+    mingwX64()
+//    watchosDeviceArm64()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 compileOnly(simbotAnnotations)
                 api(simbotRequestorCore)
@@ -159,21 +108,21 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.test)
             }
         }
 
-        getByName("jvmMain") {
+        jvmMain {
             dependencies {
                 compileOnly(simbotApi) // use @Api4J annotation
                 compileOnly(simbotAnnotations) // use @Api4J annotation
             }
         }
 
-        getByName("jvmTest") {
+        jvmTest {
             dependencies {
                 implementation(libs.ktor.client.cio)
                 implementation(simbotApi) // use @Api4J annotation
@@ -183,28 +132,17 @@ kotlin {
             }
         }
 
-        getByName("jsMain") {
+        jsMain {
+            dependencies {
+                api(simbotAnnotations)
+                api(libs.ktor.client.js)
+            }
+        }
+        jsTest {
             dependencies {
                 api(libs.ktor.client.js)
             }
         }
-        getByName("jsTest") {
-            dependencies {
-                api(libs.ktor.client.js)
-            }
-        }
-
-        val nativeMain by creating {
-            dependsOn(commonMain)
-        }
-
-        val nativeTest by creating {
-            dependsOn(commonTest)
-        }
-
-        configure(mainPresets) { dependsOn(nativeMain) }
-        configure(testPresets) { dependsOn(nativeTest) }
-
     }
 
 }

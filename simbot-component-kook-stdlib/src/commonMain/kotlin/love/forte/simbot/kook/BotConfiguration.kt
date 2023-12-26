@@ -95,7 +95,7 @@ public class BotConfiguration {
      * 针对 [HttpClientEngineConfig] 中的通用默认属性的配置。
      *
      */
-    @Serializable
+    @kotlinx.serialization.Serializable
     public data class EngineConfiguration(
         /**
          * 参考 [HttpClientEngineConfig.threadsCount][io.ktor.client.engine.HttpClientEngineConfig.threadsCount]

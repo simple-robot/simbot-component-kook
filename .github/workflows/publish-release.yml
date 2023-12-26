@@ -36,14 +36,14 @@ jobs:
       - name: Gradle Run Test
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.6
+          gradle-version: 8.5
 #          arguments: clean assemble test
           arguments: assemble test -Porg.gradle.daemon=false
 
       - name: Gradle Publish Release
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.6
+          gradle-version: 8.5
           arguments: |
             publishToSonatype
             closeAndReleaseStagingRepository
@@ -98,7 +98,7 @@ jobs:
       - name: Gradle publish snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.6
+          gradle-version: 8.5
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
         env:
           SIMBOT_IS_SNAPSHOT: true
@@ -126,7 +126,7 @@ jobs:
       - name: Gradle generate documentation
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 7.6
+          gradle-version: 8.5
           arguments: |
             -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8" 
             -Porg.gradle.daemon=false

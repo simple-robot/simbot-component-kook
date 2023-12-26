@@ -1,3 +1,12 @@
+# v3.3.0.0-beta.1
+
+> Release & Pull Notes: [v3.3.0.0-beta.1](https://github.com/simple-robot/simpler-robot/releases/tag/v3.3.0.0-beta.1) 
+
+- fix: 消息发送中增加对 AtAll 的支持 ([`9363c9e`](https://github.com/simple-robot/simpler-robot/commit/9363c9e))
+- website: 配置域名 ([`bfc48ad`](https://github.com/simple-robot/simpler-robot/commit/bfc48ad))
+- fix(doc): 修复部分对配置文件 `ticket` 的描述错误问题 ([`3841f05`](https://github.com/simple-robot/simpler-robot/commit/3841f05))
+- CI: Qodana for branches 'main' ([`e813648`](https://github.com/simple-robot/simpler-robot/commit/e813648))
+
 # v3.2.0.0-alpha.8
 
 > Release & Pull Notes: [v3.2.0.0-alpha.8](https://github.com/simple-robot/simpler-robot/releases/tag/v3.2.0.0-alpha.8) 

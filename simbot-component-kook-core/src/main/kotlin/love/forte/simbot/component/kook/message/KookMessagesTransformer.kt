@@ -319,6 +319,12 @@ private suspend inline fun Message.Element<*>.elementToRequest(
             //     this.request
             // }
 
+            is AtAll -> {
+                withinKmd {
+                    at(AtTarget.All)
+                }
+            }
+
             is KookAtAllHere -> {
                 withinKmd {
                     at(AtTarget.Here)

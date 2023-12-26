@@ -91,6 +91,11 @@ if (!isCi || isLinux) {
     }
 }
 
+// TODO see https://github.com/gradle-nexus/publish-plugin/issues/208#issuecomment-1465029831
+val signingTasks: TaskCollection<Sign> = tasks.withType<Sign>()
+tasks.withType<PublishToMavenRepository>().configureEach {
+    mustRunAfter(signingTasks)
+}
 
 fun MavenPublication.show() {
     //// show project info

@@ -24,9 +24,9 @@ repositories {
     gradlePluginPortal()
 }
 
-val kotlinVersion = "1.8.21"
-val dokkaVersion = "1.8.10"
-val suspendTransformVersion = "0.3.1"
+val kotlinVersion = "1.9.21"
+val dokkaVersion = "1.9.10"
+val suspendTransformVersion = "0.5.1"
 val gradleCommon = "0.1.1"
 
 dependencies {
@@ -35,7 +35,6 @@ dependencies {
     implementation(kotlin("serialization", kotlinVersion))
     implementation("org.jetbrains.dokka", "dokka-gradle-plugin", dokkaVersion)
     implementation("org.jetbrains.dokka", "dokka-base", dokkaVersion)
- 
     // see https://github.com/gradle-nexus/publish-plugin
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
     
@@ -46,8 +45,8 @@ dependencies {
 //    implementation("love.forte.gradle.common:gradle-common-all:$gradleCommon")
 }
 
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+//val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
 
-compileKotlin.kotlinOptions {
-    freeCompilerArgs += listOf("-Xinline-classes")
-}
+//compileKotlin.kotlinOptions {
+//    freeCompilerArgs += listOf("-Xinline-classes")
+//}

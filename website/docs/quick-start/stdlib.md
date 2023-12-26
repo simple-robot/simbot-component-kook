@@ -21,16 +21,40 @@ stdlib标准库模块基于 **KMP** 构建项目，支持 **JVM、JS、Native** 
 <Tabs groupId="use-dependency">
 <TabItem value="Gradle Kotlin DSL" attributes={{'data-value': `Kts`}}>
 
+`Gradle` 的 [`Kotlin` 插件](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)：
+
 <CodeBlock language="kotlin">{`
-// 不要忘记使用 Gradle 的 kotlin 插件来允许自动选择对应平台，比如JVM或JS等。
+// 使用 Gradle 的 kotlin 插件来允许自动选择依赖的对应平台，比如JVM或JS等。
+plugin {
+kotlin("jvm") version "合适且较新的版本"
+// 或 multiplatform, 如果你使用多平台的话
+// 如果你使用 Java，也最好添加此插件，因此它可以帮助你自动选择 -jvm 的依赖，而不需要主动添加此后缀
+}
+`.trim()}</CodeBlock>
+
+依赖：
+
+<CodeBlock language="kotlin">{`
 implementation("love.forte.simbot.component:simbot-component-kook-stdlib:${version}") // 版本参考下文所述的 Releases
 `.trim()}</CodeBlock>
 
 </TabItem>
 <TabItem value="Gradle Groovy" attributes={{'data-value': `Gradle`}}>
 
+`Gradle` 的 [`Kotlin` 插件](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)：
+
 <CodeBlock language="gradle">{`
-// 不要忘记使用 Gradle 的 kotlin 插件来允许自动选择对应平台，比如JVM或JS等。
+// 使用 Gradle 的 kotlin 插件来允许自动选择依赖的对应平台，比如JVM或JS等。
+plugin {
+id 'org.jetbrains.kotlin.jvm' version '合适且较新的版本'
+// 或 org.jetbrains.kotlin.multiplatform, 如果你使用多平台的话
+// 如果你使用 Java，也最好添加此插件，因此它可以帮助你自动选择 -jvm 的依赖，而不需要主动添加此后缀
+}
+`.trim()}</CodeBlock>
+
+依赖：
+
+<CodeBlock language="gradle">{`
 implementation 'love.forte.simbot.component:simbot-component-kook-stdlib:${version}' // 版本参考下文所述的 Releases
 `.trim()}</CodeBlock>
 
@@ -39,11 +63,11 @@ implementation 'love.forte.simbot.component:simbot-component-kook-stdlib:${versi
 
 <CodeBlock language="xml">{`
 <dependency>
-<groupId>love.forte.simbot.component</groupId>
-<!-- 在Maven中使用 '-jvm' 后缀来选择使用JVM平台库 -->
-<artifactId>simbot-component-kook-stdlib-jvm</artifactId>
-<!-- 版本参考下文所述的 Releases -->
-<version>${version}</version>
+    <groupId>love.forte.simbot.component</groupId>
+    <!-- 在Maven中使用 '-jvm' 后缀来选择使用JVM平台库 -->
+    <artifactId>simbot-component-kook-stdlib-jvm</artifactId>
+    <!-- 版本参考下文所述的 Releases -->
+    <version>${version}</version>
 </dependency>
 `.trim()}</CodeBlock>
 
@@ -56,7 +80,7 @@ implementation 'love.forte.simbot.component:simbot-component-kook-stdlib:${versi
 
 :::caution 限制条件
 
-**注意:** 你需要选择一个支持**HTTP 1.1**和**WS Client**的引擎。部分引擎可能仅能支持其中一个（例如不支持WS Client）。
+**注意:** 你需要选择一个支持**HTTP 1.1**和**WS Client**的引擎。部分引擎可能不支持WS Client，请注意区分。
 
 各引擎实现的限制可参考 [Ktor文档](https://ktor.io/docs/http-client-engines.html#limitations)。
 
