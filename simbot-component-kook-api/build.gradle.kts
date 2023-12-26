@@ -134,6 +134,7 @@ kotlin {
 
         jsMain {
             dependencies {
+                api(simbotAnnotations)
                 api(libs.ktor.client.js)
             }
         }
