@@ -40,7 +40,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
-import kotlin.jvm.Volatile
 
 /**
  * 面向平台实现的 [KookApi] 的抽象类。
@@ -429,7 +428,7 @@ public abstract class KookPostApi<T> : BaseKookApi<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
 
-    @Volatile
+    @kotlin.concurrent.Volatile
     private lateinit var _body: Any
 
     /**

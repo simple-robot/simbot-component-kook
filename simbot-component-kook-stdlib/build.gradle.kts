@@ -16,7 +16,6 @@
  */
 
 import love.forte.gradle.common.core.project.setup
-import love.forte.gradle.common.kotlin.multiplatform.NativeTargets
 
 plugins {
     kotlin("multiplatform")
@@ -44,6 +43,7 @@ repositories {
 
 kotlin {
     explicitApi()
+    applyDefaultHierarchyTemplate()
 
     sourceSets.configureEach {
         languageSettings {
@@ -70,118 +70,63 @@ kotlin {
         nodejs()
     }
 
+    // Tier 1
+    macosX64()
+    macosArm64()
+    iosSimulatorArm64()
+    iosX64()
 
-    val mainPresets = mutableSetOf<org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet>()
-    val testPresets = mutableSetOf<org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet>()
+    // Tier 2
+    linuxX64()
+    linuxArm64()
+    watchosSimulatorArm64()
+    watchosX64()
+    watchosArm32()
+    watchosArm64()
+    tvosSimulatorArm64()
+    tvosX64()
+    tvosArm64()
+    iosArm64()
 
-    // see https://kotlinlang.org/docs/native-target-suppors
-
-    val targets = NativeTargets.Official.all.intersect(NativeTargets.KtorClient.all)
-
-    targets {
-        presets.filterIsInstance<org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeTargetPreset<*>>()
-            .filter { it.name in targets }
-            .forEach { presets ->
-                val target = fromPreset(presets, presets.name)
-                val mainSourceSet = target.compilations["main"].kotlinSourceSets.first()
-                val testSourceSet = target.compilations["test"].kotlinSourceSets.first()
-
-                val tn = target.name
-                when {
-                    // just for test
-                    // main中只使用HttpClient但用不到引擎，没必要指定
-
-                    // win
-                    tn.startsWith("mingw") -> {
-                        testSourceSet.dependencies {
-                            implementation(libs.ktor.client.winhttp)
-                        }
-                    }
-                    // linux: CIO..?
-                    tn.startsWith("linux") -> {
-                        testSourceSet.dependencies {
-                            implementation(libs.ktor.client.cio)
-                        }
-                    }
-
-                    // darwin based
-                    tn.startsWith("macos")
-                            || tn.startsWith("ios")
-                            || tn.startsWith("watchos")
-                            || tn.startsWith("tvos") -> {
-                        testSourceSet.dependencies {
-                            implementation(libs.ktor.client.darwin)
-                        }
-                    }
-                }
-
-                mainPresets.add(mainSourceSet)
-                testPresets.add(testSourceSet)
-            }
-    }
+    // Tier 3
+//    androidNativeArm32()
+//    androidNativeArm64()
+//    androidNativeX86()
+//    androidNativeX64()
+    mingwX64()
+//    watchosDeviceArm64()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api(project(":simbot-component-kook-api"))
-                api(simbotLogger)
-                api(simbotUtilLoop)
-                api(simbotUtilSuspendTransformer)
-                compileOnly(simbotUtilAnnotations)
-                api(libs.kotlinx.coroutines.core)
-                api(libs.ktor.client.ws)
-                api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
-            }
+        commonMain.dependencies {
+            api(project(":simbot-component-kook-api"))
+            api(simbotLogger)
+            api(simbotUtilLoop)
+            api(simbotUtilSuspendTransformer)
+            compileOnly(simbotUtilAnnotations)
+            api(libs.kotlinx.coroutines.core)
+            api(libs.ktor.client.ws)
+            api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(libs.kotlinx.coroutines.test)
-            }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
         }
 
-        val jvmMain by getting {
-            dependencies {
-                compileOnly(simbotUtilAnnotations) // use @Api4J annotation
-            }
+        jvmMain.dependencies {
+            compileOnly(simbotUtilAnnotations) // use @Api4J annotation
         }
 
-//        getByName("jvmMain") {
-//            dependencies {
-//                compileOnly(simbotUtilAnnotations) // use @Api4J annotation
-//                api(project(":simbot-component-kook-api-multi"))
-//            }
-//        }
-
-        getByName("jvmTest") {
-            dependencies {
-                implementation(libs.ktor.client.cio)
-                implementation(simbotApi)
-                implementation(simbotLogger)
-                implementation(simbotLoggerSlf4j)
-//                implementation(libs.log4j.api)
-//                implementation(libs.log4j.core)
-//                implementation(libs.log4j.slf4j2Impl)
-            }
+        jvmTest.dependencies {
+            implementation(libs.ktor.client.cio)
+            implementation(simbotApi)
+            implementation(simbotLogger)
+            implementation(simbotLoggerSlf4j)
         }
 
-        getByName("jsMain") {
-            dependencies {
-                implementation(libs.ktor.client.js)
-            }
+        jsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
-
-        val nativeMain by creating {
-            dependsOn(commonMain)
-        }
-
-        val nativeTest by creating {
-            dependsOn(commonTest)
-        }
-
-        configure(mainPresets) { dependsOn(nativeMain) }
-        configure(testPresets) { dependsOn(nativeTest) }
 
     }
 

@@ -44,7 +44,6 @@ multiplatformConfigPublishing {
     project = P
     
     val jarJavadoc by tasks.registering(Jar::class) {
-        group = "documentation"
         archiveClassifier.set("javadoc")
         from(tasks.findByName("dokkaHtml"))
     }
@@ -57,11 +56,12 @@ multiplatformConfigPublishing {
     if (systemProp("SIMBOT_LOCAL").toBoolean()) {
         mainHost = null
     }
-//    else {
-//
-//        mainHostSupportedTargets = mainHost?.supports(hostManager) ?: emptySet()
-//    }
+}
 
+// TODO see https://github.com/gradle-nexus/publish-plugin/issues/208#issuecomment-1465029831
+val signingTasks: TaskCollection<Sign> = tasks.withType<Sign>()
+tasks.withType<PublishToMavenRepository>().configureEach {
+    mustRunAfter(signingTasks)
 }
 
 fun KonanTarget.supports(hostManager: HostManager): Set<String> {

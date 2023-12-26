@@ -1,6 +1,6 @@
 # 功能支持清单
 
-> **Note**
+> [!note]
 > 清单尚未支持的功能可能会在未来的版本更新中逐步支持，也可能会因为反馈较少而被遗忘。
 > 如果你需要一个尚未支持的 KOOK API（也包括后续官方更新而不存在于此清单中的功能），
 > 欢迎提交 [issues](https://github.com/simple-robot/simpler-robot/issues/new/choose) 来让我们知道！

@@ -42,17 +42,19 @@ fun Project.generateChangelog(tag: String) {
 
         val coreVersion = simbotVersion
 
-        file.writeText("""
+        file.writeText(
+            """
             > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simpler-robot/releases/tag/v$coreVersion)
                 
-            > **Warning**
-            > 目前版本尚处于 **`ALPHA`** 阶段，代表仍然可能存在大量[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)或未知问题，
+            > [!warning]
+            > 目前版本尚处于 **`BETA`** 阶段，代表仍然可能存在部分[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)或未知问题，
             以及未完善的内容和落后于官方更新的内容。**
             
             我们欢迎并期望着您的的[反馈](https://github.com/simple-robot/simbot-component-kook/issues)或[协助](https://github.com/simple-robot/simbot-component-kook/pulls)，
             感谢您的贡献与支持！
             
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     val rootChangelogFile = rootProject.file("CHANGELOG.md").also { file ->
@@ -155,7 +157,7 @@ fun Project.generateChangelog(tag: String) {
                 }
             }
 
-        val tmpDir = rootProject.buildDir.resolve("tmp/changelog").apply { mkdirs() }
+        val tmpDir = rootProject.layout.buildDirectory.dir("tmp/changelog").get().asFile
 
         val tmpFile =
             Files.createTempFile(tmpDir.toPath(), "changelog", "tmp").toFile()

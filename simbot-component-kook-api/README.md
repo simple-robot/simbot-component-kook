@@ -1,9 +1,9 @@
 # simple-component-kook-api
 
-> **Note**
+> [!note]
 > 请先阅读 [模块说明](Module.md)
 
-> **Note**
+> [!note]
 > 更详细的快速开始建议前往阅读 [组件手册](https://component-kook.simbot.forte.love/docs/quick-start/api) 中的相关章节。
 
 

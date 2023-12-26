@@ -16,7 +16,7 @@
 
 KOOK组件的**组件手册**: [组件手册][website]
 
-> **Note**
+> [!note]
 > 手册与simbot3官网均部署于GitHub Pages。
 > 为了更好的浏览体验，**推荐**开启魔法后访问。
 
@@ -35,7 +35,7 @@ KOOK组件的**组件手册**: [组件手册][website]
 <details>
 <summary>简单示例</summary>
 
-> **Note**
+> [!note]
 > Java开发者可直接参考 [组件手册][website] 中**快速开始**相关示例的Java部分代码。
 
 > 使用 Kotlin + `simbot-component-kook-core` 配合 `simboot-core-spring-boot-starter` 使用 `Spring Boot` 的情况下：
