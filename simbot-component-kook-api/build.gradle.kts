@@ -77,7 +77,7 @@ kotlin {
 
     // Tier 2
     linuxX64()
-    linuxArm64()
+//    linuxArm64()
     watchosSimulatorArm64()
     watchosX64()
     watchosArm32()

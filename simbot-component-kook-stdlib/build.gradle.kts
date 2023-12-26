@@ -78,7 +78,7 @@ kotlin {
 
     // Tier 2
     linuxX64()
-    linuxArm64()
+//    linuxArm64()
     watchosSimulatorArm64()
     watchosX64()
     watchosArm32()
@@ -98,11 +98,13 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            compileOnly(simbotUtilAnnotations)
             api(project(":simbot-component-kook-api"))
             api(simbotLogger)
             api(simbotUtilLoop)
             api(simbotUtilSuspendTransformer)
-            compileOnly(simbotUtilAnnotations)
+            api(libs.ktor.serialization.kotlinx.json)
+            api(libs.kotlinx.serialization.json)
             api(libs.kotlinx.coroutines.core)
             api(libs.ktor.client.ws)
             api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
@@ -137,16 +139,4 @@ atomicfu {
     transformJs = true
     jvmVariant = "FU"
 }
-
-
-// suppress all?
-//tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
-//    dokkaSourceSets.configureEach {
-//        suppress.set(true)
-//        perPackageOption {
-//            suppress.set(true)
-//        }
-//    }
-//}
-
 
