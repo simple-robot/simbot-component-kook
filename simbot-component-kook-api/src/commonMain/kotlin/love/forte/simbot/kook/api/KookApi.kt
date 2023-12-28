@@ -226,7 +226,7 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
         val result = requestResult(client, authorization)
 
         if (!result.isSuccess) {
-            throw ApiResultException(result, "result.code is not success(${result.code})")
+            throw ApiResultException(result, "result.code is not success ($result)")
         }
 
         if (resultDeserializer == Unit.serializer()) {
