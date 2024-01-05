@@ -44,7 +44,7 @@ fun Project.generateChangelog(tag: String) {
 
         file.writeText(
             """
-            > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simpler-robot/releases/tag/v$coreVersion)
+            > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simbot-component-kook/releases/tag/v$coreVersion)
                 
             > [!warning]
             > 目前版本尚处于 **`BETA`** 阶段，代表仍然可能存在部分[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)或未知问题，
