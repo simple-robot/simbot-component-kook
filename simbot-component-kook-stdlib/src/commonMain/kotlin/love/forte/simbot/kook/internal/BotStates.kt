@@ -25,9 +25,7 @@ import kotlinx.atomicfu.AtomicLong
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ChannelResult
+import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
@@ -43,6 +41,7 @@ import love.forte.simbot.kook.event.UnknownExtra
 import love.forte.simbot.logger.Logger
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException as CreateCancellationException
 
 
 internal sealed class State : love.forte.simbot.util.stageloop.State<State>() {
@@ -394,7 +393,7 @@ private class CreateClient(
                 }
             }.catch { e ->
                 bot.eventLogger.error("Event process flow on error. Cause: {}", e.message, e)
-            }.launchIn(session)
+            }.launchIn(bot)
 
         return EventProcessJob(job, channel)
     }
@@ -457,19 +456,40 @@ private class Receiving(
 
         try {
             eventLogger.trace("Receiving next frame...")
-            val frame = session.incoming.receive()
+            val frameCatching = session.incoming.receiveCatching()
+            frameCatching.onFailure { cause ->
+                eventLogger.error("Receiving next frame on failure: {}, close current session and try to reconnect", cause?.message, cause)
+                val cancelException = CreateCancellationException("Receiving next frame on failure,, close current session and try to reconnect", cause)
+                session.cancel(cancelException)
+                return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
+            }
+            frameCatching.onClosed { cause ->
+                eventLogger.error("Receiving next frame on closed: {}, close current session and try to reconnect", cause?.message, cause)
+                val cancelException = CreateCancellationException("Receiving next frame on failure,, close current session and try to reconnect", cause)
+                session.cancel(cancelException)
+                return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
+            }
+
+            val frame = frameCatching.getOrThrow()
+//            val frame = session.incoming.receive()
             eventLogger.trace("Next frame: {}", frame)
 
-            when (frame) {
-                is Frame.Text -> return processSignalString(frame.readText())
-                is Frame.Binary -> return processSignalString(frame.readToText())
-                else -> {
-                    eventLogger.trace("Other frame: {}", frame)
+            try {
+                when (frame) {
+                    is Frame.Text -> return processSignalString(frame.readText())
+                    is Frame.Binary -> return processSignalString(frame.readToText())
+                    else -> {
+                        eventLogger.trace("Other frame: {}", frame)
+                    }
                 }
+            } catch (processException: Throwable) {
+                eventLogger.error("An exception was thrown while processing the event frame", processException)
             }
 
             return this
-        } catch (cancellation: CancellationException) {
+        } catch (cancellation: CreateCancellationException) {
+            // 似乎不会到这儿来？
+            session.cancel()
             return if (!bot.isActive) {
                 botLogger.warn("Session (and bot) is cancelled: {}", cancellation.message)
                 botLogger.debug("Session (and bot) is cancelled: {}", cancellation.message, cancellation)
@@ -482,9 +502,10 @@ private class Receiving(
             }
 
         } catch (e: Throwable) {
-            botLogger.error("Session received frame failed: {}, try to re-receive.", e.message, e)
-            // next: self
-            return this
+            botLogger.error("Session received frame failed: {}, cancel current session and try reconnect", e.message, e)
+            session.cancel(CreateCancellationException("unexpected exception was received", e))
+            // next: Reconnect
+            return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
         }
     }
 
