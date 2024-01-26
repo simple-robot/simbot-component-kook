@@ -16,11 +16,8 @@
  */
 
 import love.forte.gradle.common.core.project.setup
-import love.forte.gradle.common.core.property.systemProp
 import love.forte.gradle.common.core.repository.Repositories
-import love.forte.gradle.common.core.repository.Repository
-import util.checkPublishConfigurable
-import java.time.Duration
+import love.forte.gradle.common.publication.configure.nexusPublishConfig
 
 /*
  *  Copyright (c) 2022 ForteScarlet <ForteScarlet@163.com>
@@ -44,49 +41,26 @@ plugins {
 }
 
 setup(P)
-if (isSnapshot()) {
-    version = P.snapshotVersion.toString()
+
+val userInfo = love.forte.gradle.common.publication.sonatypeUserInfoOrNull
+
+if (userInfo == null) {
+    logger.warn("sonatype.username or sonatype.password is null, cannot config nexus publishing.")
 }
 
-val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
-
-logger.info("isSnapshotOnly: {}", isSnapshotOnly)
-logger.info("isReleaseOnly: {}", isReleaseOnly)
-logger.info("isPublishConfigurable: {}", isPublishConfigurable)
-
-
-if (isPublishConfigurable) {
-    val sonatypeUsername: String? = sonatypeUsername
-    val sonatypePassword: String? = sonatypePassword
-
-    if (sonatypeUsername == null || sonatypePassword == null) {
-        logger.warn("sonatype.username or sonatype.password is null, cannot config nexus publishing.")
-    }
-
-    nexusPublishing {
-        packageGroup.set(project.group.toString())
-
-        useStaging.set(
-            project.provider { !project.version.toString().endsWith("SNAPSHOT", ignoreCase = true) }
-        )
-
-        transitionCheckOptions {
-            maxRetries.set(100)
-            delayBetween.set(Duration.ofSeconds(5))
-        }
-
-        repositories {
-            sonatype {
-                snapshotRepositoryUrl.set(uri(Repositories.Snapshot.URL))
-                username.set(sonatypeUsername)
-                password.set(sonatypePassword)
-            }
+nexusPublishConfig {
+    projectDetail = P
+    useStaging = project.provider { !project.version.toString().endsWith("SNAPSHOT", ignoreCase = true) }
+    repositoriesConfig = {
+        sonatype {
+            snapshotRepositoryUrl.set(uri(Repositories.Snapshot.URL))
+            username.set(userInfo?.username)
+            password.set(userInfo?.password)
         }
     }
 
-
-    logger.info("[publishing-configure] - [] configured.", name)
 }
+
 
 
 

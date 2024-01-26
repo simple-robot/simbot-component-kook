@@ -23,7 +23,7 @@ plugins {
     kotlin("plugin.serialization")
     `kook-dokka-partial-configure`
     `simbot-kook-suspend-transform`
-    id("kotlinx-atomicfu")
+//    id("kotlinx-atomicfu")
 }
 
 setup(P)
@@ -52,23 +52,13 @@ kotlin {
         }
     }
 
-    jvm {
-        withJava()
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-                javaParameters = true
-                freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
-            }
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    configKotlinJvm()
 
     js(IR) {
         nodejs()
     }
+
+
 
     // Tier 1
     macosX64()
@@ -107,7 +97,6 @@ kotlin {
             api(libs.kotlinx.serialization.json)
             api(libs.kotlinx.coroutines.core)
             api(libs.ktor.client.ws)
-            api("org.jetbrains.kotlinx:atomicfu:${libs.versions.atomicfu.get()}")
         }
 
         commonTest.dependencies {
@@ -132,11 +121,5 @@ kotlin {
 
     }
 
-}
-
-atomicfu {
-    transformJvm = true
-    transformJs = true
-    jvmVariant = "FU"
 }
 

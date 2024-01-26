@@ -15,11 +15,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.gradle.api.plugins.JavaBasePlugin
-import java.io.File
-import java.time.Year
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import java.time.Year
 
 
 /*
@@ -35,16 +33,17 @@ repositories {
 }
 
 fun org.jetbrains.dokka.gradle.AbstractDokkaTask.configOutput(format: String) {
-    moduleName.set("Simple Robot Component KOOK")
+    moduleName.set("Simple Robot 组件 | KOOK")
     outputDirectory.set(rootProject.file("build/dokka/$format"))
 }
 
 tasks.named<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
     configOutput("html")
-    
-//    includes.from(rootProject.file("docs/DocHome.md"))
-    includes.from(rootProject.file("README.md"))
-    
+
+    rootProject.file("README.md").takeIf { it.exists() }?.also {
+        includes.from(it)
+    }
+
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
         customAssets = listOf(rootProject.file(".simbot/dokka-assets/logo-icon.svg"))
         customStyleSheets = listOf(rootProject.file(".simbot/dokka-assets/css/kdoc-style.css"))

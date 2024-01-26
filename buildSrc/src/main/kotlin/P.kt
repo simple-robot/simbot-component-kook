@@ -20,6 +20,7 @@
 import love.forte.gradle.common.core.project.ProjectDetail
 import love.forte.gradle.common.core.project.Version
 import love.forte.gradle.common.core.project.minus
+import love.forte.gradle.common.core.property.systemProp
 import love.forte.gradle.common.core.project.version as v
 
 /*
@@ -63,17 +64,10 @@ object P : ProjectDetail() {
     override val homepage: String
         get() = HOMEPAGE
 
-    private val baseVersion = v(
-        "${simbotVersion.major}.${simbotVersion.minor}",
-        0, 0
-    )
+    private val baseVersion = v(4, 0, 0) - v("dev1")
 
-    private val alphaSuffix = v("beta3")
-
-    override val version: Version = baseVersion - alphaSuffix
-
-    val snapshotVersion: Version =
-        baseVersion - (alphaSuffix - Version.SNAPSHOT)
+    val snapshotVersion = baseVersion - Version.SNAPSHOT
+    override val version = if (isSnapshot()) snapshotVersion else baseVersion
 
     override val group: String get() = GROUP
     override val description: String get() = DESCRIPTION
@@ -122,3 +116,5 @@ private fun initIsSnapshot(): Boolean {
 }
 
 fun isSnapshot(): Boolean = _isSnapshot
+
+fun isSimbotLocal(): Boolean = systemProp("SIMBOT_LOCAL").toBoolean()

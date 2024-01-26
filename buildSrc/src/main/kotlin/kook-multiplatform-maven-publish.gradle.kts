@@ -19,8 +19,6 @@ import love.forte.gradle.common.core.Gpg
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.property.systemProp
 import love.forte.gradle.common.publication.configure.multiplatformConfigPublishing
-import org.jetbrains.kotlin.konan.target.HostManager
-import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     kotlin("multiplatform")
@@ -35,37 +33,38 @@ tasks.withType<JavaCompile> {
 }
 
 setup(P)
-if (isSnapshot()) {
-    version = P.snapshotVersion.toString()
-}
 
 val p = project
 multiplatformConfigPublishing {
     project = P
-    
-    val jarJavadoc by tasks.registering(Jar::class) {
-        archiveClassifier.set("javadoc")
-        from(tasks.findByName("dokkaHtml"))
-    }
-    artifact(jarJavadoc)
     isSnapshot = project.version.toString().contains("SNAPSHOT", true)
+
+    val jarJavadoc by tasks.registering(Jar::class) {
+        group = "documentation"
+        archiveClassifier.set("javadoc")
+        if (!(isSnapshot || isSnapshot() || isSimbotLocal())) {
+            archiveClassifier.set("javadoc")
+            from(tasks.findByName("dokkaHtml"))
+        }
+    }
+
+    artifact(jarJavadoc)
     releasesRepository = ReleaseRepository
     snapshotRepository = SnapshotRepository
     gpg = Gpg.ofSystemPropOrNull()
 
-    if (systemProp("SIMBOT_LOCAL").toBoolean()) {
+    if (isSimbotLocal()) {
         mainHost = null
     }
+
+    publicationsFromMainHost += listOf("wasm", "wasm32", "wasm_js")
+    mainHostSupportedTargets += listOf("wasm", "wasm32", "wasm_js")
 }
 
 // TODO see https://github.com/gradle-nexus/publish-plugin/issues/208#issuecomment-1465029831
 val signingTasks: TaskCollection<Sign> = tasks.withType<Sign>()
 tasks.withType<PublishToMavenRepository>().configureEach {
     mustRunAfter(signingTasks)
-}
-
-fun KonanTarget.supports(hostManager: HostManager): Set<String> {
-    return hostManager.enabledByHost[this]?.mapTo(mutableSetOf()) { target -> target.name } ?: emptySet()
 }
 
 show()
@@ -89,3 +88,6 @@ fun show() {
 
 inline val Project.sourceSets: SourceSetContainer
     get() = extensions.getByName("sourceSets") as SourceSetContainer
+
+internal val TaskContainer.dokkaHtml: TaskProvider<org.jetbrains.dokka.gradle.DokkaTask>
+    get() = named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml")
