@@ -16,24 +16,23 @@
  */
 
 import love.forte.gradle.common.core.project.setup
+import love.forte.gradle.common.kotlin.multiplatform.applyTier1
+import love.forte.gradle.common.kotlin.multiplatform.applyTier2
+import love.forte.gradle.common.kotlin.multiplatform.applyTier3
 
 plugins {
     kotlin("multiplatform")
-    `kook-multiplatform-maven-publish`
     kotlin("plugin.serialization")
     `kook-dokka-partial-configure`
+    alias(libs.plugins.ksp)
 }
 
 setup(P)
-if (isSnapshot()) {
-    version = P.snapshotVersion.toString()
-}
 
-tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-    options.encoding = "UTF-8"
-}
+useK2()
+configJavaCompileWithModule("simbot.component.kook.api")
+apply(plugin = "kook-multiplatform-maven-publish")
+
 
 repositories {
     mavenCentral()
@@ -45,66 +44,36 @@ kotlin {
 
     sourceSets.configureEach {
         languageSettings {
-//            optIn("love.forte.simbot.qguild.InternalApi")
+            optIn("love.forte.simbot.kook.ExperimentalKookApi")
+            optIn("love.forte.simbot.kook.InternalKookApi")
         }
     }
 
-    jvm {
-        withJava()
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-                javaParameters = true
-                freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
-            }
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    configKotlinJvm()
 
     js(IR) {
-        nodejs()
-        binaries.library()
+        configJs()
     }
 
 
-    // Tier 1
-    macosX64()
-    macosArm64()
-    iosSimulatorArm64()
-    iosX64()
-
-    // Tier 2
-    linuxX64()
-//    linuxArm64()
-    watchosSimulatorArm64()
-    watchosX64()
-    watchosArm32()
-    watchosArm64()
-    tvosSimulatorArm64()
-    tvosX64()
-    tvosArm64()
-    iosArm64()
-
-    // Tier 3
-//    androidNativeArm32()
-//    androidNativeArm64()
-//    androidNativeX86()
-//    androidNativeX64()
-    mingwX64()
-//    watchosDeviceArm64()
+    applyTier1()
+    applyTier2()
+    applyTier3(supportKtorClient = true)
 
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly(simbotAnnotations)
-                api(simbotRequestorCore)
+                api(libs.kotlinx.coroutines.core)
+
+                api(libs.simbot.logger)
+                api(libs.simbot.common.apidefinition)
+                api(libs.simbot.common.suspend)
+                api(libs.simbot.common.core)
+                compileOnly(libs.simbot.common.annotations)
+
                 api(libs.ktor.client.core)
                 api(libs.ktor.client.contentNegotiation)
-                api(libs.ktor.serialization.kotlinx.json)
                 api(libs.kotlinx.serialization.json)
-                api(simbotLogger)
             }
         }
 
@@ -125,36 +94,33 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(libs.ktor.client.cio)
-                implementation(simbotApi) // use @Api4J annotation
                 implementation(libs.log4j.api)
                 implementation(libs.log4j.core)
                 implementation(libs.log4j.slf4j2Impl)
+                implementation(libs.kotlinx.coroutines.reactor)
+                implementation(libs.reactor.core)
             }
         }
 
-        jsMain {
-            dependencies {
-                api(simbotAnnotations)
-                api(libs.ktor.client.js)
-            }
+        jsMain.dependencies {
+            api(libs.ktor.client.js)
+            implementation(libs.simbot.common.annotations)
         }
-        jsTest {
-            dependencies {
-                api(libs.ktor.client.js)
-            }
+
+        nativeMain.dependencies {
+            implementation(libs.simbot.common.annotations)
+        }
+
+        mingwTest.dependencies {
+            implementation(libs.ktor.client.winhttp)
         }
     }
-
 }
 
-// suppress all?
-//tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
-//    dokkaSourceSets.configureEach {
-//        suppress.set(true)
-//        perPackageOption {
-//            suppress.set(true)
-//        }
-//    }
-//}
+dependencies {
+    add("kspJvm", project(":internal-processors:api-reader"))
+}
 
-
+ksp {
+    arg("kook.api.finder.output", rootDir.resolve("generated-docs/output.md").absolutePath)
+}

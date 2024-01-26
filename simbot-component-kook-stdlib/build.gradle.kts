@@ -16,26 +16,24 @@
  */
 
 import love.forte.gradle.common.core.project.setup
+import love.forte.gradle.common.kotlin.multiplatform.applyTier1
+import love.forte.gradle.common.kotlin.multiplatform.applyTier2
+import love.forte.gradle.common.kotlin.multiplatform.applyTier3
 
 plugins {
     kotlin("multiplatform")
-    `kook-multiplatform-maven-publish`
     kotlin("plugin.serialization")
     `kook-dokka-partial-configure`
     `simbot-kook-suspend-transform`
-//    id("kotlinx-atomicfu")
 }
 
 setup(P)
-if (isSnapshot()) {
-    version = P.snapshotVersion.toString()
-}
 
-tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-    options.encoding = "UTF-8"
-}
+useK2()
+configJavaCompileWithModule("simbot.component.kook.stdlib")
+apply(plugin = "kook-multiplatform-maven-publish")
+
+configJsTestTasks()
 
 repositories {
     mavenCentral()
@@ -45,56 +43,30 @@ kotlin {
     explicitApi()
     applyDefaultHierarchyTemplate()
 
-    sourceSets.configureEach {
-        languageSettings {
-            optIn("love.forte.simbot.InternalSimbotApi")
-            optIn("love.forte.simbot.ExperimentalSimbotApi")
-        }
-    }
+//    sourceSets.configureEach {
+//        languageSettings {
+//            optIn("love.forte.simbot.InternalSimbotApi")
+//            optIn("love.forte.simbot.ExperimentalSimbotApi")
+//        }
+//    }
 
     configKotlinJvm()
 
     js(IR) {
-        nodejs()
+        configJs()
     }
 
+    applyTier1()
+    applyTier2()
+    applyTier3(supportKtorClient = true)
 
-
-    // Tier 1
-    macosX64()
-    macosArm64()
-    iosSimulatorArm64()
-    iosX64()
-
-    // Tier 2
-    linuxX64()
-//    linuxArm64()
-    watchosSimulatorArm64()
-    watchosX64()
-    watchosArm32()
-    watchosArm64()
-    tvosSimulatorArm64()
-    tvosX64()
-    tvosArm64()
-    iosArm64()
-
-    // Tier 3
-//    androidNativeArm32()
-//    androidNativeArm64()
-//    androidNativeX86()
-//    androidNativeX64()
-    mingwX64()
-//    watchosDeviceArm64()
 
     sourceSets {
         commonMain.dependencies {
-            compileOnly(simbotUtilAnnotations)
+            compileOnly(libs.simbot.common.annotations)
             api(project(":simbot-component-kook-api"))
-            api(simbotLogger)
-            api(simbotUtilLoop)
-            api(simbotUtilSuspendTransformer)
-            api(libs.ktor.serialization.kotlinx.json)
-            api(libs.kotlinx.serialization.json)
+            api(libs.simbot.common.loop)
+            api(libs.simbot.common.atomic)
             api(libs.kotlinx.coroutines.core)
             api(libs.ktor.client.ws)
         }
@@ -104,19 +76,29 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
 
-        jvmMain.dependencies {
-            compileOnly(simbotUtilAnnotations) // use @Api4J annotation
+        jvmTest.dependencies {
+            runtimeOnly(libs.ktor.client.cio)
+            implementation(libs.simbot.logger.slf4jimpl)
         }
 
-        jvmTest.dependencies {
-            implementation(libs.ktor.client.cio)
-            implementation(simbotApi)
-            implementation(simbotLogger)
-            implementation(simbotLoggerSlf4j)
-        }
+//        jvmTest.dependencies {
+//            implementation(libs.ktor.client.cio)
+//            implementation(simbotApi)
+//            implementation(simbotLogger)
+//            implementation(simbotLoggerSlf4j)
+//        }
 
         jsMain.dependencies {
-            implementation(libs.ktor.client.js)
+            api(libs.ktor.client.js)
+            implementation(libs.simbot.common.annotations)
+        }
+
+        nativeMain.dependencies {
+            implementation(libs.simbot.common.annotations)
+        }
+
+        mingwTest.dependencies {
+            implementation(libs.ktor.client.winhttp)
         }
 
     }

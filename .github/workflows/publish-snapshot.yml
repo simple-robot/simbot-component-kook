@@ -15,7 +15,7 @@ on:
       - '**.kts'
 
     tags-ignore:
-      - 'v**'
+      - 'v4**'
 
   # 手动触发工作流
   workflow_dispatch:

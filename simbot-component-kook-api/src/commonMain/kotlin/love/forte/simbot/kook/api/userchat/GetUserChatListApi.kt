@@ -70,7 +70,7 @@ public class GetUserChatListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<ListData<UserChatListView>>
+    override val resultDeserializationStrategy: DeserializationStrategy<ListData<UserChatListView>>
         get() = serializer
 
     override fun urlBuild(builder: URLBuilder) {

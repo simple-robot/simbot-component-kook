@@ -85,7 +85,7 @@ public class GetGuildListApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<ListData<SimpleGuild>> get() = deserializer
+    override val resultDeserializationStrategy: DeserializationStrategy<ListData<SimpleGuild>> get() = deserializer
     override val apiPath: ApiPath get() = PATH
 
     override fun urlBuild(builder: URLBuilder) {

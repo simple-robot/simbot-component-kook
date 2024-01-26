@@ -69,7 +69,7 @@ public class GetChannelListApi private constructor(
         ): GetChannelListApi = GetChannelListApi(guildId, page, pageSize, type)
     }
 
-    override val resultDeserializer: DeserializationStrategy<ListData<ChannelInfo>>
+    override val resultDeserializationStrategy: DeserializationStrategy<ListData<ChannelInfo>>
         get() = serializer
 
     override val apiPath: ApiPath

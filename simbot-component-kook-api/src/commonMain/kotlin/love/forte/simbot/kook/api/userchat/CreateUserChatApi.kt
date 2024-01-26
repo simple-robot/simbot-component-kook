@@ -47,7 +47,7 @@ public class CreateUserChatApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<UserChatView>
+    override val resultDeserializationStrategy: DeserializationStrategy<UserChatView>
         get() = UserChatView.serializer()
 
     override fun createBody(): Any = Body(targetId)

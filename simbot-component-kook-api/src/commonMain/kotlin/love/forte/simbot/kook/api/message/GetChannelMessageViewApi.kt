@@ -48,7 +48,7 @@ public class GetChannelMessageViewApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<ChannelMessageDetails>
+    override val resultDeserializationStrategy: DeserializationStrategy<ChannelMessageDetails>
         get() = ChannelMessageDetails.serializer()
 
     override fun urlBuild(builder: URLBuilder) {

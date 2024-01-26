@@ -209,7 +209,7 @@ public class CreateChannelApi private constructor(
     }
 
 
-    override val resultDeserializer: DeserializationStrategy<ChannelView>
+    override val resultDeserializationStrategy: DeserializationStrategy<ChannelView>
         get() = ChannelView.serializer()
 
     override val apiPath: ApiPath

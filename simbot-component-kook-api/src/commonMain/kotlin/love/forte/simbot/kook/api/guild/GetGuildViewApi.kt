@@ -44,7 +44,7 @@ public class GetGuildViewApi private constructor(private val guildId: String) : 
         public fun create(guildId: String): GetGuildViewApi = GetGuildViewApi(guildId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<SimpleGuildWithRolesAndChannels> get() = SimpleGuildWithRolesAndChannels.serializer()
+    override val resultDeserializationStrategy: DeserializationStrategy<SimpleGuildWithRolesAndChannels> get() = SimpleGuildWithRolesAndChannels.serializer()
     override val apiPath: ApiPath get() = PATH
 
     override fun urlBuild(builder: URLBuilder) {

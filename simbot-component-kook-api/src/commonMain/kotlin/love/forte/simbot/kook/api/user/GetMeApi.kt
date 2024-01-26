@@ -31,7 +31,7 @@ import love.forte.simbot.kook.objects.User
  */
 public object GetMeApi : KookGetApi<Me>() {
     override val apiPath: ApiPath = ApiPath.create("user", "me")
-    override val resultDeserializer: DeserializationStrategy<Me>
+    override val resultDeserializationStrategy: DeserializationStrategy<Me>
         get() = Me.serializer()
 }
 

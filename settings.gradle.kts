@@ -17,6 +17,9 @@
 
 rootProject.name = "simbot-component-kook"
 
+// internals
+include(":internal-processors:api-reader")
+
 include("simbot-component-kook-api")
 include("simbot-component-kook-stdlib")
 include("simbot-component-kook-core")

@@ -20,6 +20,7 @@ package love.forte.simbot.kook.api.asset
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookPostApi
@@ -37,6 +38,10 @@ import kotlin.jvm.JvmStatic
 public expect class CreateAssetApi private constructor(
     formDataContentProvider: () -> MultiPartFormDataContent
 ) : KookPostApi<Asset> {
+    override val apiPath: ApiPath
+    override val resultDeserializationStrategy: DeserializationStrategy<Asset>
+    override val body: Any?
+
     public companion object Factory {
         /**
          * 提供文件字节数据作为上传API。

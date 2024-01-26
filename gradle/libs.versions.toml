@@ -11,6 +11,10 @@ reactor = "3.6.2"
 simbot = "4.0.0-dev15"
 suspendTransform = "0.7.0-beta1"
 gradleCommon = "0.2.0"
+# ksp
+ksp = "1.9.22-1.0.17"
+# https://square.github.io/kotlinpoet/
+kotlinPoet = "1.16.0"
 
 [libraries]
 # simbot
@@ -93,6 +97,12 @@ ktor-client-winhttp = { group = "io.ktor", name = "ktor-client-winhttp", version
 # see https://ktor.io/docs/http-client-engines.html#darwin
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 
+# ksp
+ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+# https://square.github.io/kotlinpoet/interop-ksp/
+kotlinPoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinPoet" }
+
+
 
 # slf4j
 slf4j-api = "org.slf4j:slf4j-api:1.7.36"
@@ -126,6 +136,9 @@ suspend-transform-gradle = { module = "love.forte.plugin.suspend-transform:suspe
 gradle-common-core = { group = "love.forte.gradle.common", name = "gradle-common-core", version.ref = "gradleCommon" }
 gradle-common-multiplatform = { group = "love.forte.gradle.common", name = "gradle-common-kotlin-multiplatform", version.ref = "gradleCommon" }
 gradle-common-publication = { group = "love.forte.gradle.common", name = "gradle-common-publication", version.ref = "gradleCommon" }
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
 gradle-common = ["gradle-common-core", "gradle-common-multiplatform", "gradle-common-publication"]

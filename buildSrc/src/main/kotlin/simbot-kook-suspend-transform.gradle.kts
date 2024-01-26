@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
  * If not, see <https://www.gnu.org/licenses/>.
  */
-import gradle.kotlin.dsl.accessors._06ae31f6857ff01ea4cac8dbece12685.suspendTransform
 import love.forte.simbot.gradle.suspendtransforms.SuspendTransforms
 
 plugins {
@@ -31,12 +30,12 @@ suspendTransform {
         // @JvmAsync
         SuspendTransforms.jvmAsyncTransformer,
 
-        // @JvmSuspendTrans
+        // @ST
         SuspendTransforms.suspendTransTransformerForJvmBlocking,
         SuspendTransforms.suspendTransTransformerForJvmAsync,
         SuspendTransforms.suspendTransTransformerForJvmReserve,
 
-        // @JvmSuspendTransProperty
+        // @STP
         SuspendTransforms.jvmSuspendTransPropTransformerForBlocking,
         SuspendTransforms.jvmSuspendTransPropTransformerForAsync,
         SuspendTransforms.jvmSuspendTransPropTransformerForReserve,

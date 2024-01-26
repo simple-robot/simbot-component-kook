@@ -85,7 +85,7 @@ public class UpdateGuildRoleApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<SimpleRole>
+    override val resultDeserializationStrategy: DeserializationStrategy<SimpleRole>
         get() = SimpleRole.serializer()
 
     /**

@@ -109,12 +109,12 @@ public actual class CreateAssetApi private actual constructor(
         }
     }
 
-    override val apiPath: ApiPath
+    actual override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<Asset>
+    actual override val resultDeserializationStrategy: DeserializationStrategy<Asset>
         get() = Asset.serializer()
 
-    override val body: MultiPartFormDataContent
+    actual override val body: Any?
         get() = formDataContentProvider()
 }

@@ -314,7 +314,7 @@ public class GetGuildMemberListApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<GuildMemberList> get() = GuildMemberList.serializer()
+    override val resultDeserializationStrategy: DeserializationStrategy<GuildMemberList> get() = GuildMemberList.serializer()
 
     override val apiPath: ApiPath get() = PATH
 

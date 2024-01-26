@@ -23,7 +23,7 @@ package love.forte.simbot.kook.objects.kmd
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.kook.ExperimentalKookApi
 import love.forte.simbot.kook.messages.MentionPart
 import love.forte.simbot.kook.objects.MentionRolePart
 import love.forte.simbot.kook.objects.kmd.AtTarget.*
@@ -46,7 +46,7 @@ public annotation class KookMarkdownBuilderTopDsl
  * @see KMarkdownBuilder
  * @see KookMarkdownGrammar
  */
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public interface KMarkdown {
 
     /**
@@ -74,7 +74,7 @@ public interface KMarkdown {
  */
 @Serializable
 @SerialName(RawValueKMarkdown.SERIAL_NAME)
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public data class RawValueKMarkdown(
     @SerialName("raw_content")
     override val rawContent: String,
@@ -96,7 +96,7 @@ public data class RawValueKMarkdown(
  * 可以通过自定义 [appender] 来提供自定义的字符串拼接器，默认使用 [StringBuilder].
  */
 @Suppress("MemberVisibilityCanBePrivate")
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public class KMarkdownBuilder(public val appender: Appendable = StringBuilder()) {
     public constructor(capacity: Int) : this(StringBuilder(capacity))
 
@@ -309,7 +309,7 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
 }
 
 @KookMarkdownBuilderTopDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun KMarkdownBuilder.aroundLine(
     times: Int = 1,
     block: KMarkdownBuilder.() -> Unit,
@@ -326,7 +326,7 @@ public inline fun KMarkdownBuilder.aroundLine(
 }
 
 @KookMarkdownBuilderTopDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun KMarkdownBuilder.preLine(times: Int = 1, block: KMarkdownBuilder.() -> Unit): KMarkdownBuilder {
     return apply {
         for (i in 1..times) {
@@ -337,7 +337,7 @@ public inline fun KMarkdownBuilder.preLine(times: Int = 1, block: KMarkdownBuild
 }
 
 @KookMarkdownBuilderTopDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun KMarkdownBuilder.postLine(
     times: Int = 1,
     block: KMarkdownBuilder.() -> Unit,
@@ -355,7 +355,7 @@ public inline fun KMarkdownBuilder.postLine(
  * Build kmarkdown for raw string.
  */
 @KookMarkdownBuilderDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun buildRawKMarkdown(block: KMarkdownBuilder.() -> Unit): String {
     return KMarkdownBuilder().apply(block).buildRaw()
 }
@@ -364,7 +364,7 @@ public inline fun buildRawKMarkdown(block: KMarkdownBuilder.() -> Unit): String 
  * Build [KMarkdown] instance.
  */
 @KookMarkdownBuilderDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun buildKMarkdown(block: KMarkdownBuilder.() -> Unit): KMarkdown {
     return KMarkdownBuilder().apply(block).build()
 }
