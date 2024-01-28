@@ -18,8 +18,7 @@
 package love.forte.simbot.kook.stdlib
 
 /**
- * [BotConfiguration] 中 [BotConfiguration.isCompress] 的默认值。
- *
- * 在 native 平台中默认关闭且不保证支持。
+ * [BotConfiguration] 中 [BotConfiguration.isCompress] 的默认值，
+ * 默认关闭且不保证支持。
  */
 public actual const val DEFAULT_COMPRESS: Boolean = false

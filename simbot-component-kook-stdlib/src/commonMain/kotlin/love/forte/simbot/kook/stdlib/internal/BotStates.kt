@@ -21,18 +21,17 @@ import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
 import io.ktor.websocket.*
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.updateAndGet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
-import love.forte.simbot.FragileSimbotApi
-import love.forte.simbot.InternalSimbotApi
+import love.forte.simbot.annotations.FragileSimbotAPI
+import love.forte.simbot.annotations.InternalSimbotAPI
 import love.forte.simbot.common.atomic.AtomicLong
 import love.forte.simbot.common.atomic.atomic
 import love.forte.simbot.common.atomic.updateAndGet
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.api.Gateway
 import love.forte.simbot.kook.api.GetGatewayApi
 import love.forte.simbot.kook.event.EventExtra
@@ -40,13 +39,14 @@ import love.forte.simbot.kook.event.Signal
 import love.forte.simbot.kook.event.UnknownExtra
 import love.forte.simbot.kook.stdlib.KookBotClientCloseException
 import love.forte.simbot.kook.stdlib.KookBotConnectException
+import love.forte.simbot.kook.stdlib.requestDataBy
 import love.forte.simbot.logger.Logger
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException as CreateCancellationException
 
 
-internal sealed class State : love.forte.simbot.util.stageloop.State<State>() {
+internal sealed class State : love.forte.simbot.common.stageloop.State<State>() {
     internal abstract val bot: BotImpl
     internal abstract val botLogger: Logger
     internal open val isReceiving: Boolean get() = false
@@ -104,7 +104,7 @@ internal class Connect(
             }
         }
 
-        val gateway = GetGatewayApi.create(isCompress).requestBy(bot).info {
+        val gateway = GetGatewayApi.create(isCompress).requestDataBy(bot).info {
             if (reconnect != null) {
                 botLogger.debug("Reconnect: sn: {}, sessionId: {}", reconnect.sn, reconnect.sessionId)
                 parameters["session_id"] = reconnect.sessionId
@@ -256,7 +256,7 @@ private class CreateHeartbeatJob(
     val hello: Signal.Hello,
 ) : State() {
     override suspend fun invoke(): State {
-        val sn = AtomicLongRef()
+        val sn = atomic(0L)
         botLogger.debug("Creating heartbeat job for session: {}", session)
 
         val heartbeatJob = session.heartbeatJob(sn)
@@ -266,7 +266,7 @@ private class CreateHeartbeatJob(
         return CreateClient(bot, botLogger, session, hello, gateway, sn, heartbeatJob)
     }
 
-    private suspend fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLongRef): HeartbeatJob {
+    private suspend fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLong): HeartbeatJob {
         fun helloInterval(): Long {
             val r = kotlin.random.Random.nextLong(5000)
             return if (kotlin.random.Random.nextBoolean()) 30_000 + r else 30_000 - r
@@ -357,7 +357,7 @@ private class CreateClient(
     private val session: DefaultClientWebSocketSession,
     private val hello: Signal.Hello,
     private val gateway: RequestedGateway,
-    private val sn: AtomicLongRef,
+    private val sn: AtomicLong,
     private val heartbeatJob: HeartbeatJob
 ) : State() {
 
@@ -421,7 +421,7 @@ private class EventProcessJob(
 private class Client(
     val isCompress: Boolean,
     val session: DefaultClientWebSocketSession,
-    val sn: AtomicLongRef,
+    val sn: AtomicLong,
     val heartbeatJob: HeartbeatJob,
     val eventProcessJob: EventProcessJob
 )
@@ -460,14 +460,28 @@ private class Receiving(
             eventLogger.trace("Receiving next frame...")
             val frameCatching = session.incoming.receiveCatching()
             frameCatching.onFailure { cause ->
-                eventLogger.error("Receiving next frame on failure: {}, close current session and try to reconnect", cause?.message, cause)
-                val cancelException = CreateCancellationException("Receiving next frame on failure,, close current session and try to reconnect", cause)
+                eventLogger.error(
+                    "Receiving next frame on failure: {}, close current session and try to reconnect",
+                    cause?.message,
+                    cause
+                )
+                val cancelException = CreateCancellationException(
+                    "Receiving next frame on failure,, close current session and try to reconnect",
+                    cause
+                )
                 session.cancel(cancelException)
                 return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
             }
             frameCatching.onClosed { cause ->
-                eventLogger.error("Receiving next frame on closed: {}, close current session and try to reconnect", cause?.message, cause)
-                val cancelException = CreateCancellationException("Receiving next frame on failure,, close current session and try to reconnect", cause)
+                eventLogger.error(
+                    "Receiving next frame on closed: {}, close current session and try to reconnect",
+                    cause?.message,
+                    cause
+                )
+                val cancelException = CreateCancellationException(
+                    "Receiving next frame on failure,, close current session and try to reconnect",
+                    cause
+                )
                 session.cancel(cancelException)
                 return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
             }
@@ -511,6 +525,7 @@ private class Receiving(
         }
     }
 
+    @OptIn(InternalKookApi::class, FragileSimbotAPI::class)
     private suspend fun processSignalString(eventString: String): State {
         eventLogger.trace("Signal: {}", eventString)
 
@@ -558,11 +573,11 @@ private class Receiving(
                     } catch (se: SerializationException) {
                         var throwIt = false
 
-                        @OptIn(FragileSimbotApi::class)
                         val event0: Signal.Event<EventExtra>? = try {
-                            json.decodeFromJsonElement(Signal.Event.serializer(UnknownExtra.serializer()), jsonElement).also {
-                                it.data.extra.initSource(eventString)
-                            }
+                            json.decodeFromJsonElement(Signal.Event.serializer(UnknownExtra.serializer()), jsonElement)
+                                .also {
+                                    it.data.extra.initSource(eventString)
+                                }
                         } catch (e1: Exception) {
                             se.addSuppressed(e1)
                             throwIt = true
@@ -575,7 +590,8 @@ private class Receiving(
                             if (sn != null) {
                                 updateSn(sn)
                             } else {
-                                val snEx = IllegalStateException("'sn' not found in event json, can not update sn for it")
+                                val snEx =
+                                    IllegalStateException("'sn' not found in event json, can not update sn for it")
                                 se.addSuppressed(snEx)
                             }
                         }
@@ -632,9 +648,9 @@ private class Receiving(
         return this
     }
 
-    private fun updateSn(eventSn: Long) = client.sn.updateSn(eventSn)
+    private fun updateSn(eventSn: Long): Long = client.sn.updateSn(eventSn)
 
-    private fun AtomicLongRef.updateSn(newSn: Long): Long {
+    private fun AtomicLong.updateSn(newSn: Long): Long {
         return updateAndGet { v -> max(newSn, v) }
     }
 }
@@ -652,6 +668,7 @@ private data class Reconnect(
 }
 
 
+@OptIn(InternalSimbotAPI::class)
 private suspend fun Frame.readToText(): String {
     return when (this) {
         is Frame.Text -> readText()
@@ -669,16 +686,6 @@ private data class EventData(val event: Signal.Event<*>, val raw: String)
  *
  * @throws UnsupportedOperationException 当不支持解析二进制数据时
  */
-@InternalSimbotApi
+@InternalSimbotAPI
 public expect suspend fun Frame.Binary.readToTextWithDeflated(): String
 
-private class AtomicLongRef(initValue: Long = 0) {
-    private val atomicValue: AtomicLong = atomic(initValue)
-    var value: Long
-        get() = atomicValue.value
-        set(value) {
-            atomicValue.value = value
-        }
-
-    fun updateAndGet(function: (Long) -> Long): Long = atomicValue.updateAndGet(function)
-}

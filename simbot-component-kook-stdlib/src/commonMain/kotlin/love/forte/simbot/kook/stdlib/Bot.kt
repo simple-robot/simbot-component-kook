@@ -21,45 +21,15 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
 import love.forte.simbot.kook.TokenType
-import love.forte.simbot.kook.api.KookApiRequestor
 import love.forte.simbot.kook.api.user.GetMeApi
 import love.forte.simbot.kook.api.user.Me
 import love.forte.simbot.kook.api.user.OfflineApi
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventExtra
-import love.forte.simbot.kook.event.Signal
 import love.forte.simbot.suspendrunner.ST
 import love.forte.simbot.suspendrunner.STP
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmStatic
-import kotlin.jvm.JvmSynthetic
-
-/**
- * 一个平台 KOOK Bot。
- *
- * 针对某个平台的 KOOK BOT 类型，应当由 [Bot] 实现并由
- * Kotlin 多平台决定具体细节。
- *
- * [PlatformBot] 不应直接被使用，请使用 [Bot]。
- *
- * @see Bot
- *
- * @author ForteScarlet
- */
-public expect interface PlatformBot : CoroutineScope, KookApiRequestor {
-
-    /**
-     * 添加一个事件处理器。所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
-     *
-     * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
-     * @param processor 事件处理器。receiver 为本次接收到的事件信令 [Signal.Event] 中的 [data][Signal.Event.d]，参数 raw 则为接收到的原始事件信令的JSON字符串。
-     */
-    @JvmSynthetic
-    public fun processor(
-        processorType: ProcessorType = ProcessorType.NORMAL,
-        processor: suspend Event<*>.(raw: String) -> Unit
-    )
-}
 
 /**
  * 一个 KOOK Bot。
@@ -82,7 +52,7 @@ public expect interface PlatformBot : CoroutineScope, KookApiRequestor {
  *
  * @author ForteScarlet
  */
-public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
+public interface Bot : CoroutineScope {
     override val coroutineContext: CoroutineContext
 
     /**
@@ -101,12 +71,6 @@ public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
      * 此实例代表的用于进行API请求（xxxRequest）的http client。
      */
     public val apiClient: HttpClient
-
-    /**
-     * @see apiClient
-     */
-    override val client: HttpClient
-        get() = apiClient
 
     /**
      * Bot 是否处于活跃状态。
@@ -129,6 +93,27 @@ public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
      */
     public val botUserInfo: Me
 
+    /**
+     * 添加一个事件处理器。
+     * 所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
+     *
+     * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
+     * @param processor 事件处理器。
+     */
+    public fun processor(
+        processorType: ProcessorType,
+        processor: EventProcessor
+    )
+
+    /**
+     * 添加一个 [ProcessorType.NORMAL] 类型的事件处理器。
+     * 所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
+     *
+     * @param processor 事件处理器。
+     */
+    public fun processor(processor: EventProcessor) {
+        processor(ProcessorType.NORMAL, processor)
+    }
 
     /**
      * 查询 bot 作为用户的信息。
@@ -137,7 +122,6 @@ public interface Bot : PlatformBot, CoroutineScope, KookApiRequestor {
      */
     @STP
     public suspend fun me(): Me
-
 
     /**
      * 让 bot 下线。

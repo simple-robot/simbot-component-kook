@@ -23,7 +23,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -31,25 +30,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
+import love.forte.simbot.common.collection.ConcurrentQueue
+import love.forte.simbot.common.collection.ExperimentalSimbotCollectionApi
+import love.forte.simbot.common.collection.createConcurrentQueue
+import love.forte.simbot.common.stageloop.loop
 import love.forte.simbot.kook.api.user.GetMeApi
 import love.forte.simbot.kook.api.user.Me
 import love.forte.simbot.kook.api.user.OfflineApi
-import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.Signal
-import love.forte.simbot.kook.stdlib.Bot
-import love.forte.simbot.kook.stdlib.BotConfiguration
-import love.forte.simbot.kook.stdlib.ProcessorType
-import love.forte.simbot.kook.stdlib.Ticket
+import love.forte.simbot.kook.stdlib.*
 import love.forte.simbot.logger.LoggerFactory
-import love.forte.simbot.util.stageloop.loop
+import kotlin.concurrent.Volatile
 import kotlin.coroutines.CoroutineContext
-
-internal typealias EventProcessor = suspend Event<*>.(raw: String) -> Unit
 
 /**
  *
  * @author ForteScarlet
  */
+@OptIn(ExperimentalSimbotCollectionApi::class)
 internal class BotImpl(
     override val ticket: Ticket, override val configuration: BotConfiguration
 ) : Bot {
@@ -58,15 +56,13 @@ internal class BotImpl(
 
     // TODO 异常处理器或未知事件处理
 
-    override val authorization: String = "${ticket.type.prefix} ${ticket.token}"
+    internal val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
-    private val queueMap = ActualEnumMap.create<ProcessorType, EventProcessorQueue<EventProcessor>> {
-        createEventProcessorQueue(
-            16
-        )
+    private val queueMap = ActualEnumMap.create<ProcessorType, ConcurrentQueue<EventProcessor>> {
+        createConcurrentQueue()
     }
 
-    override fun processor(processorType: ProcessorType, processor: suspend Event<*>.(raw: String) -> Unit) {
+    override fun processor(processorType: ProcessorType, processor: EventProcessor) {
         queueMap[processorType].add(processor)
     }
 
@@ -103,10 +99,6 @@ internal class BotImpl(
     private fun HttpClientConfig<*>.configApiHttpClient(
         configuration: BotConfiguration, engineConfiguration: BotConfiguration.EngineConfiguration?
     ) {
-        install(ContentNegotiation) {
-            json(defaultApiDecoder)
-        }
-
         val apiHttpRequestTimeoutMillis = configuration.timeout?.requestTimeoutMillis
         val apiHttpConnectTimeoutMillis = configuration.timeout?.connectTimeoutMillis
         val apiHttpSocketTimeoutMillis = configuration.timeout?.socketTimeoutMillis
@@ -126,7 +118,6 @@ internal class BotImpl(
         engineConfiguration?.also { ec ->
             engine {
                 ec.pipelining?.also { pipelining = it }
-                ec.threadsCount?.also { threadsCount = it }
             }
         }
     }
@@ -168,7 +159,6 @@ internal class BotImpl(
         engineConfiguration?.also { ec ->
             engine {
                 ec.pipelining?.also { pipelining = it }
-                ec.threadsCount?.also { threadsCount = it }
             }
         }
     }
@@ -181,13 +171,14 @@ internal class BotImpl(
     override val isActive: Boolean
         get() = job.isActive
 
-    override var isStarted: Boolean by atomic(false)
+    @Volatile
+    override var isStarted: Boolean = false
 
-    @kotlin.concurrent.Volatile
+    @Volatile
     private lateinit var _me: Me
 
     override suspend fun me(): Me {
-        return GetMeApi.requestBy(this).also {
+        return GetMeApi.requestDataBy(this).also {
             _me = it
         }
     }
@@ -201,7 +192,7 @@ internal class BotImpl(
 
     private val startLock = Mutex()
 
-    @kotlin.concurrent.Volatile
+    @Volatile
     private var currentClientJob: Job? = null
 
     override suspend fun start(closeBotOnFailure: Boolean) {
@@ -261,7 +252,7 @@ internal class BotImpl(
     internal suspend fun processEvent(event: Signal.Event<*>, raw: String) {
         val prepareProcessors = queueMap[ProcessorType.PREPARE]
         val normalProcessors = queueMap[ProcessorType.NORMAL]
-        if (prepareProcessors.isEmpty() && normalProcessors.isEmpty()) {
+        if (prepareProcessors.size == 0 && normalProcessors.size == 0) {
             eventLogger.trace("prepare processors and normal processors are both empty, skip.")
             return
         }
@@ -269,7 +260,7 @@ internal class BotImpl(
         val eventData = event.d
         prepareProcessors.forEach { processor ->
             try {
-                processor.invoke(eventData, raw)
+                processor.doInvoke(eventData, raw)
             } catch (e: Throwable) {
                 eventLogger.error("Event prepare process failed. Enable debug level log for more information.", e)
                 eventLogger.debug(
@@ -285,7 +276,7 @@ internal class BotImpl(
         suspend fun doNormalProcess() {
             normalProcessors.forEach { processor ->
                 try {
-                    processor.invoke(eventData, raw)
+                    processor.doInvoke(eventData, raw)
                 } catch (e: Throwable) {
                     eventLogger.error("Event normal process failed. Enable debug level log for more information.", e)
                     eventLogger.debug(

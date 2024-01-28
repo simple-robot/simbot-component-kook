@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ * Copyright (c) 2024. ForteScarlet.
  *
  * This file is part of simbot-component-kook.
  *
@@ -15,28 +15,29 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:JvmName("EventProcessors")
+@file:JvmMultifileClass
 package love.forte.simbot.kook.stdlib
 
-import kotlinx.coroutines.CoroutineScope
-import love.forte.simbot.kook.api.KookApiRequestor
 import love.forte.simbot.kook.event.Event
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
+import kotlin.jvm.JvmSynthetic
 
 
 /**
- * 一个 `native` 平台 KOOK Bot。
+ * 事件处理器函数。
  *
- * 针对某个平台的 KOOK BOT 类型，应当由 [Bot] 实现并由
- * Kotlin 多平台决定具体细节。
+ * Java 中可以使用 `EventProcessors`
+ * 中提供的静态工厂来构建。
  *
  * @author ForteScarlet
  */
-public actual interface PlatformBot : CoroutineScope, KookApiRequestor {
+public fun interface EventProcessor {
+    @JvmSynthetic
+    public suspend operator fun Event<*>.invoke(raw: String)
+}
 
-    /**
-     * 添加一个事件处理器。所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
-     *
-     * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
-     * @param processor 事件处理器
-     */
-    public actual fun processor(processorType: ProcessorType, processor: suspend Event<*>.(raw: String) -> Unit)
+internal suspend fun EventProcessor.doInvoke(e: Event<*>, r: String) {
+    e.apply { invoke(r) }
 }

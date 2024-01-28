@@ -31,18 +31,26 @@ import kotlin.jvm.JvmStatic
 /**
  * [上传文件/图片](https://developer.kookapp.cn/doc/http/asset#%E4%B8%8A%E4%BC%A0%E5%AA%92%E4%BD%93%E6%96%87%E4%BB%B6)
  *
+ * 与其他 API 实现不太一样的是，[CreateAssetApi.body] 每次获取都会构建一个新的实例。
+ *
  * > `Header` 中 `Content-Type` 必须为 `form-data`
+ *
+ * 在 JVM 平台中，还可以通过 `AssetApis.xxx` 使用更多平台特定的构建方式，
+ * 例如使用 `File` 或 `Path`。
  *
  * @author ForteScarlet
  */
-public expect class CreateAssetApi private constructor(
-    formDataContentProvider: () -> MultiPartFormDataContent
-) : KookPostApi<Asset> {
-    override val apiPath: ApiPath
-    override val resultDeserializationStrategy: DeserializationStrategy<Asset>
-    override val body: Any?
-
+public class CreateAssetApi private constructor(
+    private val formDataContentProvider: () -> MultiPartFormDataContent
+) : KookPostApi<Asset>() {
     public companion object Factory {
+        private val PATH = ApiPath.create("asset", "create")
+        private const val DEFAULT_FILENAME = "unknown-file"
+        private const val ASSET_API_FORM_PROPERTY_NAME = "file"
+        private val HEADERS = Headers.build {
+            append(HttpHeaders.ContentType, "form-data")
+        }
+
         /**
          * 提供文件字节数据作为上传API。
          *
@@ -52,7 +60,14 @@ public expect class CreateAssetApi private constructor(
          */
         @JvmStatic
         @JvmOverloads
-        public fun create(fileBytes: ByteArray, filename: String? = null): CreateAssetApi
+        public fun create(
+            fileBytes: ByteArray,
+            filename: String? = null
+        ): CreateAssetApi = CreateAssetApi {
+            MultiPartFormDataContent(formData {
+                append(key = ASSET_API_FORM_PROPERTY_NAME, fileBytes, fileHeaders(filename))
+            })
+        }
 
         /**
          * 提供文件数据的 [InputProvider] 作为上传API。
@@ -63,7 +78,14 @@ public expect class CreateAssetApi private constructor(
          */
         @JvmStatic
         @JvmOverloads
-        public fun create(fileProvider: InputProvider, filename: String? = null): CreateAssetApi
+        public fun create(
+            fileProvider: InputProvider,
+            filename: String? = null
+        ): CreateAssetApi = CreateAssetApi {
+            MultiPartFormDataContent(formData {
+                append(key = ASSET_API_FORM_PROPERTY_NAME, fileProvider, fileHeaders(filename))
+            })
+        }
 
         /**
          * 提供文件数据的 [ByteReadPacket] 作为上传API。
@@ -76,8 +98,14 @@ public expect class CreateAssetApi private constructor(
          */
         @JvmStatic
         @JvmOverloads
-        public fun create(fileByteReadPacket: ByteReadPacket, filename: String? = null): CreateAssetApi
-
+        public fun create(
+            fileByteReadPacket: ByteReadPacket,
+            filename: String? = null
+        ): CreateAssetApi = CreateAssetApi {
+            MultiPartFormDataContent(formData {
+                append(key = ASSET_API_FORM_PROPERTY_NAME, fileByteReadPacket, fileHeaders(filename))
+            })
+        }
 
         /**
          * 提供文件数据的 [ChannelProvider] 作为上传API。
@@ -88,8 +116,31 @@ public expect class CreateAssetApi private constructor(
          */
         @JvmStatic
         @JvmOverloads
-        public fun create(fileChannelProvider: ChannelProvider, filename: String? = null): CreateAssetApi
+        public fun create(
+            fileChannelProvider: ChannelProvider,
+            filename: String? = null
+        ): CreateAssetApi = CreateAssetApi {
+            MultiPartFormDataContent(formData {
+                append(key = ASSET_API_FORM_PROPERTY_NAME, fileChannelProvider, fileHeaders(filename))
+            })
+        }
+
+        private fun fileHeaders(filename: String?): Headers = Headers.build {
+            append(HttpHeaders.ContentDisposition, "filename=\"${filename ?: DEFAULT_FILENAME}\"")
+        }
     }
+
+    override val headers: Headers
+        get() = HEADERS
+
+    override val apiPath: ApiPath
+        get() = PATH
+
+    override val resultDeserializationStrategy: DeserializationStrategy<Asset>
+        get() = Asset.serializer()
+
+    override val body: Any
+        get() = formDataContentProvider()
 }
 
 /**

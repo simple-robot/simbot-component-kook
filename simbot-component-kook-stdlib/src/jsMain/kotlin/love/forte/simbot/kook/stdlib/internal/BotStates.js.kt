@@ -19,8 +19,7 @@ package love.forte.simbot.kook.stdlib.internal
 
 import io.ktor.websocket.*
 import kotlinx.coroutines.await
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.InternalSimbotApi
+import love.forte.simbot.annotations.InternalSimbotAPI
 import org.khronos.webgl.Uint8Array
 import org.w3c.files.Blob
 import kotlin.js.Promise
@@ -28,13 +27,12 @@ import kotlin.js.Promise
 /**
  * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。
  *
- * JS 平台中会使用 [DecompressionStream](https://nodejs.org/api/webstreams.html#class-decompressionstream)
+ * 使用 [DecompressionStream](https://nodejs.org/api/webstreams.html#class-decompressionstream)
  * 对数据进行解压缩、并最终使用 [TextDecoder](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) 解析字符串。
  *
  * _Note: JS 平台下的二进制数据是**实验性**的，不保证可用性，且在未来可能会修改/删除。_
  */
-@InternalSimbotApi
-@ExperimentalSimbotApi
+@InternalSimbotAPI
 public actual suspend fun Frame.Binary.readToTextWithDeflated(): String {
     val uint8Array0 = Uint8Array(data.toTypedArray())
 

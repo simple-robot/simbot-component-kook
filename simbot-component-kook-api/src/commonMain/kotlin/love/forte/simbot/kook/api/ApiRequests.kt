@@ -27,13 +27,9 @@ import io.ktor.client.statement.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.http.content.*
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.common.serialization.guessSerializer
 import love.forte.simbot.logger.LoggerFactory
-import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
@@ -46,27 +42,24 @@ private val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
  * 得到原始的 [HttpResponse] 而不对结果有任何处理。
  */
 @JvmSynthetic
-public suspend fun <T : Any> KookApi<T>.request(client: HttpClient, authorization: String): HttpResponse {
-    val apiId: String? = if (apiLogger.isDebugEnabled()) {
-        "${method.value} ${url.encodedPath}"
-    } else null
-
-    coroutineContext[APIContext]?.apiId = apiId
-
-    if (this is KookPostApi) {
-        apiLogger.debug(
-            "API[{}] ======> query: {}, body: {}",
-            apiId,
-            url.encodedQuery.ifEmpty { "<EMPTY>" },
-            body
-        )
-    } else {
-        apiLogger.debug("API[{}] ======> query: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" })
-    }
+public suspend fun KookApi<*>.request(client: HttpClient, authorization: String): HttpResponse {
+    apiLogger.debug(
+        "API[{} {}] ======> query: {}, body: {}",
+        method.value,
+        url.encodedPath,
+        url.encodedQuery.ifEmpty { "<EMPTY>" },
+        body
+    )
 
     val response = reqForResp(client, authorization)
 
-    apiLogger.debug("API[{}] <====== status: {}, response: {}", apiId, response.status, response)
+    apiLogger.debug(
+        "API[{} {}] <====== status: {}, response: {}",
+        method.value,
+        url.encodedPath,
+        response.status,
+        response
+    )
 
     return response
 }
@@ -77,40 +70,43 @@ public suspend fun <T : Any> KookApi<T>.request(client: HttpClient, authorizatio
  * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
  */
 @JvmSynthetic
-public suspend fun <T : Any> KookApi<T>.requestText(client: HttpClient, authorization: String): String {
+public suspend fun KookApi<*>.requestText(client: HttpClient, authorization: String): String {
     val response = request(client, authorization)
-    return response.requireSuccess(this).bodyAsText()
+    val text = response.requireSuccess(this).bodyAsText()
+    apiLogger.debug(
+        "API[{} {}] <====== status: {}, response text: {}",
+        method.value,
+        url.encodedPath,
+        response.status,
+        text
+    )
+    return text
 }
 
 
 /**
- * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
+ * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个 [ApiResult] 结果。
  *
  * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
  */
 @JvmSynthetic
-public suspend fun <T : Any> KookApi<T>.requestResult(client: HttpClient, authorization: String): ApiResult {
-    var apiContext: APIContext? = null
-    val response = if (apiLogger.isDebugEnabled()) {
-        apiContext = coroutineContext[APIContext] ?: APIContext(null)
-        withContext(apiContext) {
-            request(client, authorization)
-        }
-    } else {
-        request(client, authorization)
-    }.requireSuccess(this)
+public suspend fun KookApi<*>.requestResult(client: HttpClient, authorization: String): ApiResult {
+    val response = request(client, authorization)
+    val text = response.requireSuccess(this).bodyAsText()
+    apiLogger.debug(
+        "API[{} {}] <====== status: {}, response text: {}",
+        method.value,
+        url.encodedPath,
+        response.status,
+        text
+    )
 
-    val raw = response.bodyAsText()
-
-    apiLogger.debug("API[{}] <====== raw result: {}", apiContext?.apiId, raw)
-
-    val result = KookApi.DEFAULT_JSON.decodeFromString(ApiResult.serializer(), raw)
+    val result = KookApi.DEFAULT_JSON.decodeFromString(ApiResult.serializer(), text)
     result.httpStatus = response.status
-    result.raw = raw
-
+    result.raw = text
 
     val rateLimit = response.headers.createRateLimit().also {
-        apiLogger.debug("API[{}] <====== rate limit: {}", apiContext?.apiId, it)
+        apiLogger.debug("API[{} {}] <====== rate limit: {}", method.value, url.encodedPath, it)
     }
     result.rateLimit = rateLimit
 
@@ -191,16 +187,3 @@ private suspend inline fun KookApi<*>.reqForResp(
     postAction()
 }
 
-private class APIContext(
-    var apiId: String? = null
-) : AbstractCoroutineContextElement(APIContext) {
-    /**
-     * Key for [APIContext] instance in the coroutine context.
-     */
-    companion object Key : CoroutineContext.Key<APIContext>
-
-    /**
-     * Returns a string representation of the object.
-     */
-    override fun toString(): String = "APIContext(apiId=$apiId)"
-}

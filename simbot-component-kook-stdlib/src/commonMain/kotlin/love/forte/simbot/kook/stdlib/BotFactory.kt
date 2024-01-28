@@ -17,6 +17,8 @@
 
 package love.forte.simbot.kook.stdlib
 
+import love.forte.simbot.common.function.ConfigurerFunction
+import love.forte.simbot.common.function.invokeBy
 import love.forte.simbot.kook.stdlib.internal.BotImpl
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
@@ -38,14 +40,14 @@ public object BotFactory {
     public fun create(ticket: Ticket, configuration: BotConfiguration = BotConfiguration()): Bot =
         BotImpl(ticket, configuration)
 
+    /**
+     * 构建一个尚未启动的 [Bot] 对象。
+     *
+     * @param ticket bot启动所需的票据信息
+     */
+    @JvmStatic
+    public fun BotFactory.create(ticket: Ticket, configurer: ConfigurerFunction<BotConfiguration>? = null): Bot =
+        create(ticket, BotConfiguration().invokeBy(configurer))
 }
 
 
-/**
- * 构建一个尚未启动的 [Bot] 对象。
- *
- * @param ticket bot启动所需的票据信息
- */
-public inline fun BotFactory.create(ticket: Ticket, config: BotConfiguration.() -> Unit): Bot {
-    return create(ticket, BotConfiguration().also(config))
-}

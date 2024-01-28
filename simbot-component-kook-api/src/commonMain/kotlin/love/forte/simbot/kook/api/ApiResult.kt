@@ -215,7 +215,7 @@ public class ApiResult @ApiResultType constructor(
      * 不会有任何判断，
      *
      * @param json 用于解析 [data] 的json反序列化器
-     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApi.resultDeserializer]
+     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApi.resultDeserializationStrategy]
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */
     @JvmOverloads
@@ -235,7 +235,7 @@ public class ApiResult @ApiResultType constructor(
      * 当 [code] 为成功的时候解析 data 数据, 如果 [code] 不为成功([KookApiResults.SUCCESS_CODE]), 则抛出 [ApiResultException] 异常。
      *
      * @param json 用于解析 [data] 的json反序列化器
-     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApi.resultDeserializer]
+     * @param deserializationStrategy 解析目标的反序列化策略，参考 [KookApi.resultDeserializationStrategy]
      * @throws ApiResultException 如果 [code] 不为成功
      * @throws SerializationException see [Json.decodeFromJsonElement].
      */

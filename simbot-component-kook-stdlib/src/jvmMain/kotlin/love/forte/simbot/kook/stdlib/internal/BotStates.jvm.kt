@@ -18,15 +18,15 @@
 package love.forte.simbot.kook.stdlib.internal
 
 import io.ktor.websocket.*
-import love.forte.simbot.InternalSimbotApi
+import love.forte.simbot.annotations.InternalSimbotAPI
 import java.util.zip.InflaterInputStream
 
 /**
  * 由平台实现对二进制 `deflate` 压缩数据进行解压缩并转为字符串数据。
  *
- * JVM 中会使用 [InflaterInputStream] 对 [Frame.Binary.data] 进行解码
+ * 使用 [InflaterInputStream] 对 [Frame.Binary.data] 进行解码
  */
-@InternalSimbotApi
+@InternalSimbotAPI
 public actual suspend fun Frame.Binary.readToTextWithDeflated(): String {
     return InflaterInputStream(data.inputStream()).reader().use { it.readText() }
 }

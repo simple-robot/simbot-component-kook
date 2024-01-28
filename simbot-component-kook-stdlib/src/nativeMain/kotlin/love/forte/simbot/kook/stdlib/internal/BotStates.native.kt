@@ -18,14 +18,14 @@
 package love.forte.simbot.kook.stdlib.internal
 
 import io.ktor.websocket.*
-import love.forte.simbot.InternalSimbotApi
+import love.forte.simbot.annotations.InternalSimbotAPI
 
 /**
- * Native 平台中不支持, 会抛出 [UnsupportedOperationException]
+ * 不支持, 会抛出 [UnsupportedOperationException]
  *
  * @throws UnsupportedOperationException 当不支持解析二进制数据时
  */
-@InternalSimbotApi
+@InternalSimbotAPI
 public actual suspend fun Frame.Binary.readToTextWithDeflated(): String {
-    throw UnsupportedOperationException("Parsing binary compressed data on native platforms is not yet supported")
+    throw UnsupportedOperationException("Parsing binary compressed data on native platforms is unsupported")
 }

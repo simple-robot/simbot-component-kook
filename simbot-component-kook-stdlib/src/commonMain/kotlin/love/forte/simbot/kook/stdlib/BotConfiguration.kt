@@ -95,16 +95,8 @@ public class BotConfiguration {
      * 针对 [HttpClientEngineConfig] 中的通用默认属性的配置。
      *
      */
-    @kotlinx.serialization.Serializable
+    @Serializable
     public data class EngineConfiguration(
-        /**
-         * 参考 [HttpClientEngineConfig.threadsCount][io.ktor.client.engine.HttpClientEngineConfig.threadsCount]
-         *
-         * 默认为 `null`。为 `null` 时不进行显示配置。
-         *
-         * @see io.ktor.client.engine.HttpClientEngineConfig.threadsCount
-         */
-        public var threadsCount: Int? = null,
         /**
          * 参考 [HttpClientEngineConfig.pipelining][io.ktor.client.engine.HttpClientEngineConfig.pipelining]
          *
