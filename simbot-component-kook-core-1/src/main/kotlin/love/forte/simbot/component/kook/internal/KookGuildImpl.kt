@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
@@ -85,7 +85,7 @@ internal class KookGuildImpl(
     override suspend fun member(id: ID): KookMember? =
         baseBot.internalMember(source.id, id.literal)
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val roles: Items<KookGuildRoleImpl>
         get() = itemsByFlow { prop ->
             val pageSize = prop.batch.takeIf { it > 0 } ?: KookApi.DEFAULT_MAX_PAGE_SIZE
@@ -118,14 +118,14 @@ internal class KookGuildImpl(
             }
         }
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(baseBot, this)
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val categories: Items<KookChannelCategory>
         get() = effectedItemsBySequence { baseBot.internalCategories(source.id) }
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override fun getCategory(id: ID): KookChannelCategory? =
         baseBot.internalCategory(id.literal)
 
@@ -135,7 +135,7 @@ internal class KookGuildImpl(
 }
 
 
-@OptIn(ExperimentalSimbotApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 private class KookGuildRoleCreatorImpl(
     private val baseBot: KookBotImpl,
     private val guild: KookGuildImpl,

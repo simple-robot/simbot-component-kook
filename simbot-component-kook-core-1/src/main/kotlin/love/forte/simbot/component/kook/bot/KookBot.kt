@@ -165,7 +165,7 @@ public interface KookBot : Bot, CoroutineScope {
      * @param api 上传资源的请求
      * @param type 构建的 [KookAsset] 的类型
      */
-    @JST
+    @ST
     public suspend fun uploadAsset(api: CreateAssetApi, type: MessageType): KookAsset =
         KookAsset(api.requestDataBy(this), type)
 
@@ -174,7 +174,7 @@ public interface KookBot : Bot, CoroutineScope {
      *
      * @param api 上传资源的请求
      */
-    @JST
+    @ST
     public suspend fun uploadAssetImage(api: CreateAssetApi): KookAssetImage =
         KookAssetImage(api.requestDataBy(this))
 
@@ -202,13 +202,13 @@ public interface KookBot : Bot, CoroutineScope {
     /**
      * 根据ID寻找指定频道。如果找不到则返回 null。
      */
-    @JST(blockingBaseName = "getGuild", blockingSuffix = "", asyncBaseName = "getGuild")
+    @ST(blockingBaseName = "getGuild", blockingSuffix = "", asyncBaseName = "getGuild")
     override suspend fun guild(id: ID): KookGuild?
 
     /**
      * 获取当前bot所处的频道服务器数量。
      */
-    @JSTP
+    @STP
     override suspend fun guildCount(): Int
     //endregion
 
@@ -255,7 +255,7 @@ public interface KookBot : Bot, CoroutineScope {
      */
     @Deprecated("'Group' is not supported in KOOK", ReplaceWith("null"))
     @JvmSynthetic
-    @JST(blockingBaseName = "getGroup", blockingSuffix = "", asyncBaseName = "getGroup")
+    @ST(blockingBaseName = "getGroup", blockingSuffix = "", asyncBaseName = "getGroup")
     override suspend fun group(id: ID): Group? = null
 
     /**
@@ -274,7 +274,7 @@ public interface KookBot : Bot, CoroutineScope {
     /**
      *  KOOK 中没有 "群"，不支持 group  相关操作
      */
-    @JSTP
+    @STP
     @JvmSynthetic
     @Deprecated("'Group' is not supported in KOOK", ReplaceWith("null"))
     override suspend fun groupCount(): Int = COUNT_NOT_SUPPORTED

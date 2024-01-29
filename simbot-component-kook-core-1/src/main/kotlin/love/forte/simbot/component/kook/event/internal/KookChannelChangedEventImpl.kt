@@ -20,7 +20,7 @@
 package love.forte.simbot.component.kook.event.internal
 
 import love.forte.simbot.Api4J
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookChannelCategory
 import love.forte.simbot.component.kook.KookGuild

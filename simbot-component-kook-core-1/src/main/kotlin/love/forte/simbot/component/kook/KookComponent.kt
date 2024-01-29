@@ -86,7 +86,7 @@ public class KookComponent @InternalSimbotApi constructor() : Component {
         /**
          * [KookComponent] 组件所使用的消息序列化信息。
          */
-        @OptIn(ExperimentalSimbotApi::class)
+        @OptIn(ExperimentalSimbotAPI::class)
         @get:JvmStatic
         public val messageSerializersModule: SerializersModule = SerializersModule {
             fun PolymorphicModuleBuilder<KookMessageElement<*>>.include() {

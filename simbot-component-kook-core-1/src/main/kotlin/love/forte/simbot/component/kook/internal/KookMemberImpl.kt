@@ -21,7 +21,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.JavaDuration
 import love.forte.simbot.component.kook.KookMember
@@ -76,7 +76,7 @@ internal class KookMemberImpl(
 
     override suspend fun guild(): KookGuildImpl = guildValue
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val roles: Items<KookMemberRoleImpl>
         get() = effectedItemsByFlow {
             flow {
@@ -135,15 +135,15 @@ internal class KookMemberImpl(
 
     override suspend fun mute(type: Int): Boolean = true.also { mute0(type, 0L) }
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override suspend fun mute(type: Int, duration: Duration): Boolean =
         true.also { mute0(type, duration.inWholeMilliseconds) }
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override suspend fun mute(type: Int, duration: JavaDuration): Boolean =
         true.also { mute0(type, duration.toMillis()) }
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override suspend fun mute(type: Int, time: Long, timeUnit: TimeUnit): Boolean =
         true.also { mute0(type, timeUnit.toMillis(time)) }
 

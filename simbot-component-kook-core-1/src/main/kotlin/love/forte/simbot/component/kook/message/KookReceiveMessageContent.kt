@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.message
 
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.action.DeleteSupport
 import love.forte.simbot.component.kook.bot.KookBot
@@ -271,7 +271,7 @@ private inline fun TextExtra.toMessages(contentElement: () -> List<Message.Eleme
 public fun Event<TextExtra>.toContent(isDirect: Boolean, bot: KookBot): KookReceiveMessageContent =
     KookReceiveMessageContent(isDirect, this, bot)
 
-@OptIn(ExperimentalSimbotApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 internal fun tryDecodeCardContent(content: String, logger: Logger): List<Message.Element<*>> {
     return runCatching {
         listOf(KookCardMessage(CardMessage.decode(content)))

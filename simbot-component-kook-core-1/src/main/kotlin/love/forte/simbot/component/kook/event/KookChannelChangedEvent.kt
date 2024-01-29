@@ -47,7 +47,7 @@ public abstract class KookChannelChangedEvent : KookSystemEvent(), ChangedEvent 
     /**
      * 事件涉及子频道所属的频道服务器。
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookGuild
 
     /**
@@ -97,7 +97,7 @@ public abstract class KookAddedChannelEvent : KookChannelChangedEvent(), Increas
     /**
      * 增加的频道。
      */
-    @JSTP
+    @STP
     abstract override suspend fun channel(): KookChannel
 
     /**
@@ -105,7 +105,7 @@ public abstract class KookAddedChannelEvent : KookChannelChangedEvent(), Increas
      *
      * @see channel
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookChannel = channel()
 
     /**
@@ -113,7 +113,7 @@ public abstract class KookAddedChannelEvent : KookChannelChangedEvent(), Increas
      *
      * @see channel
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookChannel = channel()
 
 
@@ -150,7 +150,7 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), Chang
     /**
      * 变更后的频道信息
      */
-    @JSTP
+    @STP
     abstract override suspend fun channel(): KookChannel
 
 
@@ -159,7 +159,7 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), Chang
      *
      * @see channel
      */
-    @JSTP
+    @STP
     override suspend fun organization(): Channel = channel()
 
     /**
@@ -167,13 +167,13 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent(), Chang
      *
      * @see channel
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookChannel = channel()
 
     /**
      * 恒为null
      */
-    @JSTP
+    @STP
     override suspend fun before(): Any? = null
 
     override val key: Event.Key<out KookUpdatedChannelEvent>
@@ -200,13 +200,13 @@ public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), Decre
     /**
      * 已经被删除的频道。
      */
-    @JSTP
+    @STP
     abstract override suspend fun before(): KookChannel
 
     /**
      * 始终为 null
      */
-    @JSTP
+    @STP
     override suspend fun after(): Any? = null
 
     override val key: Event.Key<out KookDeletedChannelEvent>
@@ -237,7 +237,7 @@ public abstract class KookCategoryChangedEvent : KookSystemEvent(), ChangedEvent
     /**
      * 事件涉及子频道所属的频道服务器。
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookGuild
 
     /**
@@ -286,7 +286,7 @@ public abstract class KookAddedCategoryEvent : KookCategoryChangedEvent(), Incre
     /**
      * 增加的频道分组。
      */
-    @JSTP
+    @STP
     public abstract suspend fun category(): KookChannelCategory
 
     /**
@@ -294,7 +294,7 @@ public abstract class KookAddedCategoryEvent : KookCategoryChangedEvent(), Incre
      *
      * @see category
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookChannelCategory = category()
 
 
@@ -331,7 +331,7 @@ public abstract class KookUpdatedCategoryEvent : KookCategoryChangedEvent(), Cha
     /**
      * 变更后的频道分组信息
      */
-    @JSTP
+    @STP
     public abstract suspend fun category(): KookChannelCategory
 
     /**
@@ -339,13 +339,13 @@ public abstract class KookUpdatedCategoryEvent : KookCategoryChangedEvent(), Cha
      *
      * @see category
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookChannelCategory = category()
 
     /**
      * 恒为null
      */
-    @JSTP
+    @STP
     override suspend fun before(): Any? = null
 
     override val key: Event.Key<out KookUpdatedCategoryEvent>
@@ -372,13 +372,13 @@ public abstract class KookDeletedCategoryEvent : KookCategoryChangedEvent(), Dec
     /**
      * 已经被删除的频道分组。
      */
-    @JSTP
+    @STP
     abstract override suspend fun before(): KookChannelCategory
 
     /**
      * 始终为 null
      */
-    @JSTP
+    @STP
     override suspend fun after(): Any? = null
 
     override val key: Event.Key<out KookDeletedCategoryEvent>

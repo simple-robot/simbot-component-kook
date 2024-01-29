@@ -111,7 +111,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      * @throws KookGuildNotExistsException 如果频道已经不存在
      */
-    @JSTP
+    @STP
     override suspend fun guild(): KookGuild
 
     /**
@@ -121,7 +121,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      * @see guild
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookGuild = guild()
 
     /**
@@ -131,7 +131,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
+    @ST
     override suspend fun send(message: Message): KookMessageReceipt
 
     /**
@@ -141,7 +141,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
+    @ST
     override suspend fun send(message: MessageContent): KookMessageReceipt
 
     /**
@@ -151,7 +151,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
+    @ST
     override suspend fun send(text: String): KookMessageReceipt
 
 
@@ -166,7 +166,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
+    @ST
     public suspend fun mute(type: Int): Boolean
 
     /**
@@ -178,7 +178,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
+    @ST
     public suspend fun mute(type: MuteType): Boolean = mute(type.value)
 
     /**
@@ -204,7 +204,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      */
     @JvmSynthetic
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     public suspend fun mute(type: Int, duration: Duration): Boolean
 
     /**
@@ -230,7 +230,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      */
     @JvmSynthetic
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     public suspend fun mute(type: MuteType, duration: Duration): Boolean = mute(type.value, duration)
 
     /**
@@ -256,7 +256,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      */
     @JvmSynthetic
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     public suspend fun mute(type: Int, duration: JavaDuration): Boolean
 
     /**
@@ -282,7 +282,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      */
     @JvmSynthetic
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     public suspend fun mute(type: MuteType, duration: JavaDuration): Boolean = mute(type.value, duration)
 
     /**
@@ -307,8 +307,8 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
-    @ExperimentalSimbotApi
+    @ST
+    @ExperimentalSimbotAPI
     public suspend fun mute(type: Int, time: Long, timeUnit: TimeUnit): Boolean
 
     /**
@@ -333,8 +333,8 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      *
      */
-    @JST
-    @ExperimentalSimbotApi
+    @ST
+    @ExperimentalSimbotAPI
     public suspend fun mute(type: MuteType, time: Long, timeUnit: TimeUnit): Boolean = mute(type.value, time, timeUnit)
 
     /**
@@ -346,7 +346,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResultException API 请求过程中产生的异常
      * @throws ApiResponseException API 请求过程中产生的异常
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override suspend fun mute(duration: Duration): Boolean = mute(DEFAULT_MUTE_TYPE, duration)
 
     /**
@@ -358,7 +358,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResultException API 请求过程中产生的异常
      * @throws ApiResponseException API 请求过程中产生的异常
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override suspend fun mute(time: Long, timeUnit: TimeUnit): Boolean = mute(DEFAULT_MUTE_TYPE, time, timeUnit)
 
     /**
@@ -371,7 +371,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResponseException API 请求过程中产生的异常
      */
     @Api4J
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override fun muteBlocking(duration: JavaDuration): Boolean =
         runInNoScopeBlocking { mute(DEFAULT_MUTE_TYPE, duration) }
 
@@ -386,7 +386,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResultException API 请求过程中产生的异常
      * @throws ApiResponseException API 请求过程中产生的异常
      */
-    @JST
+    @ST
     public suspend fun unmute(type: Int): Boolean
 
     /**
@@ -399,7 +399,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      * @throws ApiResultException API 请求过程中产生的异常
      * @throws ApiResponseException API 请求过程中产生的异常
      */
-    @JST
+    @ST
     public suspend fun unmute(type: MuteType): Boolean = unmute(type.value)
 
     /**
@@ -417,7 +417,7 @@ public interface KookMember : GuildMember, CoroutineScope {
      *
      * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val roles: Items<KookMemberRole>
 
 

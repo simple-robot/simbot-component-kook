@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.role
 
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.JST
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.kook.api.ApiResponseException
@@ -32,7 +32,7 @@ import love.forte.simbot.kook.api.ApiResultException
  * 仅提供了 `name` 属性。如果希望指定其他属性，考虑在创建后使用 [KookGuildRole.updater] 进行属性更新。
  *
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public interface KookGuildRoleCreator {
 
     //region DSL API
@@ -57,7 +57,7 @@ public interface KookGuildRoleCreator {
      *
      * @return 创建的角色
      */
-    @JST
+    @ST
     public suspend fun create(): KookGuildRole
 }
 

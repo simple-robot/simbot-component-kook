@@ -39,11 +39,11 @@ kotlin {
     explicitApi()
     applyDefaultHierarchyTemplate()
 
-//    sourceSets.configureEach {
-//        languageSettings {
-//            optIn("love.forte.simbot.qguild.KookInternalApi")
-//        }
-//    }
+    sourceSets.configureEach {
+        languageSettings {
+            optIn("love.forte.simbot.kook.ExperimentalKookApi")
+        }
+    }
 
     configKotlinJvm()
 
@@ -57,7 +57,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(libs.simbot.api)
+            compileOnly(libs.simbot.api)
             api(project(":simbot-component-kook-stdlib"))
             compileOnly(libs.simbot.common.annotations)
             // ktor
@@ -71,8 +71,9 @@ kotlin {
             implementation(kotlin("reflect"))
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.kotlinx.serialization.json)
-            api(libs.simbot.core)
-            api(libs.simbot.common.core)
+            implementation(libs.simbot.api)
+            implementation(libs.simbot.core)
+            implementation(libs.simbot.common.core)
         }
 
         jvmTest.dependencies {
@@ -86,10 +87,12 @@ kotlin {
         }
 
         jsMain.dependencies {
+            implementation(libs.simbot.api)
             api(libs.simbot.common.annotations)
         }
 
         nativeMain.dependencies {
+            implementation(libs.simbot.api)
             api(libs.simbot.common.annotations)
         }
 

@@ -77,19 +77,19 @@ public interface KookUserChat : Stranger, Contact, DeleteSupport {
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JST
+    @ST
     override suspend fun send(message: Message): KookMessageReceipt
 
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JST
+    @ST
     override suspend fun send(text: String): KookMessageCreatedReceipt
 
     /**
      * 向当前好友（私聊会话）发送消息。
      */
-    @JST
+    @ST
     override suspend fun send(message: MessageContent): KookMessageReceipt
 
     /**

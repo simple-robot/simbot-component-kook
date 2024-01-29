@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.role
 
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.ApiResultException
@@ -48,7 +48,7 @@ import love.forte.simbot.kook.api.ApiResultException
  *
  * @author ForteScarlet
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public interface KookMemberRole : KookRole {
 
     /**

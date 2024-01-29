@@ -20,7 +20,7 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.Api4J
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMessage
 import love.forte.simbot.definition.ResourceContainer
@@ -96,7 +96,7 @@ public sealed class KookAttachmentMessage<M : KookAttachmentMessage<M>> :
          * 其他情况则会直接使用 [KookAttachment]。
          *
          */
-        @OptIn(ExperimentalSimbotApi::class)
+        @OptIn(ExperimentalSimbotAPI::class)
         @JvmStatic
         @JvmName("of")
         public fun Attachments.asMessage(): KookAttachmentMessage<*> = when (type.lowercase()) {
@@ -154,7 +154,7 @@ public class KookAttachment private constructor(@SerialName("attachment") privat
  */
 @Serializable
 @SerialName("kook.attachment.image")
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public class KookAttachmentImage private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<KookAttachmentImage>(), Image<KookAttachmentImage> {
     internal constructor(attachments: Attachments) : this(attachments.toMessageAttachment())
@@ -187,7 +187,7 @@ public class KookAttachmentImage private constructor(@SerialName("attachment") p
  */
 @Serializable
 @SerialName("kook.attachment.file")
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public class KookAttachmentFile private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<KookAttachmentFile>() {
     internal constructor(attachments: Attachments) : this(attachments.toMessageAttachment())
@@ -218,7 +218,7 @@ public class KookAttachmentFile private constructor(@SerialName("attachment") pr
  */
 @Serializable
 @SerialName("kook.attachment.video")
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public class KookAttachmentVideo private constructor(@SerialName("attachment") private val _attachment: MessageAttachments) :
     KookAttachmentMessage<KookAttachmentVideo>() {
     internal constructor(attachments: Attachments) : this(attachments.toMessageAttachment())

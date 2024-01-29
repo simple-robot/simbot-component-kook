@@ -137,14 +137,14 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     /**
      * 等同于 [KookGuild.members]
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val roles: Items<KookGuildRole>
 
     // region send api
     /**
      * 根据 [SendChannelMessageApi] api 构建并发送消息。
      */
-    @JST
+    @ST
     public suspend fun send(request: SendChannelMessageApi): KookMessageReceipt {
         return request.requestDataBy(bot).asReceipt(false, bot)
     }
@@ -152,7 +152,7 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     /**
      * 根据 [SendChannelMessageApi] api 构建并发送消息。
      */
-    @JST
+    @ST
     public suspend fun send(
         type: Int,
         content: String,
@@ -170,7 +170,7 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
      *
      * @see SendChannelMessageApi.tempTargetId
      */
-    @JST
+    @ST
     public suspend fun send(text: String, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt {
         return send(
             MessageType.TEXT.type,
@@ -185,7 +185,7 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
      * @see SendChannelMessageApi.tempTargetId
      * @see SendChannelMessageApi.quote
      */
-    @JST
+    @ST
     public suspend fun send(message: Message, quote: ID? = null, tempTargetId: ID? = null): KookMessageReceipt
 
     /**
@@ -194,7 +194,7 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
      * @see SendChannelMessageApi.tempTargetId
      * @see SendChannelMessageApi.quote
      */
-    @JST
+    @ST
     public suspend fun send(
         message: MessageContent,
         quote: ID? = null,
@@ -205,7 +205,7 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     /**
      * 发送纯文本消息。
      */
-    @JST
+    @ST
     override suspend fun send(text: String): KookMessageReceipt {
         return send(
             MessageType.TEXT.type,
@@ -217,13 +217,13 @@ public interface KookChannel : KookChannelBased, Channel, CoroutineScope {
     /**
      * 发送消息。
      */
-    @JST
+    @ST
     override suspend fun send(message: Message): KookMessageReceipt = send(message, null)
 
     /**
      * 发送消息。
      */
-    @JST
+    @ST
     override suspend fun send(message: MessageContent): KookMessageReceipt = send(message, null)
 
     // endregion

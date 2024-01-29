@@ -23,6 +23,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import love.forte.simbot.common.apidefinition.ApiDefinition
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.Kook
 import love.forte.simbot.kook.util.buildUrl
 
@@ -76,7 +77,8 @@ public interface KookApi<T : Any> : ApiDefinition<T> {
         public const val DEFAULT_START_PAGE: Int = 1
 
         @OptIn(ExperimentalSerializationApi::class)
-        internal val DEFAULT_JSON = Json {
+        @InternalKookApi
+        public val DEFAULT_JSON: Json = Json {
             isLenient = true
             encodeDefaults = true
             ignoreUnknownKeys = true

@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.message
 
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.Simbot
 import love.forte.simbot.Timestamp
@@ -146,7 +146,7 @@ public class KookApiRequestedReceipt(
 /**
  * 多条消息发送后的回执，其中会包含多个 [KookMessageReceipt]。
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public class KookAggregatedMessageReceipt private constructor(
     override val bot: KookBot,
     private val aggregatedMessageReceipt: AggregatedMessageReceipt,

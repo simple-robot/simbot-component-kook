@@ -33,10 +33,11 @@ useK2()
 configJavaCompileWithModule("simbot.component.kook.stdlib")
 apply(plugin = "kook-multiplatform-maven-publish")
 
-configJsTestTasks()
+//configJsTestTasks()
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 kotlin {
@@ -69,8 +70,6 @@ kotlin {
             api(libs.simbot.common.atomic)
             api(libs.kotlinx.coroutines.core)
             api(libs.ktor.client.ws)
-            api(libs.ktor.client.contentNegotiation)
-            api(libs.ktor.serialization.kotlinx.json)
             api(libs.kotlinx.serialization.json)
         }
 

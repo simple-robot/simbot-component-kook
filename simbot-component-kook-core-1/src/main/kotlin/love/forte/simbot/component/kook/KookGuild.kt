@@ -120,7 +120,7 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     /**
      * 尝试根据指定ID获取匹配的 [KookChannel]。未找到时得到null。
      */
-    @JST(blockingBaseName = "getChannel", blockingSuffix = "", asyncBaseName = "getChannel")
+    @ST(blockingBaseName = "getChannel", blockingSuffix = "", asyncBaseName = "getChannel")
     override suspend fun channel(id: ID): KookChannel?
 
     /**
@@ -136,7 +136,7 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
      *
      * @see channel
      */
-    @JST(blockingBaseName = "getChild", blockingSuffix = "", asyncBaseName = "getChild")
+    @ST(blockingBaseName = "getChild", blockingSuffix = "", asyncBaseName = "getChild")
     override suspend fun child(id: ID): KookChannel? = channel(id)
 
     // categories
@@ -144,14 +144,14 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     /**
      * 得到当前频道下所有的分组型频道。
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     public val categories: Items<KookChannelCategory>
 
 
     /**
      * 尝试根据ID获取匹配的分类对象。
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     public fun getCategory(id: ID): KookChannelCategory?
 
     // members
@@ -164,7 +164,7 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     /**
      * 根据ID寻找一个此频道下的成员。
      */
-    @JST(blockingBaseName = "getMember", blockingSuffix = "", asyncBaseName = "getMember")
+    @ST(blockingBaseName = "getMember", blockingSuffix = "", asyncBaseName = "getMember")
     override suspend fun member(id: ID): KookMember?
 
     /**
@@ -172,7 +172,7 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
      *
      * @throws KookMemberNotExistsException 如果无法寻找到此成员时
      */
-    @JSTP
+    @STP
     override suspend fun owner(): KookMember
 
 
@@ -186,11 +186,11 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
      * @see KookRole
      * @see KookGuildRole
      */
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val roles: Items<KookGuildRole>
 
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override fun roleCreator(): KookGuildRoleCreator
     //endregion
 

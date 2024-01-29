@@ -19,7 +19,7 @@ package love.forte.simbot.component.kook.role
 
 import love.forte.plugin.suspendtrans.annotation.JvmAsync
 import love.forte.plugin.suspendtrans.annotation.JvmBlocking
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.JST
 import love.forte.simbot.component.kook.KookGuild
@@ -105,8 +105,8 @@ import love.forte.simbot.kook.objects.Permissions
  *
  * @author ForteScarlet
  */
-@ExperimentalSimbotApi
-@JST
+@ExperimentalSimbotAPI
+@ST
 public interface KookGuildRole : KookRole {
 
     /**
@@ -181,7 +181,7 @@ public interface KookGuildRole : KookRole {
  *
  * @return receiver 自身
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public suspend inline fun <R : KookGuildRole> R.update(block: KookGuildRoleUpdater.() -> Unit): R {
     updater().also(block).update()
     return this
@@ -193,7 +193,7 @@ public suspend inline fun <R : KookGuildRole> R.update(block: KookGuildRoleUpdat
  * @author ForteScarlet
  *
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public interface KookGuildRoleUpdater {
     //region DSL API
     /**

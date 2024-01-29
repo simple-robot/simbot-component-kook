@@ -82,43 +82,43 @@ public abstract class KookMemberChangedEvent : KookSystemEvent(), MemberChangedE
     /**
      * 本次变更涉及的频道成员信息。同 [user]
      */
-    @JSTP
+    @STP
     abstract override suspend fun member(): KookMember
 
     /**
      * 本次变更涉及的频道成员信息。同 [member]
      */
-    @JSTP
+    @STP
     override suspend fun user(): KookMember = member()
 
     /**
      * 可能存在的变更前成员信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun before(): KookMember?
 
     /**
      * 可能存在的变更后成员信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun after(): KookMember?
 
     /**
      * 变更成员所处组织。
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): Organization
 
     /**
      * 变更成员所处组织。同 [source].
      */
-    @JSTP
+    @STP
     override suspend fun organization(): Organization = source()
 
     /**
      * 可能存在的变更操作者。
      */
-    @JSTP
+    @STP
     abstract override suspend fun operator(): KookMember?
 
     public companion object Key : BaseEventKey<KookMemberChangedEvent>(
@@ -142,14 +142,14 @@ public abstract class KookMemberChannelChangedEvent : KookMemberChangedEvent() {
     /**
      * 事件涉及的频道信息。同 [organization].
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookChannel
 
 
     /**
      * 事件涉及的频道信息。同 [source].
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookChannel = source()
 
 
@@ -183,19 +183,19 @@ public abstract class KookMemberExitedChannelEvent : KookMemberChannelChangedEve
      * 此成员已经被移除自频道，因此 [before] 不可用于执行禁言等操作，
      * 也不会存在于当前频道成员中。
      */
-    @JSTP
+    @STP
     override suspend fun before(): KookMember = member()
 
     /**
      * 成员离开后。始终为null。
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookMember? = null
 
     /**
      * 成员离开频道事件的操作者始终为null （无法确定操作者）。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
     /**
@@ -230,25 +230,25 @@ public abstract class KookMemberJoinedChannelEvent : KookMemberChannelChangedEve
     /**
      * 事件涉及的频道信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookChannel
 
     /**
      * 增加的成员。
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookMember = member()
 
     /**
      * 始终为null。
      */
-    @JSTP
+    @STP
     override suspend fun before(): KookMember? = null
 
     /**
      * KOOK 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
     /**
@@ -280,13 +280,13 @@ public abstract class KookMemberGuildChangedEvent : KookMemberChangedEvent() {
     /**
      * 涉及的相关频道服务器。同 [organization].
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookGuild
 
     /**
      * 涉及的相关频道服务器。同 [source].
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookGuild = source()
 
     abstract override val key: Event.Key<out KookMemberGuildChangedEvent>
@@ -315,7 +315,7 @@ public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent()
     /**
      * 离开的成员。
      */
-    @JSTP
+    @STP
     abstract override suspend fun member(): KookMember
 
     /**
@@ -323,38 +323,38 @@ public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent()
      *
      * @see member
      */
-    @JSTP
+    @STP
     override suspend fun before(): KookMember = member()
 
     /**
      * 涉及的频道服务器。
      */
-    @JSTP
+    @STP
     abstract override suspend fun guild(): KookGuild
 
     /**
      * 涉及的相关频道服务器。同 [source].
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookGuild = guild()
 
     /**
      * 成员离开后，始终为null。
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookMember? = null
 
     /**
      * KOOK 群员离开频道事件的操作者始终为null （无法确定操作者）。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
     /**
      * 涉及的频道服务器。同 [guild]
      * @see guild
      */
-    @JSTP
+    @STP
     override suspend fun source(): KookGuild = guild()
 
     /**
@@ -389,25 +389,25 @@ public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent()
     /**
      * 涉及的相关频道服务器。
      */
-    @JSTP
+    @STP
     abstract override suspend fun guild(): KookGuild
 
     /**
      * 涉及的相关频道服务器。
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookGuild = guild()
 
     /**
      * 涉及的相关频道服务器。同 [guild]
      */
-    @JSTP
+    @STP
     override suspend fun source(): KookGuild = guild()
 
     /**
      * 加入的成员。
      */
-    @JSTP
+    @STP
     abstract override suspend fun member(): KookMember
 
     /**
@@ -415,19 +415,19 @@ public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent()
      *
      * @see member
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookMember = member()
 
     /**
      * 成员加入前，始终为null。
      */
-    @JSTP
+    @STP
     override suspend fun before(): KookMember? = null
 
     /**
      * KOOK 群员进入频道事件的操作者始终为null （无法确定操作者）。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
     /**
@@ -471,25 +471,25 @@ public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), GuildEv
     /**
      * 涉及的相关频道服务器。
      */
-    @JSTP
+    @STP
     abstract override suspend fun guild(): KookGuild
 
     /**
      * 涉及的相关频道服务器。
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookGuild = guild()
 
     /**
      * 涉及的相关频道服务器。同 [guild]
      */
-    @JSTP
+    @STP
     override suspend fun source(): KookGuild = guild()
 
     /**
      * 已经发生变更后的成员。
      */
-    @JSTP
+    @STP
     abstract override suspend fun member(): KookMember
 
     /**
@@ -497,19 +497,19 @@ public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), GuildEv
      *
      * @see member
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookMember = member()
 
     /**
      * 发生变更前的成员。
      */
-    @JSTP
+    @STP
     abstract override suspend fun before(): KookMember
 
     /**
      * 无法得知操作者，始终为 `null`。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
 
@@ -542,13 +542,13 @@ public abstract class KookBotMemberChangedEvent : KookMemberChangedEvent() {
     /**
      * 涉及的相关频道服务器。同 [organization].
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookGuild
 
     /**
      * 涉及的相关频道服务器。同 [source].
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookGuild = source()
 
 
@@ -576,19 +576,19 @@ public abstract class KookBotSelfExitedGuildEvent : KookBotMemberChangedEvent(),
     /**
      * 即bot自身在频道服务器内的信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun before(): KookMember
 
     /**
      * 始终为null。
      */
-    @JSTP
+    @STP
     override suspend fun after(): KookMember? = null
 
     /**
      * KOOK bot离开频道事件的操作者始终为null （无法确定操作者）。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
 
@@ -625,25 +625,25 @@ public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent(),
     /**
      * 涉及的相关频道服务器。
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookGuild
 
     /**
      * 即bot自身在频道服务器内的信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun after(): KookMember
 
     /**
      * 始终为null。
      */
-    @JSTP
+    @STP
     override suspend fun before(): KookMember? = null
 
     /**
      * KOOK bot进入频道事件的操作者始终为null （无法确定操作者）。
      */
-    @JSTP
+    @STP
     override suspend fun operator(): KookMember? = null
 
 
@@ -696,7 +696,7 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
      *
      * @see GuildMemberOnlineStatusChangedEventBody.userId
      */
-    @JSTP
+    @STP
     override suspend fun source(): String = sourceBody.userId
 
 
@@ -726,13 +726,13 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
     /**
      * 变更前的在线状态。相当于 `!isOnline`.
      */
-    @JSTP
+    @STP
     override suspend fun before(): Boolean = !isOnline
 
     /**
      * 变更后的在线状态。同 [isOnline].
      */
-    @JSTP
+    @STP
     override suspend fun after(): Boolean = isOnline
 
     /**

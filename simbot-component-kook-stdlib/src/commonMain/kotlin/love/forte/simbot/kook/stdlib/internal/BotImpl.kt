@@ -20,9 +20,7 @@ package love.forte.simbot.kook.stdlib.internal
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -144,10 +142,6 @@ internal class BotImpl(
     private fun HttpClientConfig<*>.configWsClient(
         engineConfiguration: BotConfiguration.EngineConfiguration?
     ) {
-        install(ContentNegotiation) {
-            json(defaultApiDecoder)
-        }
-
         install(HttpRequestRetry) {
             maxRetries = 3
         }

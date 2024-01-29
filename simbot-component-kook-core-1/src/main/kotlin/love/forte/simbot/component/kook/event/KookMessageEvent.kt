@@ -70,7 +70,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
      *
      * 即向此消息事件的发送者进行**针对性的**消息回复。
      */
-    @JST
+    @ST
     abstract override suspend fun reply(message: Message): KookMessageReceipt
 
     /**
@@ -78,7 +78,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
      *
      * 即向此消息事件的发送者进行**针对性的**消息回复。
      */
-    @JST
+    @ST
     abstract override suspend fun reply(text: String): KookMessageReceipt
 
     /**
@@ -86,7 +86,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
      *
      * 即向此消息事件的发送者进行**针对性的**消息回复。
      */
-    @JST
+    @ST
     abstract override suspend fun reply(message: MessageContent): KookMessageReceipt
 
     /**
@@ -107,7 +107,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
         /**
          * 消息事件发生的频道。
          */
-        @JSTP
+        @STP
         abstract override suspend fun source(): KookChannel
 
 
@@ -141,7 +141,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
         /**
          * 消息事件发生的对话。
          */
-        @JSTP
+        @STP
         abstract override suspend fun source(): KookUserChat
 
 
@@ -172,25 +172,25 @@ public abstract class KookChannelMessageEvent : KookMessageEvent.Channel(), Chan
     /**
      * 消息的发送者。不会是bot自己。
      */
-    @JSTP
+    @STP
     abstract override suspend fun author(): KookMember
 
     /**
      * 消息产生的频道。
      */
-    @JSTP
+    @STP
     abstract override suspend fun channel(): KookChannel
 
     /**
      * 消息产生的频道。同 [channel].
      */
-    @JSTP
+    @STP
     override suspend fun source(): KookChannel = channel()
 
     /**
      * 消息产生的频道。同 [channel].
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookChannel = channel()
 
     /**
@@ -217,7 +217,7 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
      *
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
-    @JSTP
+    @STP
     abstract override suspend fun user(): KookUserChat
 
     /**
@@ -225,7 +225,7 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
      *
      * 会在获取的时候通过api进行查询，没有内部缓存。
      */
-    @JSTP
+    @STP
     override suspend fun source(): KookUserChat = user()
 
 
@@ -253,29 +253,29 @@ public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(
     /**
      * 发生事件的频道。
      */
-    @JSTP
+    @STP
     abstract override suspend fun channel(): KookChannel
 
 
-    @JSTP
+    @STP
     override suspend fun source(): KookChannel = channel()
 
     /**
      * 发生事件的频道。同 [channel]。
      */
-    @JSTP
+    @STP
     override suspend fun organization(): KookChannel = channel()
 
     /**
      * 消息发送者，也就是bot自身的信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun member(): KookMember
 
     /**
      * 消息发送者，也就是bot自身的信息。同 [member].
      */
-    @JSTP
+    @STP
     override suspend fun user(): KookMember = member()
 
 
@@ -302,7 +302,7 @@ public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person() {
     /**
      * 发生事件的私聊会话。
      */
-    @JSTP
+    @STP
     abstract override suspend fun source(): KookUserChat
 
 

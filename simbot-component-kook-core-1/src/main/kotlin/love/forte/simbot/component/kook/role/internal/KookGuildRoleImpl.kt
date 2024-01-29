@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.role.internal
 
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
@@ -38,7 +38,7 @@ import love.forte.simbot.literal
  *
  * @author ForteScarlet
  */
-@OptIn(ExperimentalSimbotApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 internal class KookGuildRoleImpl(
     private val baseBot: KookBotImpl,
     override val guild: KookGuildImpl,
@@ -114,7 +114,7 @@ internal class KookGuildRoleImpl(
 }
 
 
-@OptIn(ExperimentalSimbotApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 private class KookGuildRoleUpdaterImpl(
     private val baseBot: KookBotImpl,
     private val guildId: String,

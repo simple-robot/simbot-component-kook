@@ -19,7 +19,7 @@ package love.forte.simbot.component.kook.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.component.kook.message.KookCardMessage.Key.asMessage
 import love.forte.simbot.kook.objects.card.Card
 import love.forte.simbot.kook.objects.card.CardMessageBuilder
@@ -33,7 +33,7 @@ import love.forte.simbot.kook.objects.card.CardMessage as KkCardMessage
  * 将 [Card] 作为消息使用。
  * @author ForteScarlet
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 @SerialName("kook.card")
 @Serializable
 public data class KookCardMessage(public val cards: KkCardMessage) : KookMessageElement<KookCardMessage> {
@@ -47,7 +47,7 @@ public data class KookCardMessage(public val cards: KkCardMessage) : KookMessage
          * 将 [Card] 作为 [KookCardMessage] 使用。
          */
         @JvmStatic
-        @ExperimentalSimbotApi
+        @ExperimentalSimbotAPI
         public fun KkCardMessage.asMessage(): KookCardMessage = KookCardMessage(this)
     }
 }
@@ -58,7 +58,7 @@ public data class KookCardMessage(public val cards: KkCardMessage) : KookMessage
  * @see KookCardMessage
  * @see buildCardMessage
  */
-@ExperimentalSimbotApi
+@ExperimentalSimbotAPI
 public inline fun kookCard(action: CardMessageBuilder.() -> Unit): KookCardMessage {
     return buildCardMessage(action).asMessage()
 }

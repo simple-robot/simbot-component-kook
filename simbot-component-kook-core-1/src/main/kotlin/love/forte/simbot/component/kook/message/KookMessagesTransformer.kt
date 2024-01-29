@@ -19,7 +19,7 @@ package love.forte.simbot.component.kook.message
 
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.streams.*
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAggregatedMessageReceipt.Companion.merge
@@ -133,7 +133,7 @@ public suspend fun Message.sendToDirectByChatCode(
  *
  * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
  */
-@OptIn(ExperimentalSimbotApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 private suspend fun Message.send0(
     bot: KookBot,
     targetId: String,
@@ -270,7 +270,7 @@ private suspend fun Message.send0(
  * 不需要处理 [KookApiMessage], 外层自行处理。
  *
  */
-@OptIn(ExperimentalSimbotApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 private suspend inline fun Message.Element<*>.elementToRequest(
     bot: KookBot,
 

@@ -23,6 +23,7 @@ package love.forte.simbot.kook.stdlib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runInterruptible
+import love.forte.simbot.annotations.Api4J
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventExtra
 import org.jetbrains.annotations.Blocking
@@ -36,6 +37,7 @@ import java.util.concurrent.CompletionStage
  *
  * [block] 最终会在 [Dispatchers.IO] 的调度器下使用 [runInterruptible] 执行。
  */
+@Api4J
 public fun interface JBlockEventProcessor : EventProcessor {
     /**
      * 处理事件。
@@ -56,6 +58,7 @@ public fun interface JBlockEventProcessor : EventProcessor {
  *
  *  [block] 最终会在 [Dispatchers.IO] 的调度器下使用 [runInterruptible] 执行。
  */
+@Api4J
 public fun interface TypedJBlockEventProcessor<E : EventExtra> {
     /**
      * 处理事件。
@@ -68,12 +71,25 @@ public fun interface TypedJBlockEventProcessor<E : EventExtra> {
 /**
  * 构建一个阻塞式的 [EventProcessor]
  */
+@Api4J
 public fun block(function: JBlockEventProcessor): EventProcessor = function
+
+/**
+ * 构建一个 [Event.type] 为 [type] 的阻塞式 [EventProcessor]
+ */
+@Api4J
+public fun block(type: Event.Type, function: JBlockEventProcessor): EventProcessor =
+    block { event, raw ->
+        if (event.type == type) {
+            function.block(event, raw)
+        }
+    }
 
 /**
  * 构建一个处理目标类型 [E] 的阻塞式 [EventProcessor]
  */
 @Suppress("UNCHECKED_CAST")
+@Api4J
 public fun <E : EventExtra> block(type: Class<E>, function: TypedJBlockEventProcessor<E>): EventProcessor =
     block { event, raw ->
         if (type.isInstance(event.extra)) {
@@ -87,6 +103,7 @@ public fun <E : EventExtra> block(type: Class<E>, function: TypedJBlockEventProc
  *
  * [block] 最终会在 [Dispatchers.IO] 的调度器下使用 [runInterruptible] 执行。
  */
+@Api4J
 public fun interface JAsyncEventProcessor : EventProcessor {
     /**
      * 处理事件。
@@ -107,6 +124,7 @@ public fun interface JAsyncEventProcessor : EventProcessor {
  *
  *  [block] 最终会在 [Dispatchers.IO] 的调度器下使用 [runInterruptible] 执行。
  */
+@Api4J
 public fun interface TypedJAsyncEventProcessor<E : EventExtra> {
     /**
      * 处理事件。
@@ -119,12 +137,27 @@ public fun interface TypedJAsyncEventProcessor<E : EventExtra> {
 /**
  * 构建一个异步式的 [EventProcessor]
  */
+@Api4J
 public fun async(function: JAsyncEventProcessor): EventProcessor = function
+
+/**
+ * 构建一个 [Event.type] 为 [type] 的 的异步式 [EventProcessor]
+ */
+@Api4J
+public fun async(type: Event.Type, function: JAsyncEventProcessor): EventProcessor =
+    async { event, raw ->
+        if (event.type == type) {
+            function.async(event, raw)
+        } else {
+            CompletableFuture.completedStage(null)
+        }
+    }
 
 /**
  * 构建一个处理目标类型 [E] 的异步式 [EventProcessor]
  */
 @Suppress("UNCHECKED_CAST")
+@Api4J
 public fun <E : EventExtra> async(type: Class<E>, function: TypedJAsyncEventProcessor<E>): EventProcessor =
     async { event, raw ->
         if (type.isInstance(event.extra)) {
@@ -133,3 +166,7 @@ public fun <E : EventExtra> async(type: Class<E>, function: TypedJAsyncEventProc
             CompletableFuture.completedStage(null)
         }
     }
+
+private fun b() {
+
+}

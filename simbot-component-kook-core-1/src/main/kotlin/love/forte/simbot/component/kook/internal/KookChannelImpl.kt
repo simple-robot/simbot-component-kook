@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.ID
 import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.component.kook.*
@@ -155,7 +155,7 @@ internal class KookChannelImpl(
         return send(request)
     }
 
-    @ExperimentalSimbotApi
+    @ExperimentalSimbotAPI
     override val roles: Items<KookGuildRole>
         get() = guildValue.roles
 

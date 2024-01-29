@@ -54,7 +54,7 @@ public abstract class KookMessagePinEvent : KookChannelChangedEvent(),
     /**
      * 此事件涉及的频道信息。
      */
-    @JSTP
+    @STP
     abstract override suspend fun channel(): KookChannel
 
 
@@ -84,14 +84,14 @@ public abstract class KookMessagePinEvent : KookChannelChangedEvent(),
      * 变更前ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
      * 有值时同 [msgId].
      */
-    @JSTP
+    @STP
     abstract override suspend fun before(): ID?
 
     /**
      * 变更后ID。如果此事件是 [KookUnpinnedMessageEvent], 则有值，否则为null。
      * 有值时同 [msgId].
      */
-    @JSTP
+    @STP
     abstract override suspend fun after(): ID?
 
 
@@ -100,7 +100,7 @@ public abstract class KookMessagePinEvent : KookChannelChangedEvent(),
     /**
      * 通过 [msgId] 查询这条被置顶的消息。
      */
-    @JST
+    @ST
     public abstract suspend fun queryMsg(): MessageContent
 //        val messageView = GetChannelMessageViewApi.create(msgId).requestDataBy(bot)
 //        return messageView.toContent(bot)
