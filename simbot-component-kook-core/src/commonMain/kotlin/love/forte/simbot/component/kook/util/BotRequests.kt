@@ -21,6 +21,9 @@ package love.forte.simbot.component.kook.util
 import io.ktor.client.statement.*
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.kook.api.*
+import love.forte.simbot.kook.stdlib.requestBy
+import love.forte.simbot.kook.stdlib.requestDataBy
+import love.forte.simbot.kook.stdlib.requestResultBy
 import love.forte.simbot.kook.stdlib.requestTextBy
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic

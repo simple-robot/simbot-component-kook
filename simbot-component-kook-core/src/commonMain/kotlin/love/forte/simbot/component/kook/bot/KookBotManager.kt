@@ -18,10 +18,8 @@
 package love.forte.simbot.component.kook.bot
 
 import kotlinx.coroutines.Job
-import love.forte.simbot.bot.BotManager
-import love.forte.simbot.bot.ConflictBotException
-import love.forte.simbot.bot.SerializableBotConfiguration
-import love.forte.simbot.bot.UnsupportedBotConfigurationException
+import love.forte.simbot.bot.*
+import love.forte.simbot.common.coroutines.mergeWith
 import love.forte.simbot.common.function.ConfigurerFunction
 import love.forte.simbot.common.function.invokeWith
 import love.forte.simbot.component.Component
@@ -93,7 +91,7 @@ public interface KookBotRegistrar {
  *
  * @author ForteScarlet
  */
-public abstract class KookBotManager : BotManager, KookBotRegistrar {
+public abstract class KookBotManager : JobBasedBotManager(), KookBotRegistrar {
     protected abstract val component: Component
     protected abstract val coroutineContext: CoroutineContext
     public abstract val configuration: KookBotManagerConfiguration
@@ -133,7 +131,8 @@ public abstract class KookBotManager : BotManager, KookBotRegistrar {
                 it.coroutineContext = context.applicationConfiguration.coroutineContext.minusKey(Job)
                 configurer.invokeWith(it)
             }
-            // TODO merge config
+            // merge config
+            config.coroutineContext = config.coroutineContext.mergeWith(context.applicationConfiguration.coroutineContext)
 
             return KookBotManagerImpl(context.eventDispatcher, config, component)
         }

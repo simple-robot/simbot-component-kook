@@ -17,33 +17,32 @@
 
 package love.forte.simbot.component.kook.message
 
+import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
-import io.ktor.utils.io.streams.*
+import io.ktor.client.statement.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.launch
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
-import love.forte.simbot.SimbotIllegalArgumentException
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAggregatedMessageReceipt.Companion.merge
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.ExperimentalKookApi
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.api.KookApi
 import love.forte.simbot.kook.api.asset.CreateAssetApi
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
 import love.forte.simbot.kook.api.message.SendDirectMessageApi
 import love.forte.simbot.kook.api.message.SendMessageResult
 import love.forte.simbot.kook.messages.MessageType
+import love.forte.simbot.kook.objects.Attachments
 import love.forte.simbot.kook.objects.kmd.AtTarget
 import love.forte.simbot.kook.objects.kmd.KMarkdownBuilder
-import love.forte.simbot.literal
+import love.forte.simbot.kook.stdlib.Bot
 import love.forte.simbot.message.*
 import love.forte.simbot.resource.ByteArrayResource
-import love.forte.simbot.resources.ByteArrayResource
-import love.forte.simbot.resources.FileResource
-import love.forte.simbot.resources.PathResource
-import love.forte.simbot.resources.URLResource
-import love.forte.simbot.utils.view.isNotEmpty
-import java.net.URL
+import love.forte.simbot.resource.Resource
 
 
 private fun createRequest(
@@ -136,7 +135,7 @@ public suspend fun Message.sendToDirectByChatCode(
  *
  * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
  */
-@OptIn(ExperimentalSimbotAPI::class, ExperimentalKookApi::class)
+@OptIn(ExperimentalSimbotAPI::class)
 private suspend fun Message.send0(
     bot: KookBot,
     targetId: String,
@@ -193,7 +192,7 @@ private suspend fun Message.send0(
                 }
             }
 
-            suspend fun process(isSingle: Boolean, message: Message.Element<*>) {
+            suspend fun process(isSingle: Boolean, message: Message.Element) {
                 when (message) {
                     is KookApiMessage -> {
                         liquidationKmd()
@@ -245,7 +244,7 @@ private suspend fun Message.send0(
         return if (this is SendMessageResult) {
             this.asReceipt(false, bot)
         } else {
-            KookApiRequestedReceipt(this, false, bot)
+            KookApiRequestedReceipt(this, false)
         }
     }
 
@@ -259,7 +258,7 @@ private suspend fun Message.send0(
         }
 
         else -> {
-            requests.map { req -> req().requestDataBy(bot).toReceipt() }.merge(bot = bot)
+            requests.map { req -> req().requestDataBy(bot).toReceipt() }.merge()
         }
     }
 }
@@ -312,7 +311,7 @@ private suspend inline fun Message.Element.elementToRequest(
 
         is KookMessageElement -> when (message) {
             // 媒体资源
-            is KookAssetMessage<*> -> doRequest(message.type, message.asset.url)
+            is KookAssetMessage -> doRequest(message.type, message.asset.url)
             // KMarkdown
             is KookKMarkdownMessage -> doRequest(MessageType.KMARKDOWN.type, message.kMarkdown.rawContent)
             // card message
@@ -350,44 +349,49 @@ private suspend inline fun Message.Element.elementToRequest(
 
                 // TODO just re-upload and send, waiting for fix.
                 //  see https://github.com/simple-robot/simbot-component-kook/issues/75
+                val createRequest = createReUploadAssetApi(bot, message.attachment)
 
-                // TODO ... platforms.
-
-                val createRequest =
-                    CreateAssetApi.create(URL(message.attachment.url), message.attachment.name)
                 val asset = createRequest.requestDataBy(bot)
 
                 doRequest(type.type, asset.url)
             }
+
+            // asset Image
+            is KookAssetImage -> doRequest(MessageType.IMAGE.type, message.assetUrl)
 
             else -> {
                 // other, ignore.
             }
         }
 
-        // 需要上传的图片
-        // TODO platforms
-        is OfflineResourceImage -> {
-            val assetApi: CreateAssetApi = when (val resource = message.resource) {
-//                is URLResource -> CreateAssetApi.create(resource.url)
-//                is FileResource -> CreateAssetApi.create(resource.file)
-//                is PathResource -> CreateAssetApi.create(resource.path)
-                is ByteArrayResource -> CreateAssetApi.create(resource.data())
-                else -> {
-                    // TODO
-                    CreateAssetApi.create(resource.data())
+        // 需要上传/发送的图片
+        is Image -> when (message) {
+            is OfflineImage -> {
+                val assetApi: CreateAssetApi = when (message) {
+                    is OfflineResourceImage -> when (val resource = message.resource) {
+                        is ByteArrayResource -> CreateAssetApi.create(resource.data())
+                        else -> {
+                            platformCreateAssetApi(resource) ?: CreateAssetApi.create(resource.data())
+                        }
+                    }
+
+                    else -> CreateAssetApi.create(message.data())
                 }
+
+                val asset = assetApi.requestDataBy(bot)
+                doRequest(MessageType.IMAGE.type, asset.url)
             }
 
-            val asset = assetApi.requestDataBy(bot)
-            doRequest(MessageType.IMAGE.type, asset.url)
-        }
+            // 其他任意 RemoteImage 图片类型, 直接使用id
+            is RemoteImage -> when (message) {
+                is RemoteUrlAwareImage -> doRequest(MessageType.IMAGE.type, message.url())
+                else -> doRequest(MessageType.IMAGE.type, message.id.literal)
+            }
 
-        // 其他任意 RemoteImage 图片类型, 直接使用id
-        is RemoteImage -> doRequest(MessageType.IMAGE.type, message.id.literal)
-
-        is Image -> {
-            // TODO any image.
+            // Unknown Image type
+            else -> {
+                bot.logger.warn("Unknown image type: {} ({})", message, message::class)
+            }
         }
 
         // std at
@@ -403,19 +407,18 @@ private suspend inline fun Message.Element.elementToRequest(
         }
 
         is Face -> {
-            // TODO serverEmoticons?
-//            withinKmd {
-//                serverEmoticons(message.id.literal)
-//            }
+            withinKmd {
+                val id = message.id.literal
+                // 名字怎么来？
+                serverEmoticons(id, id)
+            }
         }
 
         is Emoji -> {
             withinKmd {
                 emoji(message.id.literal)
-
             }
         }
-
 
         else -> {
             // other..?
@@ -424,6 +427,33 @@ private suspend inline fun Message.Element.elementToRequest(
 }
 
 
+/**
+ * 获取一个根据 [Attachments.url] 重新上传此图片的 [CreateAssetApi]。
+ * 会通过 [KookBot.sourceBot.apiClient][Bot.apiClient] 请求 url
+ * 并将结果“转录”至 [CreateAssetApi]。
+ */
+@Suppress("DEPRECATION")
+@InternalKookApi
+public fun createReUploadAssetApi(bot: KookBot, attachment: Attachments): CreateAssetApi {
+    val client = bot.sourceBot.apiClient
 
+    return CreateAssetApi.create(
+        ChannelProvider {
+            val channel = ByteChannel(true) // TODO Deprecated
+            bot.launch {
+                client.get(attachment.url).bodyAsChannel().copyAndClose(channel)
+            }.apply {
+                invokeOnCompletion { e ->
+                    if (!channel.isClosedForWrite) {
+                        channel.close(e?.takeIf { it !is CancellationException }?.let { IllegalStateException(e) })
+                    }
+                }
+            }
 
+            channel
+        },
+        filename = attachment.name
+    )
+}
 
+internal expect fun platformCreateAssetApi(resource: Resource): CreateAssetApi?

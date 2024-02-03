@@ -18,8 +18,9 @@
 package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
 import love.forte.simbot.action.ActionType
+import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
@@ -28,6 +29,7 @@ import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.message.doSafeCast
+import love.forte.simbot.suspendrunner.STP
 import love.forte.simbot.utils.item.Items
 import love.forte.simbot.kook.event.Event as KkEvent
 import love.forte.simbot.kook.objects.User as KUser
@@ -76,7 +78,7 @@ public abstract class KookMemberChangedEvent : KookSystemEvent(), MemberChangedE
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     /**
      * 本次变更涉及的频道成员信息。同 [user]
@@ -737,7 +739,7 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
 
     override val key: Event.Key<out KookUserOnlineStatusChangedEvent>

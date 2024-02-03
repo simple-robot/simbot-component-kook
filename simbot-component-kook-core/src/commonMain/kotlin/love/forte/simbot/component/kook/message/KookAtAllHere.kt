@@ -20,7 +20,6 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.message.AtAll
-import love.forte.simbot.message.Message
 
 
 /**
@@ -32,14 +31,7 @@ import love.forte.simbot.message.Message
  */
 @SerialName("kook.AtAllHere")
 @Serializable
-public object KookAtAllHere : KookMessageElement<KookAtAllHere>, Message.Key<KookAtAllHere> {
-    override val key: Message.Key<KookAtAllHere>
-        get() = this
-
+public object KookAtAllHere : KookMessageElement {
     override fun equals(other: Any?): Boolean = other === this
-
     override fun toString(): String = "AtAllHere"
-
-    override fun safeCast(value: Any): KookAtAllHere? = if (value === this) this else null
-
 }

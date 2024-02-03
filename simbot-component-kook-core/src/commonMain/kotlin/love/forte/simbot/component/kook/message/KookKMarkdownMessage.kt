@@ -20,15 +20,11 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
-import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.component.kook.message.KookKMarkdownMessage.Companion.asMessage
-import love.forte.simbot.component.kook.message.KookKMarkdownMessage.Key.asMessage
 import love.forte.simbot.kook.ExperimentalKookApi
 import love.forte.simbot.kook.objects.kmd.KMarkdown
 import love.forte.simbot.kook.objects.kmd.KMarkdownBuilder
 import love.forte.simbot.kook.objects.kmd.buildKMarkdown
-import love.forte.simbot.message.Message
-import love.forte.simbot.message.doSafeCast
 import kotlin.jvm.JvmStatic
 
 

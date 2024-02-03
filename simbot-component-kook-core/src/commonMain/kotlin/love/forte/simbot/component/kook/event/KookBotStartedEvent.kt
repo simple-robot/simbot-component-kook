@@ -17,34 +17,27 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
+import love.forte.simbot.annotations.ExperimentalSimbotAPI
+import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.UUID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
-import love.forte.simbot.event.internal.BaseInternalKey
-import love.forte.simbot.event.internal.BotStartedEvent
-import love.forte.simbot.event.internal.InternalEvent
-import love.forte.simbot.message.doSafeCast
-import love.forte.simbot.randomID
+import love.forte.simbot.event.Event
 
 /**
  * [KookBot] 执行 [start][KookBot.start] 之后推送的事件。
  *
  * @author ForteScarlet
  */
-public abstract class KookBotStartedEvent : BotStartedEvent() {
-    override val id: ID = randomID()
-    override val timestamp: Timestamp = Timestamp.now()
-    abstract override val bot: KookBot
-    override val key: InternalEvent.Key<out KookBotStartedEvent> get() = Key
+public abstract class KookBotStartedEvent : Event {
+    override val id: ID = UUID.random()
+
+    @OptIn(ExperimentalSimbotAPI::class)
+    override val time: Timestamp = Timestamp.now()
+    public abstract val bot: KookBot
 
     override fun toString(): String {
         return "KookBotStartedEvent(bot=$bot)"
     }
 
-    public companion object Key : BaseInternalKey<KookBotStartedEvent>(
-        "kook.bot_started", BotStartedEvent
-    ) {
-        override fun safeCast(value: Any): KookBotStartedEvent? = doSafeCast(value)
-    }
 }

@@ -17,14 +17,13 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
-import love.forte.simbot.event.BaseEventKey
+import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.kook.event.DeletedMessageEventExtra
 import love.forte.simbot.kook.event.DeletedPrivateMessageEventExtra
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.SystemExtra
-import love.forte.simbot.message.doSafeCast
 
 
 /**
@@ -57,15 +56,7 @@ public abstract class KookDeletedMessageEvent : KookSystemEvent() {
     /**
      * 消息被删除的时间
      */
-    abstract override val timestamp: Timestamp
-
-    abstract override val key: love.forte.simbot.event.Event.Key<out KookDeletedMessageEvent>
-
-    public companion object Key : BaseEventKey<KookDeletedMessageEvent>(
-        "kook.deleted_message_event", KookSystemEvent
-    ) {
-        override fun safeCast(value: Any): KookDeletedMessageEvent? = doSafeCast(value)
-    }
+    abstract override val time: Timestamp
 }
 
 
@@ -98,18 +89,8 @@ public abstract class KookDeletedChannelMessageEvent : KookDeletedMessageEvent()
     /**
      * 消息删除时间。来自 [Event.msgTimestamp]
      */
-    override val timestamp: Timestamp
-        get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
-
-
-    override val key: love.forte.simbot.event.Event.Key<KookDeletedChannelMessageEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookDeletedChannelMessageEvent>(
-        "kook.deleted_channel_message_event", KookDeletedMessageEvent
-    ) {
-        override fun safeCast(value: Any): KookDeletedChannelMessageEvent? = doSafeCast(value)
-    }
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 }
 
 /**
@@ -159,18 +140,8 @@ public abstract class KookDeletedPrivateMessageEvent : KookDeletedMessageEvent()
     /**
      * 消息删除时间。来自 [DeletedPrivateMessageEventExtra.Body.deletedAt]
      */
-    override val timestamp: Timestamp
-        get() = Timestamp.byMillisecond(sourceBody.deletedAt)
-
-
-    override val key: love.forte.simbot.event.Event.Key<KookDeletedPrivateMessageEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookDeletedPrivateMessageEvent>(
-        "kook.deleted_private_message_event", KookDeletedMessageEvent
-    ) {
-        override fun safeCast(value: Any): KookDeletedPrivateMessageEvent? = doSafeCast(value)
-    }
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceBody.deletedAt)
 }
 
 

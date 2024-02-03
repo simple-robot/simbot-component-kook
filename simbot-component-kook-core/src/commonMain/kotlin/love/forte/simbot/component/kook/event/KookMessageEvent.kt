@@ -18,8 +18,9 @@
 package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
 import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.KookUserChat
@@ -59,7 +60,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
 
     override val id: ID get() = sourceEvent.msgId.ID
 
-    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val time: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     /**
      * 接收到的消息体。

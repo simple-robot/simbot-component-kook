@@ -46,10 +46,9 @@ import kotlin.jvm.JvmStatic
  */
 @Serializable
 @SerialName("kook.temp.target")
-public sealed class KookTempTarget : KookMessageElement<KookTempTarget> {
+public sealed class KookTempTarget : KookMessageElement {
 
     public companion object {
-
         /**
          * 指定一个具体的ID目标作为临时消息的目标用户ID。
          */
@@ -66,7 +65,6 @@ public sealed class KookTempTarget : KookMessageElement<KookTempTarget> {
          */
         @JvmStatic
         public fun current(): KookTempTarget = Current
-
     }
 
 
@@ -87,5 +85,4 @@ public sealed class KookTempTarget : KookMessageElement<KookTempTarget> {
         override fun equals(other: Any?): Boolean = this === other
         override fun toString(): String = "Current"
     }
-
 }

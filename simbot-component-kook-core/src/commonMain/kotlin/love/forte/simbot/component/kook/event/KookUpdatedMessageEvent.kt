@@ -18,7 +18,9 @@
 package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.ID
-import love.forte.simbot.Timestamp
+import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.message.KookMessageContent
 import love.forte.simbot.component.kook.message.KookUpdatedMessageContent
 import love.forte.simbot.event.BaseEventKey
@@ -66,7 +68,7 @@ public abstract class KookUpdatedMessageEvent : KookSystemEvent() {
     /**
      * 消息被更新的时间
      */
-    abstract override val timestamp: Timestamp
+    abstract override val time: Timestamp
 
     abstract override val key: love.forte.simbot.event.Event.Key<out KookUpdatedMessageEvent>
 
@@ -107,8 +109,8 @@ public abstract class KookUpdatedChannelMessageEvent : KookUpdatedMessageEvent()
     /**
      * 消息更新时间。来自 [Event.msgTimestamp]
      */
-    override val timestamp: Timestamp
-        get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     override val updatedContent: String
         get() = sourceBody.content
@@ -183,8 +185,8 @@ public abstract class KookUpdatedPrivateMessageEvent : KookUpdatedMessageEvent()
     /**
      * 消息更新时间。来自 [DeletedPrivateMessageEventExtra.Body.deletedAt]
      */
-    override val timestamp: Timestamp
-        get() = Timestamp.byMillisecond(sourceBody.updatedAt)
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceBody.updatedAt)
 
     override val updatedContent: String
         get() = sourceBody.content

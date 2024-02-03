@@ -19,8 +19,6 @@ package love.forte.simbot.component.kook.message
 
 import love.forte.simbot.kook.api.KookApi
 import love.forte.simbot.kook.api.message.SendChannelMessageApi
-import love.forte.simbot.message.Message
-import love.forte.simbot.message.doSafeCast
 import kotlin.jvm.JvmStatic
 
 
@@ -38,20 +36,15 @@ import kotlin.jvm.JvmStatic
  * @author ForteScarlet
  */
 @KookSendOnlyMessage
-public data class KookApiMessage(public val api: KookApi<*>) : KookMessageElement<KookApiMessage> {
-    override val key: Message.Key<KookApiMessage>
-        get() = Key
+public data class KookApiMessage(public val api: KookApi<*>) : KookMessageElement {
 
-    public companion object Key : Message.Key<KookApiMessage> {
-        override fun safeCast(value: Any): KookApiMessage? = doSafeCast(value)
-
+    public companion object {
         /**
          * 通过 [KookApi] 构建 [KookApiMessage].
          */
         @JvmStatic
         public fun KookApi<*>.toRequest(): KookApiMessage =
             KookApiMessage(this)
-
     }
 }
 

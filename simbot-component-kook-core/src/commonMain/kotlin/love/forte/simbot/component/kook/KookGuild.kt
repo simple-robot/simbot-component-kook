@@ -75,6 +75,8 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     public val icon: String
         get() = source.icon
 
+    @STP
+    override suspend fun botAsMember(): KookMember
 
     /**
      * 获取当前频道服务器下的子频道序列。
@@ -105,8 +107,7 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
         asyncBaseName = "getChatChannel",
         reserveBaseName = "getChatChannel"
     )
-    override suspend fun chatChannel(id: ID): KookChatChannel? = null // channel(id)
-    // TODO
+    override suspend fun chatChannel(id: ID): KookChatChannel?
 
     // categories
 
@@ -161,6 +162,18 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
      */
     @ExperimentalSimbotAPI
     override val roles: Collectable<KookGuildRole>
+        get() = getRoles(null, null)
+
+    /**
+     * 获取当前频道服务器中配置的所有角色信息。
+     *
+     * _Note: [roles] 尚在实验阶段，可能会在未来做出变更。_
+     *
+     * @see KookRole
+     * @see KookGuildRole
+     */
+    @ExperimentalSimbotAPI
+    public fun getRoles(startPage: Int?, pageSize: Int?): Collectable<KookGuildRole>
 
 
     @ExperimentalSimbotAPI

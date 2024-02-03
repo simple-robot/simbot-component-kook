@@ -57,7 +57,7 @@ public abstract class KookDeletedMessageEvent : KookSystemEvent() {
     /**
      * 消息被删除的时间
      */
-    abstract override val timestamp: Timestamp
+    abstract override val time: Timestamp
 
     abstract override val key: love.forte.simbot.event.Event.Key<out KookDeletedMessageEvent>
 
@@ -98,8 +98,8 @@ public abstract class KookDeletedChannelMessageEvent : KookDeletedMessageEvent()
     /**
      * 消息删除时间。来自 [Event.msgTimestamp]
      */
-    override val timestamp: Timestamp
-        get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
 
     override val key: love.forte.simbot.event.Event.Key<KookDeletedChannelMessageEvent>
@@ -159,8 +159,8 @@ public abstract class KookDeletedPrivateMessageEvent : KookDeletedMessageEvent()
     /**
      * 消息删除时间。来自 [DeletedPrivateMessageEventExtra.Body.deletedAt]
      */
-    override val timestamp: Timestamp
-        get() = Timestamp.byMillisecond(sourceBody.deletedAt)
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceBody.deletedAt)
 
 
     override val key: love.forte.simbot.event.Event.Key<KookDeletedPrivateMessageEvent>

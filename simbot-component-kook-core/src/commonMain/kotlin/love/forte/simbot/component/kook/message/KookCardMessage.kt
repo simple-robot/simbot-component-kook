@@ -20,12 +20,10 @@ package love.forte.simbot.component.kook.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
-import love.forte.simbot.component.kook.message.KookCardMessage.Key.asMessage
+import love.forte.simbot.component.kook.message.KookCardMessage.Companion.asMessage
 import love.forte.simbot.kook.objects.card.Card
 import love.forte.simbot.kook.objects.card.CardMessageBuilder
 import love.forte.simbot.kook.objects.card.buildCardMessage
-import love.forte.simbot.message.Message
-import love.forte.simbot.message.doSafeCast
 import kotlin.jvm.JvmStatic
 import love.forte.simbot.kook.objects.card.CardMessage as KkCardMessage
 
@@ -37,13 +35,9 @@ import love.forte.simbot.kook.objects.card.CardMessage as KkCardMessage
 @ExperimentalSimbotAPI
 @SerialName("kook.card")
 @Serializable
-public data class KookCardMessage(public val cards: KkCardMessage) : KookMessageElement<KookCardMessage> {
-    override val key: Message.Key<KookCardMessage>
-        get() = Key
+public data class KookCardMessage(public val cards: KkCardMessage) : KookMessageElement {
 
-    public companion object Key : Message.Key<KookCardMessage> {
-        override fun safeCast(value: Any): KookCardMessage? = doSafeCast(value)
-
+    public companion object {
         /**
          * 将 [Card] 作为 [KookCardMessage] 使用。
          */

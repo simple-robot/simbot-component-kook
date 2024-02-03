@@ -17,7 +17,8 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.ID
+import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.definition.ChannelInfoContainer
@@ -30,6 +31,9 @@ import love.forte.simbot.kook.event.PinnedMessageEventExtra
 import love.forte.simbot.kook.event.UnpinnedMessageEventExtra
 import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.doSafeCast
+import love.forte.simbot.suspendrunner.ST
+import love.forte.simbot.suspendrunner.STP
+import kotlin.jvm.JvmSynthetic
 import love.forte.simbot.kook.event.Event as KEvent
 
 

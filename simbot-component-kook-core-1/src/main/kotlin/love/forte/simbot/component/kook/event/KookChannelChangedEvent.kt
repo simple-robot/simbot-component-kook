@@ -53,7 +53,7 @@ public abstract class KookChannelChangedEvent : KookSystemEvent(), ChangedEvent 
     /**
      * @see KEvent.msgTimestamp
      */
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     abstract override val key: Event.Key<out KookChannelChangedEvent>
 
@@ -243,7 +243,7 @@ public abstract class KookCategoryChangedEvent : KookSystemEvent(), ChangedEvent
     /**
      * @see KEvent.msgTimestamp
      */
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     abstract override val key: Event.Key<out KookCategoryChangedEvent>
 

@@ -38,6 +38,7 @@ import love.forte.simbot.kook.api.asset.CreateAssetApi
 import love.forte.simbot.kook.api.userchat.GetUserChatListApi
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.kook.stdlib.Ticket
+import love.forte.simbot.logger.Logger
 import love.forte.simbot.suspendrunner.ST
 import love.forte.simbot.suspendrunner.STP
 import kotlin.coroutines.CoroutineContext
@@ -48,6 +49,8 @@ import love.forte.simbot.kook.stdlib.Bot as KBot
 /**
  * simbot组件针对 Kook bot 的 [Bot] 实现。
  *
+ * 注意：[KookBot] 对第三方实现不保证兼容与稳定
+ *
  * @author ForteScarlet
  */
 public interface KookBot : Bot, CoroutineScope {
@@ -55,7 +58,6 @@ public interface KookBot : Bot, CoroutineScope {
      * 源自 [sourceBot] 的 [CoroutineContext]
      */
     override val coroutineContext: CoroutineContext
-        get() = sourceBot.coroutineContext
 
     /**
      * 得到标准库中的 [Kook Bot][KBot] 源对象。
@@ -68,6 +70,7 @@ public interface KookBot : Bot, CoroutineScope {
     override val id: ID
         get() = sourceBot.ticket.clientId.ID
 
+    public val logger: Logger
 
     /**
      * 判断此 ID 是否代表当前 bot。可以代表 bot 的 id 可能是 [clientId][Ticket.clientId],
@@ -196,6 +199,16 @@ public interface KookContactRelation : ContactRelation {
      *  @throws ApiResultException API 请求过程中产生的异常
      */
     override val contacts: Collectable<KookUserChat>
+        get() = getContacts(null)
+
+    /**
+     * 查询并获取**聊天会话**序列。
+     *
+     * @param size 每个页码的元素数量
+     * @throws ApiResponseException API 请求过程中产生的异常
+     * @throws ApiResultException API 请求过程中产生的异常
+     */
+    public fun getContacts(size: Int?): Collectable<KookUserChat>
 
     /**
      * 通过 [id] 寻找（创建）一个 [KookUserChat]。

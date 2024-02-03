@@ -17,25 +17,24 @@
 
 package love.forte.simbot.component.kook.message
 
+import io.ktor.http.*
+import love.forte.simbot.ability.*
+import love.forte.simbot.ability.StandardDeleteOption.Companion.standardAnalysis
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
-import love.forte.simbot.ID
-import love.forte.simbot.Simbot
-import love.forte.simbot.Timestamp
+import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.common.id.UUID
+import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.util.requestResultBy
-import love.forte.simbot.definition.BotContainer
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
-import love.forte.simbot.delegate.timestamp
 import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
 import love.forte.simbot.kook.api.message.DeleteDirectMessageApi
 import love.forte.simbot.kook.api.message.SendMessageResult
 import love.forte.simbot.message.AggregatedMessageReceipt
 import love.forte.simbot.message.MessageReceipt
 import love.forte.simbot.message.SingleMessageReceipt
-import love.forte.simbot.message.aggregation
-import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Kook 进行消息回复、发送后得到的回执。
@@ -43,23 +42,7 @@ import kotlin.jvm.JvmStatic
  * @see SingleKookMessageReceipt
  * @see KookAggregatedMessageReceipt
  */
-public interface KookMessageReceipt : MessageReceipt, BotContainer {
-    /**
-     * 此次消息发送的回执内容。
-     *
-     */
-    public val result: Any?
-
-    /**
-     * 是否为私聊消息。
-     */
-    public val isDirect: Boolean
-
-    /**
-     * 相关的bot。
-     */
-    override val bot: KookBot
-}
+public interface KookMessageReceipt : MessageReceipt
 
 /**
  * 用于表示 [SingleMessageReceipt] 的 [KookMessageReceipt] 实现。
@@ -67,7 +50,18 @@ public interface KookMessageReceipt : MessageReceipt, BotContainer {
  * @see KookMessageCreatedReceipt
  * @see KookApiRequestedReceipt
  */
-public abstract class SingleKookMessageReceipt : SingleMessageReceipt(), KookMessageReceipt
+public abstract class SingleKookMessageReceipt : SingleMessageReceipt(), KookMessageReceipt {
+    /**
+     * 此次消息发送的回执内容。
+     *
+     */
+    public abstract val result: Any?
+
+    /**
+     * 是否为私聊消息。
+     */
+    public abstract val isDirect: Boolean
+}
 
 /**
  * 消息创建后的回执实例。
@@ -78,33 +72,50 @@ public abstract class SingleKookMessageReceipt : SingleMessageReceipt(), KookMes
 public class KookMessageCreatedReceipt(
     override val result: SendMessageResult,
     override val isDirect: Boolean,
-    override val bot: KookBot,
+    private val bot: KookBot,
 ) : SingleKookMessageReceipt() {
-    override val id: ID by stringID { result.msgId }
-
-    /**
-     * 实例存在即成功。
-     */
-    override val isSuccess: Boolean
-        get() = true
+    override val id: ID
+        get() = result.msgId.ID
 
     public val nonce: String? get() = result.nonce
 
     /**
      * 消息发送时间(服务器时间戳)
      */
-    public val timestamp: Timestamp by timestamp { result.msgTimestamp }
+    public val timestamp: Timestamp
+        get() = Timestamp.ofMilliseconds(result.msgTimestamp)
 
     /**
      * 尝试删除（撤回）发送的这条消息。
      */
     @JvmSynthetic
-    override suspend fun delete(): Boolean {
+    override suspend fun delete(vararg options: DeleteOption) {
         val api =
             if (isDirect) DeleteDirectMessageApi.create(result.msgId)
             else DeleteChannelMessageApi.create(result.msgId)
 
-        return api.requestResultBy(bot).isSuccess
+        val stdOpts = options.standardAnalysis()
+
+        val apiResult = api.requestResultBy(bot)
+
+        if (apiResult.isHttpSuccess && apiResult.isSuccess) {
+            return
+        }
+
+        val httpStatus = apiResult.httpStatus
+        if (httpStatus.value == HttpStatusCode.NotFound.value) {
+            if (stdOpts.isIgnoreOnNoSuchTarget) {
+                return
+            }
+
+            throw NoSuchElementException("Delete target (msgId=${result.msgId}) not found: HTTP code 404 with result $apiResult")
+        }
+
+        if (stdOpts.isIgnoreOnFailure) {
+            return
+        }
+
+        throw DeleteFailureException("Delete message (msgId=${result.msgId}) failed. HTTP status: $httpStatus, result: $apiResult")
     }
 
     public companion object {
@@ -129,20 +140,24 @@ public class KookMessageCreatedReceipt(
 public class KookApiRequestedReceipt(
     override val result: Any?,
     override val isDirect: Boolean,
-    override val bot: KookBot,
 ) : SingleKookMessageReceipt() {
-    override val id: ID by stringID { random }
-
-    /**
-     * 实例存在即成功。
-     */
-    override val isSuccess: Boolean get() = true
+    override val id: ID = UUID.random()
 
     /**
      * 不支持撤回，将会始终得到 `false`。
      *
      */
-    override suspend fun delete(): Boolean = false
+    override suspend fun delete(vararg options: DeleteOption) {
+        if (options.any { it == StandardDeleteOption.IGNORE_ON_UNSUPPORTED }) {
+            return
+        }
+
+        throw UnsupportedOperationException(buildString {
+            append("KookApiRequestedReceipt.delete(")
+            options.joinTo(buffer = this, separator = ",", prefix = "[", postfix = "]")
+            append(")")
+        })
+    }
 }
 
 /**
@@ -150,54 +165,25 @@ public class KookApiRequestedReceipt(
  */
 @ExperimentalSimbotAPI
 public class KookAggregatedMessageReceipt private constructor(
-    override val bot: KookBot,
-    private val aggregatedMessageReceipt: AggregatedMessageReceipt,
+    private val receipts: List<SingleKookMessageReceipt>,
 ) : AggregatedMessageReceipt(), KookMessageReceipt {
-
-    /**
-     * @see AggregatedMessageReceipt.isSuccess
-     */
-    override val isSuccess: Boolean
-        get() = aggregatedMessageReceipt.isSuccess
-
-    /**
-     * 复数回执不存在结果。
-     */
-    override val result: Any?
-        get() = null
-
-    /**
-     * 复数回执不属于私聊类型。
-     */
-    override val isDirect: Boolean
-        get() = false
-
     override val size: Int
-        get() = aggregatedMessageReceipt.size
+        get() = receipts.size
 
-    override fun get(index: Int): SingleKookMessageReceipt {
-        return aggregatedMessageReceipt[index] as SingleKookMessageReceipt
-    }
+    override fun get(index: Int): SingleKookMessageReceipt = receipts[index]
 
-    override fun iterator(): Iterator<SingleKookMessageReceipt> {
-        // Collection.merge 保证了迭代器内部的元素类型
-        @Suppress("UNCHECKED_CAST")
-        return aggregatedMessageReceipt.iterator() as Iterator<SingleKookMessageReceipt>
-    }
+    override fun iterator(): Iterator<SingleKookMessageReceipt> = receipts.iterator()
 
     public companion object {
-
         /**
          * 将多个 [KookMessageReceipt] 合并为一个聚合的回执。
          *
-         * @param bot 如果为null，则会使用 receiver 中的第一个元素中的bot。
          * @throws IllegalArgumentException 如果 receiver 中元素为空
          */
         @JvmStatic
-        @JvmOverloads
-        public fun Collection<SingleKookMessageReceipt>.merge(bot: KookBot? = null): KookMessageReceipt {
-            Simbot.require(isNotEmpty()) { "Unable to merge empty element iterator" }
-            return KookAggregatedMessageReceipt(bot ?: first().bot, aggregation())
+        public fun Collection<SingleKookMessageReceipt>.merge(): KookMessageReceipt {
+            require(isNotEmpty()) { "Unable to merge empty element iterator" }
+            return KookAggregatedMessageReceipt(toList())
         }
     }
 

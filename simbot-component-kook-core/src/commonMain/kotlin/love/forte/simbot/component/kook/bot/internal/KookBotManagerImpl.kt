@@ -17,8 +17,15 @@
 
 package love.forte.simbot.component.kook.bot.internal
 
-import kotlinx.coroutines.*
-import love.forte.simbot.bot.BotAlreadyRegisteredException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import love.forte.simbot.bot.ConflictBotException
+import love.forte.simbot.bot.NoSuchBotException
+import love.forte.simbot.common.collection.computeValue
+import love.forte.simbot.common.collection.concurrentMutableMap
+import love.forte.simbot.common.coroutines.mergeWith
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.KookComponent
@@ -26,14 +33,11 @@ import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.KookBotConfiguration
 import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.component.kook.bot.KookBotManagerConfiguration
-import love.forte.simbot.component.kook.event.KookBotRegisteredEvent
 import love.forte.simbot.component.kook.event.internal.KookBotRegisteredEventImpl
 import love.forte.simbot.event.EventProcessor
-import love.forte.simbot.kook.BotFactory
-import love.forte.simbot.kook.Ticket
+import love.forte.simbot.event.onEachError
 import love.forte.simbot.kook.stdlib.BotFactory
-import love.forte.simbot.literal
-import java.util.concurrent.ConcurrentHashMap
+import love.forte.simbot.kook.stdlib.Ticket
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -44,81 +48,60 @@ internal class KookBotManagerImpl(
     private val eventProcessor: EventProcessor,
     override val configuration: KookBotManagerConfiguration,
     override val component: KookComponent
-) : KookBotManager() {
-    private val supervisorJob: CompletableJob = SupervisorJob(configuration.coroutineContext[Job])
-    override val coroutineContext: CoroutineContext = configuration.coroutineContext + supervisorJob
+) : KookBotManager(), CoroutineScope {
+    override val job: Job = configuration.coroutineContext[Job]!!
+    override val coroutineContext: CoroutineContext = configuration.coroutineContext
 
     /**
      * 记录所有注册进来的 [KookBot] .
      */
-    private val botMap = ConcurrentHashMap<String, KookBotImpl>()
+    private val botMap = concurrentMutableMap<String, KookBotImpl>()
 
-    override fun invokeOnCompletion(handler: CompletionHandler) {
-        supervisorJob.invokeOnCompletion(handler)
-    }
+    override fun all(): Sequence<KookBot> = botMap.values.asSequence()
 
-    override suspend fun join() {
-        supervisorJob.join()
-    }
 
-    override val isActive: Boolean get() = supervisorJob.isActive
-    override val isCancelled: Boolean get() = supervisorJob.isCancelled
-    override val isStarted: Boolean get() = true
-    override suspend fun start(): Boolean = true
+    override fun get(id: ID): KookBot =
+        botMap[id.literal] ?: throw NoSuchBotException("id=$id")
 
-    override fun all(): List<KookBot> = botMap.values.toList()
-
-    override suspend fun doCancel(reason: Throwable?): Boolean {
-        if (reason == null) {
-            supervisorJob.cancel()
-        } else {
-            supervisorJob.cancel(CancellationException(reason.localizedMessage, reason))
-        }
-        botMap.clear()
-        return true
-    }
-
-    override fun get(id: ID): KookBot? = botMap[id.literal]
+    override fun find(id: ID): KookBot? = botMap[id.literal]
 
     override fun register(ticket: Ticket, configuration: KookBotConfiguration): KookBot {
         val clientId = ticket.clientId
         fun createBot(): KookBotImpl {
             val botConfiguration = configuration.botConfiguration
-            val botCoroutineContext = botConfiguration.coroutineContext
-            var botJob: Job? = botCoroutineContext[Job]
-
-            if (botJob == null) {
-                botJob = SupervisorJob(this.supervisorJob)
-                botConfiguration.coroutineContext =
-                    this.coroutineContext.minusKey(Job) + botCoroutineContext.minusKey(Job) + botJob
-            } else {
-                // link to current job
-                invokeOnCompletion { botJob.cancel() }
-                botConfiguration.coroutineContext = this.coroutineContext.minusKey(Job) + botCoroutineContext
-            }
-
+            botConfiguration.coroutineContext = botConfiguration.coroutineContext.mergeWith(this.coroutineContext)
 
             val sourceBot = BotFactory.create(ticket, botConfiguration)
-            return KookBotImpl(eventProcessor, sourceBot, component, this, configuration)
+            return KookBotImpl(eventProcessor, sourceBot, component, configuration)
         }
 
-        return botMap.compute(clientId) { id, old ->
+        return botMap.computeValue(clientId) { id, old ->
             if (old != null) {
-                throw BotAlreadyRegisteredException("clientId=$id")
+                throw ConflictBotException("clientId=$id")
             }
 
             createBot()
         }!!.also { newBot ->
-            newBot.invokeOnCompletion {
-                botMap.remove(clientId, newBot)
+            newBot.onCompletion {
+                // TODO remove(clientId, newBot)
+                botMap.remove(clientId)
             }
 
             // Publish BotRegisteredEvent
             launch {
-                eventProcessor.pushIfProcessable(KookBotRegisteredEvent) {
-                    KookBotRegisteredEventImpl(newBot)
-                }
+                val event = KookBotRegisteredEventImpl(newBot)
+                eventProcessor.push(event)
+                    .onEachError { er ->
+                        newBot.logger.error(
+                            "Event {} process on failure: {}",
+                            event,
+                            er.content.message,
+                            er.content
+                        )
+                    }
+                    .collect()
             }
+
         }
     }
 

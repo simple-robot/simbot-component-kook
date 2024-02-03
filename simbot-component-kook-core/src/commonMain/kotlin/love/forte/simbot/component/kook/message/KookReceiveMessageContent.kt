@@ -25,7 +25,7 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.IntID.Companion.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
-import love.forte.simbot.component.kook.message.KookAttachmentMessage.Key.asMessage
+import love.forte.simbot.component.kook.message.KookAttachmentMessage.Companion.asMessage
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_USER
 import love.forte.simbot.component.kook.util.requestResultBy
@@ -91,7 +91,8 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
      * (met)123456(met) hello
      * ```
      *
-     * 而由于 [TextExtra.mention] 出现过一次上述的 `123456` 的信息，因此依次移除掉一个 `(met)123456(met)`，而最终的 [ReceivedMessageContent.plainText] 结果则为：
+     * 而由于 [TextExtra.mention] 出现过一次上述的 `123456` 的信息，因此依次移除掉一个 `(met)123456(met)`，
+     * 而最终的 [MessageContent.plainText] 结果则为：
      *
      * ```
      *  hello
@@ -100,7 +101,7 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
      * 需要注意的是，这种处理不会移除或清理任何的**空字符**，所以你可能会发现上面处理结束后的 ` hello` 前是有一个空格的。
      *
      * 如果你希望能够得到最原始的 [Event.content]，那么请通过原始事件对象（如果有） 或 [rawContent] 获取，
-     * 而不是通过 [ReceivedMessageContent.plainText] 或 [messages] 中的 [PlainText] 集。
+     * 而不是通过 [MessageContent.plainText] 或 [messages] 中的 [PlainText] 集。
      *
      * ```kotlin
      * val event: KookMessageEvent = ... // 一个KOOK的消息事件
@@ -109,7 +110,8 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
      * ```
      *
      * ## 转化丢失
-     * 将消息转化为一个消息链（尤其是转化kmarkdown类型的消息）的过程中有可能会丢失一部分原有的格式。因此当你直接通过 [messages] 重复发送消息时有可能会产生与收到的消息不一致的效果。
+     * 将消息转化为一个消息链（尤其是转化kmarkdown类型的消息）的过程中有可能会丢失一部分原有的格式。
+     * 因此当你直接通过 [messages] 重复发送消息时有可能会产生与收到的消息不一致的效果。
      *
      */
     override val messages: Messages
@@ -165,9 +167,11 @@ public class KookReceiveMessageContent(
 
     override val messages: Messages by lazy(LazyThreadSafetyMode.PUBLICATION) { source.toMessages() }
 
-    override val plainText: String?
-        get() = TODO("Not yet implemented")
+    override val plainText: String by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        messages.filterIsInstance<PlainText>().joinToString("") { it.text }
+    }
 
+    @JvmSynthetic
     override suspend fun delete(vararg options: DeleteOption) {
         // TODO options
         val api = if (isDirect) {
@@ -209,9 +213,11 @@ public class KookUpdatedMessageContent(
         toMessagesByKMarkdown(rawContent, mention, mentionRoles, isMentionAll, isMentionHere)
     }
 
-    override val plainText: String?
-        get() = TODO("Not yet implemented")
+    override val plainText: String by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        messages.filterIsInstance<PlainText>().joinToString("") { it.text }
+    }
 
+    @JvmSynthetic
     override suspend fun delete(vararg options: DeleteOption) {
         // TODO options
         val api = if (isDirect) {

@@ -92,7 +92,7 @@ internal class KookGuildRoleImpl(
         val api = DeleteGuildRoleApi.create(guildId = guild.source.id, roleId = source.roleId)
         val deleted = api.requestResultBy(baseBot)
 
-        if (deleted.isHttpSuccess || deleted.isSuccess) {
+        if (deleted.isHttpSuccess && deleted.isSuccess) {
             return true
         }
 

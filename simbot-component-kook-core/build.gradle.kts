@@ -42,6 +42,7 @@ kotlin {
     sourceSets.configureEach {
         languageSettings {
             optIn("love.forte.simbot.kook.ExperimentalKookApi")
+            optIn("love.forte.simbot.kook.InternalKookApi")
         }
     }
 

@@ -40,7 +40,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  * @see UserUpdatedEventExtra
  */
 public abstract class KookUserUpdatedEvent : KookSystemEvent(), ChangedEvent {
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     abstract override val sourceEvent: KEvent<UserUpdatedEventExtra>
 

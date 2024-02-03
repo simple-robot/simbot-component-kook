@@ -65,7 +65,7 @@ public class UnsupportedKookEvent(
     /**
      * 事件时间。
      */
-    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val time: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
 
     override fun toString(): String {

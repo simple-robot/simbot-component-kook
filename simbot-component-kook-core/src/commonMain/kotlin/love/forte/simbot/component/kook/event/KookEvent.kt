@@ -17,14 +17,12 @@
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.ID
 import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
-import love.forte.simbot.definition.BotContainer
-import love.forte.simbot.event.*
+import love.forte.simbot.event.BotEvent
 import love.forte.simbot.kook.event.EventExtra
 import love.forte.simbot.kook.event.SystemExtra
-import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.kook.event.Event as KEvent
 
 
@@ -40,8 +38,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  *
  * @author ForteScarlet
  */
-@BaseEvent
-public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotContainer, Event {
+public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotEvent {
     /**
      * 此事件对应的bot示例。
      */
@@ -60,27 +57,16 @@ public abstract class KookEvent<out EX : EventExtra, out E : KEvent<EX>> : BotCo
     override fun toString(): String {
         return "KookEvent(type=${sourceEvent.type}, channelType=${sourceEvent.channelType}, source=${sourceEvent})"
     }
-
-    abstract override val key: Event.Key<out KookEvent<*, *>>
-
-
-    public companion object Key : BaseEventKey<KookEvent<*, *>>(
-        "kook.event", Event
-    ) {
-        override fun safeCast(value: Any): KookEvent<*, *>? = doSafeCast(value)
-    }
-
 }
 
 
 /**
  * Kook 组件在simbot中的**系统事件**相关的事件总类。
  */
-@BaseEvent
 public abstract class KookSystemEvent :
     KookEvent<SystemExtra, KEvent<SystemExtra>>() {
-
-    override val id: ID get() = sourceEvent.msgId.ID
+    override val id: ID
+        get() = sourceEvent.msgId.ID
 
     /**
      * [sourceEvent] 中的 `extra.body` 信息。
@@ -89,14 +75,5 @@ public abstract class KookSystemEvent :
      * [sourceBody] 的具体类型由具体的实现类重写定义。
      *
      */
-    public open val sourceBody: Any? get() = sourceEvent.extra.body
-
-
-    abstract override val key: Event.Key<out KookSystemEvent>
-
-    public companion object Key : BaseEventKey<KookSystemEvent>(
-        "kook.system_event", KookEvent
-    ) {
-        override fun safeCast(value: Any): KookSystemEvent? = doSafeCast(value)
-    }
+    public abstract val sourceBody: Any?
 }

@@ -22,7 +22,6 @@ import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
-import love.forte.simbot.*
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.bot.serializableBotConfigurationPolymorphic
 import love.forte.simbot.common.function.ConfigurerFunction
@@ -105,7 +104,7 @@ public class KookComponent : Component {
         @OptIn(ExperimentalSimbotAPI::class, ExperimentalKookApi::class)
         @get:JvmStatic
         public val messageSerializersModule: SerializersModule = SerializersModule {
-            fun PolymorphicModuleBuilder<KookMessageElement<*>>.include() {
+            fun PolymorphicModuleBuilder<KookMessageElement>.include() {
                 subclass(KookAsset::class, KookAsset.serializer())
                 subclass(KookAssetImage::class, KookAssetImage.serializer())
                 subclass(KookAtAllHere::class, KookAtAllHere.serializer())

@@ -17,8 +17,9 @@
 
 package love.forte.simbot.component.kook.message
 
-import love.forte.simbot.ID
+import love.forte.simbot.common.id.ID
 import love.forte.simbot.message.At
+import kotlin.jvm.JvmStatic
 
 /**
  * 提供 KOOK 组件中一些会用到的信息。

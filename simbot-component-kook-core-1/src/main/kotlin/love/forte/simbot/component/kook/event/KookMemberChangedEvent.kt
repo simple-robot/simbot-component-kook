@@ -77,7 +77,7 @@ public abstract class KookMemberChangedEvent : KookSystemEvent(), MemberChangedE
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     /**
      * 本次变更涉及的频道成员信息。同 [user]
@@ -738,7 +738,7 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
 
     override val key: Event.Key<out KookUserOnlineStatusChangedEvent>

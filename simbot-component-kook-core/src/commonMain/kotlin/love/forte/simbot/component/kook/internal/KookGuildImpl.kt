@@ -17,30 +17,26 @@
 
 package love.forte.simbot.component.kook.internal
 
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.take
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
-import love.forte.simbot.annotations.ExperimentalSimbotAPI
+import love.forte.simbot.common.collectable.Collectable
+import love.forte.simbot.common.collectable.asCollectable
 import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.*
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
-import love.forte.simbot.component.kook.bot.internal.KookGuildBotImpl
 import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleCreator
 import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.delegate.getValue
-import love.forte.simbot.delegate.stringID
+import love.forte.simbot.definition.ChatChannel
 import love.forte.simbot.kook.api.KookApi
 import love.forte.simbot.kook.api.role.CreateGuildRoleApi
 import love.forte.simbot.kook.api.role.GetGuildRoleListApi
 import love.forte.simbot.kook.objects.Guild
-import love.forte.simbot.utils.item.Items
-import love.forte.simbot.utils.item.effectedItemsBySequence
-import love.forte.simbot.utils.item.itemsByFlow
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -48,87 +44,95 @@ import love.forte.simbot.utils.item.itemsByFlow
  * @author ForteScarlet
  */
 internal class KookGuildImpl(
-    private val baseBot: KookBotImpl,
+    private val bot: KookBotImpl,
     override val source: Guild,
 ) : KookGuild {
-    internal var internalBot: KookGuildBotImpl? = null
+    override val coroutineContext: CoroutineContext
+        get() = bot.subContext
 
-    override val bot: KookGuildBotImpl
-        get() {
-            return internalBot ?: (baseBot.internalMember(source.id, baseBot.sourceBot.botUserInfo.id)
-                ?: throw kookGuildNotExistsException(source.id)).let {
-                KookGuildBotImpl(baseBot, it).also { b -> internalBot = b }
-            }
-        }
+    internal lateinit var botMember: KookMemberImpl
 
-    override val currentMember: Int
-        get() = baseBot.internalGuildMemberCount(source.id)
+//    override val bot: KookGuildBotImpl
+//        get() {
+//            return internalBot ?: (baseBot.internalMember(source.id, baseBot.sourceBot.botUserInfo.id)
+//                ?: throw kookGuildNotExistsException(source.id)).let {
+//                KookGuildBotImpl(baseBot, it).also { b -> internalBot = b }
+//            }
+//        }
 
-    override val channels: Items<KookChatChannel>
-        get() = effectedItemsBySequence { baseBot.internalChannels(source.id) }
-
-    override suspend fun channel(id: ID): KookChatChannel? =
-        baseBot.internalChannel(id.literal)
-
-    override val currentChannel: Int
-        get() = baseBot.internalGuildChannelCount(source.id)
-
-    override val members: Items<KookMember>
-        get() = effectedItemsBySequence { baseBot.internalMembers(source.id) }
-
-    override suspend fun owner(): KookMember {
-        return baseBot.internalMember(source.id, id.literal)
-            ?: throw kookMemberNotExistsException(source.id)
+    override suspend fun botAsMember(): KookMember {
+        // TODO
+        return botMember
     }
 
-    override val ownerId: ID by stringID { source.userId }
+    override val channels: Collectable<KookChatChannel>
+        get() = bot.internalChannels(source.id).asCollectable()
 
-    override suspend fun member(id: ID): KookMember? =
-        baseBot.internalMember(source.id, id.literal)
+    override suspend fun channel(id: ID): KookChatChannel? =
+        bot.internalChannel(id.literal)
 
-    @ExperimentalSimbotAPI
-    override val roles: Items<KookGuildRoleImpl>
-        get() = itemsByFlow { prop ->
-            val pageSize = prop.batch.takeIf { it > 0 } ?: KookApi.DEFAULT_MAX_PAGE_SIZE
-            val limit = prop.limit.takeIf { it > 0 }
-            val offset = prop.offset.takeIf { it > 0 }
-            val startPage = offset?.div(pageSize) ?: KookApi.DEFAULT_START_PAGE
-            val drop = offset?.mod(pageSize) ?: 0
+    override val chatChannels: Collectable<ChatChannel>
+        get() = TODO("Not yet implemented")
 
-            flow {
-                var page = startPage
-                do {
-                    val result = GetGuildRoleListApi
-                        .create(source.id, page = page, pageSize = pageSize)
-                        .requestDataBy(bot)
-                    val items = result.items
-                    items.forEach {
-                        emit(it)
-                    }
-                    page = result.meta.page + 1
-
-                } while (items.isNotEmpty() && result.meta.page < result.meta.pageTotal)
-            }.drop(drop).let { flow ->
-                if (limit != null) {
-                    flow.take(limit)
-                } else {
-                    flow
-                }
-            }.map { r ->
-                KookGuildRoleImpl(baseBot, this, r)
-            }
-        }
+    override suspend fun chatChannel(id: ID): KookChatChannel? {
+        TODO("Not yet implemented")
+    }
 
     @ExperimentalSimbotAPI
-    override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(baseBot, this)
-
-    @ExperimentalSimbotAPI
-    override val categories: Items<KookCategoryChannel>
-        get() = effectedItemsBySequence { baseBot.internalCategories(source.id) }
+    override val categories: Collectable<KookCategoryChannel>
+        get() = bot.internalCategories(source.id).asCollectable()
 
     @ExperimentalSimbotAPI
     override fun getCategory(id: ID): KookCategoryChannel? =
-        baseBot.internalCategory(id.literal)
+        bot.internalCategory(id.literal)
+
+
+    override val members: Collectable<KookMember>
+        get() = bot.internalMembers(source.id).asCollectable()
+
+    override suspend fun owner(): KookMember {
+        return bot.internalMember(source.id, id.literal)
+            ?: throw kookMemberNotExistsException(source.id)
+    }
+
+    override val ownerId: ID
+        get() = source.userId.ID
+
+    override suspend fun member(id: ID): KookMember? =
+        bot.internalMember(source.id, id.literal)
+
+    @ExperimentalSimbotAPI
+    override val roles: Collectable<KookGuildRoleImpl>
+        get() = getRoles(null, null)
+
+    @ExperimentalSimbotAPI
+    override fun getRoles(startPage: Int?, pageSize: Int?): Collectable<KookGuildRoleImpl> {
+        require(pageSize == null || pageSize > 0) { "'pageSize' must be null or > 0, but $pageSize" }
+        require(startPage == null || startPage >= 0) { "'startPage' must be null or >= 0, but $pageSize" }
+
+        val pageSize1 = pageSize?.takeIf { it > 0 } ?: KookApi.DEFAULT_MAX_PAGE_SIZE
+        val startPage1 = startPage ?: KookApi.DEFAULT_START_PAGE
+
+        return flow {
+            var page = startPage1
+            do {
+                val result = GetGuildRoleListApi
+                    .create(source.id, page = page, pageSize = pageSize1)
+                    .requestDataBy(bot)
+                val items = result.items
+                items.forEach {
+                    emit(it)
+                }
+                page = result.meta.page + 1
+
+            } while (items.isNotEmpty() && result.meta.page < result.meta.pageTotal)
+        }.map { r ->
+            KookGuildRoleImpl(bot, this, r)
+        }.asCollectable()
+    }
+
+    @ExperimentalSimbotAPI
+    override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(bot, this)
 
     override fun toString(): String {
         return "KookGuild(id=${source.id}, name=${source.name})"
@@ -138,13 +142,13 @@ internal class KookGuildImpl(
 
 @OptIn(ExperimentalSimbotAPI::class)
 private class KookGuildRoleCreatorImpl(
-    private val baseBot: KookBotImpl,
+    private val bot: KookBotImpl,
     private val guild: KookGuildImpl,
 ) : KookGuildRoleCreator {
     override var name: String? = null
 
     override suspend fun create(): KookGuildRole {
-        val role = CreateGuildRoleApi.create(guild.source.id, name).requestDataBy(guild.bot)
-        return KookGuildRoleImpl(baseBot, guild, role)
+        val role = CreateGuildRoleApi.create(guild.source.id, name).requestDataBy(bot)
+        return KookGuildRoleImpl(bot, guild, role)
     }
 }

@@ -58,7 +58,7 @@ public sealed class KookMessageEvent : KookEvent<TextExtra, KEvent<TextExtra>>()
 
     override val id: ID get() = sourceEvent.msgId.ID
 
-    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val time: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     /**
      * 接收到的消息体。

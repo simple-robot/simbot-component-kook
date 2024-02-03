@@ -55,7 +55,7 @@ internal class KookMemberRoleImpl(
 
         val deleted = api.requestResultBy(baseBot)
 
-        if (deleted.isHttpSuccess || deleted.isSuccess) {
+        if (deleted.isHttpSuccess && deleted.isSuccess) {
             return
         }
 

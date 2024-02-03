@@ -17,7 +17,7 @@
 
 package love.forte.simbot.component.kook.internal
 
-import love.forte.simbot.SimbotIllegalArgumentException
+import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.message.*
@@ -30,14 +30,17 @@ import love.forte.simbot.kook.api.userchat.UserChatView
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.MessageContent
+import kotlin.coroutines.CoroutineContext
 
 /**
  *
  * @author ForteScarlet
  */
 internal class KookUserChatImpl(
-    override val bot: KookBotImpl, override val source: UserChatView,
+    private val bot: KookBotImpl, override val source: UserChatView,
 ) : KookUserChat {
+    override val coroutineContext: CoroutineContext
+        get() = bot.subContext
 
     override fun toString(): String {
         return "KookUserChat(code=${source.code}, target=${source.targetInfo})"
@@ -52,13 +55,13 @@ internal class KookUserChatImpl(
 
     override suspend fun send(message: Message): KookMessageReceipt {
         return message.sendToDirectByTargetId(bot, source.targetInfo.id, null, null, null)
-            ?: throw SimbotIllegalArgumentException("Valid messages must not be empty.")
+            ?: throw IllegalArgumentException("Valid messages must not be empty.")
     }
 
-    override suspend fun send(message: MessageContent): KookMessageReceipt {
-        return when (message) {
+    override suspend fun send(messageContent: MessageContent): KookMessageReceipt {
+        return when (messageContent) {
             is KookReceiveMessageContent -> {
-                val source = message.source
+                val source = messageContent.source
                 SendDirectMessageApi.createByTargetId(
                     targetId = this.source.targetInfo.id,
                     content = source.content,
@@ -69,7 +72,7 @@ internal class KookUserChatImpl(
             }
 
             is KookChannelMessageDetailsContent -> {
-                val details = message.details
+                val details = messageContent.details
                 SendDirectMessageApi.createByTargetId(
                     targetId = this.source.targetInfo.id,
                     content = details.content,
@@ -80,12 +83,13 @@ internal class KookUserChatImpl(
             }
 
             else -> {
-                send(message.messages)
+                send(messageContent.messages)
             }
         }
     }
 
-    override suspend fun delete(): Boolean {
-        return DeleteUserChatApi.create(source.code).requestResultBy(bot).isSuccess
+    override suspend fun delete(vararg options: DeleteOption) {
+        // TODO options
+        DeleteUserChatApi.create(source.code).requestResultBy(bot)
     }
 }

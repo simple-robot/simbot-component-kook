@@ -84,13 +84,6 @@ kotlin {
             }
         }
 
-        jvmMain {
-            dependencies {
-                compileOnly(simbotApi) // use @Api4J annotation
-                compileOnly(simbotAnnotations) // use @Api4J annotation
-            }
-        }
-
         jvmTest {
             dependencies {
                 implementation(libs.ktor.client.cio)

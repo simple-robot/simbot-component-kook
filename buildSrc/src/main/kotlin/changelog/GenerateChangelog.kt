@@ -18,7 +18,8 @@
 package changelog
 
 import org.gradle.api.Project
-import simbotVersion
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileWriter
@@ -39,8 +40,10 @@ fun Project.generateChangelog(tag: String) {
         if (!file.exists()) {
             file.createNewFile()
         }
+        val libs = rootProject.extensions.getByType<VersionCatalogsExtension>()
+            .named("libs")
 
-        val coreVersion = simbotVersion
+        val coreVersion = libs.findVersion("simbot").get()
 
         file.writeText(
             """

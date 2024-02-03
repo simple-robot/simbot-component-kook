@@ -34,7 +34,7 @@ import love.forte.simbot.message.doSafeCast
  * @author ForteScarlet
  */
 public abstract class KookMessageBtnClickEvent : KookSystemEvent() {
-    override val timestamp: Timestamp get() = Timestamp.byMillisecond(sourceEvent.msgTimestamp)
+    override val time: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<MessageBtnClickEventExtra>
 

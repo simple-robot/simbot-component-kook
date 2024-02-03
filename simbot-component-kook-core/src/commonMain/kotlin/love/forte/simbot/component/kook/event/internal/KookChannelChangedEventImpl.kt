@@ -19,10 +19,9 @@
 
 package love.forte.simbot.component.kook.event.internal
 
-import love.forte.simbot.Api4J
-import love.forte.simbot.annotations.ExperimentalSimbotAPI
-import love.forte.simbot.component.kook.KookChatChannel
+import love.forte.simbot.annotations.Api4J
 import love.forte.simbot.component.kook.KookCategoryChannel
+import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.event.*
@@ -46,7 +45,7 @@ internal data class KookAddedChannelEventImpl(
 ) : KookAddedChannelEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceBody.guildId, sourceBody.userId)
     override suspend fun source(): KookGuild = _source
-    override suspend fun channel(): KookChatChannel = _after
+    override suspend fun content(): KookChatChannel = _after
 }
 
 @Suppress("UnnecessaryOptInAnnotation")
@@ -58,11 +57,11 @@ internal data class KookUpdatedChannelEventImpl(
     override val sourceEventContent: String
 ) : KookUpdatedChannelEvent() {
     override suspend fun source(): KookGuild = _source
-    override suspend fun channel(): KookChatChannel = _channel
+    override suspend fun content(): KookChatChannel = _channel
 }
 
 @Suppress("UnnecessaryOptInAnnotation")
-@OptIn(Api4J::class, ExperimentalSimbotApi::class)
+@OptIn(Api4J::class)
 internal data class KookDeletedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<DeletedChannelEventExtra>,
@@ -71,7 +70,7 @@ internal data class KookDeletedChannelEventImpl(
     override val sourceEventContent: String
 ) : KookDeletedChannelEvent() {
     override suspend fun source(): KookGuild = _source
-    override suspend fun before(): KookChatChannel = _before
+    override suspend fun content(): KookChatChannel = _before
 }
 
 internal data class KookAddedCategoryEventImpl(
@@ -82,7 +81,7 @@ internal data class KookAddedCategoryEventImpl(
     override val sourceEventContent: String
 ) : KookAddedCategoryEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceBody.guildId, sourceBody.userId)
-    override suspend fun category(): KookCategoryChannel = _category
+    override suspend fun content(): KookCategoryChannel = _category
     override suspend fun source(): KookGuild = _source
 }
 
@@ -94,12 +93,12 @@ internal data class KookUpdatedCategoryEventImpl(
     private val _category: KookCategoryChannelImpl,
     override val sourceEventContent: String
 ) : KookUpdatedCategoryEvent() {
-    override suspend fun category(): KookCategoryChannel = _category
+    override suspend fun content(): KookCategoryChannel = _category
     override suspend fun source(): KookGuild = _source
 }
 
 @Suppress("UnnecessaryOptInAnnotation")
-@OptIn(Api4J::class, ExperimentalSimbotApi::class)
+@OptIn(Api4J::class)
 internal data class KookDeletedCategoryEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<DeletedChannelEventExtra>,
@@ -108,7 +107,7 @@ internal data class KookDeletedCategoryEventImpl(
     override val sourceEventContent: String
 ) : KookDeletedCategoryEvent() {
     override suspend fun source(): KookGuild = _source
-    override suspend fun before(): KookCategoryChannel = _before
+    override suspend fun content(): KookCategoryChannel = _before
 }
 
 @Suppress("UnnecessaryOptInAnnotation")
@@ -123,7 +122,7 @@ internal data class KookPinnedMessageEventImpl(
     override val operator: KookMemberImpl? = bot.internalMember(sourceEvent.targetId, sourceBody.operatorId)
 
     override suspend fun source(): KookGuild = _source
-    override suspend fun channel(): KookChatChannel = _channel
+    override suspend fun content(): KookChatChannel = _channel
 
     override suspend fun queryMsg(): MessageContent {
         return GetChannelMessageViewApi.create(sourceBody.msgId).requestDataBy(bot).toContent(bot)
@@ -142,7 +141,7 @@ internal data class KookUnpinnedMessageEventImpl(
     override val operator: KookMemberImpl? = bot.internalMember(sourceEvent.targetId, sourceBody.operatorId)
 
     override suspend fun source(): KookGuild = _source
-    override suspend fun channel(): KookChatChannel = _channel
+    override suspend fun content(): KookChatChannel = _channel
 
     override suspend fun queryMsg(): MessageContent {
         return GetChannelMessageViewApi.create(sourceBody.msgId).requestDataBy(bot).toContent(bot)

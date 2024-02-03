@@ -33,9 +33,7 @@ import love.forte.simbot.component.kook.role.KookGuildRoleUpdater
 import love.forte.simbot.component.kook.role.KookMemberRole
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.component.kook.util.requestResultBy
-import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.api.ApiResultException
-import love.forte.simbot.kook.api.KookApi
 import love.forte.simbot.kook.api.role.DeleteGuildRoleApi
 import love.forte.simbot.kook.api.role.GrantGuildRoleApi
 import love.forte.simbot.kook.api.role.UpdateGuildRoleApi
@@ -90,7 +88,7 @@ internal class KookGuildRoleImpl(
         val api = DeleteGuildRoleApi.create(guildId = guild.source.id, roleId = source.roleId)
         val deleted = api.requestResultBy(baseBot)
 
-        if (deleted.isHttpSuccess || deleted.isSuccess) {
+        if (deleted.isHttpSuccess && deleted.isSuccess) {
             return
         }
 

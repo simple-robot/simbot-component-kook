@@ -26,7 +26,9 @@ import love.forte.simbot.kook.api.asset.CreateAssetApi
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.message.Image
 import love.forte.simbot.message.RemoteImage
+import love.forte.simbot.message.RemoteUrlAwareImage
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * 与上传后的媒体资源相关的消息类型。
@@ -36,7 +38,7 @@ import kotlin.jvm.JvmStatic
  *
  */
 @Serializable
-public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageElement<M> {
+public sealed class KookAssetMessage : KookMessageElement {
     /**
      * 创建的文件资源。
      */
@@ -51,7 +53,6 @@ public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageEleme
     public abstract val type: Int
 
     public companion object {
-
         /**
          * 使用当前的 [Asset] 构建一个 [KookAssetMessage] 实例。
          * @param type 在发送时所需要使用的消息类型。通常选择为 [MessageType.IMAGE]、[MessageType.FILE]、[MessageType.VIDEO] 中的值，即 `2`、`3`、`4`。
@@ -72,6 +73,10 @@ public sealed class KookAssetMessage<M : KookAssetMessage<M>> : KookMessageEleme
          */
         @JvmStatic
         public fun Asset.asImage(): KookAssetImage = KookAssetImage(this)
+    }
+
+    override fun toString(): String {
+        return "KookAssetMessage(asset=$asset, type=$type)"
     }
 }
 
@@ -96,29 +101,8 @@ public data class KookAsset(
      */
     @SerialName("assetType")
     override val type: Int
-) : KookAssetMessage<KookAsset>() {
+) : KookAssetMessage() {
     public constructor(asset: Asset, type: MessageType) : this(asset, type.type)
-
-//    /**
-//     * 通过 [Asset.url] 构建得到 [URLResource].
-//     */
-//    @Suppress("MemberVisibilityCanBePrivate")
-//    public val urlResource: URLResource = URL(asset.url).toResource()
-//
-//    /**
-//     * 通过 [Asset.url] 构建得到 [URLResource].
-//     *
-//     * @see urlResource
-//     */
-//    @JvmSynthetic
-//    override suspend fun resource(): URLResource = urlResource
-//
-//    @Api4J
-//    override val resource: URLResource
-//        get() = urlResource
-//    @Api4J
-//    override val resourceAsync: CompletableFuture<out URLResource>
-//        get() = CompletableFuture.completedFuture(urlResource)
 }
 
 
@@ -128,12 +112,24 @@ public data class KookAsset(
  */
 @SerialName("kook.asset.img")
 @Serializable
-public data class KookAssetImage(override val asset: Asset) : KookAssetMessage<KookAssetImage>(), RemoteImage {
+public data class KookAssetImage(override val asset: Asset) : KookAssetMessage(), RemoteUrlAwareImage {
     override val type: Int
         get() = MessageType.IMAGE.type
 
+    /**
+     * @see Asset.url
+     */
     override val id: ID
-        get() = asset.url.ID
+        get() = assetUrl.ID
+
+    /**
+     * @see Asset.url
+     */
+    public val assetUrl: String
+        get() = asset.url
+
+    @JvmSynthetic
+    override suspend fun url(): String = assetUrl
 }
 
 

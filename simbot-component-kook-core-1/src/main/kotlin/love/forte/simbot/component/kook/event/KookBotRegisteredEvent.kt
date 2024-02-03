@@ -35,7 +35,7 @@ import love.forte.simbot.randomID
 public abstract class KookBotRegisteredEvent : BotRegisteredEvent() {
 
     override val id: ID = randomID()
-    override val timestamp: Timestamp = Timestamp.now()
+    override val time: Timestamp = Timestamp.now()
     abstract override val bot: KookBot
     override val key: InternalEvent.Key<KookBotRegisteredEvent>
         get() = Key
