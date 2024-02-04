@@ -22,39 +22,48 @@ package kook.internal.processors.apireader
 
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getKotlinClassByName
-import com.google.devtools.ksp.isAbstract
+import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ksp.toClassName
 import java.io.BufferedWriter
 import java.io.File
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.bufferedWriter
 
-private const val KOOK_API_CLASS_NAME = "love.forte.simbot.kook.api.KookApi"
+private const val KOOK_EVENT_CLASS_NAME = "love.forte.simbot.kook.event.EventExtra"
+private const val EVENT_READ_TARGET_CLASS_OPTION_KEY = "kook.api.finder.event.class"
+private const val EVENT_READ_TARGET_FILE_OPTION_KEY = "kook.api.finder.event.output"
 
-private const val API_READ_TARGET_FILE_OPTION_KEY = "kook.api.finder.api.output"
 
-abstract class ReaderProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
-    abstract val optionName: String
-    abstract val targetClassName: String
+/**
+ *
+ * @author ForteScarlet
+ */
+class EventReaderProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
+    private val EXPECT_VISIBILITY = setOf(Visibility.PUBLIC, Visibility.PROTECTED)
+
+    private val targetClassName = environment.options[EVENT_READ_TARGET_CLASS_OPTION_KEY]
+        ?: KOOK_EVENT_CLASS_NAME
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val targetFilePath: String? = environment.options[optionName]
+        val targetFilePath: String? = environment.options[EVENT_READ_TARGET_FILE_OPTION_KEY]
 
         val targetFile = File(targetFilePath ?: run {
-            val msg = "target output file option ['$optionName'] is null!"
+            val msg = "target output file option ['$EVENT_READ_TARGET_FILE_OPTION_KEY'] is null!"
             environment.logger.warn(msg)
             return emptyList()
         })
 
-        environment.logger.info("target output file: ${targetFile.absolutePath}")
+        environment.logger.info("Target class name: $targetClassName")
+        environment.logger.info("Target output file: ${targetFile.absolutePath}")
         val targetClass = resolver.getKotlinClassByName(targetClassName)
-        environment.logger.info("apiClass: $targetClassName")
+        environment.logger.info("apiClass: $targetClass")
         targetClass ?: return emptyList()
 
         val targetClasses = resolver.getAllFiles().flatMap { it.declarations }
@@ -62,7 +71,8 @@ abstract class ReaderProcessor(private val environment: SymbolProcessorEnvironme
             .filter {
                 targetClass.asStarProjectedType().isAssignableFrom(it.asStarProjectedType())
             }
-            .filter { !it.isAbstract() }
+//            .filter { !it.isAbstract() }
+            .filter { it.getVisibility() in EXPECT_VISIBILITY }
             .toList()
 
         if (!targetFile.exists()) {
@@ -81,58 +91,50 @@ abstract class ReaderProcessor(private val environment: SymbolProcessorEnvironme
             writer.writeDeflistTo(targetClasses)
         }
 
-
         return emptyList()
     }
 
-}
+    private fun BufferedWriter.writeDeflistTo(list: List<KSClassDeclaration>) {
+        write("<deflist>\n")
+        list.forEach { declaration ->
+            write("<def title=\"${declaration.simpleName.asString()}\">\n")
+            newLine()
+            write("`${declaration.toClassName().canonicalName}`\n")
+            newLine()
+            val serName = declaration.annotations.find {
+                it.shortName.asString() == "SerialName"
+            }?.arguments?.find { it.name?.asString() == "value" }?.value?.toString()
 
-/**
- *
- * @author ForteScarlet
- */
-class ApiReaderProcessor(private val environment: SymbolProcessorEnvironment) : ReaderProcessor(environment) {
-    override val optionName: String = API_READ_TARGET_FILE_OPTION_KEY
-    override val targetClassName: String = KOOK_API_CLASS_NAME
-}
-
-private fun BufferedWriter.writeDeflistTo(list: List<KSClassDeclaration>) {
-    write("<deflist>\n")
-    list.forEach { declaration ->
-        write("<def title=\"${declaration.simpleName.asString()}\">\n")
-        newLine()
-        write("`${declaration.toClassName().canonicalName}`\n")
-        newLine()
-
-        val lines = declaration.docString?.trim()
-            ?.lines()
-            ?.map { it.trim() }
-            ?.filter { !it.startsWith('@') }
-            ?.map { line ->
-                line
-                    .replace(linkRegex, "<a ignore-vars=\\\"true\\\" href=\\\"$2\\\">$1</a>")
-                    .replace(refRegex, " `$1` ")
-                    .replace(titleRegex, "\n**$1**\n")
-            }
-
-        if (lines != null) {
-            lines.forEach { line ->
-                write(line)
+            if (serName != null) {
+                write("事件类型名: `\"${serName}\"`\n")
                 newLine()
             }
-            newLine()
-        }
 
+            val lines = declaration.docString?.trim()
+                ?.lines()
+                ?.filter { it.isNotBlank() }
+                ?.map { it.trim() }
+                ?.filter { !it.startsWith('@') }
+                ?.map { line ->
+                    line
+                        .replace(linkRegex, "<a ignore-vars=\\\"true\\\" href=\\\"$2\\\">$1</a>")
+                        .replace(refRegex, " `$1` ")
+                        .replace(titleRegex, "\n**$1**\n")
+                }
+
+            if (lines != null) {
+                lines.forEach { line ->
+                    write(line)
+                    newLine()
+                }
+                newLine()
+            }
+
+            write("</def>\n")
+        }
         newLine()
+        write("</deflist>\n")
 
-        val sealedSub = declaration.getSealedSubclasses().toList()
-        if (sealedSub.isNotEmpty()) {
-            writeDeflistTo(sealedSub)
-        }
-
-        write("</def>\n")
     }
-    newLine()
-    write("</deflist>\n")
-
 }
+

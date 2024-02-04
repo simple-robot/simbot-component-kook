@@ -3,8 +3,19 @@
         SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
 
 <instance-profile id="d"
-                 name="Simple Robot | KOOK"
-                 start-page="starter-topic.md">
+                  name="Simple Robot | KOOK"
+                  start-page="welcome.md">
 
-    <toc-element topic="starter-topic.md"/>
+    <toc-element topic="welcome.md"/>
+    <toc-element toc-title="开始使用">
+        <toc-element topic="use-api.md"/>
+        <toc-element topic="use-stdlib.md"/>
+        <toc-element topic="use-core.md"/>
+        <toc-element topic="use-spring-boot.md"/>
+    </toc-element>
+    <toc-element topic="bot-config.md"/>
+    <toc-element toc-title="API与部分能力">
+        <toc-element topic="api-list.md"/>
+    </toc-element>
+    <toc-element topic="event.md"/>
 </instance-profile>

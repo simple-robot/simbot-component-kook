@@ -1,30 +1,35 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.kotlin.multiplatform.applyTier1
 import love.forte.gradle.common.kotlin.multiplatform.applyTier2
 import love.forte.gradle.common.kotlin.multiplatform.applyTier3
+import util.isCi
 
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     `kook-dokka-partial-configure`
     `simbot-kook-suspend-transform`
+    alias(libs.plugins.ksp)
 }
 
 setup(P)
@@ -101,4 +106,15 @@ kotlin {
             implementation(libs.ktor.client.winhttp)
         }
     }
+}
+
+dependencies {
+    add("kspJvm", project(":internal-processors:api-reader"))
+}
+
+ksp {
+    arg("kook.api.reader.enable", (!isCi).toString())
+//    arg("kook.api.finder.api.output", rootDir.resolve("generated-docs/api-list.md").absolutePath)
+    arg("kook.api.finder.event.output", rootDir.resolve("generated-docs/core-event-list.md").absolutePath)
+    arg("kook.api.finder.event.class", "love.forte.simbot.component.kook.event.KookEvent")
 }
