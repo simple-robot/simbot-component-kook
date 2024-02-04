@@ -16,6 +16,17 @@
 - 基于 [`Kotlin`](https://kotlinlang.org/) 提供 [KMP 多平台](https://kotlinlang.org/docs/multiplatform.html) 特性，提供 Java 友好的API。
 - 基于 [`Kotlin coroutines`](https://github.com/Kotlin/kotlinx.coroutines) 与 [`Ktor`](https://ktor.io/) 提供轻量高效的API。
 
+<note title="文档的重心">
+
+本手册 (simbot4 KOOK组件手册) 是在
+[Simple Robot 应用手册](https://simbot.forte.love)
+的**基础上**，提供与 **KOOK 相关** 的内容的说明与介绍。
+因此在 Simple Robot 应用手册中描述的那些基本的、通用的内容在本手册内可能会简单提起，
+但不会过多赘述。
+
+</note>
+
+## 更多参考
 ### 了解 Simple Robot
 
 - [Simple Robot 应用手册](https://simbot.forte.love)
