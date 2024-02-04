@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.stdlib.internal
@@ -43,6 +46,7 @@ import love.forte.simbot.kook.stdlib.requestDataBy
 import love.forte.simbot.logger.Logger
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException as CoroutineCancellationException
 import kotlinx.coroutines.CancellationException as CreateCancellationException
 
 
@@ -343,6 +347,10 @@ private class HeartbeatJob(val job: Job, val pongChannel: Channel<Signal.Pong>) 
         pongChannel.trySend(pong)
     }
 
+    fun cancel() {
+        job.cancel()
+    }
+
     override fun toString(): String {
         return "HeartbeatJob(job=$job)"
     }
@@ -361,7 +369,6 @@ private class CreateClient(
     private val heartbeatJob: HeartbeatJob
 ) : State() {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun invoke(): State {
         val eventProcessChannel = Channel<EventData>(capacity = Channel.BUFFERED)
         eventProcessChannel.invokeOnClose { cause ->
@@ -385,7 +392,9 @@ private class CreateClient(
             .cancellable()
             .buffer()
             .onEach { (event, raw) -> bot.processEvent(event, raw) }
-            .onCompletion { e ->
+            .catch { e ->
+                bot.eventLogger.error("Event process flow on error. Cause: {}", e.message, e)
+            }.onCompletion { e ->
                 if (e == null) {
                     bot.eventLogger.debug("Event process flow is completed. No exception.")
                 } else {
@@ -393,9 +402,9 @@ private class CreateClient(
                         "Event process flow is completed. Cause: {}", e.message, e
                     )
                 }
-            }.catch { e ->
-                bot.eventLogger.error("Event process flow on error. Cause: {}", e.message, e)
             }.launchIn(bot)
+
+        job.invokeOnCompletion { channel.cancel() }
 
         return EventProcessJob(job, channel)
     }
@@ -403,7 +412,7 @@ private class CreateClient(
 
 private class EventProcessJob(
     val job: Job,
-    val eventChannel: Channel<EventData>
+    val eventChannel: Channel<EventData>,
 ) {
     suspend fun sendEvent(eventData: EventData) {
         eventChannel.send(eventData)
@@ -411,6 +420,10 @@ private class EventProcessJob(
 
     fun trySendEvent(eventData: EventData): ChannelResult<Unit> {
         return eventChannel.trySend(eventData)
+    }
+
+    fun cancel() {
+        job.cancel()
     }
 
     override fun toString(): String {
@@ -424,7 +437,13 @@ private class Client(
     val sn: AtomicLong,
     val heartbeatJob: HeartbeatJob,
     val eventProcessJob: EventProcessJob
-)
+) {
+    fun cancel(sessionCause: CoroutineCancellationException? = null) {
+        session.cancel(sessionCause)
+        heartbeatJob.cancel()
+        eventProcessJob.cancel()
+    }
+}
 
 /**
  * 事件循环接收状态
@@ -449,9 +468,11 @@ private class Receiving(
             val reason = session.closeReason.await()
             return if (!bot.isActive) {
                 botLogger.error("The session [{}] (and bot) is no longer active. reason: {}", session, reason)
+                client.cancel()
                 null
             } else {
                 botLogger.error("The session [{}] is no longer active. reason: {}, try to reconnect", session, reason)
+                client.cancel()
                 Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
             }
         }
@@ -469,7 +490,7 @@ private class Receiving(
                     "Receiving next frame on failure,, close current session and try to reconnect",
                     cause
                 )
-                session.cancel(cancelException)
+                client.cancel(sessionCause = cancelException)
                 return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
             }
             frameCatching.onClosed { cause ->
@@ -482,7 +503,7 @@ private class Receiving(
                     "Receiving next frame on failure,, close current session and try to reconnect",
                     cause
                 )
-                session.cancel(cancelException)
+                client.cancel(sessionCause = cancelException)
                 return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
             }
 
@@ -505,7 +526,7 @@ private class Receiving(
             return this
         } catch (cancellation: CreateCancellationException) {
             // 似乎不会到这儿来？
-            session.cancel()
+            client.cancel()
             return if (!bot.isActive) {
                 botLogger.warn("Session (and bot) is cancelled: {}", cancellation.message)
                 botLogger.debug("Session (and bot) is cancelled: {}", cancellation.message, cancellation)
@@ -519,7 +540,7 @@ private class Receiving(
 
         } catch (e: Throwable) {
             botLogger.error("Session received frame failed: {}, cancel current session and try reconnect", e.message, e)
-            session.cancel(CreateCancellationException("unexpected exception was received", e))
+            client.cancel(sessionCause = CreateCancellationException("unexpected exception was received", e))
             // next: Reconnect
             return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
         }
@@ -548,6 +569,7 @@ private class Receiving(
 
             Signal.S_RECONNECT -> {
                 eventLogger.debug("Reconnect signal: {}", eventString)
+                client.cancel()
                 return Reconnect(bot, botLogger, client.isCompress, client.sn.value, hello.d.sessionId)
             }
 
