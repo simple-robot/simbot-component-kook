@@ -263,7 +263,7 @@ internal fun KookBotImpl.registerEvent() {
                                 .requestDataBy(thisBot)
                         }.buffer(200)
 
-                        lateinit var botAsMember: KookMemberImpl
+//                        lateinit var botAsMember: KookMemberImpl
 
                         val guild = inCacheModify {
                             val guild = KookGuildImpl(thisBot, guildInfo)
@@ -274,9 +274,9 @@ internal fun KookBotImpl.registerEvent() {
 
                             members.collect {
                                 val member = KookMemberImpl(thisBot, it, guildId)
-                                if (it.id == thisBot.sourceBot.botUserInfo.id) {
-                                    botAsMember = member
-                                }
+                                //if (it.id == thisBot.sourceBot.botUserInfo.id) {
+                                    //botAsMember = member
+                                //}
 
                                 setMember(guildId, it.id, member)
                             }
@@ -297,11 +297,6 @@ internal fun KookBotImpl.registerEvent() {
                     // Bot 离开服务器
                     is SelfExitedGuildEventExtra -> {
                         val guildId = ex.body.guildId
-                        val botMember: KookMemberImpl = internalMember(ex.body.guildId, thisBot.botUserInfo.id)
-                            ?: run {
-                                logger.warn("unknown bot self {} as member in event {}", thisBot.botUserInfo.id, event)
-                                return@processor
-                            }
 
                         val guild = inCacheModify {
                             // remove guilds
