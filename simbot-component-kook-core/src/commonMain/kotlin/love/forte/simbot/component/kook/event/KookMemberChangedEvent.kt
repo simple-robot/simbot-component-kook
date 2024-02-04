@@ -1,36 +1,35 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.ID
-import love.forte.simbot.action.ActionType
+import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.id.ID
+import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
-import love.forte.simbot.definition.Organization
-import love.forte.simbot.definition.UserInfo
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.*
-import love.forte.simbot.message.doSafeCast
 import love.forte.simbot.suspendrunner.STP
-import love.forte.simbot.utils.item.Items
 import love.forte.simbot.kook.event.Event as KkEvent
 import love.forte.simbot.kook.objects.User as KUser
 
@@ -54,7 +53,7 @@ import love.forte.simbot.kook.objects.User as KUser
  * ## 相关事件
  * ### 成员的频道变更事件
  * [KookMemberChannelChangedEvent] 事件及其子类型
- * [KookMemberJoinedChannelEvent]、[KookMemberExitedChannelEvent]
+ * [KookMemberExitedChannelEvent]、[KookMemberJoinedChannelEvent]
  * 代表了一个频道服务器中的某个群成员加入、离开某一个频道（通常为语音频道）的事件。
  *
  * ### 成员的服务器变更事件
@@ -73,199 +72,65 @@ import love.forte.simbot.kook.objects.User as KUser
  *
  * @author forte
  */
-@BaseEvent
-public abstract class KookMemberChangedEvent : KookSystemEvent(), MemberChangedEvent {
+@STP
+public abstract class KookMemberChangedEvent : KookSystemEvent(), ChangeEvent {
     /**
      * 变更时间。
      */
-    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
-
-    /**
-     * 本次变更涉及的频道成员信息。同 [user]
-     */
-    @STP
-    abstract override suspend fun member(): KookMember
-
-    /**
-     * 本次变更涉及的频道成员信息。同 [member]
-     */
-    @STP
-    override suspend fun user(): KookMember = member()
-
-    /**
-     * 可能存在的变更前成员信息。
-     */
-    @STP
-    abstract override suspend fun before(): KookMember?
-
-    /**
-     * 可能存在的变更后成员信息。
-     */
-    @STP
-    abstract override suspend fun after(): KookMember?
-
-    /**
-     * 变更成员所处组织。
-     */
-    @STP
-    abstract override suspend fun source(): Organization
-
-    /**
-     * 变更成员所处组织。同 [source].
-     */
-    @STP
-    override suspend fun organization(): Organization = source()
-
-    /**
-     * 可能存在的变更操作者。
-     */
-    @STP
-    abstract override suspend fun operator(): KookMember?
-
-    public companion object Key : BaseEventKey<KookMemberChangedEvent>(
-        "kook.member_changed", KookEvent, MemberChangedEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberChangedEvent? = doSafeCast(value)
-    }
-
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 }
 
 // region member相关
 
 // region 频道进出相关
 /**
- * KOOK [成员变更事件][KookMemberChangedEvent] 中与**频道进出**相关的变更事件。
- * 这类事件代表某人进入、离开某个频道（通常为语音频道），而不代表成员进入、离开了当前的频道服务器（`guild`）。
+ * KOOK [成员变更事件][KookMemberChangedEvent] 中与**语音频道的进出**相关的变更事件。
+ * 这类事件代表某人进入、离开某个语音频道 (`channel`)，而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
-@BaseEvent
-public abstract class KookMemberChannelChangedEvent : KookMemberChangedEvent() {
+@STP
+public abstract class KookMemberChannelChangedEvent : KookMemberChangedEvent(), OrganizationSourceEvent {
+    /**
+     * 事件涉及的频道信息。
+     */
+    abstract override suspend fun content(): KookMember
 
     /**
-     * 事件涉及的频道信息。同 [organization].
+     * 事件涉及的频道。
      */
-    @STP
-    abstract override suspend fun source(): KookChatChannel
-
+    public abstract suspend fun channel(): KookChatChannel
 
     /**
-     * 事件涉及的频道信息。同 [source].
+     * 事件发生的频道服务器。
      */
-    @STP
-    override suspend fun organization(): KookChatChannel = source()
-
-
-    public companion object Key : BaseEventKey<KookMemberChannelChangedEvent>(
-        "kook.member_channel_changed", KookMemberChangedEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberChannelChangedEvent? = doSafeCast(value)
-    }
-
+    abstract override suspend fun source(): KookGuild
 }
 
 
 /**
- * KOOK 成员离开(频道)事件。
- *
- * 此事件被触发时，相关成员**已经**被移除自对应频道，且终止了内置的所有任务。
- * 因此 [before] 不可用于执行禁言等操作，[before] 也不会存在于当前频道成员中。
+ * KOOK 成员加入(语音频道)事件。
  *
  * @see JoinedChannelEventExtra
  * @author forte
  */
-public abstract class KookMemberExitedChannelEvent : KookMemberChannelChangedEvent(), MemberDecreaseEvent {
+public abstract class KookMemberJoinedChannelEvent : KookMemberChannelChangedEvent() {
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<JoinedChannelEventExtra>
 
     override val sourceBody: JoinedChannelEventBody
         get() = sourceEvent.extra.body
-
-    /**
-     * 离开的成员。
-     *
-     * 此成员已经被移除自频道，因此 [before] 不可用于执行禁言等操作，
-     * 也不会存在于当前频道成员中。
-     */
-    @STP
-    override suspend fun before(): KookMember = member()
-
-    /**
-     * 成员离开后。始终为null。
-     */
-    @STP
-    override suspend fun after(): KookMember? = null
-
-    /**
-     * 成员离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-    /**
-     * KOOK 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE] （无法确定真正的类型）。
-     */
-    override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
-    override val key: Event.Key<out KookMemberExitedChannelEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookMemberExitedChannelEvent>(
-        "kook.member_exited_channel", KookMemberChannelChangedEvent, MemberDecreaseEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberExitedChannelEvent? = doSafeCast(value)
-    }
 }
 
 /**
- * KOOK 成员加入(频道)事件。
+ * KOOK 成员离开(语音频道)事件。
  *
  * @see ExitedChannelEventExtra
  * @author forte
  */
-public abstract class KookMemberJoinedChannelEvent : KookMemberChannelChangedEvent(), MemberIncreaseEvent {
-
+public abstract class KookMemberExitedChannelEvent : KookMemberChannelChangedEvent() {
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<ExitedChannelEventExtra>
 
     override val sourceBody: ExitedChannelEventBody
         get() = sourceEvent.extra.body
-
-    /**
-     * 事件涉及的频道信息。
-     */
-    @STP
-    abstract override suspend fun source(): KookChatChannel
-
-    /**
-     * 增加的成员。
-     */
-    @STP
-    override suspend fun after(): KookMember = member()
-
-    /**
-     * 始终为null。
-     */
-    @STP
-    override suspend fun before(): KookMember? = null
-
-    /**
-     * KOOK 群员进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-    /**
-     * KOOK 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
-     */
-    override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
-    override val key: Event.Key<out KookMemberJoinedChannelEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookMemberJoinedChannelEvent>(
-        "kook.member_joined_channel", KookMemberChannelChangedEvent, MemberIncreaseEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberJoinedChannelEvent? = doSafeCast(value)
-    }
 }
 // endregion
 
@@ -275,28 +140,12 @@ public abstract class KookMemberJoinedChannelEvent : KookMemberChannelChangedEve
  * KOOK [成员变更事件][KookMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
  */
-@BaseEvent
+@STP
 public abstract class KookMemberGuildChangedEvent : KookMemberChangedEvent() {
-
     /**
-     * 涉及的相关频道服务器。同 [organization].
+     * 涉及的相关频道服务器。
      */
-    @STP
-    abstract override suspend fun source(): KookGuild
-
-    /**
-     * 涉及的相关频道服务器。同 [source].
-     */
-    @STP
-    override suspend fun organization(): KookGuild = source()
-
-    abstract override val key: Event.Key<out KookMemberGuildChangedEvent>
-
-    public companion object Key : BaseEventKey<KookMemberGuildChangedEvent>(
-        "kook.member_guild_changed", KookMemberChangedEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberGuildChangedEvent? = doSafeCast(value)
-    }
+    abstract override suspend fun content(): KookGuild
 }
 
 
@@ -306,8 +155,8 @@ public abstract class KookMemberGuildChangedEvent : KookMemberChangedEvent() {
  * @see ExitedGuildEventExtra
  * @author forte
  */
+@STP
 public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent(), GuildMemberDecreaseEvent {
-
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<ExitedGuildEventExtra>
 
     override val sourceBody: ExitedGuildEventBody
@@ -316,62 +165,12 @@ public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent()
     /**
      * 离开的成员。
      */
-    @STP
     abstract override suspend fun member(): KookMember
-
-    /**
-     * 离开的成员。同 [member].
-     *
-     * @see member
-     */
-    @STP
-    override suspend fun before(): KookMember = member()
 
     /**
      * 涉及的频道服务器。
      */
-    @STP
-    abstract override suspend fun guild(): KookGuild
-
-    /**
-     * 涉及的相关频道服务器。同 [source].
-     */
-    @STP
-    override suspend fun organization(): KookGuild = guild()
-
-    /**
-     * 成员离开后，始终为null。
-     */
-    @STP
-    override suspend fun after(): KookMember? = null
-
-    /**
-     * KOOK 群员离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-    /**
-     * 涉及的频道服务器。同 [guild]
-     * @see guild
-     */
-    @STP
-    override suspend fun source(): KookGuild = guild()
-
-    /**
-     * KOOK 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
-     */
-    override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
-    override val key: Event.Key<out KookMemberExitedGuildEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookMemberExitedGuildEvent>(
-        "kook.member_exited_guild", KookMemberGuildChangedEvent, GuildMemberDecreaseEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberExitedGuildEvent? = doSafeCast(value)
-    }
+    abstract override suspend fun content(): KookGuild
 }
 
 /**
@@ -380,8 +179,8 @@ public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent()
  * @see JoinedGuildEventExtra
  * @author forte
  */
+@STP
 public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent(), GuildMemberIncreaseEvent {
-
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<JoinedGuildEventExtra>
 
     override val sourceBody: JoinedGuildEventBody
@@ -390,60 +189,12 @@ public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent()
     /**
      * 涉及的相关频道服务器。
      */
-    @STP
-    abstract override suspend fun guild(): KookGuild
-
-    /**
-     * 涉及的相关频道服务器。
-     */
-    @STP
-    override suspend fun organization(): KookGuild = guild()
-
-    /**
-     * 涉及的相关频道服务器。同 [guild]
-     */
-    @STP
-    override suspend fun source(): KookGuild = guild()
+    abstract override suspend fun content(): KookGuild
 
     /**
      * 加入的成员。
      */
-    @STP
     abstract override suspend fun member(): KookMember
-
-    /**
-     * 加入的成员。同 [member].
-     *
-     * @see member
-     */
-    @STP
-    override suspend fun after(): KookMember = member()
-
-    /**
-     * 成员加入前，始终为null。
-     */
-    @STP
-    override suspend fun before(): KookMember? = null
-
-    /**
-     * KOOK 群员进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-    /**
-     * KOOK 群员离开频道事件的行为类型始终为 [主动的][ActionType.PROACTIVE]。
-     */
-    override val actionType: ActionType get() = ActionType.PROACTIVE
-
-    override val key: Event.Key<out KookMemberJoinedGuildEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookMemberJoinedGuildEvent>(
-        "kook.member_joined_guild", KookMemberGuildChangedEvent, GuildMemberIncreaseEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberJoinedGuildEvent? = doSafeCast(value)
-    }
 }
 
 
@@ -456,7 +207,7 @@ public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent()
  * @see UpdatedGuildMemberEventExtra
  * @author forte
  */
-public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), GuildEvent {
+public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), MemberChangeEvent, OrganizationSourceEvent {
 
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<UpdatedGuildMemberEventExtra>
 
@@ -473,55 +224,13 @@ public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), GuildEv
      * 涉及的相关频道服务器。
      */
     @STP
-    abstract override suspend fun guild(): KookGuild
-
-    /**
-     * 涉及的相关频道服务器。
-     */
-    @STP
-    override suspend fun organization(): KookGuild = guild()
-
-    /**
-     * 涉及的相关频道服务器。同 [guild]
-     */
-    @STP
-    override suspend fun source(): KookGuild = guild()
+    abstract override suspend fun source(): KookGuild
 
     /**
      * 已经发生变更后的成员。
      */
     @STP
-    abstract override suspend fun member(): KookMember
-
-    /**
-     * 已经发生变更后的成员。同 [member].
-     *
-     * @see member
-     */
-    @STP
-    override suspend fun after(): KookMember = member()
-
-    /**
-     * 发生变更前的成员。
-     */
-    @STP
-    abstract override suspend fun before(): KookMember
-
-    /**
-     * 无法得知操作者，始终为 `null`。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-
-    override val key: Event.Key<out KookMemberUpdatedEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookMemberUpdatedEvent>(
-        "kook.member_updated", KookMemberChangedEvent, GuildEvent
-    ) {
-        override fun safeCast(value: Any): KookMemberUpdatedEvent? = doSafeCast(value)
-    }
+    abstract override suspend fun content(): KookMember
 }
 
 
@@ -530,34 +239,21 @@ public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), GuildEv
 
 // region bot相关
 /**
- * 频道成员的变动事件中，变动本体为bot自身时的事件。对应 KOOK 原始事件的 [SelfExitedGuildEventExtra] 和 [SelfJoinedGuildEventExtra]。
+ * 频道成员的变动事件中，变动本体为bot自身时的事件。
+ * 对应 KOOK 原始事件的 [SelfExitedGuildEventExtra] 和 [SelfJoinedGuildEventExtra]。
  *
  * @see KookBotMemberChangedEvent
  *
  * @author forte
  */
-@BaseEvent
-public abstract class KookBotMemberChangedEvent : KookMemberChangedEvent() {
+@STP
+public abstract class KookBotMemberChangedEvent : KookMemberChangedEvent(), GuildEvent {
     abstract override val sourceBody: BotSelfGuildEventBody
 
     /**
-     * 涉及的相关频道服务器。同 [organization].
+     * 涉及的相关频道服务器。
      */
-    @STP
-    abstract override suspend fun source(): KookGuild
-
-    /**
-     * 涉及的相关频道服务器。同 [source].
-     */
-    @STP
-    override suspend fun organization(): KookGuild = source()
-
-
-    public companion object Key : BaseEventKey<KookBotMemberChangedEvent>(
-        "kook.bot_member_changed", KookMemberChangedEvent
-    ) {
-        override fun safeCast(value: Any): KookBotMemberChangedEvent? = doSafeCast(value)
-    }
+    abstract override suspend fun content(): KookGuild
 }
 
 
@@ -567,47 +263,11 @@ public abstract class KookBotMemberChangedEvent : KookMemberChangedEvent() {
  * @see SelfExitedGuildEventExtra
  * @author forte
  */
-public abstract class KookBotSelfExitedGuildEvent : KookBotMemberChangedEvent(), MemberDecreaseEvent {
-    // TODO impl GuildEvent or GuildInfoContainer?
+public abstract class KookBotSelfExitedGuildEvent : KookBotMemberChangedEvent(), GuildEvent {
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<SelfExitedGuildEventExtra>
 
     override val sourceBody: BotSelfGuildEventBody
         get() = sourceEvent.extra.body
-
-    /**
-     * 即bot自身在频道服务器内的信息。
-     */
-    @STP
-    abstract override suspend fun before(): KookMember
-
-    /**
-     * 始终为null。
-     */
-    @STP
-    override suspend fun after(): KookMember? = null
-
-    /**
-     * KOOK bot离开频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-
-    /**
-     * KOOK 群员离开频道事件的行为类型始终为[主动的][ActionType.PROACTIVE]。
-     */
-    override val actionType: ActionType get() = ActionType.PROACTIVE
-
-
-    override val key: Event.Key<out KookBotSelfExitedGuildEvent>
-        get() = Key
-
-
-    public companion object Key : BaseEventKey<KookBotSelfExitedGuildEvent>(
-        "kook.bot_self_exited", KookBotMemberChangedEvent, MemberDecreaseEvent
-    ) {
-        override fun safeCast(value: Any): KookBotSelfExitedGuildEvent? = doSafeCast(value)
-    }
 }
 
 /**
@@ -616,52 +276,11 @@ public abstract class KookBotSelfExitedGuildEvent : KookBotMemberChangedEvent(),
  * @see SelfJoinedGuildEventExtra
  * @author forte
  */
-public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent(), MemberIncreaseEvent {
-
+public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent() {
     abstract override val sourceEvent: love.forte.simbot.kook.event.Event<SelfJoinedGuildEventExtra>
 
     override val sourceBody: BotSelfGuildEventBody
         get() = sourceEvent.extra.body
-
-    /**
-     * 涉及的相关频道服务器。
-     */
-    @STP
-    abstract override suspend fun source(): KookGuild
-
-    /**
-     * 即bot自身在频道服务器内的信息。
-     */
-    @STP
-    abstract override suspend fun after(): KookMember
-
-    /**
-     * 始终为null。
-     */
-    @STP
-    override suspend fun before(): KookMember? = null
-
-    /**
-     * KOOK bot进入频道事件的操作者始终为null （无法确定操作者）。
-     */
-    @STP
-    override suspend fun operator(): KookMember? = null
-
-
-    /**
-     * KOOK 群员离开频道事件的行为类型始终为主动的。
-     */
-    override val actionType: ActionType
-        get() = ActionType.PROACTIVE
-
-    override val key: Event.Key<out KookBotSelfJoinedGuildEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookBotSelfJoinedGuildEvent>(
-        "kook.bot_self_joined", KookBotMemberChangedEvent, MemberIncreaseEvent
-    ) {
-        override fun safeCast(value: Any): KookBotSelfJoinedGuildEvent? = doSafeCast(value)
-    }
 }
 // endregion
 
@@ -671,12 +290,6 @@ public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent(),
  * 涉及到的原始事件有：
  * - [GuildMemberOfflineEventExtra]
  * - [GuildMemberOnlineEventExtra]
- *
- * 此事件及相关事件属于 [ChangedEvent] 事件，[变化主体][source] 为相对应的[基础用户信息][UserInfo]，[变更前][before] [变更后][after] 为其上下线的状态。
- * 其中变更前后的值满足 [before] == ![after], 且 [after] 永远代表此事件发生后此用户的在线状态。
- * 也因此而满足 [after] == [isOnline].
- *
- * 当 [after] == `true` 时，代表此人由离线状态变为在线状态，反之同理。
  *
  * ## 变化主体
  * 此事件主体是事件中的 [用户ID][GuildMemberOnlineStatusChangedEventBody.userId]
@@ -689,7 +302,13 @@ public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent(),
  *
  * @author forte
  */
-public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), ChangedEvent {
+public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), ChangeEvent {
+    /**
+     * 变更时间。
+     */
+    override val time: Timestamp
+        get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
+
     abstract override val sourceBody: GuildMemberOnlineStatusChangedEventBody
 
     /**
@@ -697,9 +316,8 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
      *
      * @see GuildMemberOnlineStatusChangedEventBody.userId
      */
-    @STP
-    override suspend fun source(): String = sourceBody.userId
-
+    public val userId: ID
+        get() = sourceBody.userId.ID
 
     /**
      * 状态变化后，此用户是否为_在线_状态。
@@ -707,51 +325,30 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
     public abstract val isOnline: Boolean
 
     /**
+     * 同 [isOnline]。
+     */
+    @STP
+    override suspend fun content(): Boolean = isOnline
+
+    /**
      * 此用户与当前bot所同处的频道服务器的id列表。
      *
      * @see GuildMemberOnlineStatusChangedEventBody.guilds
      */
-    public abstract val guildIds: List<ID>
-
+    @Suppress("MemberVisibilityCanBePrivate")
+    public val guildIds: List<ID>
+        get() = sourceBody.guilds.map { it.ID }
 
     /**
      * 通过 [guildIds] 信息获取各个ID对应的 [KookGuild] 实例。
      *
-     * [guilds] 的数据不是根据 [guildIds] 立即生效的，而是在每次获取的时候读取缓存信息。
+     * 注意：[guilds] 的数据不是根据 [guildIds] 立即生效的，
+     * 而是在每次获取的时候读取缓存信息。
      * 因此可能存在获取不到的情况（例如在获取时某 guild 已经被删除），
      * [guilds] 序列中的元素可能无法与 [guildIds] 完全对应。
      *
      */
-    public abstract val guilds: Items<KookGuild>
-
-    /**
-     * 变更前的在线状态。相当于 `!isOnline`.
-     */
-    @STP
-    override suspend fun before(): Boolean = !isOnline
-
-    /**
-     * 变更后的在线状态。同 [isOnline].
-     */
-    @STP
-    override suspend fun after(): Boolean = isOnline
-
-    /**
-     * 变更时间。
-     */
-    override val changedTime: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
-
-
-    override val key: Event.Key<out KookUserOnlineStatusChangedEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookUserOnlineStatusChangedEvent>(
-        "kook.guild_member_online_status_changed", KookSystemEvent, ChangedEvent
-    ) {
-        override fun safeCast(value: Any): KookUserOnlineStatusChangedEvent? = doSafeCast(value)
-    }
-
-
+    public abstract val guilds: Collectable<KookGuild>
 }
 
 
@@ -762,24 +359,14 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
 public abstract class KookMemberOnlineEvent : KookUserOnlineStatusChangedEvent() {
     abstract override val sourceEvent: KkEvent<GuildMemberOnlineEventExtra>
 
+    override val sourceBody: GuildMemberOnlineStatusChangedEventBody
+        get() = sourceEvent.extra.body
+
     /**
      * 此事件代表上线，[isOnline] == true.
      */
     override val isOnline: Boolean
         get() = true
-
-    override val sourceBody: GuildMemberOnlineStatusChangedEventBody
-        get() = sourceEvent.extra.body
-
-    public val userId: ID get() = sourceBody.userId.ID
-
-    override val guildIds: List<ID> get() = sourceBody.guilds.map { it.ID }
-
-
-    public companion object Key :
-        BaseEventKey<KookMemberOnlineEvent>("kook.member_online", KookUserOnlineStatusChangedEvent) {
-        override fun safeCast(value: Any): KookMemberOnlineEvent? = doSafeCast(value)
-    }
 }
 
 /**
@@ -789,21 +376,12 @@ public abstract class KookMemberOnlineEvent : KookUserOnlineStatusChangedEvent()
 public abstract class KookMemberOfflineEvent : KookUserOnlineStatusChangedEvent() {
     abstract override val sourceEvent: KkEvent<GuildMemberOfflineEventExtra>
 
+    override val sourceBody: GuildMemberOnlineStatusChangedEventBody
+        get() = sourceEvent.extra.body
+
     /**
      * 此事件代表下线，[isOnline] == false.
      */
     override val isOnline: Boolean
         get() = false
-
-    override val sourceBody: GuildMemberOnlineStatusChangedEventBody
-        get() = sourceEvent.extra.body
-
-    public val userId: ID get() = sourceBody.userId.ID
-
-    override val guildIds: List<ID> get() = sourceBody.guilds.map { it.ID }
-
-    public companion object Key :
-        BaseEventKey<KookMemberOfflineEvent>("kook.member_offline", KookUserOnlineStatusChangedEvent) {
-        override fun safeCast(value: Any): KookMemberOfflineEvent? = doSafeCast(value)
-    }
 }

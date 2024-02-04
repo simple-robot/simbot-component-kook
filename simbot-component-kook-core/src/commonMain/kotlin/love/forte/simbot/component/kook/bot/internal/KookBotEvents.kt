@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.bot.internal
@@ -32,6 +35,7 @@ import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.event.Event
 import love.forte.simbot.event.onEachError
+import love.forte.simbot.kook.DiscreetKookApi
 import love.forte.simbot.kook.api.guild.GetGuildViewApi
 import love.forte.simbot.kook.api.member.GetGuildMemberListApi
 import love.forte.simbot.kook.api.member.createItemFlow
@@ -65,7 +69,13 @@ internal fun KookBotImpl.registerEvent() {
                     love.forte.simbot.kook.event.Event.ChannelType.GROUP -> {
                         val guildId = ex.guildId!!
 
-                        val channel = internalChannel(targetId)
+                        val guild = internalGuild(guildId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", guildId, event)
+                                return@processor
+                            }
+
+                        val channel = internalChatChannel(targetId)
                             ?: run {
                                 logger.warn("Unknown channel {} in event {}", targetId, event)
                                 return@processor
@@ -84,6 +94,7 @@ internal fun KookBotImpl.registerEvent() {
                                     event.doAs(),
                                     channel,
                                     author,
+                                    guild,
                                     rawEvent
                                 )
                             )
@@ -94,6 +105,7 @@ internal fun KookBotImpl.registerEvent() {
                                     event.doAs(),
                                     author,
                                     channel,
+                                    guild,
                                     rawEvent
                                 )
                             )
@@ -173,7 +185,13 @@ internal fun KookBotImpl.registerEvent() {
                         val userId = ex.body.userId
                         val channelId = ex.body.channelId
 
-                        val channel = internalChannel(channelId)
+                        val guild = internalGuild(guildId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", guildId, event)
+                                return@processor
+                            }
+
+                        val channel = internalChatChannel(channelId)
                             ?: run {
                                 logger.warn("Unknown channel {} in event {}", channelId, event)
                                 return@processor
@@ -189,6 +207,7 @@ internal fun KookBotImpl.registerEvent() {
                             KookMemberJoinedChannelEventImpl(
                                 thisBot,
                                 event.doAs(),
+                                guild,
                                 channel,
                                 member,
                                 rawEvent
@@ -202,7 +221,13 @@ internal fun KookBotImpl.registerEvent() {
                         val userId = ex.body.userId
                         val channelId = ex.body.channelId
 
-                        val channel = internalChannel(channelId)
+                        val guild = internalGuild(guildId)
+                            ?: run {
+                                logger.warn("Unknown guild {} in event {}", guildId, event)
+                                return@processor
+                            }
+
+                        val channel = internalChatChannel(channelId)
                             ?: run {
                                 logger.warn("Unknown channel {} in event {}", channelId, event)
                                 return@processor
@@ -218,6 +243,7 @@ internal fun KookBotImpl.registerEvent() {
                             KookMemberExitedChannelEventImpl(
                                 thisBot,
                                 event.doAs(),
+                                guild,
                                 channel,
                                 member,
                                 rawEvent
@@ -263,7 +289,6 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                botAsMember,
                                 rawEvent
                             )
                         )
@@ -298,7 +323,6 @@ internal fun KookBotImpl.registerEvent() {
                                 thisBot,
                                 event.doAs(),
                                 guild,
-                                botMember,
                                 rawEvent
                             )
                         )
@@ -455,7 +479,7 @@ internal fun KookBotImpl.registerEvent() {
 
                         val channelId = ex.body.channelId
 
-                        val channel = internalChannel(channelId)
+                        val channel = internalChatChannel(channelId)
                             ?: run {
                                 logger.warn("Unknown channel {} in event {}", channelId, event)
                                 return@processor
@@ -482,7 +506,7 @@ internal fun KookBotImpl.registerEvent() {
 
                         val channelId = ex.body.channelId
 
-                        val channel = internalChannel(channelId)
+                        val channel = internalChatChannel(channelId)
                             ?: run {
                                 logger.warn("Unknown channel {} in event {}", channelId, event)
                                 return@processor
@@ -611,6 +635,7 @@ internal fun KookBotImpl.registerEvent() {
     }
 }
 
+@OptIn(DiscreetKookApi::class)
 private suspend fun KookBotImpl.pushUnsupported(event: KEvent<EventExtra>, sourceEventJson: String) {
     pushAndLaunch(
         UnsupportedKookEvent(

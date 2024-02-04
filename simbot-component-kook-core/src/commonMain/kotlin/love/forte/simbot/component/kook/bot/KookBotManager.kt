@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.bot
@@ -22,6 +25,7 @@ import love.forte.simbot.bot.*
 import love.forte.simbot.common.coroutines.mergeWith
 import love.forte.simbot.common.function.ConfigurerFunction
 import love.forte.simbot.common.function.invokeWith
+import love.forte.simbot.common.services.Services
 import love.forte.simbot.component.Component
 import love.forte.simbot.component.NoSuchComponentException
 import love.forte.simbot.component.kook.KookComponent
@@ -132,7 +136,8 @@ public abstract class KookBotManager : JobBasedBotManager(), KookBotRegistrar {
                 configurer.invokeWith(it)
             }
             // merge config
-            config.coroutineContext = config.coroutineContext.mergeWith(context.applicationConfiguration.coroutineContext)
+            config.coroutineContext =
+                config.coroutineContext.mergeWith(context.applicationConfiguration.coroutineContext)
 
             return KookBotManagerImpl(context.eventDispatcher, config, component)
         }
@@ -144,12 +149,21 @@ public abstract class KookBotManager : JobBasedBotManager(), KookBotRegistrar {
  * 实现 [PluginFactoryProvider] 并通过 `Java SPI`
  * 支持 [KookBotManager] 的自动安装。
  */
-public class KookBotManagerAutoRegistrarFactory :
+public class KookBotManagerFactoryProvider :
     PluginFactoryProvider<KookBotManagerConfiguration> {
-    override fun loadConfigures(): Sequence<PluginFactoryConfigurerProvider<KookBotManagerConfiguration>>? {
-        // TODO loadConfigures
-        return super.loadConfigures()
+    override fun loadConfigures(): Sequence<PluginFactoryConfigurerProvider<KookBotManagerConfiguration>> {
+        return Services.loadProviders<KookBotManagerFactoryConfigurerProvider>()
+            .map { it() } + loadJvmConfigurerProviders()
     }
 
     override fun provide(): PluginFactory<*, KookBotManagerConfiguration> = KookBotManager
 }
+
+/**
+ * 用于 [KookBotManagerFactoryProvider.loadConfigures] 中的可自动装配 configuration provider
+ */
+public fun interface KookBotManagerFactoryConfigurerProvider :
+    PluginFactoryConfigurerProvider<KookBotManagerConfiguration>
+
+
+internal expect fun KookBotManagerFactoryProvider.loadJvmConfigurerProviders(): Sequence<KookBotManagerFactoryConfigurerProvider>

@@ -1,29 +1,39 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.internal
 
+import io.ktor.http.*
+import love.forte.simbot.ability.DeleteFailureException
 import love.forte.simbot.ability.DeleteOption
+import love.forte.simbot.ability.StandardDeleteOption.Companion.standardAnalysis
+import love.forte.simbot.ability.isIgnoreOnFailure
+import love.forte.simbot.ability.isIgnoreOnNoSuchTarget
+import love.forte.simbot.common.exception.initExceptionCause
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.message.*
 import love.forte.simbot.component.kook.message.KookMessageCreatedReceipt.Companion.asReceipt
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.component.kook.util.requestResultBy
+import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.message.SendDirectMessageApi
 import love.forte.simbot.kook.api.userchat.DeleteUserChatApi
 import love.forte.simbot.kook.api.userchat.UserChatView
@@ -90,6 +100,44 @@ internal class KookUserChatImpl(
 
     override suspend fun delete(vararg options: DeleteOption) {
         // TODO options
-        DeleteUserChatApi.create(source.code).requestResultBy(bot)
+        val stdOpts = options.standardAnalysis()
+
+        val result = try {
+            DeleteUserChatApi.create(source.code).requestResultBy(bot)
+        } catch (respEx: ApiResponseException) {
+            val response = respEx.response
+            if (response.status.value == HttpStatusCode.NotFound.value) {
+                if (stdOpts.isIgnoreOnNoSuchTarget) {
+                    return
+                }
+
+                throw NoSuchElementException(
+                    "Delete user chat(code=${source.code}, target=${source.targetInfo.id}, ${source.targetInfo.username})" +
+                            " on failure: response status is 404: ${respEx.message}"
+                ).also {
+                    it.initExceptionCause(respEx)
+                }
+            }
+
+            if (stdOpts.isIgnoreOnFailure) {
+                return
+            }
+
+            throw DeleteFailureException(
+                "Delete user chat(code=${source.code}, target=${source.targetInfo.id}, ${source.targetInfo.username})" +
+                        " on failure: response status is not successful: ${response.status}", respEx
+            )
+        }
+
+        if (!result.isSuccess) {
+            if (stdOpts.isIgnoreOnFailure) {
+                return
+            }
+
+            throw DeleteFailureException(
+                "Delete user chat(code=${source.code}, target=${source.targetInfo.id}, ${source.targetInfo.username})" +
+                        " on failure: result code is not successful: $result"
+            )
+        }
     }
 }

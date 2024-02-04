@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.internal
@@ -31,7 +34,6 @@ import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleCreator
 import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
 import love.forte.simbot.component.kook.util.requestDataBy
-import love.forte.simbot.definition.ChatChannel
 import love.forte.simbot.kook.api.KookApi
 import love.forte.simbot.kook.api.role.CreateGuildRoleApi
 import love.forte.simbot.kook.api.role.GetGuildRoleListApi
@@ -50,7 +52,7 @@ internal class KookGuildImpl(
     override val coroutineContext: CoroutineContext
         get() = bot.subContext
 
-    internal lateinit var botMember: KookMemberImpl
+    internal var botMember: KookMemberImpl? = null
 
 //    override val bot: KookGuildBotImpl
 //        get() {
@@ -61,22 +63,23 @@ internal class KookGuildImpl(
 //        }
 
     override suspend fun botAsMember(): KookMember {
-        // TODO
+        val id = bot.sourceBot.botUserInfo.id
         return botMember
+            ?: bot.internalMember(source.id, id)
+            ?: throw NoSuchElementException("Bot as member(id=$id)")
     }
 
-    override val channels: Collectable<KookChatChannel>
+    override val channels: Collectable<KookChannel>
         get() = bot.internalChannels(source.id).asCollectable()
 
-    override suspend fun channel(id: ID): KookChatChannel? =
+    override suspend fun channel(id: ID): KookChannel? =
         bot.internalChannel(id.literal)
 
-    override val chatChannels: Collectable<ChatChannel>
-        get() = TODO("Not yet implemented")
+    override val chatChannels: Collectable<KookChatChannel>
+        get() = bot.internalChatChannels(source.id).asCollectable()
 
-    override suspend fun chatChannel(id: ID): KookChatChannel? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun chatChannel(id: ID): KookChatChannel? =
+        bot.internalChatChannel(id.literal)
 
     @ExperimentalSimbotAPI
     override val categories: Collectable<KookCategoryChannel>

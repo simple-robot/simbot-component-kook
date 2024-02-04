@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.api
@@ -24,6 +27,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_LIMIT
 import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_REMAINING
 import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_RESET
@@ -168,14 +172,14 @@ public class ApiResult @ApiResultType constructor(
      */
     @Transient
     public lateinit var raw: String
-        @JvmSynthetic internal set // hide from Java, warning to Kt
+        @JvmSynthetic @InternalKookApi internal set // hide from Java, warning to Kt
 
     /**
      * 当前api响应值的 [速率限制][RateLimit] 信息。
      */
     @Transient
     public lateinit var rateLimit: RateLimit
-        @JvmSynthetic internal set // hide from Java, warning to Kt
+        @JvmSynthetic @InternalKookApi internal set // hide from Java, warning to Kt
 
     /**
      * 此API的HTTP响应状态码
@@ -184,7 +188,7 @@ public class ApiResult @ApiResultType constructor(
      */
     @Transient
     public lateinit var httpStatus: HttpStatusCode
-        @JvmSynthetic internal set // hide from Java, warning to Kt
+        @JvmSynthetic @InternalKookApi internal set // hide from Java, warning to Kt
 
     /**
      * http响应状态码

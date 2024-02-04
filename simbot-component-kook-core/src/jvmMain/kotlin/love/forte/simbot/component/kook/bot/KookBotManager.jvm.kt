@@ -18,10 +18,12 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-package love.forte.simbot.component.kook.bot.internal
+package love.forte.simbot.component.kook.bot
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import java.util.*
+import kotlin.streams.asSequence
 
-internal actual fun cacheModifyContextDispatcher(): CoroutineDispatcher = Dispatchers.IO
+internal actual fun KookBotManagerFactoryProvider.loadJvmConfigurerProviders(): Sequence<KookBotManagerFactoryConfigurerProvider> {
+    return ServiceLoader.load(KookBotManagerFactoryConfigurerProvider::class.java, this::class.java.classLoader)
+        .stream().map { it.get() }.asSequence()
+}

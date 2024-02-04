@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook
@@ -81,9 +84,10 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     /**
      * 获取当前频道服务器下的子频道序列。
      *
-     * 子频道列表**不包含**分组类型的频道，这类"分类频道"请参考 [categories]。
+     * @see KookChatChannel
+     * @see KookCategoryChannel
      */
-    override val channels: Collectable<KookChatChannel>
+    override val channels: Collectable<KookChannel>
 
     /**
      * 尝试根据指定ID获取匹配的 [KookChatChannel]。未找到时得到null。
@@ -109,6 +113,10 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     )
     override suspend fun chatChannel(id: ID): KookChatChannel?
 
+    /**
+     * 获取此频道服务器内的所有聊天频道集合。
+     */
+    override val chatChannels: Collectable<KookChatChannel>
     // categories
 
     /**

@@ -1,23 +1,29 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook
 
 import kotlinx.coroutines.CoroutineScope
+import love.forte.simbot.ability.DeleteFailureException
+import love.forte.simbot.ability.DeleteOption
+import love.forte.simbot.ability.DeleteSupport
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.id.ID
@@ -44,7 +50,7 @@ import love.forte.simbot.kook.objects.User as KUser
  *
  * @author ForteScarlet
  */
-public interface KookMember : Member, CoroutineScope {
+public interface KookMember : Member, CoroutineScope, DeleteSupport {
     /**
      * 源于 bot 的上下文，但是没有 Job。
      */
@@ -122,6 +128,15 @@ public interface KookMember : Member, CoroutineScope {
     @ST
     override suspend fun send(text: String): KookMessageReceipt
 
+    /**
+     * 踢出此成员。bot 应当具有相应的权限。
+     *
+     * @throws NoSuchElementException 无法找到删除目标，例如此成员已经不在频道中
+     * @throws DeleteFailureException 删除失败，
+     * 例如因没有权限而产生 [ApiResultException] 或 [ApiResponseException]
+     */
+    @JvmSynthetic
+    override suspend fun delete(vararg options: DeleteOption)
 
     //region mute API
 
@@ -262,7 +277,7 @@ public interface KookMember : Member, CoroutineScope {
      * @throws ApiResultException API 请求过程中产生的异常
      * @throws ApiResponseException API 请求过程中产生的异常
      */
-    @ST
+    @JvmSynthetic
     @ExperimentalSimbotAPI
     public suspend fun mute(duration: Duration): Boolean = mute(DEFAULT_MUTE_TYPE, duration)
 

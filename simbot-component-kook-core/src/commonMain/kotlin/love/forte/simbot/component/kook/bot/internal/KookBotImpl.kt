@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.bot.internal
@@ -25,10 +28,11 @@ import love.forte.simbot.ability.OnCompletion
 import love.forte.simbot.common.atomic.atomic
 import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.collectable.asCollectable
-import love.forte.simbot.common.collection.computeValueIfPresent
 import love.forte.simbot.common.collection.concurrentMutableMap
+import love.forte.simbot.common.collection.removeValue
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.literal
+import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.KookBotConfiguration
@@ -81,8 +85,6 @@ internal class KookBotImpl(
     override val logger =
         LoggerFactory.getLogger("love.forte.simbot.component.kook.bot.${sourceBot.ticket.clientId}")
 
-    internal val isNormalEventProcessAsync = sourceBot.configuration.isNormalEventProcessAsync
-
     val botUserInfo get() = sourceBot.botUserInfo
 
     override fun isMe(id: ID): Boolean {
@@ -103,16 +105,16 @@ internal class KookBotImpl(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private val cacheModifyContext =
-        // Use IO in JVM
-        Dispatchers.Default.limitedParallelism(1) + CoroutineName("KookBotCacheModify")
+        cacheModifyContextDispatcher().limitedParallelism(1) + CoroutineName("KookBotCacheModify")
 
     private val internalCache = InternalCache()
 
     internal fun internalGuild(guildId: String) = internalCache.guilds[guildId]
-    internal fun internalChannel(channelId: String) = internalCache.channels[channelId]
+    internal fun internalChatChannel(channelId: String) = internalCache.channels[channelId]
     internal fun internalCategory(categoryId: String) = internalCache.categories[categoryId]
-    internal fun internalChannels(guildId: String): Sequence<KookChatChannelImpl> =
+    internal fun internalChatChannels(guildId: String): Sequence<KookChatChannelImpl> =
         internalCache.channels.values.asSequence().filter { it.source.guildId == guildId }
+
 
     internal fun internalMembers(guildId: String): Sequence<KookMemberImpl> {
         return internalCache.members.entries.asSequence().filter { it.key.guildId == guildId }.map { it.value }
@@ -124,12 +126,11 @@ internal class KookBotImpl(
     internal fun internalMember(guildId: String, userId: String) =
         internalCache.member(guildId, userId)
 
-    internal fun internalGuildChannelCount(guildId: String): Int =
-        internalCache.channels.values.count { it.source.guildId == guildId }
+    internal fun internalChannel(channelId: String): KookChannel? =
+        internalCategory(channelId) ?: internalChatChannel(channelId)
 
-    internal fun internalGuildMemberCount(guildId: String): Int {
-        return internalCache.members.keys.count { it.guildId == guildId }
-    }
+    internal fun internalChannels(guildId: String): Sequence<KookChannel> =
+        internalCategories(guildId) + internalChatChannels(guildId)
 
     internal fun internalSetMuteJob(guildId: String, userId: String, value: MuteJob): MuteJob? {
         val key = internalCache.memberCacheId(guildId, userId)
@@ -139,12 +140,11 @@ internal class KookBotImpl(
     internal fun internalRemoveMuteJob(guildId: String, userId: String, target: MuteJob? = null): MuteJob? {
         val key = internalCache.memberCacheId(guildId, userId)
         if (target != null) {
-            // TODO remove(key, target)
-            val removed = internalCache.memberMutes.computeValueIfPresent(key) { k, ol ->
-                if (ol == target) null else ol
-            }
-            // == null -> delete success
-            return if (removed == null) target else null
+            val removed = internalCache.memberMutes.removeValue(key) { target }
+//            val removed = internalCache.memberMutes.computeValueIfPresent(key) { k, ol ->
+//                if (ol == target) null else ol
+//            }
+            return if (removed) target else null
         }
 
         return internalCache.memberMutes.remove(key)
@@ -392,15 +392,6 @@ internal class KookBotImpl(
         }
     }
 
-    private val contacts: Flow<KookUserChatImpl>
-        get() = flow {
-            GetUserChatListApi.createItemFlow { page -> create(page = page).requestDataBy(sourceBot) }
-                .map {
-                    KookUserChatImpl(this@KookBotImpl, it.toUserChatView())
-                }
-        }
-
-
     @OptIn(ApiResultType::class)
     private fun UserChatListView.toUserChatView(
         isFriend: Boolean = false,
@@ -470,4 +461,4 @@ internal class MuteJob(val job: Job) {
 /**
  * 在 native 和 JVM 中使用 `Dispatcher.IO`，JS 中使用 [Dispatchers.Default]。
  */
-internal expect fun cacheModifyContextDispatcher(): CoroutineContext
+internal expect fun cacheModifyContextDispatcher(): CoroutineDispatcher

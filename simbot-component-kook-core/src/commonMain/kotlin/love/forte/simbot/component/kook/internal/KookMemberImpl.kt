@@ -1,29 +1,39 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.internal
 
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import love.forte.simbot.ability.DeleteFailureException
+import love.forte.simbot.ability.DeleteOption
+import love.forte.simbot.ability.StandardDeleteOption.Companion.standardAnalysis
+import love.forte.simbot.ability.isIgnoreOnFailure
+import love.forte.simbot.ability.isIgnoreOnNoSuchTarget
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.collectable.asCollectable
+import love.forte.simbot.common.exception.initExceptionCause
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.TimeUnit
@@ -35,8 +45,11 @@ import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.role.internal.KookGuildRoleImpl
 import love.forte.simbot.component.kook.role.internal.KookMemberRoleImpl
 import love.forte.simbot.component.kook.util.requestDataBy
+import love.forte.simbot.component.kook.util.requestResultBy
+import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.guild.CreateGuildMuteApi
 import love.forte.simbot.kook.api.guild.DeleteGuildMuteApi
+import love.forte.simbot.kook.api.member.KickoutMemberApi
 import love.forte.simbot.kook.api.user.GetUserViewApi
 import love.forte.simbot.kook.objects.User
 import love.forte.simbot.logger.isDebugEnabled
@@ -93,6 +106,43 @@ internal class KookMemberImpl(
                 emit(KookMemberRoleImpl(bot, this@KookMemberImpl, guildIdValue, role))
             }
         }.asCollectable()
+
+    /**
+     * 踢出成员。
+     */
+    override suspend fun delete(vararg options: DeleteOption) {
+        val stdOpts = options.standardAnalysis()
+
+        val result = try {
+            KickoutMemberApi.create(guildIdValue, source.id).requestResultBy(bot)
+        } catch (respEx: ApiResponseException) {
+            if (respEx.response.status.value == HttpStatusCode.NotFound.value) {
+                if (stdOpts.isIgnoreOnNoSuchTarget) {
+                    return
+                }
+
+                throw NoSuchElementException("Kick member(id=${source.id}) on failure. Http status is ${HttpStatusCode.NotFound}: ${respEx.response.status}").also {
+                    it.initExceptionCause(respEx)
+                }
+            }
+            if (stdOpts.isIgnoreOnFailure) {
+                return
+            }
+
+            throw DeleteFailureException(
+                "Kick member(id=${source.id}) on failure. HTTP status: ${respEx.response.status.value}): ${respEx.message}",
+                respEx
+            )
+        }
+
+        if (!result.isSuccess) {
+            if (stdOpts.isIgnoreOnFailure) {
+                return
+            }
+
+            throw DeleteFailureException("Kick member(id=${source.id}) on failure. result.code is not successful: ${result})")
+        }
+    }
 
     private suspend fun mute0(type: Int, milli: Long) {
         val userId = source.id

@@ -1,31 +1,31 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.event
 
-import love.forte.simbot.ID
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.message.KookMessageContent
 import love.forte.simbot.component.kook.message.KookUpdatedMessageContent
-import love.forte.simbot.event.BaseEventKey
 import love.forte.simbot.kook.event.*
-import love.forte.simbot.message.doSafeCast
 
 
 /**
@@ -69,14 +69,6 @@ public abstract class KookUpdatedMessageEvent : KookSystemEvent() {
      * 消息被更新的时间
      */
     abstract override val time: Timestamp
-
-    abstract override val key: love.forte.simbot.event.Event.Key<out KookUpdatedMessageEvent>
-
-    public companion object Key : BaseEventKey<KookUpdatedMessageEvent>(
-        "kook.updated_message_event", KookSystemEvent
-    ) {
-        override fun safeCast(value: Any): KookUpdatedMessageEvent? = doSafeCast(value)
-    }
 }
 
 
@@ -126,15 +118,6 @@ public abstract class KookUpdatedChannelMessageEvent : KookUpdatedMessageEvent()
             isMentionAll = sourceBody.isMentionAll,
             isMentionHere = sourceBody.isMentionHere,
         )
-    }
-
-    override val key: love.forte.simbot.event.Event.Key<KookUpdatedChannelMessageEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookUpdatedChannelMessageEvent>(
-        "kook.updated_channel_message_event", KookUpdatedMessageEvent
-    ) {
-        override fun safeCast(value: Any): KookUpdatedChannelMessageEvent? = doSafeCast(value)
     }
 }
 
@@ -202,15 +185,6 @@ public abstract class KookUpdatedPrivateMessageEvent : KookUpdatedMessageEvent()
             isMentionAll = false,
             isMentionHere = false,
         )
-    }
-
-    override val key: love.forte.simbot.event.Event.Key<KookUpdatedPrivateMessageEvent>
-        get() = Key
-
-    public companion object Key : BaseEventKey<KookUpdatedPrivateMessageEvent>(
-        "kook.updated_private_message_event", KookUpdatedMessageEvent
-    ) {
-        override fun safeCast(value: Any): KookUpdatedPrivateMessageEvent? = doSafeCast(value)
     }
 }
 
