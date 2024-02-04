@@ -1,3 +1,10 @@
+# v4.0.0-dev2
+
+> Release & Pull Notes: [v4.0.0-dev2](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev2) 
+
+- refactor: 项目整体结构更新 ([`6fda1f2`](https://github.com/simple-robot/simpler-robot/commit/6fda1f2))
+- fix: CHANGELOG.md ([`d254b9e`](https://github.com/simple-robot/simpler-robot/commit/d254b9e))
+
 # v4.0.0-dev1
 
 > Release & Pull Notes: [v4.0.0-dev1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev1) 

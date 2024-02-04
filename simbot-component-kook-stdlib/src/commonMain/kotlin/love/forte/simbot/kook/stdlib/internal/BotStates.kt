@@ -370,6 +370,7 @@ private class CreateClient(
 ) : State() {
 
     override suspend fun invoke(): State {
+        // TODO Array of Channel and hash by guild id
         val eventProcessChannel = Channel<EventData>(capacity = Channel.BUFFERED)
         eventProcessChannel.invokeOnClose { cause ->
             botLogger.debug("Event process closed, cause: {}", cause?.message, cause)
