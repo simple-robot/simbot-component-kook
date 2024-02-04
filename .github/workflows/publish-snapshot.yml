@@ -3,19 +3,16 @@ on:
   push:
     branches:
       - main
-      - dev/ver/**
+      - dev-snapshot**
+      - v*.*.**
       - dev/main
-      - dev-v4/**
+      - dev/ver/**
+
     paths:
-      - 'buildSrc'
-      - '**src/**/kotlin/**.kt'
-      - '**src/**/java/**.java'
-      - '**/src/**/kotlin/**.kt'
-      - '**/src/**/java/**.java'
-      - '**/build.gradle.kts'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
+      - '**src/main/kotlin/**.kt'
+      - '**src/main/java/**.java'
+      - 'buildSrc/**'
+      - '**.kts'
 
     tags-ignore:
       - 'v4**'
