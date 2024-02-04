@@ -34,14 +34,14 @@ jobs:
           cache: 'gradle'
 
       - name: Gradle Run Test
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
 #          arguments: clean assemble test
           arguments: assemble test -Porg.gradle.daemon=false
 
       - name: Gradle Publish Release
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
           arguments: |
@@ -80,7 +80,10 @@ jobs:
 
   publish-snapshot:
     name: Publish snapshot
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
     needs: run-test-and-publish
     steps:
       # 检出仓库代码
@@ -96,7 +99,7 @@ jobs:
 
       # setup Gradle
       - name: Gradle publish snapshot
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
           arguments: clean test publishToSonatype closeAndReleaseStagingRepository
@@ -124,7 +127,7 @@ jobs:
 
       # setup Gradle
       - name: Gradle generate documentation
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
           arguments: |
