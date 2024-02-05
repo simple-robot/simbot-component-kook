@@ -118,10 +118,13 @@ love.forte.simbot.kook.api.guild.GetGuildListApi
 
 API的应用大差不差，因此此处仅使用部分类型作为示例，
 不会演示所有API。
-如果想浏览或寻找需要的 API，可前往 [APIDoc引导](https://docs.simbot.forte.love)
-中进入KOOK组件的 KDoc 查阅，或可以简单的借助IDE的智能提示进行寻找。
+如果想浏览或寻找需要的 API，可前往
+<a href="api-list.md" />
+或
+[APIDoc引导](https://docs.simbot.forte.love)
+中进入KOOK组件的 KDoc 查阅，也可以简单的借助IDE的智能提示进行寻找。
 
-以 [获取当前用户加入的服务器列表](https://developer.kookapp.cn/doc/http/guild#获取当前用户加入的服务器列表) 为例。
+此处仅以 [获取当前用户加入的服务器列表](https://developer.kookapp.cn/doc/http/guild#获取当前用户加入的服务器列表) 为例。
 
 <tabs group="Code">
 <tab title="Kotlin" group-key="Kotlin">

@@ -1,3 +1,6 @@
+---
+switcher-label: Java API 风格
+---
 # 消息元素
 
 本章节介绍 KOOK 组件中针对 simbot4 的 **消息元素(`Message.Element`)** 的实现类型。

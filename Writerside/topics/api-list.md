@@ -4,6 +4,8 @@
 
 > 对于一个具体的API的详细说明，我们建议你前往 [API 文档](https://docs.simbot.forte.love/) 或源码注释查阅，
 > 因为那是最贴合真实情况且最全面的。
+> 
+> 此处的列表是自动生成的，会不定期更新。
 
 <deflist>
 <def title="GetGatewayApi">

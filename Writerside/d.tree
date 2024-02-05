@@ -17,6 +17,7 @@
     <toc-element toc-title="基础内容">
         <toc-element topic="api-list.md"/>
         <toc-element topic="event.md"/>
+        <toc-element topic="message-send.md"/>
         <toc-element topic="message-element.md"/>
         <toc-element topic="unsupported-event.md"/>
         <toc-element topic="role-api.md"/>
