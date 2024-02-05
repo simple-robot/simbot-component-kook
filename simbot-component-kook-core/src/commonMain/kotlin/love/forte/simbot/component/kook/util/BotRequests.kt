@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 @file:JvmName("KookBotRequests")
 
@@ -20,7 +23,9 @@ package love.forte.simbot.component.kook.util
 
 import io.ktor.client.statement.*
 import love.forte.simbot.component.kook.bot.KookBot
-import love.forte.simbot.kook.api.*
+import love.forte.simbot.kook.api.ApiResult
+import love.forte.simbot.kook.api.KookApi
+import love.forte.simbot.kook.api.request
 import love.forte.simbot.kook.stdlib.requestBy
 import love.forte.simbot.kook.stdlib.requestDataBy
 import love.forte.simbot.kook.stdlib.requestResultBy
@@ -48,7 +53,7 @@ public suspend fun <T : Any> KookBot.requestData(api: KookApi<T>): T = api.reque
 /**
  * 使用 [KookBot] 对 [api] 发起请求。
  *
- * @see KookApi.requestRawBy
+ * @see KookApi.requestTextBy
  */
 @JvmSynthetic
 public suspend fun KookBot.requestText(api: KookApi<*>): String {
@@ -87,7 +92,7 @@ public suspend fun <T : Any> KookApi<T>.requestDataBy(bot: KookBot): T = bot.req
 /**
  * 使用 [KookApi] 通过 [bot] 发起请求。
  *
- * @see KookApi.requestRawBy
+ * @see KookApi.requestTextBy
  */
 @JvmSynthetic
 public suspend fun KookApi<*>.requestTextBy(bot: KookBot): String = bot.requestText(this)

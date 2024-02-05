@@ -28,6 +28,7 @@ import love.forte.simbot.ability.OnCompletion
 import love.forte.simbot.common.atomic.atomic
 import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.collectable.asCollectable
+import love.forte.simbot.common.collection.computeValueIfAbsent
 import love.forte.simbot.common.collection.concurrentMutableMap
 import love.forte.simbot.common.collection.removeValue
 import love.forte.simbot.common.id.ID
@@ -49,8 +50,11 @@ import love.forte.simbot.kook.api.channel.ChannelInfo
 import love.forte.simbot.kook.api.channel.GetChannelListApi
 import love.forte.simbot.kook.api.channel.toChannel
 import love.forte.simbot.kook.api.guild.GetGuildListApi
+import love.forte.simbot.kook.api.guild.GetGuildViewApi
 import love.forte.simbot.kook.api.member.GetGuildMemberListApi
+import love.forte.simbot.kook.api.member.createItemFlow
 import love.forte.simbot.kook.api.userchat.*
+import love.forte.simbot.kook.event.SelfJoinedGuildEventExtra
 import love.forte.simbot.kook.objects.Guild
 import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.kook.stdlib.requestDataBy
@@ -98,6 +102,44 @@ internal class KookBotImpl(
             // ignore match and return true
             true
         }
+    }
+
+    private val initialingGuildJobs = concurrentMutableMap<String, Deferred<KookGuildImpl>>()
+
+    fun initialingGuildJob(id: String): Deferred<KookGuildImpl>? = initialingGuildJobs[id]
+
+    fun initialNewGuild(extra: SelfJoinedGuildEventExtra): Deferred<KookGuildImpl> {
+        val guildId = extra.body.guildId
+
+        fun createAsyncJob(): Deferred<KookGuildImpl> {
+            return async {
+                val guildInfo = GetGuildViewApi.create(guildId).requestDataBy(sourceBot)
+
+                // guild members sync
+                val members = GetGuildMemberListApi.createItemFlow { page ->
+                    create(guildId = guildId, page = page).requestDataBy(sourceBot)
+                }.buffer(200)
+
+                inCacheModify {
+                    val guild = KookGuildImpl(this@KookBotImpl, guildInfo)
+                    guilds[guildId] = guild
+                    guildInfo.channels.forEach {
+                        channels[it.id] = KookChatChannelImpl(this@KookBotImpl, it)
+                    }
+
+                    members.collect {
+                        val member = KookMemberImpl(this@KookBotImpl, it, guildId)
+                        setMember(guildId, it.id, member)
+                    }
+
+                    guild
+                }
+            }
+        }
+
+        val asyncJob = initialingGuildJobs.computeValueIfAbsent(guildId) { createAsyncJob() }
+        asyncJob.invokeOnCompletion { initialingGuildJobs.removeValue(guildId) { asyncJob } }
+        return asyncJob
     }
 
     /**

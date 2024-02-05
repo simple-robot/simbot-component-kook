@@ -32,9 +32,6 @@ import love.forte.simbot.kook.event.Event as KEvent
 /**
  * Kook 组件的事件类型基类。
  *
- * @param E Kook api模块中所定义的原始 Kook 事件对象 [KEvent].
- * @param EX Kook api模块中所定义的原始 Kook 事件对象的 [extra][EventExtra] 属性类型。
- *
  * @see UnsupportedKookEvent
  * @see KookBotEvent
  * @see KookSystemEvent
