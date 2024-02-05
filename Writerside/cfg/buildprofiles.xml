@@ -10,13 +10,17 @@
         <download-title>GitHub</download-title>
         <download-page>https://github.com/simple-robot/simbot-component-kook/</download-page>
         <showDownloadButton>true</showDownloadButton>
-<!--        <browser-edits-url>https://github.com/simple-robot-library/simbot4-website/tree/master/Writerside/</browser-edits-url>-->
+        <browser-edits-url>https://github.com/simple-robot/simbot-component-kook/tree/dev/main/Writerside/</browser-edits-url>
         <enable-browser-edits>true</enable-browser-edits>
         <locale-code>zh-CN</locale-code>
         <noindex-content>false</noindex-content>
+        <algolia-id>VLLZ4JZE8Z</algolia-id>
+        <algolia-index>kook-doc</algolia-index>
+        <algolia-api-key>e60d9ee16618a0ad3a338ecc73cb840e</algolia-api-key>
+        <web-root>http://component-kook.simbot.forte.love</web-root>
     </variables>
 
-    <build-profile instance="d">
+    <build-profile instance="kook">
         <variables>
             <noindex-content>false</noindex-content>
         </variables>
