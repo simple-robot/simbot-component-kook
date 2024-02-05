@@ -16,7 +16,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 所有事件的 `extra` 的封装类型均继承密封类 `love.forte.simbot.kook.event.EventExtra`。
 
 <deflist>
-<def title="SelfJoinedGuildEventExtra">
+<def title="SelfJoinedGuildEventExtra" id="love_forte_simbot_kook_event_SelfJoinedGuildEventExtra">
 
 `love.forte.simbot.kook.event.SelfJoinedGuildEventExtra`
 
@@ -26,7 +26,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 > 当自己被邀请或主动加入新的服务器时, 产生该事件
 
 </def>
-<def title="SelfExitedGuildEventExtra">
+<def title="SelfExitedGuildEventExtra" id="love_forte_simbot_kook_event_SelfExitedGuildEventExtra">
 
 `love.forte.simbot.kook.event.SelfExitedGuildEventExtra`
 
@@ -36,7 +36,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 > 当自己被踢出服务器或被拉黑或主动退出服务器时, 产生该事件
 
 </def>
-<def title="MessageBtnClickEventExtra">
+<def title="MessageBtnClickEventExtra" id="love_forte_simbot_kook_event_MessageBtnClickEventExtra">
 
 `love.forte.simbot.kook.event.MessageBtnClickEventExtra`
 
@@ -45,7 +45,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/user#Card%20%E6%B6%88%E6%81%AF%E4%B8%AD%E7%9A%84%20Button%20%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6">Card 消息中的 Button 点击事件</a>
 
 </def>
-<def title="AddedChannelEventExtra">
+<def title="AddedChannelEventExtra" id="love_forte_simbot_kook_event_AddedChannelEventExtra">
 
 `love.forte.simbot.kook.event.AddedChannelEventExtra`
 
@@ -54,7 +54,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E6%96%B0%E5%A2%9E%E9%A2%91%E9%81%93">新增频道</a>
 
 </def>
-<def title="UpdatedChannelEventExtra">
+<def title="UpdatedChannelEventExtra" id="love_forte_simbot_kook_event_UpdatedChannelEventExtra">
 
 `love.forte.simbot.kook.event.UpdatedChannelEventExtra`
 
@@ -63,7 +63,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E4%BF%AE%E6%94%B9%E9%A2%91%E9%81%93%E4%BF%A1%E6%81%AF">修改频道信息</a>
 
 </def>
-<def title="DeletedChannelEventExtra">
+<def title="DeletedChannelEventExtra" id="love_forte_simbot_kook_event_DeletedChannelEventExtra">
 
 `love.forte.simbot.kook.event.DeletedChannelEventExtra`
 
@@ -72,7 +72,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E5%88%A0%E9%99%A4%E9%A2%91%E9%81%93">删除频道</a>
 
 </def>
-<def title="AddedReactionEventExtra">
+<def title="AddedReactionEventExtra" id="love_forte_simbot_kook_event_AddedReactionEventExtra">
 
 `love.forte.simbot.kook.event.AddedReactionEventExtra`
 
@@ -81,7 +81,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E6%B7%BB%E5%8A%A0%20reaction">频道内用户添加 reaction</a>
 
 </def>
-<def title="DeletedReactionEventExtra">
+<def title="DeletedReactionEventExtra" id="love_forte_simbot_kook_event_DeletedReactionEventExtra">
 
 `love.forte.simbot.kook.event.DeletedReactionEventExtra`
 
@@ -90,7 +90,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E9%A2%91%E9%81%93%E5%86%85%E7%94%A8%E6%88%B7%E5%8F%96%E6%B6%88%20reaction">频道内用户取消 reaction</a>
 
 </def>
-<def title="UpdatedMessageEventExtra">
+<def title="UpdatedMessageEventExtra" id="love_forte_simbot_kook_event_UpdatedMessageEventExtra">
 
 `love.forte.simbot.kook.event.UpdatedMessageEventExtra`
 
@@ -99,7 +99,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E9%A2%91%E9%81%93%E6%B6%88%E6%81%AF%E6%9B%B4%E6%96%B0">频道消息更新</a>
 
 </def>
-<def title="DeletedMessageEventExtra">
+<def title="DeletedMessageEventExtra" id="love_forte_simbot_kook_event_DeletedMessageEventExtra">
 
 `love.forte.simbot.kook.event.DeletedMessageEventExtra`
 
@@ -108,7 +108,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E9%A2%91%E9%81%93%E6%B6%88%E6%81%AF%E8%A2%AB%E5%88%A0%E9%99%A4">频道消息被删除</a>
 
 </def>
-<def title="PinnedMessageEventExtra">
+<def title="PinnedMessageEventExtra" id="love_forte_simbot_kook_event_PinnedMessageEventExtra">
 
 `love.forte.simbot.kook.event.PinnedMessageEventExtra`
 
@@ -117,7 +117,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E6%96%B0%E7%9A%84%E9%A2%91%E9%81%93%E7%BD%AE%E9%A1%B6%E6%B6%88%E6%81%AF">新的频道置顶消息</a>
 
 </def>
-<def title="UnpinnedMessageEventExtra">
+<def title="UnpinnedMessageEventExtra" id="love_forte_simbot_kook_event_UnpinnedMessageEventExtra">
 
 `love.forte.simbot.kook.event.UnpinnedMessageEventExtra`
 
@@ -126,7 +126,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/channel#%E5%8F%96%E6%B6%88%E9%A2%91%E9%81%93%E7%BD%AE%E9%A1%B6%E6%B6%88%E6%81%AF">取消频道置顶消息</a>
 
 </def>
-<def title="EventExtra">
+<def title="EventExtra" id="love_forte_simbot_kook_event_EventExtra">
 
 `love.forte.simbot.kook.event.EventExtra`
 
@@ -138,7 +138,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 它用来承载那些接收后无法被解析或尚未支持的事件类型。
 
 </def>
-<def title="TextExtra">
+<def title="TextExtra" id="love_forte_simbot_kook_event_TextExtra">
 
 `love.forte.simbot.kook.event.TextExtra`
 
@@ -149,42 +149,42 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 当此事件的频道类型 `Event.channelType` 为 `Event.ChannelType.PERSON` 时，例如 `guildId` 等频道才有的属性可能会使用空内容填充。
 
 </def>
-<def title="TextEventExtra">
+<def title="TextEventExtra" id="love_forte_simbot_kook_event_TextEventExtra">
 
 `love.forte.simbot.kook.event.TextEventExtra`
 
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/message#%E6%96%87%E5%AD%97%E6%B6%88%E6%81%AF">文字消息事件 extra</a>
 
 </def>
-<def title="ImageEventExtra">
+<def title="ImageEventExtra" id="love_forte_simbot_kook_event_ImageEventExtra">
 
 `love.forte.simbot.kook.event.ImageEventExtra`
 
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/message#%E5%9B%BE%E7%89%87%E6%B6%88%E6%81%AF">图片消息事件 extra</a>
 
 </def>
-<def title="VideoEventExtra">
+<def title="VideoEventExtra" id="love_forte_simbot_kook_event_VideoEventExtra">
 
 `love.forte.simbot.kook.event.VideoEventExtra`
 
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/message#%E8%A7%86%E9%A2%91%E6%B6%88%E6%81%AF">视频消息事件 extra</a>
 
 </def>
-<def title="KMarkdownEventExtra">
+<def title="KMarkdownEventExtra" id="love_forte_simbot_kook_event_KMarkdownEventExtra">
 
 `love.forte.simbot.kook.event.KMarkdownEventExtra`
 
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/message#KMarkdown%20%E6%B6%88%E6%81%AF">KMarkdown 消息事件 extra</a>
 
 </def>
-<def title="CardEventExtra">
+<def title="CardEventExtra" id="love_forte_simbot_kook_event_CardEventExtra">
 
 `love.forte.simbot.kook.event.CardEventExtra`
 
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/message#Card%20%E6%B6%88%E6%81%AF">Card 消息事件 extra</a>
 
 </def>
-<def title="SystemExtra">
+<def title="SystemExtra" id="love_forte_simbot_kook_event_SystemExtra">
 
 `love.forte.simbot.kook.event.SystemExtra`
 
@@ -194,7 +194,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 > 当 [`type`] `Event.typeValue` 为系统消息(255)时
 
 </def>
-<def title="UnknownExtra">
+<def title="UnknownExtra" id="love_forte_simbot_kook_event_UnknownExtra">
 
 `love.forte.simbot.kook.event.UnknownExtra`
 
@@ -213,7 +213,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 因此使用 `UnknownExtra` 时应当明确了解其可能出现的内容，同时不可过分依赖它。
 
 </def>
-<def title="UpdateGuildEventExtra">
+<def title="UpdateGuildEventExtra" id="love_forte_simbot_kook_event_UpdateGuildEventExtra">
 
 `love.forte.simbot.kook.event.UpdateGuildEventExtra`
 
@@ -222,7 +222,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0">服务器信息更新</a>
 
 </def>
-<def title="DeleteGuildEventExtra">
+<def title="DeleteGuildEventExtra" id="love_forte_simbot_kook_event_DeleteGuildEventExtra">
 
 `love.forte.simbot.kook.event.DeleteGuildEventExtra`
 
@@ -231,7 +231,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%88%A0%E9%99%A4">服务器删除</a>
 
 </def>
-<def title="AddBlockListEventExtra">
+<def title="AddBlockListEventExtra" id="love_forte_simbot_kook_event_AddBlockListEventExtra">
 
 `love.forte.simbot.kook.event.AddBlockListEventExtra`
 
@@ -240,7 +240,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%B0%81%E7%A6%81%E7%94%A8%E6%88%B7">服务器封禁用户</a>
 
 </def>
-<def title="DeleteBlockListEventExtra">
+<def title="DeleteBlockListEventExtra" id="love_forte_simbot_kook_event_DeleteBlockListEventExtra">
 
 `love.forte.simbot.kook.event.DeleteBlockListEventExtra`
 
@@ -249,7 +249,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8F%96%E6%B6%88%E5%B0%81%E7%A6%81%E7%94%A8%E6%88%B7">服务器取消封禁用户</a>
 
 </def>
-<def title="AddedEmojiEventExtra">
+<def title="AddedEmojiEventExtra" id="love_forte_simbot_kook_event_AddedEmojiEventExtra">
 
 `love.forte.simbot.kook.event.AddedEmojiEventExtra`
 
@@ -258,7 +258,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0%E6%96%B0%E8%A1%A8%E6%83%85">服务器添加新表情</a>
 
 </def>
-<def title="RemovedEmojiEventExtra">
+<def title="RemovedEmojiEventExtra" id="love_forte_simbot_kook_event_RemovedEmojiEventExtra">
 
 `love.forte.simbot.kook.event.RemovedEmojiEventExtra`
 
@@ -267,7 +267,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%88%A0%E9%99%A4%E8%A1%A8%E6%83%85">服务器删除表情</a>
 
 </def>
-<def title="UpdatedEmojiEventExtra">
+<def title="UpdatedEmojiEventExtra" id="love_forte_simbot_kook_event_UpdatedEmojiEventExtra">
 
 `love.forte.simbot.kook.event.UpdatedEmojiEventExtra`
 
@@ -276,7 +276,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9B%B4%E6%96%B0%E8%A1%A8%E6%83%85">服务器更新表情</a>
 
 </def>
-<def title="JoinedGuildEventExtra">
+<def title="JoinedGuildEventExtra" id="love_forte_simbot_kook_event_JoinedGuildEventExtra">
 
 `love.forte.simbot.kook.event.JoinedGuildEventExtra`
 
@@ -285,7 +285,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-member#%E6%96%B0%E6%88%90%E5%91%98%E5%8A%A0%E5%85%A5%E6%9C%8D%E5%8A%A1%E5%99%A8">新成员加入服务器</a>
 
 </def>
-<def title="ExitedGuildEventExtra">
+<def title="ExitedGuildEventExtra" id="love_forte_simbot_kook_event_ExitedGuildEventExtra">
 
 `love.forte.simbot.kook.event.ExitedGuildEventExtra`
 
@@ -294,7 +294,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E9%80%80%E5%87%BA">服务器成员退出</a>
 
 </def>
-<def title="UpdatedGuildMemberEventExtra">
+<def title="UpdatedGuildMemberEventExtra" id="love_forte_simbot_kook_event_UpdatedGuildMemberEventExtra">
 
 `love.forte.simbot.kook.event.UpdatedGuildMemberEventExtra`
 
@@ -303,7 +303,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E4%BF%A1%E6%81%AF%E6%9B%B4%E6%96%B0">服务器成员信息更新</a>
 
 </def>
-<def title="GuildMemberOnlineEventExtra">
+<def title="GuildMemberOnlineEventExtra" id="love_forte_simbot_kook_event_GuildMemberOnlineEventExtra">
 
 `love.forte.simbot.kook.event.GuildMemberOnlineEventExtra`
 
@@ -312,7 +312,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E4%B8%8A%E7%BA%BF">服务器成员上线</a>
 
 </def>
-<def title="GuildMemberOfflineEventExtra">
+<def title="GuildMemberOfflineEventExtra" id="love_forte_simbot_kook_event_GuildMemberOfflineEventExtra">
 
 `love.forte.simbot.kook.event.GuildMemberOfflineEventExtra`
 
@@ -321,7 +321,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-member#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%90%E5%91%98%E4%B8%8B%E7%BA%BF">服务器成员下线</a>
 
 </def>
-<def title="UpdatedPrivateMessageEventExtra">
+<def title="UpdatedPrivateMessageEventExtra" id="love_forte_simbot_kook_event_UpdatedPrivateMessageEventExtra">
 
 `love.forte.simbot.kook.event.UpdatedPrivateMessageEventExtra`
 
@@ -330,7 +330,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/direct-message#%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF%E6%9B%B4%E6%96%B0">私聊消息更新</a>
 
 </def>
-<def title="DeletedPrivateMessageEventExtra">
+<def title="DeletedPrivateMessageEventExtra" id="love_forte_simbot_kook_event_DeletedPrivateMessageEventExtra">
 
 `love.forte.simbot.kook.event.DeletedPrivateMessageEventExtra`
 
@@ -339,7 +339,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/direct-message#%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF%E8%A2%AB%E5%88%A0%E9%99%A4">私聊消息删除</a>
 
 </def>
-<def title="AddedRoleEventExtra">
+<def title="AddedRoleEventExtra" id="love_forte_simbot_kook_event_AddedRoleEventExtra">
 
 `love.forte.simbot.kook.event.AddedRoleEventExtra`
 
@@ -348,7 +348,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-role#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A7%92%E8%89%B2%E5%A2%9E%E5%8A%A0">服务器角色增加</a>
 
 </def>
-<def title="DeletedRoleEventExtra">
+<def title="DeletedRoleEventExtra" id="love_forte_simbot_kook_event_DeletedRoleEventExtra">
 
 `love.forte.simbot.kook.event.DeletedRoleEventExtra`
 
@@ -357,7 +357,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-role#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A7%92%E8%89%B2%E5%88%A0%E9%99%A4">服务器角色删除</a>
 
 </def>
-<def title="UpdatedRoleEventExtra">
+<def title="UpdatedRoleEventExtra" id="love_forte_simbot_kook_event_UpdatedRoleEventExtra">
 
 `love.forte.simbot.kook.event.UpdatedRoleEventExtra`
 
@@ -366,7 +366,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/guild-role#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A7%92%E8%89%B2%E6%9B%B4%E6%96%B0">服务器角色更新</a>
 
 </def>
-<def title="JoinedChannelEventExtra">
+<def title="JoinedChannelEventExtra" id="love_forte_simbot_kook_event_JoinedChannelEventExtra">
 
 `love.forte.simbot.kook.event.JoinedChannelEventExtra`
 
@@ -375,7 +375,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/user#%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93">用户加入语音频道</a>
 
 </def>
-<def title="ExitedChannelEventExtra">
+<def title="ExitedChannelEventExtra" id="love_forte_simbot_kook_event_ExitedChannelEventExtra">
 
 `love.forte.simbot.kook.event.ExitedChannelEventExtra`
 
@@ -384,7 +384,7 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 <a ignore-vars="true" href="https://developer.kookapp.cn/doc/event/user#%E7%94%A8%E6%88%B7%E9%80%80%E5%87%BA%E8%AF%AD%E9%9F%B3%E9%A2%91%E9%81%93">用户退出语音频道</a>
 
 </def>
-<def title="UserUpdatedEventExtra">
+<def title="UserUpdatedEventExtra" id="love_forte_simbot_kook_event_UserUpdatedEventExtra">
 
 `love.forte.simbot.kook.event.UserUpdatedEventExtra`
 
@@ -412,42 +412,42 @@ API 模块所有的事件封装类型都在包 `love.forte.simbot.kook.event` �
 > 因此它实现了 `ChatChannelMessageEvent`。
 
 <deflist>
-<def title="KookEvent">
+<def title="KookEvent" id="love_forte_simbot_component_kook_event_KookEvent">
 
 `love.forte.simbot.component.kook.event.KookEvent`
 
 Kook 组件的事件类型基类。
 
 </def>
-<def title="KookBotEvent">
+<def title="KookBotEvent" id="love_forte_simbot_component_kook_event_KookBotEvent">
 
 `love.forte.simbot.component.kook.event.KookBotEvent`
 
 `KookEvent` 下实现 `BotEvent` 的基础类型。
 
 </def>
-<def title="KookSystemEvent">
+<def title="KookSystemEvent" id="love_forte_simbot_component_kook_event_KookSystemEvent">
 
 `love.forte.simbot.component.kook.event.KookSystemEvent`
 
 `KookBotEvent` 的 **系统事件** 相关的事件基类。
 
 </def>
-<def title="KookBotRegisteredEvent">
+<def title="KookBotRegisteredEvent" id="love_forte_simbot_component_kook_event_KookBotRegisteredEvent">
 
 `love.forte.simbot.component.kook.event.KookBotRegisteredEvent`
 
 当一个 `KookBot` 在 `KookBotManager` 中被_注册_时。
 
 </def>
-<def title="KookBotStartedEvent">
+<def title="KookBotStartedEvent" id="love_forte_simbot_component_kook_event_KookBotStartedEvent">
 
 `love.forte.simbot.component.kook.event.KookBotStartedEvent`
 
 `KookBot` 执行 `start`  `KookBot.start` 之后推送的事件。
 
 </def>
-<def title="KookChannelChangedEvent">
+<def title="KookChannelChangedEvent" id="love_forte_simbot_component_kook_event_KookChannelChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookChannelChangedEvent`
 
@@ -458,28 +458,28 @@ KOOK 系统事件中与 _频道变更_ 相关的事件的simbot事件基准类�
 - `DeletedChannelEventExtra`
 
 </def>
-<def title="KookAddedChannelEvent">
+<def title="KookAddedChannelEvent" id="love_forte_simbot_component_kook_event_KookAddedChannelEvent">
 
 `love.forte.simbot.component.kook.event.KookAddedChannelEvent`
 
 某频道服务器中新增了一个频道后的事件。
 
 </def>
-<def title="KookUpdatedChannelEvent">
+<def title="KookUpdatedChannelEvent" id="love_forte_simbot_component_kook_event_KookUpdatedChannelEvent">
 
 `love.forte.simbot.component.kook.event.KookUpdatedChannelEvent`
 
 某频道发生了信息变更。
 
 </def>
-<def title="KookDeletedChannelEvent">
+<def title="KookDeletedChannelEvent" id="love_forte_simbot_component_kook_event_KookDeletedChannelEvent">
 
 `love.forte.simbot.component.kook.event.KookDeletedChannelEvent`
 
 某频道被删除的事件。
 
 </def>
-<def title="KookCategoryChangedEvent">
+<def title="KookCategoryChangedEvent" id="love_forte_simbot_component_kook_event_KookCategoryChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookCategoryChangedEvent`
 
@@ -490,28 +490,28 @@ KOOK 系统事件中与 _频道分组变更_ 相关的事件的simbot事件基�
 - `DeletedChannelEventExtra`
 
 </def>
-<def title="KookAddedCategoryEvent">
+<def title="KookAddedCategoryEvent" id="love_forte_simbot_component_kook_event_KookAddedCategoryEvent">
 
 `love.forte.simbot.component.kook.event.KookAddedCategoryEvent`
 
 某频道服务器中新增了一个频道分组后的事件。
 
 </def>
-<def title="KookUpdatedCategoryEvent">
+<def title="KookUpdatedCategoryEvent" id="love_forte_simbot_component_kook_event_KookUpdatedCategoryEvent">
 
 `love.forte.simbot.component.kook.event.KookUpdatedCategoryEvent`
 
 某频道分组发生了信息变更。
 
 </def>
-<def title="KookDeletedCategoryEvent">
+<def title="KookDeletedCategoryEvent" id="love_forte_simbot_component_kook_event_KookDeletedCategoryEvent">
 
 `love.forte.simbot.component.kook.event.KookDeletedCategoryEvent`
 
 某频道分组被删除的事件。
 
 </def>
-<def title="KookDeletedMessageEvent">
+<def title="KookDeletedMessageEvent" id="love_forte_simbot_component_kook_event_KookDeletedMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookDeletedMessageEvent`
 
@@ -521,21 +521,21 @@ KOOK 系统事件中与 _消息删除_ 相关的事件的simbot事件基准类�
 - `DeletedPrivateMessageEventExtra`
 
 </def>
-<def title="KookDeletedChannelMessageEvent">
+<def title="KookDeletedChannelMessageEvent" id="love_forte_simbot_component_kook_event_KookDeletedChannelMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookDeletedChannelMessageEvent`
 
 KOOK中一个频道消息被删除的事件。
 
 </def>
-<def title="KookDeletedPrivateMessageEvent">
+<def title="KookDeletedPrivateMessageEvent" id="love_forte_simbot_component_kook_event_KookDeletedPrivateMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookDeletedPrivateMessageEvent`
 
 KOOK中一个私聊消息被删除的事件。
 
 </def>
-<def title="KookMemberChangedEvent">
+<def title="KookMemberChangedEvent" id="love_forte_simbot_component_kook_event_KookMemberChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberChangedEvent`
 
@@ -580,7 +580,7 @@ KOOK 的频道成员变更事件。
 代表了当前bot加入新频道服务器、离开旧频道服务器的事件。
 
 </def>
-<def title="KookMemberChannelChangedEvent">
+<def title="KookMemberChannelChangedEvent" id="love_forte_simbot_component_kook_event_KookMemberChannelChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberChannelChangedEvent`
 
@@ -588,21 +588,21 @@ KOOK [成员变更事件] `KookMemberChangedEvent` 中与**语音频道的进出
 这类事件代表某人进入、离开某个语音频道 (`channel`)，而不代表成员进入、离开了当前的频道服务器（`guild`）。
 
 </def>
-<def title="KookMemberJoinedChannelEvent">
+<def title="KookMemberJoinedChannelEvent" id="love_forte_simbot_component_kook_event_KookMemberJoinedChannelEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberJoinedChannelEvent`
 
 KOOK 成员加入(语音频道)事件。
 
 </def>
-<def title="KookMemberExitedChannelEvent">
+<def title="KookMemberExitedChannelEvent" id="love_forte_simbot_component_kook_event_KookMemberExitedChannelEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberExitedChannelEvent`
 
 KOOK 成员离开(语音频道)事件。
 
 </def>
-<def title="KookMemberGuildChangedEvent">
+<def title="KookMemberGuildChangedEvent" id="love_forte_simbot_component_kook_event_KookMemberGuildChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberGuildChangedEvent`
 
@@ -610,28 +610,28 @@ KOOK [成员变更事件] `KookMemberChangedEvent` 中与**频道服务器进出
 这类事件代表某人加入、离开某个频道服务器。
 
 </def>
-<def title="KookMemberExitedGuildEvent">
+<def title="KookMemberExitedGuildEvent" id="love_forte_simbot_component_kook_event_KookMemberExitedGuildEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberExitedGuildEvent`
 
 KOOK 成员离开(频道)事件。
 
 </def>
-<def title="KookMemberJoinedGuildEvent">
+<def title="KookMemberJoinedGuildEvent" id="love_forte_simbot_component_kook_event_KookMemberJoinedGuildEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberJoinedGuildEvent`
 
 KOOK 成员加入(频道)事件。
 
 </def>
-<def title="KookMemberUpdatedEvent">
+<def title="KookMemberUpdatedEvent" id="love_forte_simbot_component_kook_event_KookMemberUpdatedEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberUpdatedEvent`
 
 KOOK 频道成员信息更新事件。
 
 </def>
-<def title="KookBotMemberChangedEvent">
+<def title="KookBotMemberChangedEvent" id="love_forte_simbot_component_kook_event_KookBotMemberChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookBotMemberChangedEvent`
 
@@ -639,21 +639,21 @@ KOOK 频道成员信息更新事件。
 对应 KOOK 原始事件的 `SelfExitedGuildEventExtra` 和 `SelfJoinedGuildEventExtra` 。
 
 </def>
-<def title="KookBotSelfExitedGuildEvent">
+<def title="KookBotSelfExitedGuildEvent" id="love_forte_simbot_component_kook_event_KookBotSelfExitedGuildEvent">
 
 `love.forte.simbot.component.kook.event.KookBotSelfExitedGuildEvent`
 
 KOOK BOT自身离开(频道)事件。
 
 </def>
-<def title="KookBotSelfJoinedGuildEvent">
+<def title="KookBotSelfJoinedGuildEvent" id="love_forte_simbot_component_kook_event_KookBotSelfJoinedGuildEvent">
 
 `love.forte.simbot.component.kook.event.KookBotSelfJoinedGuildEvent`
 
 KOOK BOT自身加入(频道)事件。
 
 </def>
-<def title="KookUserOnlineStatusChangedEvent">
+<def title="KookUserOnlineStatusChangedEvent" id="love_forte_simbot_component_kook_event_KookUserOnlineStatusChangedEvent">
 
 `love.forte.simbot.component.kook.event.KookUserOnlineStatusChangedEvent`
 
@@ -671,28 +671,28 @@ KOOK 用户在线状态变更相关事件的抽象父类。
 此事件是密封的，如果你只想监听某人的上线或下线中的其中一种事件，则考虑监听此事件类的具体子类型。
 
 </def>
-<def title="KookMemberOnlineEvent">
+<def title="KookMemberOnlineEvent" id="love_forte_simbot_component_kook_event_KookMemberOnlineEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberOnlineEvent`
 
 `KookUserOnlineStatusChangedEvent` 对于用户上线的事件子类型。
 
 </def>
-<def title="KookMemberOfflineEvent">
+<def title="KookMemberOfflineEvent" id="love_forte_simbot_component_kook_event_KookMemberOfflineEvent">
 
 `love.forte.simbot.component.kook.event.KookMemberOfflineEvent`
 
 `KookUserOnlineStatusChangedEvent` 对于用户离线的事件子类型。
 
 </def>
-<def title="KookMessageBtnClickEvent">
+<def title="KookMessageBtnClickEvent" id="love_forte_simbot_component_kook_event_KookMessageBtnClickEvent">
 
 `love.forte.simbot.component.kook.event.KookMessageBtnClickEvent`
 
 一个 `Card` 中的按钮被按下的事件。
 
 </def>
-<def title="KookMessageEvent">
+<def title="KookMessageEvent" id="love_forte_simbot_component_kook_event_KookMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookMessageEvent`
 
@@ -712,7 +712,7 @@ KOOK 的消息推送同样会推送bot自己所发送的消息。在stdlib模块
 - 来自bot自己的事件: `KookBotSelfChannelMessageEvent` , `KookBotSelfMessageEvent`
 
 </def>
-<def title="KookChannelMessageEvent">
+<def title="KookChannelMessageEvent" id="love_forte_simbot_component_kook_event_KookChannelMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookChannelMessageEvent`
 
@@ -720,7 +720,7 @@ Kook 普通频道消息事件。即来自bot以外的人发送的消息的类型
 此事件只会由 bot 自身以外的人触发。
 
 </def>
-<def title="KookContactMessageEvent">
+<def title="KookContactMessageEvent" id="love_forte_simbot_component_kook_event_KookContactMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookContactMessageEvent`
 
@@ -728,7 +728,7 @@ Kook 普通私聊消息事件。即来自bot以外的人发送的消息的类型
 此事件只会由 bot 以外的人触发。
 
 </def>
-<def title="KookBotSelfChannelMessageEvent">
+<def title="KookBotSelfChannelMessageEvent" id="love_forte_simbot_component_kook_event_KookBotSelfChannelMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookBotSelfChannelMessageEvent`
 
@@ -736,7 +736,7 @@ Kook bot频道消息事件。即来自bot自身发送的消息的类型。
 此事件只会由 bot 自身触发。
 
 </def>
-<def title="KookBotSelfMessageEvent">
+<def title="KookBotSelfMessageEvent" id="love_forte_simbot_component_kook_event_KookBotSelfMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookBotSelfMessageEvent`
 
@@ -744,7 +744,7 @@ Kook bot频道消息事件。即来自bot自身发送的消息的类型。
 此事件只会由 bot 自身触发，代表bot在私聊会话中发出的消息。
 
 </def>
-<def title="KookMessagePinEvent">
+<def title="KookMessagePinEvent" id="love_forte_simbot_component_kook_event_KookMessagePinEvent">
 
 `love.forte.simbot.component.kook.event.KookMessagePinEvent`
 
@@ -754,7 +754,7 @@ Kook bot频道消息事件。即来自bot自身发送的消息的类型。
 - `UnpinnedMessageEventExtra`
 
 </def>
-<def title="KookPinnedMessageEvent">
+<def title="KookPinnedMessageEvent" id="love_forte_simbot_component_kook_event_KookPinnedMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookPinnedMessageEvent`
 
@@ -762,14 +762,14 @@ Kook bot频道消息事件。即来自bot自身发送的消息的类型。
 代表一个新的消息被设置为了目标频道的置顶消息。
 
 </def>
-<def title="KookUnpinnedMessageEvent">
+<def title="KookUnpinnedMessageEvent" id="love_forte_simbot_component_kook_event_KookUnpinnedMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookUnpinnedMessageEvent`
 
 消息取消置顶事件。代表一个新的消息被设置为了目标频道的置顶消息。
 
 </def>
-<def title="KookUpdatedMessageEvent">
+<def title="KookUpdatedMessageEvent" id="love_forte_simbot_component_kook_event_KookUpdatedMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookUpdatedMessageEvent`
 
@@ -779,21 +779,21 @@ KOOK 系统事件中与 _消息更新_ 相关的事件的simbot事件基准类�
 - `UpdatedPrivateMessageEventExtra`
 
 </def>
-<def title="KookUpdatedChannelMessageEvent">
+<def title="KookUpdatedChannelMessageEvent" id="love_forte_simbot_component_kook_event_KookUpdatedChannelMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookUpdatedChannelMessageEvent`
 
 KOOK中一个频道消息被更新的事件。
 
 </def>
-<def title="KookUpdatedPrivateMessageEvent">
+<def title="KookUpdatedPrivateMessageEvent" id="love_forte_simbot_component_kook_event_KookUpdatedPrivateMessageEvent">
 
 `love.forte.simbot.component.kook.event.KookUpdatedPrivateMessageEvent`
 
 KOOK中一个私聊消息被更新的事件。
 
 </def>
-<def title="KookUserUpdatedEvent">
+<def title="KookUserUpdatedEvent" id="love_forte_simbot_component_kook_event_KookUserUpdatedEvent">
 
 `love.forte.simbot.component.kook.event.KookUserUpdatedEvent`
 
@@ -805,7 +805,7 @@ Kook 用户信息更新事件。
 只要有好友关系即会推送。
 
 </def>
-<def title="UnsupportedKookEvent">
+<def title="UnsupportedKookEvent" id="love_forte_simbot_component_kook_event_UnsupportedKookEvent">
 
 `love.forte.simbot.component.kook.event.UnsupportedKookEvent`
 

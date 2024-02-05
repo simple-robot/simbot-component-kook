@@ -8,7 +8,7 @@
 > 此处的列表是自动生成的，会不定期更新。
 
 <deflist>
-<def title="GetGatewayApi">
+<def title="GetGatewayApi" id="love_forte_simbot_kook_api_GetGatewayApi">
 
 `love.forte.simbot.kook.api.GetGatewayApi`
 
@@ -18,7 +18,7 @@
 
 
 <deflist>
-<def title="Compress">
+<def title="Compress" id="love_forte_simbot_kook_api_GetGatewayApi_Compress">
 
 `love.forte.simbot.kook.api.GetGatewayApi.Compress`
 
@@ -26,7 +26,7 @@
 
 
 </def>
-<def title="NotCompress">
+<def title="NotCompress" id="love_forte_simbot_kook_api_GetGatewayApi_NotCompress">
 
 `love.forte.simbot.kook.api.GetGatewayApi.NotCompress`
 
@@ -34,7 +34,7 @@
 
 
 </def>
-<def title="Resume">
+<def title="Resume" id="love_forte_simbot_kook_api_GetGatewayApi_Resume">
 
 `love.forte.simbot.kook.api.GetGatewayApi.Resume`
 
@@ -46,7 +46,7 @@
 
 </deflist>
 </def>
-<def title="CreateAssetApi">
+<def title="CreateAssetApi" id="love_forte_simbot_kook_api_asset_CreateAssetApi">
 
 `love.forte.simbot.kook.api.asset.CreateAssetApi`
 
@@ -62,7 +62,7 @@
 
 
 </def>
-<def title="CreateChannelApi">
+<def title="CreateChannelApi" id="love_forte_simbot_kook_api_channel_CreateChannelApi">
 
 `love.forte.simbot.kook.api.channel.CreateChannelApi`
 
@@ -71,7 +71,7 @@
 
 
 </def>
-<def title="DeleteChannelApi">
+<def title="DeleteChannelApi" id="love_forte_simbot_kook_api_channel_DeleteChannelApi">
 
 `love.forte.simbot.kook.api.channel.DeleteChannelApi`
 
@@ -81,7 +81,7 @@
 
 
 </def>
-<def title="GetChannelListApi">
+<def title="GetChannelListApi" id="love_forte_simbot_kook_api_channel_GetChannelListApi">
 
 `love.forte.simbot.kook.api.channel.GetChannelListApi`
 
@@ -90,7 +90,7 @@
 
 
 </def>
-<def title="GetChannelViewApi">
+<def title="GetChannelViewApi" id="love_forte_simbot_kook_api_channel_GetChannelViewApi">
 
 `love.forte.simbot.kook.api.channel.GetChannelViewApi`
 
@@ -99,7 +99,7 @@
 
 
 </def>
-<def title="CreateGuildMuteApi">
+<def title="CreateGuildMuteApi" id="love_forte_simbot_kook_api_guild_CreateGuildMuteApi">
 
 `love.forte.simbot.kook.api.guild.CreateGuildMuteApi`
 
@@ -108,7 +108,7 @@
 
 
 </def>
-<def title="DeleteGuildMuteApi">
+<def title="DeleteGuildMuteApi" id="love_forte_simbot_kook_api_guild_DeleteGuildMuteApi">
 
 `love.forte.simbot.kook.api.guild.DeleteGuildMuteApi`
 
@@ -117,7 +117,7 @@
 
 
 </def>
-<def title="GetGuildBoostHistoryListApi">
+<def title="GetGuildBoostHistoryListApi" id="love_forte_simbot_kook_api_guild_GetGuildBoostHistoryListApi">
 
 `love.forte.simbot.kook.api.guild.GetGuildBoostHistoryListApi`
 
@@ -128,7 +128,7 @@
 
 
 </def>
-<def title="GetGuildListApi">
+<def title="GetGuildListApi" id="love_forte_simbot_kook_api_guild_GetGuildListApi">
 
 `love.forte.simbot.kook.api.guild.GetGuildListApi`
 
@@ -137,7 +137,7 @@
 
 
 </def>
-<def title="GetGuildMuteListApi">
+<def title="GetGuildMuteListApi" id="love_forte_simbot_kook_api_guild_GetGuildMuteListApi">
 
 `love.forte.simbot.kook.api.guild.GetGuildMuteListApi`
 
@@ -146,7 +146,7 @@
 
 
 </def>
-<def title="GetGuildViewApi">
+<def title="GetGuildViewApi" id="love_forte_simbot_kook_api_guild_GetGuildViewApi">
 
 `love.forte.simbot.kook.api.guild.GetGuildViewApi`
 
@@ -155,7 +155,7 @@
 
 
 </def>
-<def title="LeaveGuildApi">
+<def title="LeaveGuildApi" id="love_forte_simbot_kook_api_guild_LeaveGuildApi">
 
 `love.forte.simbot.kook.api.guild.LeaveGuildApi`
 
@@ -164,7 +164,7 @@
 
 
 </def>
-<def title="CreateInviteApi">
+<def title="CreateInviteApi" id="love_forte_simbot_kook_api_invite_CreateInviteApi">
 
 `love.forte.simbot.kook.api.invite.CreateInviteApi`
 
@@ -173,7 +173,7 @@
 
 
 </def>
-<def title="DeleteInviteApi">
+<def title="DeleteInviteApi" id="love_forte_simbot_kook_api_invite_DeleteInviteApi">
 
 `love.forte.simbot.kook.api.invite.DeleteInviteApi`
 
@@ -182,7 +182,7 @@
 
 
 </def>
-<def title="GetInviteListApi">
+<def title="GetInviteListApi" id="love_forte_simbot_kook_api_invite_GetInviteListApi">
 
 `love.forte.simbot.kook.api.invite.GetInviteListApi`
 
@@ -191,7 +191,7 @@
 
 
 </def>
-<def title="GetGuildMemberListApi">
+<def title="GetGuildMemberListApi" id="love_forte_simbot_kook_api_member_GetGuildMemberListApi">
 
 `love.forte.simbot.kook.api.member.GetGuildMemberListApi`
 
@@ -200,7 +200,7 @@
 
 
 </def>
-<def title="KickoutMemberApi">
+<def title="KickoutMemberApi" id="love_forte_simbot_kook_api_member_KickoutMemberApi">
 
 `love.forte.simbot.kook.api.member.KickoutMemberApi`
 
@@ -209,7 +209,7 @@
 
 
 </def>
-<def title="ModifyMemberNicknameApi">
+<def title="ModifyMemberNicknameApi" id="love_forte_simbot_kook_api_member_ModifyMemberNicknameApi">
 
 `love.forte.simbot.kook.api.member.ModifyMemberNicknameApi`
 
@@ -218,7 +218,7 @@
 
 
 </def>
-<def title="AddChannelReactionApi">
+<def title="AddChannelReactionApi" id="love_forte_simbot_kook_api_message_AddChannelReactionApi">
 
 `love.forte.simbot.kook.api.message.AddChannelReactionApi`
 
@@ -227,7 +227,7 @@
 
 
 </def>
-<def title="DeleteChannelMessageApi">
+<def title="DeleteChannelMessageApi" id="love_forte_simbot_kook_api_message_DeleteChannelMessageApi">
 
 `love.forte.simbot.kook.api.message.DeleteChannelMessageApi`
 
@@ -238,7 +238,7 @@
 
 
 </def>
-<def title="DeleteChannelReactionApi">
+<def title="DeleteChannelReactionApi" id="love_forte_simbot_kook_api_message_DeleteChannelReactionApi">
 
 `love.forte.simbot.kook.api.message.DeleteChannelReactionApi`
 
@@ -247,7 +247,7 @@
 
 
 </def>
-<def title="DeleteDirectMessageApi">
+<def title="DeleteDirectMessageApi" id="love_forte_simbot_kook_api_message_DeleteDirectMessageApi">
 
 `love.forte.simbot.kook.api.message.DeleteDirectMessageApi`
 
@@ -258,7 +258,7 @@
 
 
 </def>
-<def title="GetChannelMessageListApi">
+<def title="GetChannelMessageListApi" id="love_forte_simbot_kook_api_message_GetChannelMessageListApi">
 
 `love.forte.simbot.kook.api.message.GetChannelMessageListApi`
 
@@ -269,7 +269,7 @@
 
 
 </def>
-<def title="GetChannelMessageReactorListApi">
+<def title="GetChannelMessageReactorListApi" id="love_forte_simbot_kook_api_message_GetChannelMessageReactorListApi">
 
 `love.forte.simbot.kook.api.message.GetChannelMessageReactorListApi`
 
@@ -278,7 +278,7 @@
 
 
 </def>
-<def title="GetChannelMessageViewApi">
+<def title="GetChannelMessageViewApi" id="love_forte_simbot_kook_api_message_GetChannelMessageViewApi">
 
 `love.forte.simbot.kook.api.message.GetChannelMessageViewApi`
 
@@ -287,7 +287,7 @@
 
 
 </def>
-<def title="GetDirectMessageListApi">
+<def title="GetDirectMessageListApi" id="love_forte_simbot_kook_api_message_GetDirectMessageListApi">
 
 `love.forte.simbot.kook.api.message.GetDirectMessageListApi`
 
@@ -296,7 +296,7 @@
 
 
 </def>
-<def title="GetDirectMessageViewApi">
+<def title="GetDirectMessageViewApi" id="love_forte_simbot_kook_api_message_GetDirectMessageViewApi">
 
 `love.forte.simbot.kook.api.message.GetDirectMessageViewApi`
 
@@ -305,7 +305,7 @@
 
 
 </def>
-<def title="SendChannelMessageApi">
+<def title="SendChannelMessageApi" id="love_forte_simbot_kook_api_message_SendChannelMessageApi">
 
 `love.forte.simbot.kook.api.message.SendChannelMessageApi`
 
@@ -319,7 +319,7 @@
 
 
 </def>
-<def title="SendDirectMessageApi">
+<def title="SendDirectMessageApi" id="love_forte_simbot_kook_api_message_SendDirectMessageApi">
 
 `love.forte.simbot.kook.api.message.SendDirectMessageApi`
 
@@ -328,7 +328,7 @@
 
 
 </def>
-<def title="UpdateChannelMessageApi">
+<def title="UpdateChannelMessageApi" id="love_forte_simbot_kook_api_message_UpdateChannelMessageApi">
 
 `love.forte.simbot.kook.api.message.UpdateChannelMessageApi`
 
@@ -337,7 +337,7 @@
 
 
 </def>
-<def title="UpdateDirectMessageApi">
+<def title="UpdateDirectMessageApi" id="love_forte_simbot_kook_api_message_UpdateDirectMessageApi">
 
 `love.forte.simbot.kook.api.message.UpdateDirectMessageApi`
 
@@ -348,7 +348,7 @@
 
 
 </def>
-<def title="CreateGuildRoleApi">
+<def title="CreateGuildRoleApi" id="love_forte_simbot_kook_api_role_CreateGuildRoleApi">
 
 `love.forte.simbot.kook.api.role.CreateGuildRoleApi`
 
@@ -357,7 +357,7 @@
 
 
 </def>
-<def title="DeleteGuildRoleApi">
+<def title="DeleteGuildRoleApi" id="love_forte_simbot_kook_api_role_DeleteGuildRoleApi">
 
 `love.forte.simbot.kook.api.role.DeleteGuildRoleApi`
 
@@ -366,7 +366,7 @@
 
 
 </def>
-<def title="GetGuildRoleListApi">
+<def title="GetGuildRoleListApi" id="love_forte_simbot_kook_api_role_GetGuildRoleListApi">
 
 `love.forte.simbot.kook.api.role.GetGuildRoleListApi`
 
@@ -375,7 +375,7 @@
 
 
 </def>
-<def title="GrantGuildRoleApi">
+<def title="GrantGuildRoleApi" id="love_forte_simbot_kook_api_role_GrantGuildRoleApi">
 
 `love.forte.simbot.kook.api.role.GrantGuildRoleApi`
 
@@ -383,7 +383,7 @@
 
 
 </def>
-<def title="RevokeGuildRoleApi">
+<def title="RevokeGuildRoleApi" id="love_forte_simbot_kook_api_role_RevokeGuildRoleApi">
 
 `love.forte.simbot.kook.api.role.RevokeGuildRoleApi`
 
@@ -392,7 +392,7 @@
 
 
 </def>
-<def title="UpdateGuildRoleApi">
+<def title="UpdateGuildRoleApi" id="love_forte_simbot_kook_api_role_UpdateGuildRoleApi">
 
 `love.forte.simbot.kook.api.role.UpdateGuildRoleApi`
 
@@ -401,7 +401,7 @@
 
 
 </def>
-<def title="GetMeApi">
+<def title="GetMeApi" id="love_forte_simbot_kook_api_user_GetMeApi">
 
 `love.forte.simbot.kook.api.user.GetMeApi`
 
@@ -410,7 +410,7 @@
 
 
 </def>
-<def title="GetUserViewApi">
+<def title="GetUserViewApi" id="love_forte_simbot_kook_api_user_GetUserViewApi">
 
 `love.forte.simbot.kook.api.user.GetUserViewApi`
 
@@ -419,7 +419,7 @@
 
 
 </def>
-<def title="OfflineApi">
+<def title="OfflineApi" id="love_forte_simbot_kook_api_user_OfflineApi">
 
 `love.forte.simbot.kook.api.user.OfflineApi`
 
@@ -428,7 +428,7 @@
 
 
 </def>
-<def title="CreateUserChatApi">
+<def title="CreateUserChatApi" id="love_forte_simbot_kook_api_userchat_CreateUserChatApi">
 
 `love.forte.simbot.kook.api.userchat.CreateUserChatApi`
 
@@ -437,7 +437,7 @@
 
 
 </def>
-<def title="DeleteUserChatApi">
+<def title="DeleteUserChatApi" id="love_forte_simbot_kook_api_userchat_DeleteUserChatApi">
 
 `love.forte.simbot.kook.api.userchat.DeleteUserChatApi`
 
@@ -445,7 +445,7 @@
 
 
 </def>
-<def title="GetUserChatListApi">
+<def title="GetUserChatListApi" id="love_forte_simbot_kook_api_userchat_GetUserChatListApi">
 
 `love.forte.simbot.kook.api.userchat.GetUserChatListApi`
 
@@ -454,7 +454,7 @@
 
 
 </def>
-<def title="GetUserChatViewApi">
+<def title="GetUserChatViewApi" id="love_forte_simbot_kook_api_userchat_GetUserChatViewApi">
 
 `love.forte.simbot.kook.api.userchat.GetUserChatViewApi`
 

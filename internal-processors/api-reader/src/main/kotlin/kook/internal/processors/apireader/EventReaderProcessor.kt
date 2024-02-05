@@ -97,9 +97,11 @@ class EventReaderProcessor(private val environment: SymbolProcessorEnvironment) 
     private fun BufferedWriter.writeDeflistTo(list: List<KSClassDeclaration>) {
         write("<deflist>\n")
         list.forEach { declaration ->
-            write("<def title=\"${declaration.simpleName.asString()}\">\n")
+            val className = declaration.toClassName().canonicalName
+            val idName = className.replace('.', '_')
+            write("<def title=\"${declaration.simpleName.asString()}\" id=\"$idName\">\n")
             newLine()
-            write("`${declaration.toClassName().canonicalName}`\n")
+            write("`$className`\n")
             newLine()
             val serName = declaration.annotations.find {
                 it.shortName.asString() == "SerialName"
