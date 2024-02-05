@@ -56,7 +56,7 @@ public class GetChannelMessageReactorListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<List<MessageReactor>>
+    override val resultDeserializationStrategy: DeserializationStrategy<List<MessageReactor>>
         get() = serializer
 
     override fun urlBuild(builder: URLBuilder) {

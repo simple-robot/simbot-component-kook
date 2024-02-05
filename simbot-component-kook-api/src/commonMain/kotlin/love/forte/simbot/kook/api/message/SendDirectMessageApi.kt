@@ -147,7 +147,7 @@ public class SendDirectMessageApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<SendMessageResult>
+    override val resultDeserializationStrategy: DeserializationStrategy<SendMessageResult>
         get() = SendMessageResult.serializer()
 
     override val apiPath: ApiPath

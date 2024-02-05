@@ -60,7 +60,7 @@ public class GetGuildBoostHistoryListApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<ListData<BoostData>>
+    override val resultDeserializationStrategy: DeserializationStrategy<ListData<BoostData>>
         get() = deserializer
 
     override val apiPath: ApiPath

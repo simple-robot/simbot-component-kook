@@ -17,79 +17,15 @@
 
 package love.forte.simbot.kook.api
 
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.client.utils.*
 import io.ktor.http.*
-import io.ktor.http.content.*
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.*
-import kotlinx.serialization.builtins.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
+import love.forte.simbot.common.apidefinition.ApiDefinition
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.Kook
-import love.forte.simbot.kook.api.KookApi.Companion.DEFAULT_JSON
 import love.forte.simbot.kook.util.buildUrl
-import love.forte.simbot.logger.LoggerFactory
-import love.forte.simbot.util.api.requestor.API
-import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
-import kotlin.jvm.JvmField
-import kotlin.jvm.JvmSynthetic
-
-/**
- * 面向平台实现的 [KookApi] 的抽象类。
- *
- * 用于面向平台提供额外支持的能力。仅用于平台实现，不应被直接使用，请直接使用 [KookApi]。
- */
-public expect abstract class PlatformKookApi<T>() : API<KookApiRequestor, T> {
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个 [ApiResult]。
-     *
-     * 得到原始的 [HttpResponse] 而不对结果有任何处理。
-     */
-    @JvmSynthetic
-    public abstract suspend fun request(client: HttpClient, authorization: String): HttpResponse
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个结果字符串。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     */
-    @JvmSynthetic
-    public abstract suspend fun requestRaw(client: HttpClient, authorization: String): String
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个 [ApiResult] 结果。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     */
-    @JvmSynthetic
-    public abstract suspend fun requestResult(client: HttpClient, authorization: String): ApiResult
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
-     */
-    @JvmSynthetic
-    public abstract suspend fun requestData(client: HttpClient, authorization: String): T
-
-    /**
-     * 通过一个 [requestor] 对当前API发起请求，并得到一个具体结果。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
-     */
-    @JvmSynthetic
-    abstract override suspend fun requestBy(requestor: KookApiRequestor): T
-}
 
 /**
  * 一个用于表示 KOOK API 封装的抽象类。
@@ -100,16 +36,16 @@ public expect abstract class PlatformKookApi<T>() : API<KookApiRequestor, T> {
  *
  * @author ForteScarlet
  */
-public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>() {
+public interface KookApi<T : Any> : ApiDefinition<T> {
     /**
      * 此请求最终的url。
      */
-    public abstract val url: Url
+    override val url: Url
 
     /**
      * 此请求使用的 [HttpMethod]。
      */
-    public abstract val method: HttpMethod
+    override val method: HttpMethod
 
     /**
      * 预期结果类型的反序列化策略。
@@ -117,136 +53,17 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
      * 更多有关 API 响应体的说明参考 [KookApiResults]。
      *
      */
-    public abstract val resultDeserializer: DeserializationStrategy<T>
+    override val resultDeserializationStrategy: DeserializationStrategy<T>
 
     /**
      * 此次请求所发送的Body数据。为null则代表没有参数。
      */
-    public abstract val body: Any?
+    override val body: Any?
 
     /**
-     * 可以为 [request] 提供更多行为的函数。
-     *
-     * 例如清除默认的请求头 `Content-Type` 为其他值。
+     * 本次请求提供的请求头。
      */
-    protected open fun HttpRequestBuilder.requestPostAction() {
-    }
-
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个 [ApiResult]。
-     *
-     * 得到原始的 [HttpResponse] 而不对结果有任何处理。
-     */
-    @JvmSynthetic
-    override suspend fun request(client: HttpClient, authorization: String): HttpResponse {
-        val apiId: String? = if (apiLogger.isDebugEnabled()) {
-            "${method.value} ${url.encodedPath}"
-        } else null
-
-        coroutineContext[APIContext]?.apiId = apiId
-
-        if (this is KookPostApi) {
-            apiLogger.debug("API[{}] ======> query: {}, body: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" }, body)
-        } else {
-            apiLogger.debug("API[{}] ======> query: {}", apiId, url.encodedQuery.ifEmpty { "<EMPTY>" })
-        }
-
-        val response = reqForResp(client, authorization) {
-            requestPostAction()
-        }
-
-        apiLogger.debug("API[{}] <====== status: {}, response: {}", apiId, response.status, response)
-
-        return response
-    }
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个结果字符串。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     */
-    @JvmSynthetic
-    override suspend fun requestRaw(client: HttpClient, authorization: String): String {
-        val response = request(client, authorization)
-        return response.requireSuccess().bodyAsText()
-    }
-
-    private fun HttpResponse.requireSuccess(): HttpResponse {
-        if (!status.isSuccess()) {
-            throw ApiResponseException(this, "API [${this@KookApi}] response status non-successful: $status")
-        }
-
-        return this
-    }
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     */
-    @JvmSynthetic
-    override suspend fun requestResult(client: HttpClient, authorization: String): ApiResult {
-        var apiContext: APIContext? = null
-        val response = if (apiLogger.isDebugEnabled()) {
-            apiContext = coroutineContext[APIContext] ?: APIContext(null)
-            withContext(apiContext) {
-                request(client, authorization)
-            }
-        } else {
-            request(client, authorization)
-        }.requireSuccess()
-
-        val raw = response.bodyAsText()
-
-        apiLogger.debug("API[{}] <====== raw result: {}", apiContext?.apiId, raw)
-
-        val result = DEFAULT_JSON.decodeFromString(ApiResult.serializer(), raw)
-        result.httpStatus = response.status
-        result.raw = raw
-
-
-        val rateLimit = response.headers.createRateLimit().also {
-            apiLogger.debug("API[{}] <====== rate limit: {}", apiContext?.apiId, it)
-        }
-        result.rateLimit = rateLimit
-
-        return result
-    }
-
-
-    /**
-     * 通过一个 [HttpClient] 和校验信息 [authorization] 对当前API发起请求，并得到一个具体结果。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
-     */
-    @JvmSynthetic
-    override suspend fun requestData(client: HttpClient, authorization: String): T {
-        val result = requestResult(client, authorization)
-
-        if (!result.isSuccess) {
-            throw ApiResultException(result, "result.code is not success ($result)")
-        }
-
-        if (resultDeserializer == Unit.serializer()) {
-            @Suppress("UNCHECKED_CAST")
-            return Unit as T
-        }
-
-        return result.parseDataOrThrow(DEFAULT_JSON, resultDeserializer)
-    }
-
-    /**
-     * 通过一个 [requestor] 对当前API发起请求，并得到一个具体结果。
-     *
-     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
-     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
-     */
-    @JvmSynthetic
-    override suspend fun requestBy(requestor: KookApiRequestor): T =
-        requestData(requestor.client, requestor.authorization)
-
+    override val headers: Headers
 
     public companion object {
         /**
@@ -259,12 +76,9 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
          */
         public const val DEFAULT_START_PAGE: Int = 1
 
-        @JvmField
-        internal val apiLogger = LoggerFactory.getLogger("love.forte.simbot.kook.api")
-
-        @JvmField
         @OptIn(ExperimentalSerializationApi::class)
-        internal val DEFAULT_JSON = Json {
+        @InternalKookApi
+        public val DEFAULT_JSON: Json = Json {
             isLenient = true
             encodeDefaults = true
             ignoreUnknownKeys = true
@@ -278,64 +92,13 @@ public abstract class KookApi<T> : API<KookApiRequestor, T>, PlatformKookApi<T>(
     }
 }
 
-private class APIContext(
-    var apiId: String? = null
-) : AbstractCoroutineContextElement(APIContext) {
-    /**
-     * Key for [APIContext] instance in the coroutine context.
-     */
-    companion object Key : CoroutineContext.Key<APIContext>
-
-    /**
-     * Returns a string representation of the object.
-     */
-    override fun toString(): String = "APIContext(apiId=$apiId)"
-}
-
-private suspend inline fun KookApi<*>.reqForResp(
-    client: HttpClient,
-    authorization: String,
-    preAction: HttpRequestBuilder.() -> Unit = {},
-    postAction: HttpRequestBuilder.() -> Unit = {}
-): HttpResponse = client.request {
-    preAction()
-    this.method = this@reqForResp.method
-    url(this@reqForResp.url)
-    headers[HttpHeaders.Authorization] = authorization
-    headers[HttpHeaders.ContentType] = ContentType.Application.Json.toString() // by default
-
-    // set Body
-    when (val body = this@reqForResp.body) {
-        null -> setBody(EmptyContent)
-        is OutgoingContent -> setBody(body)
-        else -> {
-            if (client.pluginOrNull(ContentNegotiation) != null) {
-                setBody(body)
-            } else {
-                try {
-                    val ser = guessSerializer(body, DEFAULT_JSON.serializersModule)
-                    val bodyJson = DEFAULT_JSON.encodeToString(ser, body)
-                    setBody(bodyJson)
-                } catch (e: Throwable) {
-                    try {
-                        setBody(body)
-                    } catch (e0: Throwable) {
-                        e0.addSuppressed(e)
-                        throw e0
-                    }
-                }
-            }
-        }
-    }
-
-    postAction()
-}
-
 
 /**
  * [KookApi] 的进一步抽象实现，简化针对 [KookApi.url] 的构造过程。
  */
-public abstract class BaseKookApi<T> : KookApi<T>() {
+public abstract class BaseKookApi<T : Any> : KookApi<T> {
+    override val headers: Headers
+        get() = Headers.Empty
 
     /**
      * API路径片段，例如：
@@ -372,7 +135,6 @@ public abstract class BaseKookApi<T> : KookApi<T>() {
         }
     }
 
-
     /**
      * 根据当前API获取请求URL。
      *
@@ -391,6 +153,7 @@ public abstract class BaseKookApi<T> : KookApi<T>() {
     protected sealed class ApiPath {
         internal abstract val apiPath: List<String>
         internal abstract fun includeTo(builder: URLBuilder)
+
         public companion object {
             public fun create(isEncoded: Boolean, vararg apiPath: String): ApiPath {
                 return if (isEncoded) {
@@ -424,7 +187,7 @@ public abstract class BaseKookApi<T> : KookApi<T>() {
  * [KookPostApi] 对外暴露其用于请求的 [body] 实体。
  *
  */
-public abstract class KookPostApi<T> : BaseKookApi<T>() {
+public abstract class KookPostApi<T : Any> : BaseKookApi<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Post
 
@@ -464,7 +227,7 @@ public abstract class KookPostApi<T> : BaseKookApi<T>() {
  *
  *
  */
-public abstract class KookGetApi<T> : BaseKookApi<T>() {
+public abstract class KookGetApi<T : Any> : BaseKookApi<T>() {
     override val method: HttpMethod
         get() = HttpMethod.Get
 
@@ -474,55 +237,3 @@ public abstract class KookGetApi<T> : BaseKookApi<T>() {
     override val body: Any?
         get() = null
 }
-
-//region Ktor ContentNegotiation guessSerializer
-// see KotlinxSerializationJsonExtensions.kt
-// see SerializerLookup.kt
-
-@Suppress("UNCHECKED_CAST")
-private fun guessSerializer(value: Any?, module: SerializersModule): KSerializer<Any> = when (value) {
-    null -> String.serializer().nullable
-    is List<*> -> ListSerializer(value.elementSerializer(module))
-    is Array<*> -> value.firstOrNull()?.let { guessSerializer(it, module) } ?: ListSerializer(String.serializer())
-    is Set<*> -> SetSerializer(value.elementSerializer(module))
-    is Map<*, *> -> {
-        val keySerializer = value.keys.elementSerializer(module)
-        val valueSerializer = value.values.elementSerializer(module)
-        MapSerializer(keySerializer, valueSerializer)
-    }
-
-    else -> {
-        @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
-        module.getContextual(value::class) ?: value::class.serializer()
-    }
-} as KSerializer<Any>
-
-
-@OptIn(ExperimentalSerializationApi::class)
-private fun Collection<*>.elementSerializer(module: SerializersModule): KSerializer<*> {
-    val serializers: List<KSerializer<*>> =
-        filterNotNull().map { guessSerializer(it, module) }.distinctBy { it.descriptor.serialName }
-
-    if (serializers.size > 1) {
-        error(
-            "Serializing collections of different element types is not yet supported. " +
-                    "Selected serializers: ${serializers.map { it.descriptor.serialName }}",
-        )
-    }
-
-    val selected = serializers.singleOrNull() ?: String.serializer()
-
-    if (selected.descriptor.isNullable) {
-        return selected
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    selected as KSerializer<Any>
-
-    if (any { it == null }) {
-        return selected.nullable
-    }
-
-    return selected
-}
-//endregion

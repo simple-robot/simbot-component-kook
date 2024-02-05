@@ -71,7 +71,7 @@ tasks.getByName<Test>("test") {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         javaParameters = true
-        jvmTarget = "1.8"
+//        jvmTarget = "1.8"
         freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
     }
 }
@@ -84,12 +84,6 @@ kotlin {
             // optIn("love.forte.simbot.ExperimentalSimbotApi")
         }
     }
-}
-
-tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-    options.encoding = "UTF-8"
 }
 
 configurations.all {

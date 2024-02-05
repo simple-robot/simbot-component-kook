@@ -1,15 +1,36 @@
 [versions]
+kotlin = "1.9.22"
 kotlinx-coroutines = "1.7.3"
 kotlinx-serialization = "1.6.2"
-spring-boot = "2.7.5"
+dokka = "1.9.10"
 openjdk-jmh = "1.35"
-forte-di = "0.0.3"
-forte-annotationTool = "0.6.3"
-ktor = "2.3.0"
+ktor = "2.3.7"
 log4j = "2.20.0"
-atomicfu = "0.23.1"
+reactor = "3.6.2"
+# simbot
+simbot = "4.0.0-dev18"
+suspendTransform = "0.6.0"
+gradleCommon = "0.2.0"
+# ksp
+ksp = "1.9.22-1.0.17"
+# https://square.github.io/kotlinpoet/
+kotlinPoet = "1.16.0"
 
 [libraries]
+# simbot
+simbot-api = { group = "love.forte.simbot", name = "simbot-api", version.ref = "simbot" }
+simbot-core = { group = "love.forte.simbot", name = "simbot-core", version.ref = "simbot" }
+simbot-spring = { group = "love.forte.simbot", name = "simbot-core-spring-boot-starter", version.ref = "simbot" }
+simbot-logger = { group = "love.forte.simbot.logger", name = "simbot-logger", version.ref = "simbot" }
+simbot-logger-slf4jimpl = { group = "love.forte.simbot.logger", name = "simbot-logger-slf4j2-impl", version.ref = "simbot" }
+simbot-common-apidefinition = { group = "love.forte.simbot.common", name = "simbot-common-apidefinition", version.ref = "simbot" }
+simbot-common-atomic = { group = "love.forte.simbot.common", name = "simbot-common-atomic", version.ref = "simbot" }
+simbot-common-core = { group = "love.forte.simbot.common", name = "simbot-common-core", version.ref = "simbot" }
+simbot-common-suspend = { group = "love.forte.simbot.common", name = "simbot-common-suspend-runner", version.ref = "simbot" }
+simbot-common-annotations = { group = "love.forte.simbot.common", name = "simbot-common-annotations", version.ref = "simbot" }
+simbot-common-loop = { group = "love.forte.simbot.common", name = "simbot-common-stage-loop", version.ref = "simbot" }
+simbot-gradle = { group = "love.forte.simbot.gradle", name = "simbot-gradle-suspendtransforms", version.ref = "simbot" }
+
 # jetbrains-annotation
 jetbrains-annotations = "org.jetbrains:annotations:24.0.1"
 
@@ -76,6 +97,12 @@ ktor-client-winhttp = { group = "io.ktor", name = "ktor-client-winhttp", version
 # see https://ktor.io/docs/http-client-engines.html#darwin
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 
+# ksp
+ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+# https://square.github.io/kotlinpoet/interop-ksp/
+kotlinPoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinPoet" }
+
+
 
 # slf4j
 slf4j-api = "org.slf4j:slf4j-api:1.7.36"
@@ -90,16 +117,29 @@ lmax-disruptor = "com.lmax:disruptor:3.4.4"
 openjdk-jmh-core = { group = "org.openjdk.jmh", name = "jmh-core", version.ref = "openjdk-jmh" }
 openjdk-jmh-generator-annprocess = { group = "org.openjdk.jmh", name = "jmh-generator-annprocess", version.ref = "openjdk-jmh" }
 
-forte-di-api = { group = "love.forte.di", name = "di-api", version.ref = "forte-di" }
-forte-di-core = { group = "love.forte.di", name = "di-core", version.ref = "forte-di" }
-forte-di-spring = { group = "love.forte.di", name = "di-spring", version.ref = "forte-di" }
-
-forte-annotationTool-api = { group = "love.forte.annotation-tool", name = "api", version.ref = "forte-annotationTool" }
-forte-annotationTool-core = { group = "love.forte.annotation-tool", name = "core", version.ref = "forte-annotationTool" }
-forte-annotationTool-kcore = { group = "love.forte.annotation-tool", name = "kcore", version.ref = "forte-annotationTool" }
+# reactor
+reactor-core = { group = "io.projectreactor", name = "reactor-core", version.ref = "reactor" }
 
 # log4j
 log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
 log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
 log4j-slf4jImpl = { group = "org.apache.logging.log4j", name = "log4j-slf4j-impl", version.ref = "log4j" }
 log4j-slf4j2Impl = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version.ref = "log4j" }
+
+# dokka
+dokka-plugin = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version.ref = "dokka" }
+dokka-base = { group = "org.jetbrains.dokka", name = "dokka-base", version.ref = "dokka" }
+
+suspend-transform-gradle = { module = "love.forte.plugin.suspend-transform:suspend-transform-plugin-gradle", version.ref = "suspendTransform" }
+
+# gradle-common
+gradle-common-core = { group = "love.forte.gradle.common", name = "gradle-common-core", version.ref = "gradleCommon" }
+gradle-common-multiplatform = { group = "love.forte.gradle.common", name = "gradle-common-kotlin-multiplatform", version.ref = "gradleCommon" }
+gradle-common-publication = { group = "love.forte.gradle.common", name = "gradle-common-publication", version.ref = "gradleCommon" }
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+[bundles]
+gradle-common = ["gradle-common-core", "gradle-common-multiplatform", "gradle-common-publication"]
+dokka = ["dokka-plugin", "dokka-base"]

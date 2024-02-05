@@ -51,7 +51,7 @@ public class ModifyMemberNicknameApi private constructor(private val _body: Body
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<Unit>
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPath: ApiPath

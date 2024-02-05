@@ -52,7 +52,7 @@ public class RevokeGuildRoleApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<UserRoleOperated>
+    override val resultDeserializationStrategy: DeserializationStrategy<UserRoleOperated>
         get() = UserRoleOperated.serializer()
 
     override fun createBody(): Any = Body(guildId, userId, roleId)

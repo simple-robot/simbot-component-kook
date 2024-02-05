@@ -35,7 +35,7 @@ public class GetGuildMuteListApi private constructor(private val guildId: String
         private val PATH = ApiPath.create("guild-mute", "list")
     }
 
-    override val resultDeserializer: DeserializationStrategy<MuteList>
+    override val resultDeserializationStrategy: DeserializationStrategy<MuteList>
         get() = MuteList.serializer()
 
     override val apiPath: ApiPath

@@ -27,7 +27,7 @@ import love.forte.simbot.kook.api.KookPostApi
  * @author ForteScarlet
  */
 public object OfflineApi : KookPostApi<Unit>() {
-    override val resultDeserializer: DeserializationStrategy<Unit>
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPath: ApiPath = ApiPath.create("user", "offline")

@@ -1,4 +1,16 @@
-# v3.3.0.0-beta.1
+# v4.0.0-dev2
+
+> Release & Pull Notes: [v4.0.0-dev2](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev2) 
+
+- refactor: 项目整体结构更新 ([`6fda1f2`](https://github.com/simple-robot/simpler-robot/commit/6fda1f2))
+- fix: CHANGELOG.md ([`d254b9e`](https://github.com/simple-robot/simpler-robot/commit/d254b9e))
+
+# v4.0.0-dev1
+
+> Release & Pull Notes: [v4.0.0-dev1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev1) 
+
+- fix: CHANGELOG.md ([`d254b9e`](https://github.com/simple-robot/simpler-robot/commit/d254b9e))
+
 
 > Release & Pull Notes: [v3.3.0.0-beta.1](https://github.com/simple-robot/simbot-component-kook/releases/tag/v3.3.0.0-beta.1) 
 

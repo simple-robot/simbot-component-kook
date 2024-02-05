@@ -55,7 +55,7 @@ public class UpdateDirectMessageApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<Unit>
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPath: ApiPath

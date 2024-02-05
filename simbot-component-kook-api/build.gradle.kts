@@ -1,39 +1,42 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 import love.forte.gradle.common.core.project.setup
+import love.forte.gradle.common.kotlin.multiplatform.applyTier1
+import love.forte.gradle.common.kotlin.multiplatform.applyTier2
+import love.forte.gradle.common.kotlin.multiplatform.applyTier3
+import util.isCi
 
 plugins {
     kotlin("multiplatform")
-    `kook-multiplatform-maven-publish`
     kotlin("plugin.serialization")
     `kook-dokka-partial-configure`
+    alias(libs.plugins.ksp)
 }
 
 setup(P)
-if (isSnapshot()) {
-    version = P.snapshotVersion.toString()
-}
 
-tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-    options.encoding = "UTF-8"
-}
+useK2()
+configJavaCompileWithModule("simbot.component.kook.api")
+apply(plugin = "kook-multiplatform-maven-publish")
+
 
 repositories {
     mavenCentral()
@@ -45,66 +48,36 @@ kotlin {
 
     sourceSets.configureEach {
         languageSettings {
-//            optIn("love.forte.simbot.qguild.InternalApi")
+            optIn("love.forte.simbot.kook.ExperimentalKookApi")
+            optIn("love.forte.simbot.kook.InternalKookApi")
         }
     }
 
-    jvm {
-        withJava()
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-                javaParameters = true
-                freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
-            }
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    configKotlinJvm()
 
     js(IR) {
-        nodejs()
-        binaries.library()
+        configJs()
     }
 
 
-    // Tier 1
-    macosX64()
-    macosArm64()
-    iosSimulatorArm64()
-    iosX64()
-
-    // Tier 2
-    linuxX64()
-//    linuxArm64()
-    watchosSimulatorArm64()
-    watchosX64()
-    watchosArm32()
-    watchosArm64()
-    tvosSimulatorArm64()
-    tvosX64()
-    tvosArm64()
-    iosArm64()
-
-    // Tier 3
-//    androidNativeArm32()
-//    androidNativeArm64()
-//    androidNativeX86()
-//    androidNativeX64()
-    mingwX64()
-//    watchosDeviceArm64()
+    applyTier1()
+    applyTier2()
+    applyTier3(supportKtorClient = true)
 
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly(simbotAnnotations)
-                api(simbotRequestorCore)
+                api(libs.kotlinx.coroutines.core)
+
+                api(libs.simbot.logger)
+                api(libs.simbot.common.apidefinition)
+                api(libs.simbot.common.suspend)
+                api(libs.simbot.common.core)
+                compileOnly(libs.simbot.common.annotations)
+
                 api(libs.ktor.client.core)
                 api(libs.ktor.client.contentNegotiation)
-                api(libs.ktor.serialization.kotlinx.json)
                 api(libs.kotlinx.serialization.json)
-                api(simbotLogger)
             }
         }
 
@@ -115,46 +88,38 @@ kotlin {
             }
         }
 
-        jvmMain {
-            dependencies {
-                compileOnly(simbotApi) // use @Api4J annotation
-                compileOnly(simbotAnnotations) // use @Api4J annotation
-            }
-        }
-
         jvmTest {
             dependencies {
                 implementation(libs.ktor.client.cio)
-                implementation(simbotApi) // use @Api4J annotation
                 implementation(libs.log4j.api)
                 implementation(libs.log4j.core)
                 implementation(libs.log4j.slf4j2Impl)
+                implementation(libs.kotlinx.coroutines.reactor)
+                implementation(libs.reactor.core)
             }
         }
 
-        jsMain {
-            dependencies {
-                api(simbotAnnotations)
-                api(libs.ktor.client.js)
-            }
+        jsMain.dependencies {
+            api(libs.ktor.client.js)
+            implementation(libs.simbot.common.annotations)
         }
-        jsTest {
-            dependencies {
-                api(libs.ktor.client.js)
-            }
+
+        nativeMain.dependencies {
+            implementation(libs.simbot.common.annotations)
+        }
+
+        mingwTest.dependencies {
+            implementation(libs.ktor.client.winhttp)
         }
     }
-
 }
 
-// suppress all?
-//tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
-//    dokkaSourceSets.configureEach {
-//        suppress.set(true)
-//        perPackageOption {
-//            suppress.set(true)
-//        }
-//    }
-//}
+dependencies {
+    add("kspJvm", project(":internal-processors:api-reader"))
+}
 
-
+ksp {
+    arg("kook.api.reader.enable", (!isCi).toString())
+    arg("kook.api.finder.api.output", rootDir.resolve("generated-docs/api-list.md").absolutePath)
+    arg("kook.api.finder.event.output", rootDir.resolve("generated-docs/event-list.md").absolutePath)
+}

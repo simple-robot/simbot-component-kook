@@ -1,24 +1,28 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package changelog
 
 import org.gradle.api.Project
-import simbotVersion
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileWriter
@@ -39,19 +43,20 @@ fun Project.generateChangelog(tag: String) {
         if (!file.exists()) {
             file.createNewFile()
         }
+        val libs = rootProject.extensions.getByType<VersionCatalogsExtension>()
+            .named("libs")
 
-        val coreVersion = simbotVersion
+        val coreVersion = libs.findVersion("simbot").get()
 
         file.writeText(
             """
-            > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simbot-component-kook/releases/tag/v$coreVersion)
+            > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simpler-robot/releases/tag/v$coreVersion)
                 
             > [!warning]
-            > 目前版本尚处于 **`BETA`** 阶段，代表仍然可能存在部分[已知问题](https://github.com/simple-robot/simbot-component-kook/issues)或未知问题，
-            以及未完善的内容和落后于官方更新的内容。**
+            > 目前版本尚处于 **`dev`** 阶段，代表仍然可能存在部分已知问题或未知问题，
+            > 以及尚未完善的内容和落后于官方更新的内容。
             
-            我们欢迎并期望着您的的[反馈](https://github.com/simple-robot/simbot-component-kook/issues)或[协助](https://github.com/simple-robot/simbot-component-kook/pulls)，
-            感谢您的贡献与支持！
+            我们欢迎并期望着您的 [反馈](https://github.com/simple-robot/simbot-component-kook/issues) 或 [协助](https://github.com/simple-robot/simbot-component-kook/pulls)，感谢您的贡献与支持！
             
         """.trimIndent()
         )
@@ -148,7 +153,7 @@ fun Project.generateChangelog(tag: String) {
                 if (lines.isEmpty()) {
                     add(null)
                 } else {
-                    val last = lines.last
+                    val last = lines.last()
                     if (last.message == message) {
                         last.hash.add(0, hash)
                     } else {
@@ -157,10 +162,14 @@ fun Project.generateChangelog(tag: String) {
                 }
             }
 
-        val tmpDir = rootProject.layout.buildDirectory.dir("tmp/changelog").get().asFile
+        val tmpDir = rootProject.layout.buildDirectory.dir("changelog_tmp").get().asFile
+        tmpDir.mkdirs()
 
         val tmpFile =
             Files.createTempFile(tmpDir.toPath(), "changelog", "tmp").toFile()
+
+        tmpFile.createNewFile()
+        tmpFile.deleteOnExit()
 
         // copy source file to tmp file
         RandomAccessFile(rootChangelogFile, "r").channel.use { srcChannel ->
