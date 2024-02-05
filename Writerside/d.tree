@@ -21,4 +21,18 @@
         <toc-element topic="unsupported-event.md"/>
         <toc-element topic="role-api.md"/>
     </toc-element>
+    <toc-element toc-title="其他版本">
+        <toc-element toc-title="v3.3.0.0-beta1">
+            <toc-element toc-title="快速开始">
+                <toc-element topic="old-quick-start-api.md"/>
+                <toc-element topic="old-quick-start-stdlib.md"/>
+                <toc-element topic="old-quick-start-simbot-core.md"/>
+                <toc-element topic="old-quick-start-spring-boot.md"/>
+            </toc-element>
+            <toc-element topic="old-bot-config.md"/>
+            <toc-element toc-title="基础内容">
+                <toc-element topic="old-basic-message.md"/>
+            </toc-element>
+        </toc-element>
+    </toc-element>
 </instance-profile>
