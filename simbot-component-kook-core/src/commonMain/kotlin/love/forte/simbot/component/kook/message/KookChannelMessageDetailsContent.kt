@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.message
@@ -23,11 +26,13 @@ import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.ability.StandardDeleteOption.Companion.standardAnalysis
 import love.forte.simbot.ability.isIgnoreOnFailure
 import love.forte.simbot.ability.isIgnoreOnNoSuchTarget
+import love.forte.simbot.common.exception.initExceptionCause
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Companion.asMessage
 import love.forte.simbot.component.kook.util.requestResultBy
+import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
 import love.forte.simbot.kook.api.message.GetChannelMessageViewApi
 import love.forte.simbot.kook.messages.ChannelMessageDetails
@@ -95,27 +100,33 @@ public data class KookChannelMessageDetailsContent(
      */
     override suspend fun delete(vararg options: DeleteOption) {
         val stdOpts = options.standardAnalysis()
-        // TODO try-catch?
-        val result = DeleteChannelMessageApi.create(details.id).requestResultBy(bot)
-        if (result.isSuccess && result.isHttpSuccess) {
-            return
-        }
+        val result = try {
+            DeleteChannelMessageApi.create(details.id).requestResultBy(bot)
+        } catch (respEx: ApiResponseException) {
+            val httpStatus = respEx.response.status
+            if (httpStatus.value == HttpStatusCode.NotFound.value) {
+                if (stdOpts.isIgnoreOnNoSuchTarget) {
+                    return
+                }
 
-        val httpStatus = result.httpStatus
+                throw NoSuchElementException("Delete channel message (details.id=${details.id}) not found: HTTP response status 404").also {
+                    it.initExceptionCause(respEx)
+                }
+            }
 
-        if (httpStatus.value == HttpStatusCode.NotFound.value) {
-            if (stdOpts.isIgnoreOnNoSuchTarget) {
+            // other ex
+            if (stdOpts.isIgnoreOnFailure) {
                 return
             }
 
-            throw NoSuchElementException("Delete target (details.id=${details.id}) not found: HTTP code 404 with result $result")
+            throw DeleteFailureException("Delete channel message(details.id=${details.id}) on failure: ${respEx.message}", respEx)
         }
 
-        if (stdOpts.isIgnoreOnFailure) {
+        if (result.isSuccess || stdOpts.isIgnoreOnFailure) {
             return
         }
 
-        throw DeleteFailureException("Delete result not success. HTTP code: $httpStatus, result: $result")
+        throw DeleteFailureException("Delete channel message(details.id=${details.id}) on failure with result: $result")
     }
 
     override fun toString(): String = "KookChannelMessageDetailsContent(details=$details)"

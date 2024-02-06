@@ -99,7 +99,6 @@ internal class KookUserChatImpl(
     }
 
     override suspend fun delete(vararg options: DeleteOption) {
-        // TODO options
         val stdOpts = options.standardAnalysis()
 
         val result = try {
