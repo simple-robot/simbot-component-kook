@@ -1,3 +1,11 @@
+# v4.0.0-dev3
+
+> Release & Pull Notes: [v4.0.0-dev3](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev3) 
+
+- refactor: 清理、处理部分TODO ([`bd65597`](https://github.com/simple-robot/simpler-robot/commit/bd65597))
+- config: release.yml ([`5fae0d9`](https://github.com/simple-robot/simpler-robot/commit/5fae0d9))
+- pref: 优化 KMarkdown内的部分 `object` ([`76acc61`](https://github.com/simple-robot/simpler-robot/commit/76acc61))
+
 # v4.0.0-dev2
 
 > Release & Pull Notes: [v4.0.0-dev2](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev2) 
