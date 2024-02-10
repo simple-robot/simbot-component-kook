@@ -18,6 +18,7 @@
         <algolia-index>kook-doc</algolia-index>
         <algolia-api-key>e60d9ee16618a0ad3a338ecc73cb840e</algolia-api-key>
         <web-root>http://component-kook.simbot.forte.love</web-root>
+        <analytics-head-script-file>head.html</analytics-head-script-file>
     </variables>
 
     <build-profile instance="kook">
