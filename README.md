@@ -19,11 +19,8 @@ KOOK组件库可以作为底层API依赖使用、
 
 ## 文档
 
-> [!warning]
-> 建设中
-
 - 了解simbot: [**Simple Robot 应用手册**](https://simbot.forte.love)
-- **KOOK组件**手册(v4 建设中)：<https://component-kook.simbot.forte.love/> (即当前仓库的 GitHub Pages)
+- **KOOK组件**手册：<https://component-kook.simbot.forte.love/> (即当前仓库的 GitHub Pages)
 - **API文档**: [**文档引导站点**](https://docs.simbot.forte.love) 中KOOK的 [**KDoc站点**](https://docs.simbot.forte.love/components/qq-guild)
 
 ---
