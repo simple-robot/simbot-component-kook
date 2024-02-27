@@ -25,11 +25,14 @@ KOOK组件库可以作为底层API依赖使用、
 
 ---
 
-我们欢迎并期望着您的
-[反馈](https://github.com/simple-robot/simbot-component-qq-guild/issues)
-或
-[协助](https://github.com/simple-robot/simbot-component-qq-guild/pulls)，
-感谢您的贡献与支持！
+## 支持列表
+
+前往 [支持列表](support-list.md) 查看已经支持的API、尚未支持的API。
+如果你迫切的希望支持某些API，而它们尚未被支持，请[让我们知道](https://github.com/simple-robot/simbot-component-kook/issues)!
+
+## 贡献
+
+前往 [贡献手册](docs/CONTRIBUTING_CN.md) 了解更多！
 
 ## 快速开始
 
