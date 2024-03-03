@@ -4,7 +4,7 @@ kotlinx-coroutines = "1.8.0-RC2"
 kotlinx-serialization = "1.6.2"
 dokka = "1.9.10"
 openjdk-jmh = "1.35"
-ktor = "2.3.7"
+ktor = "2.3.8"
 log4j = "2.20.0"
 reactor = "3.6.2"
 # simbot
