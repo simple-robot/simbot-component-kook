@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.22"
-kotlinx-coroutines = "1.8.0-RC2"
+kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.6.3"
 dokka = "1.9.10"
 openjdk-jmh = "1.35"
