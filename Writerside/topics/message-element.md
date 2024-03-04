@@ -3,18 +3,24 @@ switcher-label: Java API 风格
 ---
 # 消息元素
 
-本章节介绍 KOOK 组件中针对 simbot4 的 **消息元素(`Message.Element`)** 的实现类型。
+本章节介绍 KOOK 组件中针对 simbot 标准库中 **消息元素(`Message.Element`)** 的实现类型。
+
+<tip title="标准库的标准">
+
+
+</tip>
 
 ## Message.Element
 
-先简单介绍一下 `Message.Element`。它是 simbot4 标准库中提供一个接口类型，
+先简单介绍一下 `Message.Element`。它是 simbot 标准库中提供一个接口类型，
 用来定义一个**消息元素**。一个消息元素或多个消息元素组成的**消息链**可用于发送消息。
 
-simbot4 的标准库提供了一些常见的标准消息元素实现，例如 `At`、`Image` 等。
+simbot 标准库提供了一些常见的标准消息元素实现，例如 `At`、`Image` 等。
 但是很多情况下，对于一个组件而言这些标准实现可能不能满足需求，这时候就需要组件实现这个接口，
 来提供更多期望的功能。
 
-> 有关更详细的描述参考 [simbot4 手册](https://simbot.forte.love) 中的相关章节。
+> 你可以前往 [simbot4 手册的消息元素](https://simbot.forte.love/basic-messages.html)
+> 了解更多详情。
 
 ## 标准消息元素支持
 
