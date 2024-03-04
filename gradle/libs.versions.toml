@@ -5,14 +5,14 @@ kotlinx-serialization = "1.6.3"
 dokka = "1.9.10"
 openjdk-jmh = "1.37"
 ktor = "2.3.8"
-log4j = "2.20.0"
+log4j = "2.23.0"
 reactor = "3.6.2"
 # simbot
 simbot = "4.0.0-beta1"
 suspendTransform = "0.6.0"
 gradleCommon = "0.2.0"
 # ksp
-ksp = "1.9.22-1.0.17"
+ksp = "1.9.22-1.0.18"
 # https://square.github.io/kotlinpoet/
 kotlinPoet = "1.16.0"
 
@@ -32,7 +32,7 @@ simbot-common-loop = { group = "love.forte.simbot.common", name = "simbot-common
 simbot-gradle = { group = "love.forte.simbot.gradle", name = "simbot-gradle-suspendtransforms", version.ref = "simbot" }
 
 # jetbrains-annotation
-jetbrains-annotations = "org.jetbrains:annotations:24.0.1"
+jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 
 # kotlinx-coroutines
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
