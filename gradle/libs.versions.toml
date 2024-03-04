@@ -12,7 +12,7 @@ simbot = "4.0.0-dev18"
 suspendTransform = "0.6.0"
 gradleCommon = "0.2.0"
 # ksp
-ksp = "1.9.22-1.0.17"
+ksp = "1.9.22-1.0.18"
 # https://square.github.io/kotlinpoet/
 kotlinPoet = "1.16.0"
 
