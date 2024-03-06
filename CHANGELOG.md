@@ -1,6 +1,6 @@
-# v4.0.0-beta1
+# v4.0.0-beta2
 
-> Release & Pull Notes: [v4.0.0-beta1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta1) 
+> Release & Pull Notes: [v4.0.0-beta2](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta2) 
 
 - build(deps): bump org.jetbrains:annotations from 24.0.1 to 24.1.0 ([`278ac66`](https://github.com/simple-robot/simpler-robot/commit/278ac66))
 - build(deps): bump ksp from 1.9.22-1.0.17 to 1.9.22-1.0.18 ([`0a23a80`](https://github.com/simple-robot/simpler-robot/commit/0a23a80))
