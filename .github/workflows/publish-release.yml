@@ -4,6 +4,10 @@ on:
     tags:
       - 'v4**'
 
+concurrency:
+  cancel-in-progress: true
+  group: publish-release-${{ github.ref_name }}
+
 env:
   IS_CI: true
   GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
