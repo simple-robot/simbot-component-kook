@@ -9,6 +9,9 @@ on:
     paths:
       - 'Writerside/**'
       - '.github/workflows/deploy-website-v4.yml'
+
+    tags-ignore:
+      - v4.**.**
   # Specify to run a workflow manually from the Actions tab on GitHub
   workflow_dispatch:
 

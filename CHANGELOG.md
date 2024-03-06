@@ -1,3 +1,19 @@
+# v4.0.0-beta1
+
+> Release & Pull Notes: [v4.0.0-beta1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta1) 
+
+- build(deps): bump org.jetbrains:annotations from 24.0.1 to 24.1.0 ([`278ac66`](https://github.com/simple-robot/simpler-robot/commit/278ac66))
+- build(deps): bump ksp from 1.9.22-1.0.17 to 1.9.22-1.0.18 ([`0a23a80`](https://github.com/simple-robot/simpler-robot/commit/0a23a80))
+- build(deps): bump log4j from 2.20.0 to 2.23.0 ([`227ca86`](https://github.com/simple-robot/simpler-robot/commit/227ca86))
+- build(deps): bump openjdk-jmh from 1.35 to 1.37 ([`8f549a9`](https://github.com/simple-robot/simpler-robot/commit/8f549a9))
+- build(deps): bump kotlinx-coroutines from 1.8.0-RC2 to 1.8.0 ([`5146020`](https://github.com/simple-robot/simpler-robot/commit/5146020))
+- refactor: version to v4.0.0-beta1 ([`fe3b343`](https://github.com/simple-robot/simpler-robot/commit/fe3b343))
+- build(deps): bump org.slf4j:slf4j-api from 1.7.36 to 2.0.12 ([`99f45e8`](https://github.com/simple-robot/simpler-robot/commit/99f45e8))
+- build(deps): bump ktor from 2.3.7 to 2.3.8 ([`9d6f9f8`](https://github.com/simple-robot/simpler-robot/commit/9d6f9f8))
+- build(deps): bump com.charleskorn.kaml:kaml from 0.46.0 to 0.57.0 ([`2eb75d3`](https://github.com/simple-robot/simpler-robot/commit/2eb75d3))
+- build(deps): bump kotlinx-serialization from 1.6.2 to 1.6.3 ([`8c66e3f`](https://github.com/simple-robot/simpler-robot/commit/8c66e3f))
+- CI: config ([`fc19828`](https://github.com/simple-robot/simpler-robot/commit/fc19828))
+
 # v4.0.0-dev3
 
 > Release & Pull Notes: [v4.0.0-dev3](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-dev3) 

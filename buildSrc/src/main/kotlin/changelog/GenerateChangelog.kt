@@ -53,7 +53,7 @@ fun Project.generateChangelog(tag: String) {
             > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simpler-robot/releases/tag/v$coreVersion)
                 
             > [!warning]
-            > 目前版本尚处于 **`dev`** 阶段，代表仍然可能存在部分已知问题或未知问题，
+            > 目前版本尚处于 **`beta`** 阶段，代表仍然可能存在部分已知问题或未知问题，
             > 以及尚未完善的内容和落后于官方更新的内容。
             
             我们欢迎并期望着您的 [反馈](https://github.com/simple-robot/simbot-component-kook/issues) 或 [协助](https://github.com/simple-robot/simbot-component-kook/pulls)，感谢您的贡献与支持！
