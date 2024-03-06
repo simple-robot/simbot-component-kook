@@ -45,7 +45,7 @@ public class KickoutMemberApi private constructor(guildId: String, targetId: Str
         public fun create(guildId: String, targetId: String): KickoutMemberApi = KickoutMemberApi(guildId, targetId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<Unit>
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPath: ApiPath

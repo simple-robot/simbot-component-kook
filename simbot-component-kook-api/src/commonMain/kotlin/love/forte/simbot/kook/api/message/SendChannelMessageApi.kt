@@ -119,7 +119,7 @@ public class SendChannelMessageApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<SendMessageResult>
+    override val resultDeserializationStrategy: DeserializationStrategy<SendMessageResult>
         get() = SendMessageResult.serializer()
 
     /**

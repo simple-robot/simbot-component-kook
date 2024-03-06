@@ -22,31 +22,25 @@ plugins {
 repositories {
     mavenCentral()
     gradlePluginPortal()
+    mavenLocal()
 }
 
-val kotlinVersion = "1.9.21"
-val dokkaVersion = "1.9.10"
-val suspendTransformVersion = "0.5.1"
-val gradleCommon = "0.1.1"
+val kotlinVersion: String = libs.versions.kotlin.get()
 
 dependencies {
-    // kotlin("jvm") apply false
     implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation(kotlin("serialization", kotlinVersion))
-    implementation("org.jetbrains.dokka", "dokka-gradle-plugin", dokkaVersion)
-    implementation("org.jetbrains.dokka", "dokka-base", dokkaVersion)
+    implementation(libs.bundles.dokka)
+
     // see https://github.com/gradle-nexus/publish-plugin
     implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
-    
-    implementation("love.forte.plugin.suspend-transform:suspend-transform-plugin-gradle:$suspendTransformVersion")
-    implementation("love.forte.gradle.common:gradle-common-core:$gradleCommon")
-    implementation("love.forte.gradle.common:gradle-common-kotlin-multiplatform:$gradleCommon")
-    implementation("love.forte.gradle.common:gradle-common-publication:$gradleCommon")
-//    implementation("love.forte.gradle.common:gradle-common-all:$gradleCommon")
+
+    // simbot suspend transform gradle common
+    implementation(libs.simbot.gradle)
+
+    // suspend transform
+    implementation(libs.suspend.transform.gradle)
+
+    // gradle common
+    implementation(libs.bundles.gradle.common)
 }
-
-//val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-
-//compileKotlin.kotlinOptions {
-//    freeCompilerArgs += listOf("-Xinline-classes")
-//}

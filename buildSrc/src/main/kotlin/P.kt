@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -20,6 +23,7 @@
 import love.forte.gradle.common.core.project.ProjectDetail
 import love.forte.gradle.common.core.project.Version
 import love.forte.gradle.common.core.project.minus
+import love.forte.gradle.common.core.property.systemProp
 import love.forte.gradle.common.core.project.version as v
 
 /*
@@ -39,21 +43,6 @@ import love.forte.gradle.common.core.project.version as v
 *
 */
 
-val simbotVersion = v(3, 3, 0)
-
-val simbotApi = "love.forte.simbot:simbot-api:$simbotVersion"
-val simbotAnnotations = "love.forte.simbot.util:simbot-annotations:$simbotVersion"
-val simbotCore = "love.forte.simbot:simbot-core:$simbotVersion"
-val simbotLogger = "love.forte.simbot:simbot-logger:$simbotVersion"
-val simbotLoggerSlf4j = "love.forte.simbot:simbot-logger-slf4j-impl:$simbotVersion"
-
-val simbotRequestorCore = "love.forte.simbot.util:simbot-util-api-requestor-core:$simbotVersion"
-val simbotRequestorKtor = "love.forte.simbot.util:simbot-util-api-requestor-ktor:$simbotVersion"
-
-val simbotUtilSuspendTransformer = "love.forte.simbot.util:simbot-util-suspend-transformer:$simbotVersion"
-val simbotUtilLoop = "love.forte.simbot.util:simbot-util-stage-loop:$simbotVersion"
-val simbotUtilAnnotations = "love.forte.simbot.util:simbot-annotations:$simbotVersion"
-
 
 object P : ProjectDetail() {
     const val GROUP = "love.forte.simbot.component"
@@ -63,17 +52,10 @@ object P : ProjectDetail() {
     override val homepage: String
         get() = HOMEPAGE
 
-    private val baseVersion = v(
-        "${simbotVersion.major}.${simbotVersion.minor}",
-        0, 0
-    )
+    private val baseVersion = v(4, 0, 0) - v("beta1")
 
-    private val alphaSuffix = v("beta1")
-
-    override val version: Version = baseVersion - alphaSuffix
-
-    val snapshotVersion: Version =
-        baseVersion - (alphaSuffix - Version.SNAPSHOT)
+    val snapshotVersion = baseVersion - Version.SNAPSHOT
+    override val version = if (isSnapshot()) snapshotVersion else baseVersion
 
     override val group: String get() = GROUP
     override val description: String get() = DESCRIPTION
@@ -122,3 +104,5 @@ private fun initIsSnapshot(): Boolean {
 }
 
 fun isSnapshot(): Boolean = _isSnapshot
+
+fun isSimbotLocal(): Boolean = systemProp("SIMBOT_LOCAL").toBoolean()

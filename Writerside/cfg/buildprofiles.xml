@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildprofiles xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/build-profiles.xsd"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <variables>
+        <primary-color>ruby</primary-color>
+        <custom-favicons>logo-icon.svg</custom-favicons>
+        <header-logo>logo-icon.svg</header-logo>
+        <product-web-url>https://github.com/simple-robot/simbot-component-kook/</product-web-url>
+        <download-title>GitHub</download-title>
+        <download-page>https://github.com/simple-robot/simbot-component-kook/</download-page>
+        <showDownloadButton>true</showDownloadButton>
+        <browser-edits-url>https://github.com/simple-robot/simbot-component-kook/tree/dev/main/Writerside/</browser-edits-url>
+        <enable-browser-edits>true</enable-browser-edits>
+        <locale-code>zh-CN</locale-code>
+        <noindex-content>false</noindex-content>
+        <algolia-id>VLLZ4JZE8Z</algolia-id>
+        <algolia-index>kook-doc</algolia-index>
+        <algolia-api-key>e60d9ee16618a0ad3a338ecc73cb840e</algolia-api-key>
+        <web-root>http://component-kook.simbot.forte.love</web-root>
+        <analytics-head-script-file>head.html</analytics-head-script-file>
+    </variables>
+
+    <build-profile instance="kook">
+        <variables>
+            <noindex-content>false</noindex-content>
+        </variables>
+    </build-profile>
+
+    <footer>
+        <copyright>%copyright-year% Forte Scarlet.</copyright>
+        <link href="https://simbot.forte.love/">simbot官网手册</link>
+        <link href="https://docs.simbot.forte.love/">文档引导站</link>
+        <link href="https://github.com/orgs/simple-robot/discussions">社区</link>
+        <link href="https://github.com/simple-robot/simpler-robot/issues">反馈</link>
+        <link href="https://github.com/simple-robot">组织库</link>
+        <link href="https://github.com/simple-robot/simpler-robot">核心库仓库</link>
+        <social type="bilibili" href="https://space.bilibili.com/2714954" />
+        <social type="email" href="ForteScarlet@163.com" />
+    </footer>
+</buildprofiles>

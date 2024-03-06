@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vars SYSTEM "https://resources.jetbrains.com/writerside/1.0/vars.dtd">
+<vars>
+    <var name="jb" value="阻塞"/>
+    <var name="ja" value="异步"/>
+    <var name="version" value="4.0.0-beta1"/>
+    <var name="minimum-core-version" value="4.0.0-beta1"/>
+</vars>

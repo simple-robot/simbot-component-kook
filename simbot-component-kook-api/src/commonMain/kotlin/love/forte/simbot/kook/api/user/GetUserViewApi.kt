@@ -49,7 +49,7 @@ public class GetUserViewApi private constructor(
             GetUserViewApi(userId, guildId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<SimpleUser>
+    override val resultDeserializationStrategy: DeserializationStrategy<SimpleUser>
         get() = SimpleUser.serializer()
 
     override val apiPath: ApiPath

@@ -46,39 +46,37 @@ plugins {
 val (isSnapshotOnly, isReleaseOnly, isPublishConfigurable) = checkPublishConfigurable()
 
 
-logger.info("isSnapshotOnly: $isSnapshotOnly")
-logger.info("isReleaseOnly: $isReleaseOnly")
-logger.info("isPublishConfigurable: $isPublishConfigurable")
+logger.info("isSnapshotOnly: {}", isSnapshotOnly)
+logger.info("isReleaseOnly: {}", isReleaseOnly)
+logger.info("isPublishConfigurable: {}", isPublishConfigurable)
 
 if (!isCi || isLinux) {
     checkPublishConfigurable {
         jvmConfigPublishing {
             project = P
             publicationName = "kookDist"
+            isSnapshot = isSnapshot().also {
+                logger.info("jvmConfigPublishing.isSnapshot: {}", it)
+            }
             val jarSources by tasks.registering(Jar::class) {
                 archiveClassifier.set("sources")
                 from(sourceSets["main"].allSource)
             }
 
             val jarJavadoc by tasks.registering(Jar::class) {
+                if (!(isSnapshot || isSnapshot())) {
+                    dependsOn(tasks.dokkaHtml)
+                    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+                }
                 archiveClassifier.set("javadoc")
             }
 
             artifact(jarSources)
             artifact(jarJavadoc)
 
-            isSnapshot = isSnapshot()
             releasesRepository = ReleaseRepository
             snapshotRepository = SnapshotRepository
             gpg = if (isSnapshot()) null else Gpg.ofSystemPropOrNull()
-        }
-
-        if (isSnapshot()) {
-            publishing {
-                publications.withType<MavenPublication> {
-                    version = P.snapshotVersion.toString()
-                }
-            }
         }
 
         publishing {
@@ -103,7 +101,7 @@ fun MavenPublication.show() {
     println("== MavenPublication for ${project.name}")
     println("== maven.pub.group:       $group")
     println("== maven.pub.name:        $name")
-    println("== project.verson:        ${project.version}")
+    println("== project.version:       ${project.version}")
     println("== maven.pub.version:     $version")
     println("== maven.pub.description: $description")
     println("========================================================")
@@ -112,3 +110,6 @@ fun MavenPublication.show() {
 
 inline val Project.sourceSets: SourceSetContainer
     get() = extensions.getByName("sourceSets") as SourceSetContainer
+
+internal val TaskContainer.dokkaHtml: TaskProvider<org.jetbrains.dokka.gradle.DokkaTask>
+    get() = named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml")

@@ -60,7 +60,7 @@ public class UpdateChannelMessageApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<Unit>
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override fun createBody(): Any = Body(msgId, content, quote, tempTargetId)

@@ -55,7 +55,7 @@ public class CreateGuildRoleApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<SimpleRole>
+    override val resultDeserializationStrategy: DeserializationStrategy<SimpleRole>
         get() = SimpleRole.serializer()
 
     override fun createBody(): Any = Body(guildId, name)

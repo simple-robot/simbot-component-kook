@@ -10,6 +10,7 @@ on:
       - '*/src/*/kotlin/**'
       - '*/src/*/java/**'
       - '*/src/*/resource/**'
+      - 'gradle/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,15 +28,15 @@ jobs:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: 11
-          cache: 'gradle'
+          java-version: 21
+#          cache: 'gradle'
 
       - name: Run All Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
           arguments: |

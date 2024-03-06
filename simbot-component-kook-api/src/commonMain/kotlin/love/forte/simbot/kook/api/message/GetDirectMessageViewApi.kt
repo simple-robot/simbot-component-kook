@@ -50,7 +50,7 @@ public class GetDirectMessageViewApi private constructor(
 
     }
 
-    override val resultDeserializer: DeserializationStrategy<DirectMessageDetails>
+    override val resultDeserializationStrategy: DeserializationStrategy<DirectMessageDetails>
         get() = DirectMessageDetails.serializer()
 
     override val apiPath: ApiPath

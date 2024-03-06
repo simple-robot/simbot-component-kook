@@ -75,7 +75,7 @@ public sealed class GetGatewayApi(private val isCompress: Boolean) : KookGetApi<
     }
 
     override val apiPath: ApiPath get() = PATH
-    override val resultDeserializer: DeserializationStrategy<Gateway> get() = Gateway.serializer()
+    override val resultDeserializationStrategy: DeserializationStrategy<Gateway> get() = Gateway.serializer()
 
     override fun urlBuild(builder: URLBuilder) {
         builder.parameters.append("compress", if (isCompress) "1" else "0")
@@ -84,12 +84,12 @@ public sealed class GetGatewayApi(private val isCompress: Boolean) : KookGetApi<
     /**
      * 压缩数据
      */
-    public object Compress : GetGatewayApi(true)
+    public data object Compress : GetGatewayApi(true)
 
     /**
      * 不进行数据压缩
      */
-    public object NotCompress : GetGatewayApi(false)
+    public data object NotCompress : GetGatewayApi(false)
 
     /**
      * 用于内部重连恢复的 [Resume] API。

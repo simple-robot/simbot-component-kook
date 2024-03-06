@@ -194,7 +194,7 @@ public class GetDirectMessageListApi private constructor(
             builderByChatCode(chatCode).apply(block).build()
     }
 
-    override val resultDeserializer: DeserializationStrategy<DirectMessageList>
+    override val resultDeserializationStrategy: DeserializationStrategy<DirectMessageList>
         get() = DirectMessageList.serializer()
 
     override val apiPath: ApiPath

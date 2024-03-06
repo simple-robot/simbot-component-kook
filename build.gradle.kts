@@ -1,3 +1,5 @@
+import love.forte.gradle.common.core.repository.Repositories
+
 /*
  * Copyright (c) 2022-2023. ForteScarlet.
  *
@@ -16,29 +18,24 @@
  */
 
 plugins {
-    `simbot-kook-nexus-publish`
     `simbot-kook-changelog-generator`
     `simbot-kook-dokka-multi-module`
+    `simbot-kook-nexus-publish`
 }
 
 buildscript {
     repositories {
         mavenCentral()
     }
-
-    dependencies {
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${libs.versions.atomicfu.get()}")
-    }
 }
 
-subprojects {
+allprojects {
     repositories {
         mavenCentral()
-        love.forte.gradle.common.core.repository.Repositories.Snapshot.Default.apply {
-            configMaven {
-                mavenContent {
-                    snapshotsOnly()
-                }
+        maven {
+            url = uri(Repositories.Snapshot.URL)
+            mavenContent {
+                snapshotsOnly()
             }
         }
     }

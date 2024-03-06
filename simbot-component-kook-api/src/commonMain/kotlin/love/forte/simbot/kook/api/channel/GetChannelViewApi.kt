@@ -50,7 +50,7 @@ public class GetChannelViewApi private constructor(private val targetId: String,
             GetChannelViewApi(targetId, needChildren)
     }
 
-    override val resultDeserializer: DeserializationStrategy<ChannelView>
+    override val resultDeserializationStrategy: DeserializationStrategy<ChannelView>
         get() = ChannelView.serializer()
 
     override val apiPath: ApiPath

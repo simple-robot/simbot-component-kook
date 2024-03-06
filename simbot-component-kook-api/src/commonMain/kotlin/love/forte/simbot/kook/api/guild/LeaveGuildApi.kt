@@ -44,7 +44,7 @@ public class LeaveGuildApi(guildId: String) : KookPostApi<Unit>() {
             LeaveGuildApi(guildId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<Unit>
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
         get() = Unit.serializer()
 
     override val apiPath: ApiPath

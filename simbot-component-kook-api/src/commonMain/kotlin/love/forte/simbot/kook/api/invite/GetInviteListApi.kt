@@ -64,7 +64,7 @@ public class GetInviteListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<InviteInfo>
+    override val resultDeserializationStrategy: DeserializationStrategy<InviteInfo>
         get() = InviteInfo.serializer()
 
     override fun urlBuild(builder: URLBuilder) {

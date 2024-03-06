@@ -69,7 +69,7 @@ public class GrantGuildRoleApi private constructor(
             GrantGuildRoleApi(guildId, userId, roleId)
     }
 
-    override val resultDeserializer: DeserializationStrategy<UserRoleOperated>
+    override val resultDeserializationStrategy: DeserializationStrategy<UserRoleOperated>
         get() = UserRoleOperated.serializer()
 
     override val apiPath: ApiPath

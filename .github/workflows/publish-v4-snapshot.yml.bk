@@ -1,0 +1,107 @@
+name: Publish Snapshot
+on:
+  push:
+    branches:
+      - main
+      - dev-snapshot**
+      - v*.*.**
+      - dev/main
+      - dev/ver/**
+
+    paths:
+      - '**src/main/kotlin/**.kt'
+      - '**src/main/java/**.java'
+      - 'buildSrc/**'
+      - '**.kts'
+
+    tags-ignore:
+      - 'v4**'
+
+  # 手动触发工作流
+  workflow_dispatch:
+
+env:
+  IS_CI: true
+  GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+  GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+  GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+  SIMBOT_IS_SNAPSHOT: true
+  SIMBOT_SNAPSHOT_ONLY: true
+  GRADLE_OPTS: "-Dfile.encoding=UTF-8"
+
+jobs:
+  publish-snapshot:
+    name: Publish snapshot
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # 检出仓库代码
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      # setup Java
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      # setup Gradle
+      - name: Gradle publish snapshot
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.5
+          arguments: |
+            test 
+            publishToSonatype
+            closeAndReleaseStagingRepository
+            --info
+            --warning-mode all
+            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" 
+            -Porg.gradle.daemon=false
+
+  deploy-doc:
+    name: Deploy snapshot doc
+    runs-on: ubuntu-latest
+    needs: publish-snapshot
+    steps:
+      # 检出仓库代码
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # setup Java
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      # setup Gradle
+      - name: Gradle generate documentation
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.5
+          arguments: |
+            -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8" 
+            -Porg.gradle.daemon=false
+            --info 
+            --warning-mode all
+            -x test
+            --build-cache
+            dokkaHtmlMultiModule
+
+      - name: Push to doc repository
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PUSH_TOKEN }}
+          external_repository: simple-robot-library/simbot3-api-docs
+          publish_branch: kdoc-deploy/snapshots/component-kook
+          publish_dir: ./build/dokka/html
+          # deploy to sub dir
+          destination_dir: snapshots/components/kook

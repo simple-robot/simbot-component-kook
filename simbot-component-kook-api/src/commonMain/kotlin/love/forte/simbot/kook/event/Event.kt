@@ -19,9 +19,9 @@ package love.forte.simbot.kook.event
 
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
-import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.FragileSimbotApi
-import love.forte.simbot.InternalSimbotApi
+import love.forte.simbot.annotations.FragileSimbotAPI
+import love.forte.simbot.kook.ExperimentalKookApi
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.objects.SimpleAttachments
 import love.forte.simbot.kook.objects.SimpleUser
 import love.forte.simbot.kook.objects.kmd.RawValueKMarkdown
@@ -430,7 +430,6 @@ public data class VideoEventExtra(
  *
  * @author ForteScarlet
  */
-@OptIn(ExperimentalSimbotApi::class)
 @Serializable
 public data class KMarkdownEventExtra(
     override val type: Int,
@@ -450,19 +449,19 @@ public data class KMarkdownEventExtra(
     /**
      * `nav_channels`
      */
-    @ExperimentalSimbotApi
+    @property:ExperimentalKookApi
     public val navChannels: List<String>? = null,
 
     /**
      * `code`
      */
-    @ExperimentalSimbotApi
+    @property:ExperimentalKookApi
     public val code: String? = null,
 
     /**
      * KMarkdown data
      */
-    @ExperimentalSimbotApi
+    @property:ExperimentalKookApi
     public val kmarkdown: RawValueKMarkdown
 ) : TextExtra()
 
@@ -490,13 +489,13 @@ public data class CardEventExtra(
     /**
      * `nav_channels`
      */
-    @ExperimentalSimbotApi
+    @property:ExperimentalKookApi
     public val navChannels: List<String>? = null,
 
     /**
      * `code`
      */
-    @ExperimentalSimbotApi
+    @property:ExperimentalKookApi
     public val code: String? = null,
 ) : TextExtra()
 
@@ -536,7 +535,7 @@ public sealed class SystemExtra : EventExtra() {
  *  对可能造成 [UnknownExtra] 出现概率降低的更新不会做专门的提示。
  *  因此使用 [UnknownExtra] 时应当明确了解其可能出现的内容，同时不可过分依赖它。
  */
-@FragileSimbotApi
+@FragileSimbotAPI
 @Serializable
 @SerialName("$\$UNKNOWN")
 public class UnknownExtra : EventExtra() {
@@ -552,7 +551,7 @@ public class UnknownExtra : EventExtra() {
     /**
      * @suppress 内部使用，用于初始化 [source] 值
      */
-    @InternalSimbotApi
+    @InternalKookApi
     @JvmSynthetic
     public fun initSource(source: String) {
         if (sourceInitialized) {

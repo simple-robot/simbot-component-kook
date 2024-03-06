@@ -78,7 +78,7 @@ public class CreateInviteApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<CreatedInvite>
+    override val resultDeserializationStrategy: DeserializationStrategy<CreatedInvite>
         get() = CreatedInvite.serializer()
 
     override fun createBody(): Any = Body(

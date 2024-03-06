@@ -109,7 +109,7 @@ public class GetChannelMessageListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<ChannelMessageList>
+    override val resultDeserializationStrategy: DeserializationStrategy<ChannelMessageList>
         get() = ChannelMessageList.serializer()
 
     override fun urlBuild(builder: URLBuilder) {

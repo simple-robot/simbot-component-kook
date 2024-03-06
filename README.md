@@ -1,105 +1,48 @@
 # Simple Robot - KOOK 组件
 
-此为 [Simple Robot v3][simbot3] （以下简称为 `simbot3` ） 下基于simbot标准API对 [KOOK API](https://www.kookapp.cn/) 的组件支持。
+这是 
+[Simple Robot v4][simbot4] 
+下的子项目，是针对
+[KOOK(开黑啦)bot](https://developer.kookapp.cn/doc/reference)
+各方面的 simbot 组件库实现，
+包括对 `API` 内容的实现、事件相关的实现以及 bot 对于事件的监听与交互等。
 
-**Simple Robot - KOOK 组件** <small>以下简称KOOK组件</small> 
-是一个基于 [KMP](https://kotlinlang.org/docs/multiplatform.html)、
-支持多平台（`JVM`、`JS`、native）且JVM平台库对Java友好、
-（特定模块）实现simbot3标准API的 **KOOK 机器人API** 依赖库。
+KOOK组件库可以作为底层API依赖使用、
+轻量级的KOOK事件调度框架使用，
+也可以基于 simbot 核心库的种种快速开发一个功能强大的 KOOK 机器人！
 
-**KOOK组件**提供多平台的KOOK API、bot事件订阅等功能实现的底层库，
-以及基于simbot3标准API的高级功能应用库。
+- 基于 [`Kotlin`](https://kotlinlang.org/) 提供 [KMP 多平台](https://kotlinlang.org/docs/multiplatform.html) 特性，提供 Java 友好的API。
+- 基于 [`Kotlin coroutines`](https://github.com/Kotlin/kotlinx.coroutines) 与 [`Ktor`](https://ktor.io/) 提供轻量高效的API。
+
+> [!Note]
+> 下文中 `Simple Robot v4` 简称为 `simbot4`
 
 ## 文档
 
-了解**simbot3**: [simbot3官网](https://simbot.forte.love)
+- 了解simbot: [**Simple Robot 应用手册**](https://simbot.forte.love)
+- **KOOK组件**手册：<https://component-kook.simbot.forte.love/> (即当前仓库的 GitHub Pages)
+- **API文档**: [**文档引导站点**](https://docs.simbot.forte.love) 中KOOK的 [**KDoc站点**](https://docs.simbot.forte.love/components/qq-guild)
 
-KOOK组件的**组件手册**: [组件手册][website]
+---
 
-> [!note]
-> 手册与simbot3官网均部署于GitHub Pages。
-> 为了更好的浏览体验，**推荐**开启魔法后访问。
+## 支持列表
 
-**API文档**: [API文档引导站](https://docs.simbot.forte.love)
+前往 [支持列表](support-list.md) 查看已经支持的API、尚未支持的API。
+如果你迫切的希望支持某些API，而它们尚未被支持，请[让我们知道](https://github.com/simple-robot/simbot-component-kook/issues)!
 
-## 支持情况
+## 贡献
 
-前往查看 [支持列表](support-list.md)。
+前往 [贡献手册](docs/CONTRIBUTING_CN.md) 了解更多！
 
 ## 快速开始
 
 前往 [组件手册][website] 阅读 **快速开始** 相关章节。
 
-## 走马观花
+## 法欧莉
 
-<details>
-<summary>简单示例</summary>
-
-> [!note]
-> Java开发者可直接参考 [组件手册][website] 中**快速开始**相关示例的Java部分代码。
-
-> 使用 Kotlin + `simbot-component-kook-core` 配合 `simboot-core-spring-boot-starter` 使用 `Spring Boot` 的情况下：
-
-```kotlin
-// simbot-core / simbot-boot
-suspend fun KookContactMessageEvent.onEvent() {
-    author().send("Hello World")
-}
-```
-
-```kotlin
-// simbot-boot
-@Listener
-@Filter("签到")
-suspend fun KookChannelMessageEvent.onEvent() {
-    reply("签到成功")
-}
-```
-
-```kotlin
-@Listener
-@Filter("叫我{{name,.+}}")
-suspend fun KookChannelMessageEvent.onEvent(@FilterValue("name") name: String) {
-    group.send(At(author.id) + "好的，以后就叫你$name了".toText())
-}
-```
-
-简单的完整示例：
-> (使用 Kotlin + `simbot-component-kook-core`, 非 Spring Boot 的情况下：)
-
-```kotlin
-suspend fun main() {
-    createSimpleApplication {
-        // 注册并使用Kook组件。
-        useKook()
-        
-        // 注册各种监听函数
-        listeners {
-            // 监听联系人(私聊)消息
-            // 此事件的逻辑：收到消息，回复一句"你说的是："，
-            // 然后再复读一遍你说的话。
-            ContactMessageEvent { event ->
-                val contact: Contact = event.source()
-                contact.send("你说的是：")
-                contact.send(event.messageContent)
-            }
-        }
-        
-        // 注册kook的bot
-        kookBots {
-            val bot = register("client_id", "token")
-            // bot需要start才能连接服务器、初始化信息等。
-            bot.start()
-        }
-    }.join() // join, 挂起直到被终止。
-}
-```
-
-</details>
-
-## 应用案例
-
-如果你想看看通过 simbot 开发的bot是什么样子，不妨添加我们亲爱的 [法欧莉斯卡雷特](https://www.kookapp.cn/app/oauth2/authorize?id=10250&permissions=197958144&client_id=jqdlyHK85xe1i5Bo&redirect_uri=&scope=bot) 并使用 `@法欧莉 今天的我` 来看看效果吧~
+如果你想看一看使用 KOOK组件实现的具体作品，
+不妨添加我们亲爱的 [法欧莉斯卡雷特](https://www.kookapp.cn/app/oauth2/authorize?id=10250&permissions=197958144&client_id=jqdlyHK85xe1i5Bo&redirect_uri=&scope=bot) 
+并使用 `@法欧莉 今天的我` 来看看效果吧~
 
 
 ## License
@@ -122,6 +65,6 @@ program. If not, see <https://www.gnu.org/licenses/>.
 [m-api]: simbot-component-kook-api
 [m-stdlib]: simbot-component-kook-stdlib
 [m-core]: simbot-component-kook-core
-[simbot3]: https://github.com/simple-robot/simpler-robot
+[simbot4]: https://github.com/simple-robot/simpler-robot
 
 [website]: https://component-kook.simbot.forte.love/

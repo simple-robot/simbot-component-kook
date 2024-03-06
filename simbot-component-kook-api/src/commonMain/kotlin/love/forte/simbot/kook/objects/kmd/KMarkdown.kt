@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 @file:Suppress("unused")
@@ -23,7 +26,7 @@ package love.forte.simbot.kook.objects.kmd
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import love.forte.simbot.ExperimentalSimbotApi
+import love.forte.simbot.kook.ExperimentalKookApi
 import love.forte.simbot.kook.messages.MentionPart
 import love.forte.simbot.kook.objects.MentionRolePart
 import love.forte.simbot.kook.objects.kmd.AtTarget.*
@@ -46,7 +49,7 @@ public annotation class KookMarkdownBuilderTopDsl
  * @see KMarkdownBuilder
  * @see KookMarkdownGrammar
  */
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public interface KMarkdown {
 
     /**
@@ -74,7 +77,7 @@ public interface KMarkdown {
  */
 @Serializable
 @SerialName(RawValueKMarkdown.SERIAL_NAME)
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public data class RawValueKMarkdown(
     @SerialName("raw_content")
     override val rawContent: String,
@@ -96,7 +99,7 @@ public data class RawValueKMarkdown(
  * 可以通过自定义 [appender] 来提供自定义的字符串拼接器，默认使用 [StringBuilder].
  */
 @Suppress("MemberVisibilityCanBePrivate")
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public class KMarkdownBuilder(public val appender: Appendable = StringBuilder()) {
     public constructor(capacity: Int) : this(StringBuilder(capacity))
 
@@ -309,7 +312,7 @@ public class KMarkdownBuilder(public val appender: Appendable = StringBuilder())
 }
 
 @KookMarkdownBuilderTopDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun KMarkdownBuilder.aroundLine(
     times: Int = 1,
     block: KMarkdownBuilder.() -> Unit,
@@ -326,7 +329,7 @@ public inline fun KMarkdownBuilder.aroundLine(
 }
 
 @KookMarkdownBuilderTopDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun KMarkdownBuilder.preLine(times: Int = 1, block: KMarkdownBuilder.() -> Unit): KMarkdownBuilder {
     return apply {
         for (i in 1..times) {
@@ -337,7 +340,7 @@ public inline fun KMarkdownBuilder.preLine(times: Int = 1, block: KMarkdownBuild
 }
 
 @KookMarkdownBuilderTopDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun KMarkdownBuilder.postLine(
     times: Int = 1,
     block: KMarkdownBuilder.() -> Unit,
@@ -355,7 +358,7 @@ public inline fun KMarkdownBuilder.postLine(
  * Build kmarkdown for raw string.
  */
 @KookMarkdownBuilderDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun buildRawKMarkdown(block: KMarkdownBuilder.() -> Unit): String {
     return KMarkdownBuilder().apply(block).buildRaw()
 }
@@ -364,7 +367,7 @@ public inline fun buildRawKMarkdown(block: KMarkdownBuilder.() -> Unit): String 
  * Build [KMarkdown] instance.
  */
 @KookMarkdownBuilderDsl
-@ExperimentalSimbotApi
+@ExperimentalKookApi
 public inline fun buildKMarkdown(block: KMarkdownBuilder.() -> Unit): KMarkdown {
     return KMarkdownBuilder().apply(block).build()
 }
@@ -408,15 +411,15 @@ public interface KookMarkdownGrammar<P> {
     public sealed class Source(public open val name: String) {
 
         /** 来源 - markdown官方 */
-        public object Markdown : Source("official")
+        public data object Markdown : Source("official")
 
         /** 来源 - Kook 官方 */
         public sealed class Kook(name: String) : Source(name) {
             /** Kook 官方 - 自定义 */
-            public object Custom : Kook("kook-custom")
+            public data object Custom : Kook("kook-custom")
 
             /** Kook 官方 - emoji */
-            public object Emoji : Kook("kook-emoji")
+            public data object Emoji : Kook("kook-emoji")
         }
 
         /** 其他自定义 */
@@ -619,7 +622,7 @@ public sealed class AtTarget : CharSequence {
      *
      * @see AtTarget
      */
-    public object All : AtTarget() {
+    public data object All : AtTarget() {
         private const val DELEGATE = "all"
         override val length: Int get() = DELEGATE.length
         override fun get(index: Int): Char = DELEGATE[index]
@@ -632,7 +635,7 @@ public sealed class AtTarget : CharSequence {
      *
      * @see AtTarget
      */
-    public object Here : AtTarget() {
+    public data object Here : AtTarget() {
         private const val DELEGATE = "here"
         override val length: Int get() = DELEGATE.length
         override fun get(index: Int): Char = DELEGATE[index]

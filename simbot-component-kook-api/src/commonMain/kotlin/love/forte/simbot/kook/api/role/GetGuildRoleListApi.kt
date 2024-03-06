@@ -59,7 +59,7 @@ public class GetGuildRoleListApi private constructor(
     override val apiPath: ApiPath
         get() = PATH
 
-    override val resultDeserializer: DeserializationStrategy<ListData<Role>>
+    override val resultDeserializationStrategy: DeserializationStrategy<ListData<Role>>
         get() = serializer
 
     override fun urlBuild(builder: URLBuilder) {
