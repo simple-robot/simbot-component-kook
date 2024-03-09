@@ -11,6 +11,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Name of module and id separated by a slash
+  INSTANCE: Writerside/kook
+  INSTANCE_NAME: kook
+  # Replace HI with the ID of the instance in capital letters
+  ARTIFACT: webHelpKOOK2-all.zip
+  # Writerside docker image version
+  DOCKER_VERSION: 233.14389
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,6 +42,14 @@ jobs:
           path: |
             artifacts/${{ env.ARTIFACT }}
             artifacts/report.json
+          retention-days: 7
+
+      - name: Upload documentation reports
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: 'report.json'
+          path: artifacts/**
           retention-days: 7
 
   # Add the job below and artifacts/report.json on Upload documentation step above if you want to fail the build when documentation contains errors
