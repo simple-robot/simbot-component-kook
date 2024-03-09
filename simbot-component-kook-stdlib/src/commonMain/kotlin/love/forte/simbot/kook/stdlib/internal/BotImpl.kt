@@ -59,12 +59,12 @@ internal class BotImpl(
 
     internal val authorization: String = "${ticket.type.prefix} ${ticket.token}"
 
-    private val queueMap = ActualEnumMap.create<ProcessorType, ConcurrentQueue<EventProcessor>> {
+    private val queueMap = ActualEnumMap.create<SubscribeSequence, ConcurrentQueue<EventProcessor>> {
         createConcurrentQueue()
     }
 
-    override fun processor(processorType: ProcessorType, processor: EventProcessor) {
-        queueMap[processorType].add(processor)
+    override fun subscribe(subscribeSequence: SubscribeSequence, processor: EventProcessor) {
+        queueMap[subscribeSequence].add(processor)
     }
 
     private val job = SupervisorJob(configuration.coroutineContext[Job])
@@ -247,8 +247,8 @@ internal class BotImpl(
     }
 
     internal suspend fun processEvent(event: Signal.Event<*>, raw: String) {
-        val prepareProcessors = queueMap[ProcessorType.PREPARE]
-        val normalProcessors = queueMap[ProcessorType.NORMAL]
+        val prepareProcessors = queueMap[SubscribeSequence.PREPARE]
+        val normalProcessors = queueMap[SubscribeSequence.NORMAL]
         if (prepareProcessors.size == 0 && normalProcessors.size == 0) {
             eventLogger.trace("prepare processors and normal processors are both empty, skip.")
             return
