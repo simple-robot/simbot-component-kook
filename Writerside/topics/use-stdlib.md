@@ -123,9 +123,9 @@ val bot = BotFactory.create(ticket) {
 }
 
 // 注册事件有一些不同但类似的方式
-// 1️⃣ 通过 processor 注册一个普通的事件处理器，此处理器会接收并处理所有类型的事件
-//     processor 是最基本的注册方式，也是其他方式的最终汇集点
-bot.processor { raw ->
+// 1️⃣ 通过 subscribe 注册一个普通的事件处理器，此处理器会接收并处理所有类型的事件
+//     subscribe 是最基本的注册方式，也是其他方式的最终汇集点
+bot.subscribe { raw ->
     // raw 代表事件的原始JSON字符串
     // this: Event<*>, 也就是解析出来的事件结构体
     println("event: $this")
@@ -133,11 +133,11 @@ bot.processor { raw ->
     println("raw: $raw")
 }
 
-// 2️⃣ 通过 processor<EventExtraType> 注册一个针对具体 Event<EventExtra> 事件类型的事件处理器，
+// 2️⃣ 通过 subscribe<EventExtraType> 注册一个针对具体 Event<EventExtra> 事件类型的事件处理器，
 //     它只有在接收到的 Event.extra 与目标类型一致时才会处理。
 //     此示例展示处理 KMarkdownEventExtra 也就 KMarkdown 类型的消息事件，
 //     并在对方发送了包含 'stop' 的文本时终止 bot。
-bot.processor<KMarkdownEventExtra> {
+bot.subscribe<KMarkdownEventExtra> {
     // raw 代表事件的原始JSON字符串
     // this: Event<KMarkdownEventExtra>, 也就是解析出来的事件结构体，
     // 并且 extra 类型为指定的 KMarkdownEventExtra
@@ -176,9 +176,9 @@ Bot bot = BotFactory.create(ticket, config -> {
     // 一些其他的配置...
 });
 
-// 通过 processor 注册一个普通的事件处理器，
+// 通过 subscribe 注册一个普通的事件处理器，
 // 此处理器会接收并处理所有类型的事件
-bot.processor(EventProcessors.async((event, raw) -> {
+bot.subscribe(EventProcessors.async((event, raw) -> {
     // raw 代表事件的原始JSON字符串
     // event: Event<*>, 也就是解析出来的事件结构体
     System.out.println("event: " + event);
@@ -189,10 +189,10 @@ bot.processor(EventProcessors.async((event, raw) -> {
     return CompletableFuture.completedFuture(null);
 }));
 
-// 通过 processor 注册一个普通的事件处理器，
+// 通过 subscribe 注册一个普通的事件处理器，
 // 此处理器会接收并处理指定的类型 AtMessageCreate 的事件
 // 此示例展示处理 AtMessageCreate 也就公域是消息事件，并在对方发送了包含 'stop' 的文本时终止 bot。
-bot.processor(EventProcessors.async(KMarkdownEventExtra.class, (event, raw) -> {
+bot.subscribe(EventProcessors.async(KMarkdownEventExtra.class, (event, raw) -> {
     // raw 代表事件的原始JSON字符串
     // event: Event<? extends KMarkdownEventExtra>, 也就是解析出来的事件结构体
     System.out.println("event kmarkdown: " + event.getExtra().getKmarkdown());
@@ -233,9 +233,9 @@ Bot bot = BotFactory.create(ticket, config -> {
     // 一些其他的配置...
 });
 
-// 通过 processor 注册一个普通的事件处理器，
+// 通过 subscribe 注册一个普通的事件处理器，
 // 此处理器会接收并处理所有类型的事件
-bot.processor(EventProcessors.async((event, raw) -> {
+bot.subscribe(EventProcessors.async((event, raw) -> {
     // raw 代表事件的原始JSON字符串
     // event: Event<*>, 也就是解析出来的事件结构体
     System.out.println("event: " + event);
@@ -243,10 +243,10 @@ bot.processor(EventProcessors.async((event, raw) -> {
     System.out.println("raw: " + raw);
 }));
 
-// 通过 processor 注册一个普通的事件处理器，
+// 通过 subscribe 注册一个普通的事件处理器，
 // 此处理器会接收并处理指定的类型 AtMessageCreate 的事件
 // 此示例展示处理 AtMessageCreate 也就公域是消息事件，并在对方发送了包含 'stop' 的文本时终止 bot。
-    bot.processor(EventProcessors.block(KMarkdownEventExtra.class, (event, raw) -> {
+    bot.subscribe(EventProcessors.block(KMarkdownEventExtra.class, (event, raw) -> {
     // raw 代表事件的原始JSON字符串
     // event: Event<? extends KMarkdownEventExtra>, 也就是解析出来的事件结构体
     System.out.println("event kmarkdown: " + event.getExtra().getKmarkdown());

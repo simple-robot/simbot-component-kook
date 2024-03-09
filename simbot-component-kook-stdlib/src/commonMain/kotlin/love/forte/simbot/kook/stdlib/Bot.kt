@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023-2024. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.stdlib
@@ -97,22 +100,62 @@ public interface Bot : CoroutineScope {
      * 添加一个事件处理器。
      * 所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
      *
+     * Deprecated: 重命名为了 [subscribe]
+     *
+     * @see subscribe
      * @param processorType 事件处理器类型。默认为 [ProcessorType.NORMAL]。
      * @param processor 事件处理器。
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("Use `subscribe`", ReplaceWith("subscribe(subscribeSequence = processorType, processor = processor)"))
     public fun processor(
         processorType: ProcessorType,
         processor: EventProcessor
-    )
+    ) {
+        subscribe(
+            subscribeSequence = when (processorType) {
+                ProcessorType.PREPARE -> SubscribeSequence.PREPARE
+                ProcessorType.NORMAL -> SubscribeSequence.NORMAL
+            },
+            processor = processor
+        )
+    }
 
     /**
      * 添加一个 [ProcessorType.NORMAL] 类型的事件处理器。
      * 所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
      *
+     * Deprecated: 重命名为了 [subscribe]
+     *
+     * @see subscribe
      * @param processor 事件处理器。
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("Use `subscribe`", ReplaceWith("subscribe(SubscribeSequence.NORMAL, processor = processor)"))
     public fun processor(processor: EventProcessor) {
         processor(ProcessorType.NORMAL, processor)
+    }
+
+    /**
+     * 订阅事件并使用事件处理器 [processor] 进行处理。。
+     * 所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
+     *
+     * @param subscribeSequence 事件订阅的序列类型。默认为 [SubscribeSequence.NORMAL]。
+     * @param processor 事件处理器。
+     */
+    public fun subscribe(
+        subscribeSequence: SubscribeSequence,
+        processor: EventProcessor
+    )
+
+    /**
+     * 添加一个 [SubscribeSequence.NORMAL] 类型的事件处理器。
+     * 所有事件处理器会在每次触发的时候按照添加顺序依次进行处理。
+     *
+     * @param processor 事件处理器。
+     */
+    public fun subscribe(processor: EventProcessor) {
+        subscribe(SubscribeSequence.NORMAL, processor)
     }
 
     /**
@@ -258,6 +301,8 @@ private data class BotWsTicket(override val clientId: String, override val token
  * @param EX 事件内容 [Event.extra] 的具体类型。
  *
  */
+@Suppress("DEPRECATION")
+@Deprecated("Use `Bot.subscribe(...)`", ReplaceWith("this.subscribe<EX>(processor)"))
 public inline fun <reified EX : EventExtra> Bot.processor(crossinline processor: suspend Event<EX>.(raw: String) -> Unit) {
     processor { raw ->
         if (extra is EX) {
@@ -272,6 +317,8 @@ public inline fun <reified EX : EventExtra> Bot.processor(crossinline processor:
  *
  * @param type 事件类型。
  */
+@Suppress("DEPRECATION")
+@Deprecated("Use `Bot.subscribe(...)`", ReplaceWith("this.subscribe(type, processor)"))
 public inline fun Bot.processor(type: Event.Type, crossinline processor: suspend Event<*>.(raw: String) -> Unit) {
     processor { raw ->
         if (this.type == type) {
@@ -282,8 +329,36 @@ public inline fun Bot.processor(type: Event.Type, crossinline processor: suspend
 
 /**
  * [Bot] 中的事件处理器类型。
+ *
+ * Deprecated: 重命名为了 [SubscribeSequence]
+ *
+ * @see SubscribeSequence
  */
+@Deprecated("Use `SubscribeSequence` with `Bot.subscribe`", ReplaceWith("SubscribeSequence"))
 public enum class ProcessorType {
+    /**
+     * 前置类型。所有前置事件处理器会在每次触发的时候优先于 [普通类型][NORMAL] 的事件处理器进行处理，
+     * 并且所有前置处理器**不会**异步执行。
+     *
+     * 前置类型的事件处理器应当尽可能的快速执行完毕。
+     */
+    PREPARE,
+
+    /**
+     * 普通类型。所有事件处理器会在每次触发的时候按照添加顺序依次进行处理，
+     * 但是以事件为单位，整个流程可能是异步的。
+     *
+     * [NORMAL] 最终是否会异步处理会受配置项 [BotConfiguration.isNormalEventProcessAsync]
+     * 的影响，默认为异步。如果此配置为 `false` 则 [NORMAL] 的实际表现效果将会与 [PREPARE] 类似，
+     * 只是优先级低于 [PREPARE]。
+     */
+    NORMAL;
+}
+
+/**
+ * [Bot] 中订阅事件时的序列类型。
+ */
+public enum class SubscribeSequence {
     /**
      * 前置类型。所有前置事件处理器会在每次触发的时候优先于 [普通类型][NORMAL] 的事件处理器进行处理，
      * 并且所有前置处理器**不会**异步执行。

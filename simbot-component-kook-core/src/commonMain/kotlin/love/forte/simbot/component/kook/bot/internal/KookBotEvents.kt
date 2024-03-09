@@ -35,7 +35,7 @@ import love.forte.simbot.kook.DiscreetKookApi
 import love.forte.simbot.kook.api.user.GetUserViewApi
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.objects.SimpleUser
-import love.forte.simbot.kook.stdlib.ProcessorType
+import love.forte.simbot.kook.stdlib.SubscribeSequence
 import love.forte.simbot.kook.event.Event as KEvent
 import love.forte.simbot.kook.objects.User as KUser
 
@@ -71,7 +71,7 @@ internal fun KookBotImpl.registerEvent() {
     val thisBot = this
 
 
-    sourceBot.processor(ProcessorType.PREPARE) { rawEvent ->
+    sourceBot.subscribe(SubscribeSequence.PREPARE) { rawEvent ->
         val event = this
 
         when (val ex = extra) {
@@ -286,7 +286,7 @@ internal fun KookBotImpl.registerEvent() {
                             members.entries.removeAll { (k, _) -> k.guildId == guildId }
 
                             removedGuild
-                        } ?: return@processor
+                        } ?: return@subscribe
 
                         pushAndLaunch(
                             KookBotSelfExitedGuildEventImpl(
@@ -434,7 +434,11 @@ internal fun KookBotImpl.registerEvent() {
                                 }
 
                                 else -> {
-                                    logger.warn("No chat channel or category ({}) removed in event {}", ex.body.id, event)
+                                    logger.warn(
+                                        "No chat channel or category ({}) removed in event {}",
+                                        ex.body.id,
+                                        event
+                                    )
                                 }
                             }
                         }
@@ -603,7 +607,7 @@ private fun KookBotImpl.pushUnsupported(event: KEvent<EventExtra>, sourceEventJs
 }
 
 
-private inline fun KookBotImpl.pushAndLaunch(event: Event): Job {
+private fun KookBotImpl.pushAndLaunch(event: Event): Job {
     return launch {
         eventProcessor.push(event)
             .onEachError { er ->
