@@ -1,4 +1,29 @@
-# Simple Robot - KOOK 组件
+# 
+
+<!--suppress HtmlDeprecatedAttribute -->
+<div align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".simbot/logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset=".simbot/logo.svg">
+  <img alt="simbot logo" src=".simbot/logo.svg" width="260" />
+</picture>
+<h2>
+    ~ Simple Robot ~ <br/> <small>KOOK组件</small>
+</h2>
+<a href="https://github.com/simple-robot/simbot-component-kook/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/simple-robot/simbot-component-kook" /></a>
+<a href="https://repo1.maven.org/maven2/love/forte/simbot/component/simbot-component-kook-api/" target="_blank">
+  <img alt="release" src="https://img.shields.io/maven-central/v/love.forte.simbot.component/simbot-component-kook-api" /></a>
+   <hr>
+   <img alt="stars" src="https://img.shields.io/github/stars/simple-robot/simbot-component-kook" />
+   <img alt="forks" src="https://img.shields.io/github/forks/simple-robot/simbot-component-kook" />
+   <img alt="watchers" src="https://img.shields.io/github/watchers/simple-robot/simbot-component-kook" />
+   <img alt="repo size" src="https://img.shields.io/github/repo-size/simple-robot/simbot-component-kook" />
+   <img alt="lines" src="https://img.shields.io/tokei/lines/github/simple-robot/simbot-component-kook" />
+   <img alt="issues" src="https://img.shields.io/github/issues-closed/simple-robot/simbot-component-kook?color=green" />
+   <img alt="last commit" src="https://img.shields.io/github/last-commit/simple-robot/simbot-component-kook" />
+   <a href="./COPYING"><img alt="copying" src="https://img.shields.io/github/license/simple-robot/simbot-component-kook" /></a>
+
+</div>
 
 这是 
 [Simple Robot v4][simbot4] 
@@ -21,7 +46,7 @@ KOOK组件库可以作为底层API依赖使用、
 
 - 了解simbot: [**Simple Robot 应用手册**](https://simbot.forte.love)
 - **KOOK组件**手册：<https://component-kook.simbot.forte.love/> (即当前仓库的 GitHub Pages)
-- **API文档**: [**文档引导站点**](https://docs.simbot.forte.love) 中KOOK的 [**KDoc站点**](https://docs.simbot.forte.love/components/qq-guild)
+- **API文档**: [**文档引导站点**](https://docs.simbot.forte.love) 中KOOK的 [**KDoc站点**](https://docs.simbot.forte.love/components/kook)
 
 ---
 
