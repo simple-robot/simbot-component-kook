@@ -2,4 +2,4 @@
 
 > 官方文档: [卡片消息](https://developer.kookapp.cn/doc/cardmessage)
 
-Start typing here...
+<include from="snippets.md" element-id="need-help"/>

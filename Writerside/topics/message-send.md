@@ -5,6 +5,9 @@ switcher-label: Java API 风格
 
 在 KOOK 组件中，主要有两种发送消息的方式。
 
+<include from="snippets.md" element-id="need-help"/>
+
+
 <list type="decimal">
 <li>直接构建并使用 API 发送消息。这是最原始的消息发送方式。</li>
 <li>

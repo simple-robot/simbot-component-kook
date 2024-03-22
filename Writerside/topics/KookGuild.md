@@ -1,3 +1,4 @@
 # 频道 KookGuild
 
-Start typing here...
+<include from="snippets.md" element-id="need-help"/>
+
