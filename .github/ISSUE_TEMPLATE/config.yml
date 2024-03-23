@@ -3,7 +3,7 @@ blank_issues_enabled: true
 contact_links:
   - name: 问题反馈
     url: https://github.com/simple-robot/simpler-robot/issues/new/choose
-    about: 统一的问题反馈处
+    about: 通过simbot核心库issues统一反馈组件问题
 
   - name: 社区
     url: https://github.com/orgs/simple-robot/discussions
