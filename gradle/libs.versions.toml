@@ -7,7 +7,7 @@ openjdk-jmh = "1.37"
 ktor = "2.3.8"
 log4j = "2.23.0"
 # simbot
-simbot = "4.0.0-beta1"
+simbot = "4.0.0-beta3"
 suspendTransform = "0.6.0"
 gradleCommon = "0.2.0"
 # ksp
