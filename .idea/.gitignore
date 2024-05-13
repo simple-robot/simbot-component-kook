@@ -8,3 +8,9 @@
 /dataSources.local.xml
 
 compiler.xml
+/artifacts/
+
+*.*
+!/codeStyles/**
+!/runConfigurations/**
+!/scopes/**
