@@ -2,4 +2,4 @@
 
 > 官方文档: [KMarkdown](https://developer.kookapp.cn/doc/kmarkdown)
 
-Start typing here...
+<include from="snippets.md" element-id="need-help"/>

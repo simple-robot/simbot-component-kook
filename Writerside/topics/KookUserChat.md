@@ -1,3 +1,4 @@
 # 私聊会话 KookUserChat
 
-Start typing here...
+<include from="snippets.md" element-id="need-help"/>
+

@@ -34,7 +34,6 @@ plugins {
 
 setup(P)
 
-useK2()
 configJavaCompileWithModule("simbot.component.kook.core")
 apply(plugin = "kook-multiplatform-maven-publish")
 
@@ -84,8 +83,8 @@ kotlin {
 
         jvmTest.dependencies {
             runtimeOnly(libs.ktor.client.cio)
-            runtimeOnly(libs.kotlinx.coroutines.reactor)
-            implementation(libs.reactor.core)
+//            runtimeOnly(libs.kotlinx.coroutines.reactor)
+//            implementation(libs.reactor.core)
 
             implementation(libs.log4j.api)
             implementation(libs.log4j.core)

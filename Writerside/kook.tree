@@ -17,6 +17,14 @@
     <toc-element toc-title="基础内容">
         <toc-element topic="api-list.md"/>
         <toc-element topic="event.md"/>
+        <toc-element topic="actors.md">
+            <toc-element topic="kookbot.md"/>
+            <toc-element topic="KookGuild.md"/>
+            <toc-element topic="KookChannel.md"/>
+            <toc-element topic="KookMember.md"/>
+            <toc-element topic="role-api.md"/>
+            <toc-element topic="KookUserChat.md"/>
+        </toc-element>
         <toc-element topic="message-send.md"/>
         <toc-element topic="message-element.md"/>
         <toc-element topic="unsupported-event.md"/>
@@ -27,14 +35,7 @@
             <toc-element topic="objects-Attachments.md"/>
         </toc-element>
     </toc-element>
-    <toc-element topic="actors.md">
-        <toc-element topic="kookbot.md"/>
-        <toc-element topic="KookGuild.md"/>
-        <toc-element topic="KookChannel.md"/>
-        <toc-element topic="KookMember.md"/>
-        <toc-element topic="role-api.md"/>
-        <toc-element topic="KookUserChat.md"/>
-    </toc-element>
+    <toc-element toc-title="社群信息" href="https://simbot.forte.love/communities.html" />
     <toc-element toc-title="其他版本">
         <toc-element toc-title="v3.3.0.0-beta1">
             <toc-element toc-title="快速开始">

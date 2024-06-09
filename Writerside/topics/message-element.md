@@ -5,10 +5,6 @@ switcher-label: Java API 风格
 
 本章节介绍 KOOK 组件中针对 simbot 标准库中 **消息元素(`Message.Element`)** 的实现类型。
 
-<tip title="标准库的标准">
-
-
-</tip>
 
 ## Message.Element
 

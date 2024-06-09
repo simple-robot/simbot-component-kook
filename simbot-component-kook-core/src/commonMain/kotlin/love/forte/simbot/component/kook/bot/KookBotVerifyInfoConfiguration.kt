@@ -27,7 +27,7 @@ import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.bot.KookBotVerifyInfoConfiguration.Ticket
 import love.forte.simbot.kook.TokenType
 import love.forte.simbot.kook.stdlib.BotConfiguration
-import love.forte.simbot.kook.stdlib.ProcessorType
+import love.forte.simbot.kook.stdlib.SubscribeSequence
 
 /**
  * `.bot` 配置文件读取的配置信息实体, 用于接收序列化配置信息。
@@ -160,7 +160,7 @@ public data class KookBotVerifyInfoConfiguration(
 
 
         /**
-         * [ProcessorType.NORMAL] 类型的事件处理器是否在异步中执行。
+         * [SubscribeSequence.NORMAL] 类型的事件处理器是否在异步中执行。
          *
          * 更多说明参考 [BotConfiguration.isNormalEventProcessAsync]
          *

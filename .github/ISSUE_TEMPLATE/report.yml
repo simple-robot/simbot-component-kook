@@ -1,0 +1,46 @@
+name: "🔥问题反馈"
+description: "反馈遇到的BUG或问题"
+labels: [ "bug?" ]
+assignees: [ "ForteScarlet" ]
+# https://docs.github.com/cn/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 须知
+        在进行问题反馈前，请**确认**以下内容：
+        1. 我确认目前的 [issues](https://github.com/simple-robot/simbot-component-kook/issues?q=is%3Aissue+label%3Abug%3F) 中没有类似内容。
+        2. 我已确认所述内容不涉及任何个人隐私或其他敏感信息，遵守相关地区法律法规。
+        
+        <hr />
+
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: 使用的语言
+      options:
+        - Java
+        - Kotlin
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: build-tool
+    attributes:
+      label: 使用的构建工具
+      options:
+        - Maven
+        - Gradle
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 内容描述
+      description: 描述你的反馈内容
+    validations:
+      required: true

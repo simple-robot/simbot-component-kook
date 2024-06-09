@@ -33,7 +33,6 @@ plugins {
 
 setup(P)
 
-useK2()
 configJavaCompileWithModule("simbot.component.kook.api")
 apply(plugin = "kook-multiplatform-maven-publish")
 
@@ -94,8 +93,8 @@ kotlin {
                 implementation(libs.log4j.api)
                 implementation(libs.log4j.core)
                 implementation(libs.log4j.slf4j2Impl)
-                implementation(libs.kotlinx.coroutines.reactor)
-                implementation(libs.reactor.core)
+//                implementation(libs.kotlinx.coroutines.reactor)
+//                implementation(libs.reactor.core)
             }
         }
 
