@@ -34,7 +34,6 @@ plugins {
 
 setup(P)
 
-useK2()
 configJavaCompileWithModule("simbot.component.kook.core")
 apply(plugin = "kook-multiplatform-maven-publish")
 

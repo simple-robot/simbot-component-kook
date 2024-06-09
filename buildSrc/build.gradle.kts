@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.bundles.dokka)
 
     // see https://github.com/gradle-nexus/publish-plugin
-    implementation("io.github.gradle-nexus:publish-plugin:1.3.0")
+    implementation("io.github.gradle-nexus:publish-plugin:2.0.0")
 
     // simbot suspend transform gradle common
     implementation(libs.simbot.gradle)

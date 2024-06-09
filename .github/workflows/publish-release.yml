@@ -50,7 +50,7 @@ jobs:
           gradle-version: 8.5
           arguments: |
             publishToSonatype
-            closeAndReleaseStagingRepository
+            closeAndReleaseStagingRepositories
             --info
             --warning-mode all
             -x test
@@ -108,7 +108,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
-          arguments: clean test publishToSonatype closeAndReleaseStagingRepository
+          arguments: clean test publishToSonatype closeAndReleaseStagingRepositories
         env:
           SIMBOT_IS_SNAPSHOT: true
           SIMBOT_SNAPSHOT_ONLY: true

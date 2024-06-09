@@ -58,7 +58,7 @@ jobs:
           arguments: |
             test 
             publishToSonatype
-            closeAndReleaseStagingRepository
+            closeAndReleaseStagingRepositories
             --info
             --warning-mode all
             -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" 
