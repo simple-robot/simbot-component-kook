@@ -1,19 +1,19 @@
 [versions]
-kotlin = "1.9.22"
-kotlinx-coroutines = "1.8.0"
+kotlin = "2.0.0"
+kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.6.3"
-dokka = "1.9.10"
+dokka = "1.9.20"
 openjdk-jmh = "1.37"
 ktor = "2.3.8"
 log4j = "2.23.0"
 # simbot
-simbot = "4.0.0-beta1"
-suspendTransform = "0.6.0"
-gradleCommon = "0.2.0"
+simbot = "4.0.0-RC3"
+suspendTransform = "0.8.0-beta1"
+gradleCommon = "0.4.0"
 # ksp
-ksp = "1.9.22-1.0.18"
+ksp = "2.0.0-1.0.22"
 # https://square.github.io/kotlinpoet/
-kotlinPoet = "1.16.0"
+kotlinPoet = "1.17.0"
 
 [libraries]
 # simbot
