@@ -1,3 +1,9 @@
+# v4.0.0-beta4
+
+> Release & Pull Notes: [v4.0.0-beta4](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta4) 
+
+- deps: 更新simbot到v4.0.0 ([`5d25c7d`](https://github.com/simple-robot/simpler-robot/commit/5d25c7d))
+
 # v4.0.0-beta3
 
 > Release & Pull Notes: [v4.0.0-beta3](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta3) 
