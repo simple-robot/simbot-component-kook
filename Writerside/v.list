@@ -3,6 +3,6 @@
 <vars>
     <var name="jb" value="阻塞"/>
     <var name="ja" value="异步"/>
-    <var name="version" value="4.0.0-beta3"/>
-    <var name="minimum-core-version" value="4.0.0-RC3"/>
+    <var name="version" value="4.0.0-beta4"/>
+    <var name="minimum-core-version" value="4.0.0"/>
 </vars>
