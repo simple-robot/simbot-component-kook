@@ -26,14 +26,14 @@ import love.forte.simbot.common.id.UUID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.KookBotManager
-import love.forte.simbot.event.BotEvent
+import love.forte.simbot.event.BotRegisteredEvent
 
 /**
  * 当一个 [KookBot] 在 [KookBotManager] 中被_注册_时。
  *
  * @author ForteScarlet
  */
-public abstract class KookBotRegisteredEvent : KookEvent(), BotEvent {
+public abstract class KookBotRegisteredEvent : KookEvent(), BotRegisteredEvent {
     override val id: ID = UUID.random()
 
     @OptIn(ExperimentalSimbotAPI::class)

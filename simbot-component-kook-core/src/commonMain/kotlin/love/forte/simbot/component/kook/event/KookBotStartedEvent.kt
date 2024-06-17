@@ -25,14 +25,14 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.UUID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
-import love.forte.simbot.event.BotEvent
+import love.forte.simbot.event.BotStartedEvent
 
 /**
  * [KookBot] 执行 [start][KookBot.start] 之后推送的事件。
  *
  * @author ForteScarlet
  */
-public abstract class KookBotStartedEvent : KookEvent(), BotEvent {
+public abstract class KookBotStartedEvent : KookEvent(), BotStartedEvent {
     override val id: ID = UUID.random()
 
     @OptIn(ExperimentalSimbotAPI::class)
