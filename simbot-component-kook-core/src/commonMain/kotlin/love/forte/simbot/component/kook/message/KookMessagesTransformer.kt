@@ -344,8 +344,8 @@ private suspend inline fun Message.Element.elementToRequest(
                     is KookAttachmentVideo -> MessageType.VIDEO
                 }
 
-                // TODO just re-upload and send, waiting for fix.
-                //  see https://github.com/simple-robot/simbot-component-kook/issues/75
+                // Just re-upload and send, waiting for fix.
+                //  See https://github.com/simple-robot/simbot-component-kook/issues/75
                 val createRequest = createReUploadAssetApi(bot, message.attachment)
 
                 val asset = createRequest.requestDataBy(bot)

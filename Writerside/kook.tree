@@ -50,4 +50,6 @@
             </toc-element>
         </toc-element>
     </toc-element>
+    <toc-element toc-title="社群" href="https://simbot.forte.love/communities.html" />
+    <toc-element toc-title="赞助" href="https://simbot.forte.love/sponsor.html" />
 </instance-profile>
