@@ -4,6 +4,8 @@ switcher-label: Java API 风格
 
 <var name="jr" value="Reactor"/>
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 # 使用 Spring Boot
 
 
@@ -50,7 +52,7 @@ simbot 核心库的版本尽量不要低于 `v%minimum-core-version%`，可前�
 // simbot4核心库
 implementation("love.forte.simbot:simbot-core-spring-boot-starter:%minimum-core-version%")
 // KOOK组件库
-implementation("love.forte.simbot.component:simbot-component-kook-core:%version%")
+implementation("love.forte.simbot.component:simbot-component-kook-core:%kook-version%")
 ```
 
 <tip>
@@ -62,7 +64,7 @@ implementation("love.forte.simbot.component:simbot-component-kook-core:%version%
 // simbot4核心库
 implementation("love.forte.simbot:simbot-core-spring-boot-starter:%minimum-core-version%")
 // KOOK组件库
-implementation("love.forte.simbot.component:simbot-component-kook-core-jvm:%version%")
+implementation("love.forte.simbot.component:simbot-component-kook-core-jvm:%kook-version%")
 ```
 
 </tip>
@@ -74,7 +76,7 @@ implementation("love.forte.simbot.component:simbot-component-kook-core-jvm:%vers
 // simbot4核心库
 implementation 'love.forte.simbot:simbot-core-spring-boot-starter:%minimum-core-version%'
 // KOOK组件库
-implementation 'love.forte.simbot.component:simbot-component-kook-core:%version%'
+implementation 'love.forte.simbot.component:simbot-component-kook-core:%kook-version%'
 ```
 
 <tip>
@@ -86,7 +88,7 @@ implementation 'love.forte.simbot.component:simbot-component-kook-core:%version%
 // simbot4核心库
 implementation 'love.forte.simbot:simbot-core-spring-boot-starter:%minimum-core-version%'
 // KOOK组件库
-implementation 'love.forte.simbot.component:simbot-component-kook-core-jvm:%version%'
+implementation 'love.forte.simbot.component:simbot-component-kook-core-jvm:%kook-version%'
 ```
 
 </tip>
@@ -105,7 +107,7 @@ implementation 'love.forte.simbot.component:simbot-component-kook-core-jvm:%vers
 <dependency>
     <groupId>love.forte.simbot.component</groupId>
     <artifactId>simbot-component-kook-core-jvm</artifactId>
-    <version>%version%</version>
+    <version>%kook-version%</version>
 </dependency>
 ```
 

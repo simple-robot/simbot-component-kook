@@ -1,5 +1,7 @@
 # Bot配置文件
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 <tldr>
 <p>在使用 <b>Spring Boot</b> 时自动注册 bot 所需的配置文件。</p>
 </tldr>

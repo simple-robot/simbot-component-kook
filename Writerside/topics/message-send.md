@@ -3,6 +3,8 @@ switcher-label: Java API 风格
 ---
 # 消息发送
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 在 KOOK 组件中，主要有两种发送消息的方式。
 
 <include from="snippets.md" element-id="need-help"/>

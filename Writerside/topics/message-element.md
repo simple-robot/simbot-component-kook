@@ -3,6 +3,8 @@ switcher-label: Java API 风格
 ---
 # 消息元素
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 本章节介绍 KOOK 组件中针对 simbot 标准库中 **消息元素(`Message.Element`)** 的实现类型。
 
 

@@ -214,3 +214,27 @@ implementation 'io.ktor:ktor-client-darwin:$ktor_version'
 </warning>
 
 </snippet>
+
+<procedure title="公告" id="to-main-doc">
+
+<h2>站点迁移啦~！</h2>
+
+<warning>
+
+KOOK组件的文档内容已经迁移合并到了[**核心库手册**](https://simbot.forte.love/component-kook.html)中！
+本站点将不再更新，直接前往核心库手册的[**KOOK组件**](https://simbot.forte.love/component-kook.html)部分吧~！
+
+</warning>
+
+<procedure title="为什么迁移?" id="Why" collapsible="true">
+
+作为由我们官方维护的组件库，分散在各自的文档站点中的确有好处：它们可以各自维护自己所需的东西、互不干扰。
+
+但是缺点也很明显：**太过分散。**
+
+组件库与核心库之间的关系是比较**紧密**的，
+我们希望你能够在一个站点内就可以查阅或搜索到所有你想要得知的信息。
+
+</procedure>
+
+</procedure>

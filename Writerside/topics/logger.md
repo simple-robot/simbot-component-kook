@@ -1,5 +1,7 @@
 # 日志
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 ## API 日志
 
 开启 `love.forte.simbot.kook.api` 的 `DEBUG` 级别日志，

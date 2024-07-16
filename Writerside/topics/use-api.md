@@ -4,6 +4,8 @@ switcher-label: Java API 风格
 
 <var name="jr" value="Reactor"/>
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 # 使用 API
 
 <tldr>
@@ -44,7 +46,7 @@ API 模块无法直接作为 Simple Robot 组件使用。
 <tab title="Gradle(Kotlin DSL)" group-key="kts">
 
 ```Kotlin
-implementation("love.forte.simbot.component:simbot-component-kook-api:%version%")
+implementation("love.forte.simbot.component:simbot-component-kook-api:%kook-version%")
 ```
 
 <tip>
@@ -53,7 +55,7 @@ implementation("love.forte.simbot.component:simbot-component-kook-api:%version%"
 那么你需要指定依赖的后缀为 `-jvm`。
 
 ```Kotlin
-implementation("love.forte.simbot.component:simbot-component-kook-api-jvm:%version%")
+implementation("love.forte.simbot.component:simbot-component-kook-api-jvm:%kook-version%")
 ```
 
 </tip>
@@ -62,7 +64,7 @@ implementation("love.forte.simbot.component:simbot-component-kook-api-jvm:%versi
 <tab title="Gradle(Groovy)" group-key="groovy">
 
 ```Groovy
-implementation 'love.forte.simbot.component:simbot-component-kook-api:%version%'
+implementation 'love.forte.simbot.component:simbot-component-kook-api:%kook-version%'
 ```
 
 <tip>
@@ -71,7 +73,7 @@ implementation 'love.forte.simbot.component:simbot-component-kook-api:%version%'
 那么你需要指定依赖的后缀为 `-jvm`。
 
 ```Groovy
-implementation 'love.forte.simbot.component:simbot-component-kook-api-jvm:%version%'
+implementation 'love.forte.simbot.component:simbot-component-kook-api-jvm:%kook-version%'
 ```
 
 </tip>
@@ -84,7 +86,7 @@ implementation 'love.forte.simbot.component:simbot-component-kook-api-jvm:%versi
     <groupId>love.forte.simbot.component</groupId>
     <!-- Maven 需要添加 `-jvm` 后缀来选择使用 JVM 平台 -->
     <artifactId>simbot-component-kook-api-jvm</artifactId>
-    <version>%version%</version>
+    <version>%kook-version%</version>
 </dependency>
 ```
 

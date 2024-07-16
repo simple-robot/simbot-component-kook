@@ -1,5 +1,7 @@
 # API定义列表
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 此处会列举 `API 模块` 中、`love.forte.simbot.kook.api` 包下定义的所有 `KookApi` 实现。
 
 > 对于一个具体的API的详细说明，我们建议你前往 [API 文档](https://docs.simbot.forte.love/) 或源码注释查阅，
