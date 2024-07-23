@@ -43,10 +43,6 @@ fun org.jetbrains.dokka.gradle.AbstractDokkaTask.configOutput(format: String) {
 tasks.named<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
     configOutput("html")
 
-    rootProject.file("README.md").takeIf { it.exists() }?.also {
-        includes.from(it)
-    }
-
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
         customAssets = listOf(
             rootProject.file(".simbot/dokka-assets/logo-icon.svg"),
