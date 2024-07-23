@@ -111,7 +111,7 @@ tasks.withType<DokkaTaskPartial>().configureEach {
         externalDocumentation(URI.create("https://api.ktor.io/"))
 
         // simbot doc
-        externalDocumentation(URI.create("https://docs.simbot.forte.love/main/"))
+        externalDocumentation(URI.create("https://docs.simbot.forte.love/main-v4/"))
 
     }
 }
