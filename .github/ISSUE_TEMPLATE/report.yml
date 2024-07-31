@@ -1,6 +1,5 @@
 name: "🔥问题反馈"
-description: "反馈遇到的BUG或问题"
-labels: [ "bug?" ]
+description: "直接向本仓库反馈问题或提出一个贡献申请"
 assignees: [ "ForteScarlet" ]
 # https://docs.github.com/cn/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema
 body:
@@ -14,11 +13,34 @@ body:
         
         <hr />
 
+  - type: dropdown
+    id: will-contribute
+    attributes:
+      label: 是否会提供贡献？
+      description: 如果此条议题是你打算提供代码贡献作为前提，那么标记它，来告诉我们与其他开发者，以避免产生可能的重复劳动
+      options:
+        - 否
+        - 是
+        - 不确定
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: 版本信息
+      description: 核心库、组件库、以及其他可能涉及到的依赖库的版本信息。
+      placeholder: |
+        例如: 
+        simbot-component-kook: va.b.c
+        simbot-core: v999
 
   - type: dropdown
     id: language
     attributes:
-      label: 使用的语言
+      label: 涉及的编程语言
+      description: 如果没有或无对应选项则选择'其他'后在后续描述中补充说明
       options:
         - Java
         - Kotlin
@@ -29,7 +51,8 @@ body:
   - type: dropdown
     id: build-tool
     attributes:
-      label: 使用的构建工具
+      label: 项目构建工具
+      description: 如果没有或无对应选项则选择'其他'后在后续描述中补充说明
       options:
         - Maven
         - Gradle
@@ -41,6 +64,6 @@ body:
     id: description
     attributes:
       label: 内容描述
-      description: 描述你的反馈内容
+      description: 描述你的反馈内容。（注意日志、代码等特殊内容格式，确保易于阅读）
     validations:
       required: true
