@@ -6,6 +6,8 @@ on:
     branches:
       - dev/main
       - main
+    branches-ignore:
+      - 'dependabot/**'
 
 jobs:
   qodana:
