@@ -13,7 +13,7 @@ gradleCommon = "0.4.0"
 # ksp
 ksp = "2.0.0-1.0.22"
 # https://square.github.io/kotlinpoet/
-kotlinPoet = "1.17.0"
+kotlinPoet = "1.18.1"
 
 [libraries]
 # simbot
