@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2024. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -18,14 +18,18 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
+package kook.internal.processors.msgelement
 
-// internals
-include(":internal-processors:api-reader")
-include(":internal-processors:message-element-processor")
+import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-core")
+/**
+ *
+ * @author ForteScarlet
+ */
+class MessageElementProcessorProvider : SymbolProcessorProvider {
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
+        MessageElementProcessor(environment)
+}
 
-//include("simbot-component-kook-stdlib-test")

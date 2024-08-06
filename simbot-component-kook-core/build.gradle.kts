@@ -18,6 +18,7 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
+import com.google.devtools.ksp.gradle.KspTaskMetadata
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.kotlin.multiplatform.applyTier1
 import love.forte.gradle.common.kotlin.multiplatform.applyTier2
@@ -82,13 +83,11 @@ kotlin {
         }
 
         jvmTest.dependencies {
-            runtimeOnly(libs.ktor.client.cio)
-//            runtimeOnly(libs.kotlinx.coroutines.reactor)
-//            implementation(libs.reactor.core)
+            implementation(libs.ktor.client.java)
 
-            implementation(libs.log4j.api)
-            implementation(libs.log4j.core)
-            implementation(libs.log4j.slf4j2Impl)
+            implementation(libs.simbot.logger.slf4jimpl)
+//            implementation(libs.log4j.core)
+//            implementation(libs.log4j.slf4j2Impl)
         }
 
         jsMain.dependencies {
@@ -109,6 +108,7 @@ kotlin {
 
 dependencies {
     add("kspJvm", project(":internal-processors:api-reader"))
+    add("kspCommonMainMetadata", project(":internal-processors:message-element-processor"))
 }
 
 ksp {
@@ -117,3 +117,11 @@ ksp {
     arg("kook.api.finder.event.output", rootDir.resolve("generated-docs/core-event-list.md").absolutePath)
     arg("kook.api.finder.event.class", "love.forte.simbot.component.kook.event.KookEvent")
 }
+
+ kotlin.sourceSets.commonMain {
+     // solves all implicit dependency trouble and IDEs source code detection
+     // see https://github.com/google/ksp/issues/963#issuecomment-1894144639
+     tasks.withType<KspTaskMetadata> {
+         kotlin.srcDir(destinationDirectory.file("kotlin"))
+     }
+ }
