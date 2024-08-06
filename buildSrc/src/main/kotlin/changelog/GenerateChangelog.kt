@@ -33,7 +33,7 @@ import java.util.*
 data class CommitLog(val message: String, val hash: MutableList<String>, val pre: String?)
 
 fun Project.generateChangelog(tag: String) {
-    println("Generate change log for $tag ...")
+    logger.lifecycle("Generate change log for {} ...", tag)
     // configurations.runtimeClasspath
     val changelogDir = rootProject.file(".changelog").also {
         it.mkdirs()

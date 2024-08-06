@@ -48,7 +48,7 @@ tasks.withType<DokkaTaskPartial>().configureEach {
     }
 
     dokkaSourceSets.configureEach {
-        version = P.version.toString()
+        version = P.version
         documentedVisibilities.set(
             listOf(
                 DokkaConfiguration.Visibility.PUBLIC,
@@ -83,6 +83,9 @@ tasks.withType<DokkaTaskPartial>().configureEach {
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
             val relativeTo = projectDir.relativeTo(rootProject.projectDir)
+                .path
+                .replace('\\', '/')
+
             remoteUrl.set(URI.create("${P.HOMEPAGE}/tree/main/$relativeTo/src/").toURL())
             remoteLineSuffix.set("#L")
         }

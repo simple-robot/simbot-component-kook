@@ -21,10 +21,7 @@
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 import love.forte.gradle.common.core.project.ProjectDetail
-import love.forte.gradle.common.core.project.Version
-import love.forte.gradle.common.core.project.minus
 import love.forte.gradle.common.core.property.systemProp
-import love.forte.gradle.common.core.project.version as v
 
 /*
 *  Copyright (c) 2022-2022 ForteScarlet <ForteScarlet@163.com>
@@ -52,10 +49,11 @@ object P : ProjectDetail() {
     override val homepage: String
         get() = HOMEPAGE
 
-    private val baseVersion = v(4, 0, 0)
+    const val VERSION = "4.0.0-beta5"
+    const val NEXT_VERSION = "4.0.0-beta6"
 
-    val snapshotVersion = baseVersion - Version.SNAPSHOT
-    override val version = if (isSnapshot()) snapshotVersion else baseVersion
+    override val snapshotVersion = "$NEXT_VERSION-SNAPSHOT"
+    override val version = if (isSnapshot()) snapshotVersion else VERSION
 
     override val group: String get() = GROUP
     override val description: String get() = DESCRIPTION

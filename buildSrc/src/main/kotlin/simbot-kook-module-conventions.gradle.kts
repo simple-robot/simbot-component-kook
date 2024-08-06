@@ -49,7 +49,7 @@ plugins {
 
 setup(P)
 if (isSnapshot()) {
-    version = P.snapshotVersion.toString()
+    version = P.snapshotVersion
 }
 
 repositories {
@@ -94,14 +94,6 @@ configurations.all {
     // check for updates every build
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
-
-
-//// show project info
-logger.info("========================================================")
-logger.info("== project.group:   ${group}")
-logger.info("== project.name:    ${name}")
-logger.info("== project.version: ${version}")
-logger.info("========================================================")
 
 idea {
     module {
