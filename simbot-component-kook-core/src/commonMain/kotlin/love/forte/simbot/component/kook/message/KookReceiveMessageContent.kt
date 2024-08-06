@@ -1,22 +1,26 @@
 /*
- * Copyright (c) 2022-2023. ForteScarlet.
+ *     Copyright (c) 2022-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.message
 
+import kotlinx.serialization.SerializationException
 import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.ability.DeleteSupport
 import love.forte.simbot.annotations.ExperimentalSimbotAPI
@@ -28,16 +32,25 @@ import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Companion.asMessage
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_USER
+import love.forte.simbot.component.kook.message.KookQuote.Companion.asMessage
+import love.forte.simbot.component.kook.util.requestData
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.component.kook.util.requestResultBy
 import love.forte.simbot.component.kook.util.walk
 import love.forte.simbot.kook.api.ApiResponseException
+import love.forte.simbot.kook.api.ApiResult
+import love.forte.simbot.kook.api.ApiResultException
 import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
 import love.forte.simbot.kook.api.message.DeleteDirectMessageApi
+import love.forte.simbot.kook.api.message.GetChannelMessageViewApi
+import love.forte.simbot.kook.api.message.GetDirectMessageViewApi
+import love.forte.simbot.kook.api.userchat.CreateUserChatApi
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.objects.card.CardMessage
 import love.forte.simbot.logger.Logger
 import love.forte.simbot.logger.LoggerFactory
 import love.forte.simbot.message.*
+import love.forte.simbot.suspendrunner.STP
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.jvm.JvmSynthetic
@@ -117,6 +130,31 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
     override val messages: Messages
 
     /**
+     * 获取消息中的引用信息。
+     * 会通过 API [GetChannelMessageViewApi]
+     * 或 [GetDirectMessageViewApi] 发起请求并得到结果，
+     * 因此 [reference] 会产生挂起。
+     *
+     * 如果是私聊会话，会先查询会话code，然后查询消息引用。
+     *
+     * 查询结果不会被缓存，每次调用都会产生API请求。
+     *
+     * @throws SerializationException 由于服务端响应值类型不规范导致的异常。
+     * 2024/8/6: 经测试，在私聊会话情况下，如果发送的消息内无引用，则响应的 `quote` 值为 **空字符串**，
+     * 例如：
+     * ```json
+     * {"quote":""}
+     * ```
+     * 这会引发 [SerializationException]。而如果消息包含引用，则响应为 `Quote` 对象结构。
+     * 虽然在内部做了写兼容性的处理，但是不能保证未来服务端的行为不会发生变化。
+     *
+     * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
+     * @throws ApiResultException 请求结果的 [ApiResult.code] 校验失败
+     */
+    @STP
+    override suspend fun reference(): KookQuote?
+
+    /**
      * 尝试根据当前消息ID删除目标。
      *
      * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
@@ -133,6 +171,22 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
 public abstract class BaseKookReceiveMessageContent : KookMessageContent
 
 
+private suspend fun referenceFromChannel(bot: KookBot, msgId: String): KookQuote? {
+    val api = GetChannelMessageViewApi.create(msgId)
+    val details = bot.requestData(api)
+    return details.quote?.asMessage()
+}
+
+private suspend fun referenceFromDirect(bot: KookBot, msgId: String, authorId: String): KookQuote? {
+    val chat = CreateUserChatApi.create(authorId).requestDataBy(bot)
+    return referenceFromDirectWithChatCode(bot, msgId, chat.code)
+}
+
+private suspend fun referenceFromDirectWithChatCode(bot: KookBot, msgId: String, chatCode: String): KookQuote? {
+    val details = GetDirectMessageViewApi.create(chatCode, msgId).requestDataBy(bot)
+    return details.quote?.asMessage()
+}
+
 /**
  * KOOK 消息事件所收到的消息正文类型。
  *
@@ -142,7 +196,7 @@ public abstract class BaseKookReceiveMessageContent : KookMessageContent
  *
  * @author ForteScarlet
  */
-public class KookReceiveMessageContent(
+public class KookReceiveMessageContent internal constructor(
     private val isDirect: Boolean,
     internal val source: Event<TextExtra>,
     private val bot: KookBot,
@@ -172,6 +226,15 @@ public class KookReceiveMessageContent(
     }
 
     @JvmSynthetic
+    override suspend fun reference(): KookQuote? {
+        return if (isDirect) {
+            referenceFromDirect(bot, source.msgId, source.authorId)
+        } else {
+            referenceFromChannel(bot, source.msgId)
+        }
+    }
+
+    @JvmSynthetic
     override suspend fun delete(vararg options: DeleteOption) {
         // TODO options
         val api = if (isDirect) {
@@ -196,9 +259,10 @@ public class KookReceiveMessageContent(
  *
  * @see KookMessageContent
  */
-public class KookUpdatedMessageContent(
+public class KookUpdatedMessageContent internal constructor(
     private val bot: KookBot,
     private val isDirect: Boolean,
+    private val chatCode: String? = null,
     override val rawContent: String,
     private val msgId: String,
     private val mention: List<String>,
@@ -206,8 +270,13 @@ public class KookUpdatedMessageContent(
     private val isMentionAll: Boolean,
     private val isMentionHere: Boolean,
 ) : BaseKookReceiveMessageContent() {
-    override val id: ID get() = msgId.ID
+    init {
+        check(!isDirect || chatCode != null) {
+            "If is direct, chatCode can not be null"
+        }
+    }
 
+    override val id: ID get() = msgId.ID
 
     override val messages: Messages by lazy(LazyThreadSafetyMode.PUBLICATION) {
         toMessagesByKMarkdown(rawContent, mention, mentionRoles, isMentionAll, isMentionHere)
@@ -215,6 +284,15 @@ public class KookUpdatedMessageContent(
 
     override val plainText: String by lazy(LazyThreadSafetyMode.PUBLICATION) {
         messages.filterIsInstance<PlainText>().joinToString("") { it.text }
+    }
+
+    @JvmSynthetic
+    override suspend fun reference(): KookQuote? {
+        return if (isDirect) {
+            referenceFromDirectWithChatCode(bot, msgId, chatCode!!)
+        } else {
+            referenceFromChannel(bot, msgId)
+        }
     }
 
     @JvmSynthetic

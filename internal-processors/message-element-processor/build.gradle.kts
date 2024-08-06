@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2024. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -18,14 +18,33 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// internals
-include(":internal-processors:api-reader")
-include(":internal-processors:message-element-processor")
+plugins {
+    kotlin("jvm")
+}
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-core")
+repositories {
+    mavenCentral()
+}
 
-//include("simbot-component-kook-stdlib-test")
+kotlin {
+    jvmToolchain(11)
+    compilerOptions {
+        javaParameters = true
+        jvmTarget.set(JvmTarget.JVM_11)
+    }
+}
+
+configJavaCompileWithModule()
+
+dependencies {
+    api(libs.ksp)
+    api(libs.kotlinPoet.ksp)
+    testImplementation(kotlin("test-junit5"))
+}
+
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+}
+

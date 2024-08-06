@@ -48,23 +48,17 @@ import love.forte.simbot.resource.ByteArrayResource
 import love.forte.simbot.resource.Resource
 
 
-private fun createRequest(
-    type: Int,
-    content: String,
-    targetId: String,
-    quote: String?,
-    nonce: String?,
-    tempTargetId: String?,
-): KookApi<*> {
-    return SendChannelMessageApi.create(
-        type = type,
-        targetId = targetId,
-        content = content,
-        quote = quote,
-        nonce = nonce,
-        tempTargetId = tempTargetId,
-    )
+private data class QuoteRef(var quote: String?) {
+    // 是否要让只有第一个消息有引用效果？
+//    fun take(): String? {
+//        val q = quote
+//        if (q != null) {
+//            quote = null
+//        }
+//        return q
+//    }
 }
+private data class TempTargetIdRef(var tempTargetId: String?)
 
 private const val NOT_DIRECT = 0
 private const val DIRECT_TYPE_BY_TARGET = 1
@@ -75,10 +69,13 @@ private const val DIRECT_TYPE_BY_CODE = 2
  * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
- * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
+ * [quote]、[nonce] 和 [tempTargetId] 会被 **所有** 可能产生的消息重复使用。
  *
+ * 其中，部分消息元素可能会覆盖默认值：
+ * - [MessageReference] 会覆盖 [quote]
+ * - [KookTempTarget] 会覆盖 [tempTargetId]
  *
- * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
+ * @return 消息最终地发送结果回执。如果为 `null` 则代表没有有效消息发送。
  */
 public suspend fun Message.sendToChannel(
     bot: KookBot,
@@ -95,10 +92,13 @@ public suspend fun Message.sendToChannel(
  * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
- * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
+ * [quote]、[nonce] 和 [tempTargetId] 会被 **所有** 可能产生的消息重复使用。
  *
+ * 其中，部分消息元素可能会覆盖默认值：
+ * - [MessageReference] 会覆盖 [quote]
+ * - [KookTempTarget] 会覆盖 [tempTargetId]
  *
- * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
+ * @return 消息最终地发送结果回执。如果为 `null` 则代表没有有效消息发送。
  */
 public suspend fun Message.sendToDirectByTargetId(
     bot: KookBot,
@@ -113,10 +113,13 @@ public suspend fun Message.sendToDirectByTargetId(
  * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
- * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
+ * [quote]、[nonce] 和 [tempTargetId] 会被 **所有** 可能产生的消息重复使用。 *
  *
+ * 其中，部分消息元素可能会覆盖默认值：
+ * - [MessageReference] 会覆盖 [quote]
+ * - [KookTempTarget] 会覆盖 [tempTargetId]
  *
- * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
+ * @return 消息最终地发送结果回执。如果为 `null` 则代表没有有效消息发送。
  */
 public suspend fun Message.sendToDirectByChatCode(
     bot: KookBot,
@@ -132,11 +135,15 @@ public suspend fun Message.sendToDirectByChatCode(
  * 届时将会返回 [KookAggregatedMessageReceipt].
  *
  * 消息的发送会更**倾向于**整合为一条或较少条消息，如果出现多条消息，
- * 则 [quote] 会只被**第一条**消息所使用，而 [nonce] 和 [tempTargetId] 则会重复使用。
+ * [quote]、[nonce] 和 [tempTargetId] 会被 **所有** 可能产生的消息重复使用。
+ *
+ * 其中，部分消息元素可能会覆盖默认值：
+ * - [MessageReference] 会覆盖 [quote]
+ * - [KookTempTarget] 会覆盖 [tempTargetId]
  *
  * @param defaultTempTargetId 如果存在 [KookTempTarget]
  *
- * @return 消息最终的发送结果回执。如果为 null 则代表没有有效消息发送。
+ * @return 消息最终地发送结果回执。如果为 `null` 则代表没有有效消息发送。
  */
 @OptIn(ExperimentalSimbotAPI::class)
 private suspend fun Message.send0(
@@ -148,10 +155,6 @@ private suspend fun Message.send0(
     tempTargetId: String? = null,
     defaultTempTargetId: String? = null,
 ): KookMessageReceipt? {
-    data class TempTargetIdWrapper(var tempTargetId: String?)
-
-//    var quote0 = quote
-
     fun doRequest(type: Int, content: String, nonce: String?, quote: String?, tempTargetId: String?): KookApi<*> {
         return when (directType) {
             NOT_DIRECT -> SendChannelMessageApi.create(
@@ -171,8 +174,8 @@ private suspend fun Message.send0(
 
     val message = this
     var kMarkdownBuilder: KMarkdownBuilder? = null
-    var quote0 = quote
-    val tempWrapper = TempTargetIdWrapper(tempTargetId)
+    val quoteRef = QuoteRef(quote)
+    val tempRef = TempTargetIdRef(tempTargetId)
 
 //    val requests: List<KookApiRequest<*>> = buildList(if (this is Message.Element<*>) 1 else (this as Messages).size) {
     val requests: List<() -> KookApi<*>> =
@@ -180,15 +183,13 @@ private suspend fun Message.send0(
             // 清算 kmd
             fun liquidationKmd() {
                 kMarkdownBuilder?.let { kmb ->
-                    val currentQuote = quote0
-                    quote0 = null
                     add {
                         doRequest(
                             MessageType.KMARKDOWN.type,
                             kmb.buildRaw(),
                             nonce,
-                            currentQuote,
-                            tempWrapper.tempTargetId
+                            quoteRef.quote,
+                            tempRef.tempTargetId
                         )
                     }
                     kMarkdownBuilder = null
@@ -203,14 +204,19 @@ private suspend fun Message.send0(
                     }
 
                     is KookTempTarget -> when (message) {
-                        is KookTempTarget.Target -> tempWrapper.tempTargetId = message.id.literal
-                        is KookTempTarget.Current -> tempWrapper.tempTargetId = defaultTempTargetId
+                        is KookTempTarget.Target -> tempRef.tempTargetId = message.id.literal
+                        is KookTempTarget.Current -> tempRef.tempTargetId = defaultTempTargetId
+                    }
+                    // 任意的 MessageReference 类型元素
+                    // 覆盖当前消息元素
+                    is MessageReference -> {
+                        quoteRef.quote = message.id.literal
                     }
 
                     else -> {
                         message.elementToRequest(bot, isSingle, { type, content ->
                             liquidationKmd()
-                            add { doRequest(type, content, nonce, null, tempWrapper.tempTargetId) }
+                            add { doRequest(type, content, nonce, quoteRef.quote, tempRef.tempTargetId) }
                         }) { block ->
                             block(kMarkdownBuilder ?: KMarkdownBuilder().also { kMarkdownBuilder = it })
                         }
@@ -319,10 +325,6 @@ private suspend inline fun Message.Element.elementToRequest(
             is KookKMarkdownMessage -> doRequest(MessageType.KMARKDOWN.type, message.kMarkdown.rawContent)
             // card message
             is KookCardMessage -> doRequest(MessageType.CARD.type, message.cards.encode())
-
-            // is KookRequestMessage -> {
-            //     this.request
-            // }
 
             is KookAtAllHere -> {
                 withinKmd {

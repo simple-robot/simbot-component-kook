@@ -119,6 +119,7 @@ public data class CardMessage(private val cards: List<Card>) : List<Card> by car
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
+            coerceInputValues = true
         }
 
         /**
