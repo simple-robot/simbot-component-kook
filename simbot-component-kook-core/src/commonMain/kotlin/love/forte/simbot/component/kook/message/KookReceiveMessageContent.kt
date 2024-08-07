@@ -126,6 +126,9 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
      * 将消息转化为一个消息链（尤其是转化kmarkdown类型的消息）的过程中有可能会丢失一部分原有的格式。
      * 因此当你直接通过 [messages] 重复发送消息时有可能会产生与收到的消息不一致的效果。
      *
+     * ## 消息引用
+     * 有关消息引用的信息需要通过 [reference] API 查询获取，不会被包含在 [messages] 中。
+     *
      */
     override val messages: Messages
 
@@ -134,6 +137,8 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
      * 会通过 API [GetChannelMessageViewApi]
      * 或 [GetDirectMessageViewApi] 发起请求并得到结果，
      * 因此 [reference] 会产生挂起。
+     *
+     * [reference] 的结果不会包含在 [messages] 中。
      *
      * 如果是私聊会话，会先查询会话code，然后查询消息引用。
      *
