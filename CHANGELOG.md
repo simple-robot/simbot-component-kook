@@ -1,3 +1,15 @@
+# v4.0.0-beta5
+
+> Release & Pull Notes: [v4.0.0-beta5](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta5) 
+
+- feat: 支持 `KookQuote` 的获取和`MessageReference` 的解析 ([`887ea1d`](https://github.com/simple-robot/simpler-robot/commit/887ea1d))
+- build(deps): bump kotlinx-serialization from 1.6.3 to 1.7.1 ([`453d5ef`](https://github.com/simple-robot/simpler-robot/commit/453d5ef))
+- build(deps): Update simbot from 4.0.0 to 4.5.0 ([`44a0979`](https://github.com/simple-robot/simpler-robot/commit/44a0979))
+- build(deps): bump ksp from 2.0.0-1.0.22 to 2.0.0-1.0.24 ([`12b52ad`](https://github.com/simple-robot/simpler-robot/commit/12b52ad))
+- build(deps): bump com.squareup:kotlinpoet-ksp from 1.17.0 to 1.18.1 ([`4087da8`](https://github.com/simple-robot/simpler-robot/commit/4087da8))
+- build(deps): bump ktor from 2.3.8 to 2.3.12 ([`9c4e560`](https://github.com/simple-robot/simpler-robot/commit/9c4e560))
+- pref: 优化KookBotStartedEvent和KookBotRegisteredEvent的继承性 ([`dfcac89`](https://github.com/simple-robot/simpler-robot/commit/dfcac89))
+
 # v4.0.0-beta4
 
 > Release & Pull Notes: [v4.0.0-beta4](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta4) 
