@@ -111,6 +111,7 @@ public abstract class KookUpdatedChannelMessageEvent : KookUpdatedMessageEvent()
         KookUpdatedMessageContent(
             bot = bot,
             isDirect = false,
+            chatCode = null,
             rawContent = sourceBody.content,
             msgId = sourceBody.msgId,
             mention = sourceBody.mention,
@@ -178,6 +179,7 @@ public abstract class KookUpdatedPrivateMessageEvent : KookUpdatedMessageEvent()
         KookUpdatedMessageContent(
             bot = bot,
             isDirect = true,
+            chatCode = sourceBody.chatCode,
             rawContent = sourceBody.content,
             msgId = sourceBody.msgId,
             mention = emptyList(),

@@ -45,8 +45,7 @@ KOOK组件库可以作为底层API依赖使用、
 
 ## 文档与引导
 
-- KOOK组件手册: [手册](https://component-kook.simbot.forte.love/) (即当前仓库的 GitHub Pages)
-- 了解simbot: [Simple Robot 应用手册](https://simbot.forte.love)
+- 手册: [Simple Robot 应用手册](https://simbot.forte.love) 以及其中的 [KOOK组件](https://simbot.forte.love/component-kook.html) 部分。
 - [文档引导站&API文档](https://docs.simbot.forte.love)
 - 前往 [组织首页](https://github.com/simple-robot/) 了解更多有关其他组件、文档、以及社群等相关信息！
 - [**社群**](https://simbot.forte.love/communities.html): 文档中也有提供社群信息喔

@@ -31,6 +31,8 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Companion.asMessage
+import love.forte.simbot.component.kook.message.KookQuote.Companion.asMessage
+import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.component.kook.util.requestResultBy
 import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.message.DeleteChannelMessageApi
@@ -43,6 +45,7 @@ import love.forte.simbot.message.Messages
 import love.forte.simbot.message.PlainText
 import love.forte.simbot.message.toText
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * 将 [ChannelMessageDetails] 作为消息正文实现。
@@ -51,7 +54,7 @@ import kotlin.jvm.JvmStatic
  * @see GetChannelMessageViewApi
  * @author ForteScarlet
  */
-public data class KookChannelMessageDetailsContent(
+public data class KookChannelMessageDetailsContent internal constructor(
     internal val details: ChannelMessageDetails,
     private val bot: KookBot,
 ) : KookMessageContent {
@@ -89,6 +92,12 @@ public data class KookChannelMessageDetailsContent(
      */
     override val plainText: String by lazy(LazyThreadSafetyMode.PUBLICATION) {
         messages.filterIsInstance<PlainText>().joinToString("") { it.text }
+    }
+
+    @JvmSynthetic
+    override suspend fun reference(): KookQuote? {
+        val details = GetChannelMessageViewApi.create(details.id).requestDataBy(bot)
+        return details.quote?.asMessage()
     }
 
     /**

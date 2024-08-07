@@ -21,11 +21,9 @@
 package love.forte.simbot.component.kook
 
 
-import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
-import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.bot.serializableBotConfigurationPolymorphic
 import love.forte.simbot.common.function.ConfigurerFunction
 import love.forte.simbot.common.function.invokeBy
@@ -34,11 +32,12 @@ import love.forte.simbot.component.ComponentConfigureContext
 import love.forte.simbot.component.ComponentFactory
 import love.forte.simbot.component.ComponentFactoryProvider
 import love.forte.simbot.component.kook.bot.KookBotVerifyInfoConfiguration
-import love.forte.simbot.component.kook.message.*
+import love.forte.simbot.component.kook.message.KookMessageElement
+import love.forte.simbot.component.kook.message.includeKookMessageElements
 import love.forte.simbot.kook.ExperimentalKookApi
 import love.forte.simbot.kook.objects.kmd.KMarkdown
 import love.forte.simbot.kook.objects.kmd.RawValueKMarkdown
-import love.forte.simbot.message.Message
+import love.forte.simbot.message.messageElementPolymorphic
 import kotlin.jvm.JvmStatic
 
 /**
@@ -104,36 +103,19 @@ public class KookComponent : Component {
         /**
          * [KookComponent] 组件所使用的消息序列化信息。
          */
-        @OptIn(ExperimentalSimbotAPI::class, ExperimentalKookApi::class)
+        @OptIn(ExperimentalKookApi::class)
         @get:JvmStatic
         public val messageSerializersModule: SerializersModule = SerializersModule {
-            fun PolymorphicModuleBuilder<KookMessageElement>.include() {
-                subclass(KookAsset::class, KookAsset.serializer())
-                subclass(KookAssetImage::class, KookAssetImage.serializer())
-                subclass(KookAtAllHere::class, KookAtAllHere.serializer())
-                // KookAttachmentMessage
-                subclass(KookAttachment::class, KookAttachment.serializer())
-                subclass(KookAttachmentImage::class, KookAttachmentImage.serializer())
-                subclass(KookAttachmentFile::class, KookAttachmentFile.serializer())
-                subclass(KookAttachmentVideo::class, KookAttachmentVideo.serializer())
+            polymorphic(KookMessageElement::class) {
+                includeKookMessageElements()
+            }
 
-                subclass(KookCardMessage::class, KookCardMessage.serializer())
-                subclass(KookKMarkdownMessage::class, KookKMarkdownMessage.serializer())
-
-                subclass(KookTempTarget.Current::class, KookTempTarget.Current.serializer())
-                subclass(KookTempTarget.Target::class, KookTempTarget.Target.serializer())
+            messageElementPolymorphic {
+                includeKookMessageElements()
             }
 
             polymorphic(KMarkdown::class) {
                 subclass(RawValueKMarkdown::class, RawValueKMarkdown.serializer())
-            }
-
-            polymorphic(KookMessageElement::class) {
-                include()
-            }
-
-            polymorphic(Message.Element::class) {
-                include()
             }
 
             serializableBotConfigurationPolymorphic {

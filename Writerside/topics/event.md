@@ -1,5 +1,7 @@
 # 事件定义列表
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 KOOK组件中的**事件类型**包含两个层面：
 
 1. **API 模块** 中，对 KOOK API 中官方定义的事件结构的基本封装与实现。

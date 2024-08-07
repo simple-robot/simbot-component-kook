@@ -1,24 +1,29 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 import love.forte.gradle.common.core.Gpg
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.property.systemProp
-import love.forte.gradle.common.publication.configure.multiplatformConfigPublishing
+import love.forte.gradle.common.publication.configure.configPublishMaven
+import love.forte.gradle.common.publication.configure.publishingExtension
+import love.forte.gradle.common.publication.configure.setupPom
 
 plugins {
     kotlin("multiplatform")
@@ -30,30 +35,43 @@ plugins {
 setup(P)
 
 val p = project
-multiplatformConfigPublishing {
-    project = P
-    isSnapshot = project.version.toString().contains("SNAPSHOT", true)
+val isSnapshot = project.version.toString().contains("SNAPSHOT", true)
 
-    val jarJavadoc by tasks.registering(Jar::class) {
-        group = "documentation"
-        archiveClassifier.set("javadoc")
-        if (!(isSnapshot || isSnapshot() || isSimbotLocal())) {
-            archiveClassifier.set("javadoc")
-            from(tasks.findByName("dokkaHtml"))
+val jarJavadoc by tasks.registering(Jar::class) {
+    group = "documentation"
+    archiveClassifier.set("javadoc")
+    if (!(isSnapshot || isSnapshot() || isSimbotLocal())) {
+        dependsOn(tasks.dokkaHtml)
+        from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+    }
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+        if (isSnapshot) {
+            configPublishMaven(SnapshotRepository)
+        } else {
+            configPublishMaven(ReleaseRepository)
         }
     }
 
-    artifact(jarJavadoc)
-    releasesRepository = ReleaseRepository
-    snapshotRepository = SnapshotRepository
-    gpg = Gpg.ofSystemPropOrNull()
+    publications {
+        withType<MavenPublication> {
+            artifacts {
+                artifact(jarJavadoc)
+            }
 
-    if (isSimbotLocal()) {
-        mainHost = null
+            setupPom(project.name, P)
+        }
     }
+}
 
-    publicationsFromMainHost += listOf("wasm", "wasm32", "wasm_js")
-    mainHostSupportedTargets += listOf("wasm", "wasm32", "wasm_js")
+signing {
+    val gpg = Gpg.ofSystemPropOrNull() ?: return@signing
+    val (keyId, secretKey, password) = gpg
+    useInMemoryPgpKeys(keyId, secretKey, password)
+    sign(publishingExtension.publications)
 }
 
 // TODO see https://github.com/gradle-nexus/publish-plugin/issues/208#issuecomment-1465029831

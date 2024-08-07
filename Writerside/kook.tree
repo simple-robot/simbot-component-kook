@@ -35,7 +35,6 @@
             <toc-element topic="objects-Attachments.md"/>
         </toc-element>
     </toc-element>
-    <toc-element toc-title="社群信息" href="https://simbot.forte.love/communities.html" />
     <toc-element toc-title="其他版本">
         <toc-element toc-title="v3.3.0.0-beta1">
             <toc-element toc-title="快速开始">
@@ -50,4 +49,6 @@
             </toc-element>
         </toc-element>
     </toc-element>
+    <toc-element toc-title="社群" href="https://simbot.forte.love/communities.html" />
+    <toc-element toc-title="赞助" href="https://simbot.forte.love/sponsor.html" />
 </instance-profile>

@@ -1,5 +1,7 @@
 # 欢迎！
 
+<include from="snippets.md" element-id="to-main-doc" />
+
 这里是
 [**Simple Robot v4**](https://github.com/simple-robot/simpler-robot/tree/v4-dev)
 的
