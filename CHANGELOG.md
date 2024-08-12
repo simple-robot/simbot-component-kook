@@ -1,3 +1,10 @@
+# v4.0.0-beta6
+
+> Release & Pull Notes: [v4.0.0-beta6](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta6) 
+
+- optimize(internal): 简单优化内部的KSP ([`bd15b6a`](https://github.com/simple-robot/simpler-robot/commit/bd15b6a))
+- fix(api): 修复 CreateAssetApi 使用的错误请求头 ([`f0a0fe0`](https://github.com/simple-robot/simpler-robot/commit/f0a0fe0))
+
 # v4.0.0-beta5
 
 > Release & Pull Notes: [v4.0.0-beta5](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta5) 
