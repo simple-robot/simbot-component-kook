@@ -51,7 +51,7 @@ public class CreateAssetApi private constructor(
         private const val DEFAULT_FILENAME = "unknown-file"
         private const val ASSET_API_FORM_PROPERTY_NAME = "file"
         private val HEADERS = Headers.build {
-            append(HttpHeaders.ContentType, "form-data")
+            append(HttpHeaders.ContentType, ContentType.MultiPart.FormData)
         }
 
         /**
