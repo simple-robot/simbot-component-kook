@@ -20,8 +20,7 @@
 
 package kook.internal.processors.apireader
 
-import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.getKotlinClassByName
+import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.isAbstract
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -42,29 +41,11 @@ abstract class ReaderProcessor(private val environment: SymbolProcessorEnvironme
     abstract val optionName: String
     abstract val targetClassName: String
 
-    @OptIn(KspExperimental::class)
-    override fun process(resolver: Resolver): List<KSAnnotated> {
-        val targetFilePath: String? = environment.options[optionName]
+    private var targetFile: File? = null
+    private val targetClasses = mutableListOf<KSClassDeclaration>()
 
-        val targetFile = File(targetFilePath ?: run {
-            val msg = "target output file option ['$optionName'] is null!"
-            environment.logger.warn(msg)
-            return emptyList()
-        })
-
-        environment.logger.info("target output file: ${targetFile.absolutePath}")
-        val targetClass = resolver.getKotlinClassByName(targetClassName)
-        environment.logger.info("apiClass: $targetClassName")
-        targetClass ?: return emptyList()
-
-        val targetClasses = resolver.getAllFiles().flatMap { it.declarations }
-            .filterIsInstance<KSClassDeclaration>()
-            .filter {
-                targetClass.asStarProjectedType().isAssignableFrom(it.asStarProjectedType())
-            }
-            .filter { !it.isAbstract() }
-            .toList()
-
+    override fun finish() {
+        val targetFile = targetFile ?: return
         if (!targetFile.exists()) {
             targetFile.parentFile.mkdirs()
         } else {
@@ -80,7 +61,32 @@ abstract class ReaderProcessor(private val environment: SymbolProcessorEnvironme
         ).use { writer ->
             writer.writeDeflistTo(targetClasses)
         }
+    }
 
+    override fun process(resolver: Resolver): List<KSAnnotated> {
+        val targetFilePath: String? = environment.options[optionName]
+
+        val targetFile = File(targetFilePath ?: run {
+            val msg = "target output file option ['$optionName'] is null!"
+            environment.logger.warn(msg)
+            return emptyList()
+        })
+
+        this.targetFile = targetFile
+
+        environment.logger.info("target output file: ${targetFile.absolutePath}")
+        val targetClass = resolver.getClassDeclarationByName(targetClassName)
+        environment.logger.info("apiClass: $targetClassName found $targetClass", targetClass)
+        targetClass ?: return emptyList()
+
+        // find all
+        resolver.getAllFiles().flatMap { it.declarations }
+            .filterIsInstance<KSClassDeclaration>()
+            .filter {
+                targetClass.asStarProjectedType().isAssignableFrom(it.asStarProjectedType())
+            }
+            .filter { !it.isAbstract() }
+            .toCollection(targetClasses)
 
         return emptyList()
     }
@@ -91,7 +97,7 @@ abstract class ReaderProcessor(private val environment: SymbolProcessorEnvironme
  *
  * @author ForteScarlet
  */
-class ApiReaderProcessor(private val environment: SymbolProcessorEnvironment) : ReaderProcessor(environment) {
+class ApiReaderProcessor(environment: SymbolProcessorEnvironment) : ReaderProcessor(environment) {
     override val optionName: String = API_READ_TARGET_FILE_OPTION_KEY
     override val targetClassName: String = KOOK_API_CLASS_NAME
 }
