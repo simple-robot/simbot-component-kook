@@ -88,10 +88,11 @@ jobs:
 
         # Create gitHub release
       - name: Create Github Release
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PUSH_TOKEN }}
           body_path: .changelog/${{ github.ref_name }}.md
+          body: ''
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, 'preview') || contains(github.ref_name, 'alpha') || contains(github.ref_name, 'dev') }}
 
@@ -137,27 +138,3 @@ jobs:
           # deploy to sub dir
           destination_dir: components/kook
 
-#  deploy-website:
-#    name: Deploy Website
-#    runs-on: ubuntu-latest
-#    needs: run-test-and-publish
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: 16.x
-#          cache: npm
-#          cache-dependency-path: ./website/package-lock.json
-#
-#      - run: |
-#          npm ci
-#          npm run build
-#        working-directory: ./website
-#
-#      # https://github.com/marketplace/actions/github-pages-action
-#      - name: Push to doc repository
-#        uses: peaceiris/actions-gh-pages@v3
-#        with:
-#          personal_token: ${{ secrets.PUSH_TOKEN }}
-#          publish_branch: gh-pages
-#          publish_dir: ./website/build

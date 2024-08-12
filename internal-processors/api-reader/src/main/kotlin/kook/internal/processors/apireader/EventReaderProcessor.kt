@@ -20,8 +20,7 @@
 
 package kook.internal.processors.apireader
 
-import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.getKotlinClassByName
+import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -50,30 +49,11 @@ class EventReaderProcessor(private val environment: SymbolProcessorEnvironment) 
     private val targetClassName = environment.options[EVENT_READ_TARGET_CLASS_OPTION_KEY]
         ?: KOOK_EVENT_CLASS_NAME
 
-    @OptIn(KspExperimental::class)
-    override fun process(resolver: Resolver): List<KSAnnotated> {
-        val targetFilePath: String? = environment.options[EVENT_READ_TARGET_FILE_OPTION_KEY]
+    private var targetFile: File? = null
+    private val targetClasses = mutableListOf<KSClassDeclaration>()
 
-        val targetFile = File(targetFilePath ?: run {
-            val msg = "target output file option ['$EVENT_READ_TARGET_FILE_OPTION_KEY'] is null!"
-            environment.logger.warn(msg)
-            return emptyList()
-        })
-
-        environment.logger.info("Target class name: $targetClassName")
-        environment.logger.info("Target output file: ${targetFile.absolutePath}")
-        val targetClass = resolver.getKotlinClassByName(targetClassName)
-        environment.logger.info("apiClass: $targetClass")
-        targetClass ?: return emptyList()
-
-        val targetClasses = resolver.getAllFiles().flatMap { it.declarations }
-            .filterIsInstance<KSClassDeclaration>()
-            .filter {
-                targetClass.asStarProjectedType().isAssignableFrom(it.asStarProjectedType())
-            }
-//            .filter { !it.isAbstract() }
-            .filter { it.getVisibility() in EXPECT_VISIBILITY }
-            .toList()
+    override fun finish() {
+        val targetFile = targetFile ?: return
 
         if (!targetFile.exists()) {
             targetFile.parentFile.mkdirs()
@@ -90,6 +70,32 @@ class EventReaderProcessor(private val environment: SymbolProcessorEnvironment) 
         ).use { writer ->
             writer.writeDeflistTo(targetClasses)
         }
+    }
+
+    override fun process(resolver: Resolver): List<KSAnnotated> {
+        val targetFilePath: String? = environment.options[EVENT_READ_TARGET_FILE_OPTION_KEY]
+
+        val targetFile = File(targetFilePath ?: run {
+            val msg = "target output file option ['$EVENT_READ_TARGET_FILE_OPTION_KEY'] is null!"
+            environment.logger.warn(msg)
+            return emptyList()
+        })
+        this.targetFile = targetFile
+
+        environment.logger.info("Target class name: $targetClassName")
+        environment.logger.info("Target output file: ${targetFile.absolutePath}")
+        val targetClass = resolver.getClassDeclarationByName(targetClassName)
+        environment.logger.info("apiClass: $targetClass found at $targetClass", targetClass)
+        targetClass ?: return emptyList()
+
+        resolver.getAllFiles().flatMap { it.declarations }
+            .filterIsInstance<KSClassDeclaration>()
+            .filter {
+                targetClass.asStarProjectedType().isAssignableFrom(it.asStarProjectedType())
+            }
+//            .filter { !it.isAbstract() }
+            .filter { it.getVisibility() in EXPECT_VISIBILITY }
+            .toCollection(targetClasses)
 
         return emptyList()
     }
