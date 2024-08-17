@@ -262,7 +262,7 @@ public class KookReceiveMessageContent internal constructor(
         }
     }
 
-    override suspend fun referenceMessage(): KookMessageContent? {
+    override suspend fun referenceMessage(): KookMessageContent {
         return if (isDirect) {
             val details = detailsFromDirect(bot, source.msgId, source.authorId)
             KookUpdatedMessageContent(
