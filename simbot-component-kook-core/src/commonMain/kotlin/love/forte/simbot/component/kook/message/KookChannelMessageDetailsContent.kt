@@ -100,6 +100,12 @@ public data class KookChannelMessageDetailsContent internal constructor(
         return details.quote?.asMessage()
     }
 
+    override suspend fun referenceMessage(): KookMessageContent? {
+        val quote = details.quote ?: return null
+        val view = GetChannelMessageViewApi.create(quote.id).requestDataBy(bot)
+        return view.toContent(bot)
+    }
+
     /**
      * 删除当前的频道消息。
      *

@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2024. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.component.kook.bot
@@ -25,20 +28,25 @@ import love.forte.simbot.bot.GuildRelation
 import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookUserChat
 import love.forte.simbot.component.kook.message.KookAsset
 import love.forte.simbot.component.kook.message.KookAssetImage
+import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent.Companion.toContent
+import love.forte.simbot.component.kook.message.KookMessageContent
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.ApiResponseException
 import love.forte.simbot.kook.api.ApiResultException
 import love.forte.simbot.kook.api.asset.Asset
 import love.forte.simbot.kook.api.asset.CreateAssetApi
+import love.forte.simbot.kook.api.message.GetChannelMessageViewApi
 import love.forte.simbot.kook.api.userchat.GetUserChatListApi
 import love.forte.simbot.kook.messages.MessageType
 import love.forte.simbot.kook.stdlib.Ticket
 import love.forte.simbot.logger.Logger
+import love.forte.simbot.message.MessageReference
 import love.forte.simbot.suspendrunner.ST
 import love.forte.simbot.suspendrunner.STP
 import kotlin.coroutines.CoroutineContext
@@ -162,6 +170,23 @@ public interface KookBot : Bot, CoroutineScope {
     @Deprecated("Unsupported in KOOK", ReplaceWith("null"))
     override val groupRelation: GroupRelation?
         get() = null
+
+    /**
+     * 根据引用ID查询对应的 **频道消息** 的 [KookMessageContent]。
+     */
+    @ST
+    override suspend fun messageFromId(id: ID): KookMessageContent {
+        val view = GetChannelMessageViewApi.create(id.literal).requestDataBy(this)
+        return view.toContent(this)
+    }
+
+    /**
+     * 根据引用查询对应的 **频道消息** 的 [KookMessageContent]。
+     */
+    @ST
+    override suspend fun messageFromReference(reference: MessageReference): KookMessageContent {
+        return messageFromId(reference.id)
+    }
 }
 
 /**

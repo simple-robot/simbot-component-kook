@@ -1,3 +1,20 @@
+# v4.0.0
+
+> Release & Pull Notes: [v4.0.0](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0) 
+
+- feat(core): KookBot 支持根据引用查询消息内容的相关API ([`98a7fc1..500491e`](https://github.com/simple-robot/simpler-robot/compare/98a7fc1..8e460f6))
+
+    <details><summary><code>98a7fc1..500491e</code></summary>
+
+    - [`98a7fc1`](https://github.com/simple-robot/simpler-robot/commit/98a7fc1)
+    - [`500491e`](https://github.com/simple-robot/simpler-robot/commit/500491e)
+
+    </details>
+
+- feat(core): KookMessageContent 支持根据引用查询消息内容的相关API ([`8e460f6`](https://github.com/simple-robot/simpler-robot/commit/8e460f6))
+- build(deps): Update Kotlin to 2.0.10, simbot to 4.6.0 ([`f81d7e7`](https://github.com/simple-robot/simpler-robot/commit/f81d7e7))
+- build(deps): bump ksp from 2.0.0-1.0.24 to 2.0.10-1.0.24 ([`11bfb0c`](https://github.com/simple-robot/simpler-robot/commit/11bfb0c))
+
 # v4.0.0-beta6
 
 > Release & Pull Notes: [v4.0.0-beta6](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta6) 
