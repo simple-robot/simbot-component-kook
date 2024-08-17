@@ -30,6 +30,7 @@ import love.forte.simbot.common.id.IntID.Companion.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.message.KookAttachmentMessage.Companion.asMessage
+import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent.Companion.toContent
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_ROLE
 import love.forte.simbot.component.kook.message.KookMessages.AT_TYPE_USER
 import love.forte.simbot.component.kook.message.KookQuote.Companion.asMessage
@@ -46,6 +47,8 @@ import love.forte.simbot.kook.api.message.GetChannelMessageViewApi
 import love.forte.simbot.kook.api.message.GetDirectMessageViewApi
 import love.forte.simbot.kook.api.userchat.CreateUserChatApi
 import love.forte.simbot.kook.event.*
+import love.forte.simbot.kook.messages.ChannelMessageDetails
+import love.forte.simbot.kook.messages.DirectMessageDetails
 import love.forte.simbot.kook.objects.card.CardMessage
 import love.forte.simbot.logger.Logger
 import love.forte.simbot.logger.LoggerFactory
@@ -160,6 +163,12 @@ public interface KookMessageContent : MessageContent, DeleteSupport {
     override suspend fun reference(): KookQuote?
 
     /**
+     * 根据 [消息引用][reference] 查询其对应的消息原内容。
+     */
+    @STP
+    override suspend fun referenceMessage(): KookMessageContent?
+
+    /**
      * 尝试根据当前消息ID删除目标。
      *
      * @throws ApiResponseException 请求结果的状态码不是 200..300 之间
@@ -190,6 +199,20 @@ private suspend fun referenceFromDirect(bot: KookBot, msgId: String, authorId: S
 private suspend fun referenceFromDirectWithChatCode(bot: KookBot, msgId: String, chatCode: String): KookQuote? {
     val details = GetDirectMessageViewApi.create(chatCode, msgId).requestDataBy(bot)
     return details.quote?.asMessage()
+}
+
+private suspend fun detailsFromChannel(bot: KookBot, msgId: String): ChannelMessageDetails {
+    val api = GetChannelMessageViewApi.create(msgId)
+    return bot.requestData(api)
+}
+
+private suspend fun detailsFromDirect(bot: KookBot, msgId: String, authorId: String): DirectMessageDetails {
+    val chat = CreateUserChatApi.create(authorId).requestDataBy(bot)
+    return detailsFromDirectWithChatCode(bot, msgId, chat.code)
+}
+
+private suspend fun detailsFromDirectWithChatCode(bot: KookBot, msgId: String, chatCode: String): DirectMessageDetails {
+    return GetDirectMessageViewApi.create(chatCode, msgId).requestDataBy(bot)
 }
 
 /**
@@ -236,6 +259,26 @@ public class KookReceiveMessageContent internal constructor(
             referenceFromDirect(bot, source.msgId, source.authorId)
         } else {
             referenceFromChannel(bot, source.msgId)
+        }
+    }
+
+    override suspend fun referenceMessage(): KookMessageContent {
+        return if (isDirect) {
+            val details = detailsFromDirect(bot, source.msgId, source.authorId)
+            KookUpdatedMessageContent(
+                bot = bot,
+                isDirect = false,
+                chatCode = null,
+                rawContent = details.content,
+                msgId = details.id,
+                mention = emptyList(),
+                mentionRoles = emptyList(),
+                isMentionAll = false,
+                isMentionHere = false
+            )
+        } else {
+            val details = detailsFromChannel(bot, source.msgId)
+            details.toContent(bot)
         }
     }
 
@@ -297,6 +340,27 @@ public class KookUpdatedMessageContent internal constructor(
             referenceFromDirectWithChatCode(bot, msgId, chatCode!!)
         } else {
             referenceFromChannel(bot, msgId)
+        }
+    }
+
+    @JvmSynthetic
+    override suspend fun referenceMessage(): KookMessageContent {
+        return if (isDirect) {
+            val details = detailsFromDirectWithChatCode(bot, msgId, chatCode!!)
+            KookUpdatedMessageContent(
+                bot = bot,
+                isDirect = false,
+                chatCode = null,
+                rawContent = details.content,
+                msgId = details.id,
+                mention = emptyList(),
+                mentionRoles = emptyList(),
+                isMentionAll = false,
+                isMentionHere = false
+            )
+        } else {
+            val details = detailsFromChannel(bot, msgId)
+            details.toContent(bot)
         }
     }
 
