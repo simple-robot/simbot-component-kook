@@ -1,3 +1,9 @@
+# v4.0.1
+
+> Release & Pull Notes: [v4.0.1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.1) 
+
+- fix(api): 为 CardMessage 相关的部分类型的部分属性添加默认值，以及修正部分缺陷 ([`a3745a7`](https://github.com/simple-robot/simpler-robot/commit/a3745a7))
+
 # v4.0.0
 
 > Release & Pull Notes: [v4.0.0](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0) 
@@ -15,7 +21,6 @@
 - build(deps): Update Kotlin to 2.0.10, simbot to 4.6.0 ([`f81d7e7`](https://github.com/simple-robot/simpler-robot/commit/f81d7e7))
 - build(deps): bump ksp from 2.0.0-1.0.24 to 2.0.10-1.0.24 ([`11bfb0c`](https://github.com/simple-robot/simpler-robot/commit/11bfb0c))
 
-# v4.0.0-beta6
 
 > Release & Pull Notes: [v4.0.0-beta6](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.0-beta6) 
 
