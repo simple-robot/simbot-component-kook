@@ -377,7 +377,7 @@ public sealed class CardElement {
     @SerialName(Image.TYPE)
     public data class Image @JvmOverloads constructor(
         public val src: String,
-        public val alt: String,
+        public val alt: String = "",
         public val size: Size = Size.Default,
         public val circle: Boolean = false
     ) : CardElement() {
@@ -453,7 +453,7 @@ public sealed class CardElement {
     @SerialName(Paragraph.TYPE)
     public data class Paragraph(
         public val cols: Int,
-        public val fields: List<Text>
+        public val fields: List<Text> = emptyList()
     ) : CardElement() {
         init {
             require(cols in 1..3) { "Cols must in 1..3, but $cols" }
@@ -625,8 +625,10 @@ public sealed class CardModule {
      */
     @Serializable
     @SerialName(ImageGroup.TYPE)
-    public data class ImageGroup(@Serializable(CardImageListWithTypeSerializer::class) public val elements: List<CardElement.Image>) :
-        CardModule() {
+    public data class ImageGroup(
+        @Serializable(CardImageListWithTypeSerializer::class)
+        public val elements: List<CardElement.Image>
+    ) : CardModule() {
         init {
             require(elements.size in 1..9) { "The size of elements must be 1..9, but ${elements.size}" }
         }
@@ -659,8 +661,10 @@ public sealed class CardModule {
      */
     @Serializable
     @SerialName(Container.TYPE)
-    public data class Container(@Serializable(CardImageListWithTypeSerializer::class) public val elements: List<CardElement.Image>) :
-        CardModule() {
+    public data class Container(
+        @Serializable(CardImageListWithTypeSerializer::class)
+        public val elements: List<CardElement.Image>
+    ) : CardModule() {
         init {
             require(elements.size in 1..9) { "The size of elements must be 1..9, but ${elements.size}" }
         }
@@ -693,8 +697,10 @@ public sealed class CardModule {
      */
     @Serializable
     @SerialName(ActionGroup.TYPE)
-    public data class ActionGroup(@Serializable(CardButtonListWithTypeSerializer::class) public val elements: List<CardElement.Button>) :
-        CardModule() {
+    public data class ActionGroup(
+        @Serializable(CardButtonListWithTypeSerializer::class)
+        public val elements: List<CardElement.Button> = emptyList()
+    ) : CardModule() {
         init {
             require(elements.size <= 4) { "The size of elements must be <= 4, but ${elements.size}" }
         }
@@ -789,7 +795,11 @@ public sealed class CardModule {
          */
         @Serializable
         @SerialName(FILE_TYPE)
-        public data class File(override val src: String, override val title: String, override val cover: String) :
+        public data class File(
+            override val src: String = "",
+            override val title: String = "",
+            override val cover: String = ""
+        ) :
             Files()
 
         /**
@@ -797,7 +807,11 @@ public sealed class CardModule {
          */
         @Serializable
         @SerialName(AUDIO_TYPE)
-        public data class Audio(override val src: String, override val title: String, override val cover: String) :
+        public data class Audio(
+            override val src: String = "",
+            override val title: String = "",
+            override val cover: String = ""
+        ) :
             Files()
 
         /**
@@ -805,7 +819,11 @@ public sealed class CardModule {
          */
         @Serializable
         @SerialName(VIDEO_TYPE)
-        public data class Video(override val src: String, override val title: String, override val cover: String) :
+        public data class Video(
+            override val src: String = "",
+            override val title: String = "",
+            override val cover: String = ""
+        ) :
             Files()
 
         public companion object {
@@ -814,13 +832,16 @@ public sealed class CardModule {
             public const val VIDEO_TYPE: String = "video"
 
             @JvmStatic
-            public fun file(src: String, title: String, cover: String): File = File(src, title, cover)
+            @JvmOverloads
+            public fun file(src: String, title: String, cover: String = ""): File = File(src, title, cover)
 
             @JvmStatic
-            public fun audio(src: String, title: String, cover: String): Audio = Audio(src, title, cover)
+            @JvmOverloads
+            public fun audio(src: String, title: String, cover: String = ""): Audio = Audio(src, title, cover)
 
             @JvmStatic
-            public fun video(src: String, title: String, cover: String): Video = Video(src, title, cover)
+            @JvmOverloads
+            public fun video(src: String, title: String, cover: String = ""): Video = Video(src, title, cover)
 
         }
     }
@@ -853,8 +874,10 @@ public sealed class CardModule {
         public val endTime: Long
     ) : CardModule() {
         init {
-            require(mode == CountdownMode.SECOND && startTime != null) {
-                "When mode is 'SECOND', 'startTime' must not be null."
+            if (mode == CountdownMode.SECOND) {
+                requireNotNull(startTime) {
+                    "When mode is 'SECOND', 'startTime' must not be null."
+                }
             }
         }
 
@@ -898,7 +921,7 @@ public sealed class CardModule {
         public val code: String
     ) : CardModule() {
         public companion object {
-            public const val TYPE: String = ""
+            public const val TYPE: String = "invite"
         }
     }
 
