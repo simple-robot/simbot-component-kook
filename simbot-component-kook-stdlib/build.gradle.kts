@@ -66,7 +66,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            compileOnly(libs.simbot.common.annotations)
+            api(libs.simbot.common.annotations)
             api(project(":simbot-component-kook-api"))
             api(libs.simbot.common.loop)
             api(libs.simbot.common.atomic)
@@ -85,20 +85,8 @@ kotlin {
             implementation(libs.simbot.logger.slf4jimpl)
         }
 
-//        jvmTest.dependencies {
-//            implementation(libs.ktor.client.cio)
-//            implementation(simbotApi)
-//            implementation(simbotLogger)
-//            implementation(simbotLoggerSlf4j)
-//        }
-
         jsMain.dependencies {
             api(libs.ktor.client.js)
-            implementation(libs.simbot.common.annotations)
-        }
-
-        nativeMain.dependencies {
-            implementation(libs.simbot.common.annotations)
         }
 
         mingwTest.dependencies {
