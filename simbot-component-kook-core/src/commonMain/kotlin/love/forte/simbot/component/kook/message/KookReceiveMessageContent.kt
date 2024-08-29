@@ -262,6 +262,7 @@ public class KookReceiveMessageContent internal constructor(
         }
     }
 
+    @JvmSynthetic
     override suspend fun referenceMessage(): KookMessageContent? {
         return if (isDirect) {
             val ref = referenceFromDirect(bot, source.msgId, source.authorId) ?: return null

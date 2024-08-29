@@ -65,7 +65,7 @@ kotlin {
         commonMain.dependencies {
             compileOnly(libs.simbot.api)
             api(project(":simbot-component-kook-stdlib"))
-            compileOnly(libs.simbot.common.annotations)
+            api(libs.simbot.common.annotations)
             // ktor
             api(libs.ktor.client.contentNegotiation)
 //            api(libs.ktor.serialization.kotlinx.json)
@@ -84,20 +84,15 @@ kotlin {
 
         jvmTest.dependencies {
             implementation(libs.ktor.client.java)
-
             implementation(libs.simbot.logger.slf4jimpl)
-//            implementation(libs.log4j.core)
-//            implementation(libs.log4j.slf4j2Impl)
         }
 
         jsMain.dependencies {
             implementation(libs.simbot.api)
-            api(libs.simbot.common.annotations)
         }
 
         nativeMain.dependencies {
             implementation(libs.simbot.api)
-            api(libs.simbot.common.annotations)
         }
 
         mingwTest.dependencies {
