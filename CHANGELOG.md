@@ -1,3 +1,9 @@
+# v4.0.2
+
+> Release & Pull Notes: [v4.0.2](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.2) 
+
+- fix(core): 修复事件中接收的 MessageContent 中, `referenceMessage` 的行为与 `reference` 不一致，会错误地获取自身消息详情而非引用消息详情的问题 ([`517e442`](https://github.com/simple-robot/simpler-robot/commit/517e442))
+
 # v4.0.1
 
 > Release & Pull Notes: [v4.0.1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.1) 
