@@ -262,9 +262,10 @@ public class KookReceiveMessageContent internal constructor(
         }
     }
 
-    override suspend fun referenceMessage(): KookMessageContent {
+    override suspend fun referenceMessage(): KookMessageContent? {
         return if (isDirect) {
-            val details = detailsFromDirect(bot, source.msgId, source.authorId)
+            val ref = referenceFromDirect(bot, source.msgId, source.authorId) ?: return null
+            val details = detailsFromDirect(bot, ref.quote.id, source.authorId)
             KookUpdatedMessageContent(
                 bot = bot,
                 isDirect = false,
@@ -277,7 +278,8 @@ public class KookReceiveMessageContent internal constructor(
                 isMentionHere = false
             )
         } else {
-            val details = detailsFromChannel(bot, source.msgId)
+            val ref = referenceFromChannel(bot, source.msgId) ?: return null
+            val details = detailsFromChannel(bot, ref.quote.id)
             details.toContent(bot)
         }
     }
@@ -344,9 +346,11 @@ public class KookUpdatedMessageContent internal constructor(
     }
 
     @JvmSynthetic
-    override suspend fun referenceMessage(): KookMessageContent {
+    override suspend fun referenceMessage(): KookMessageContent? {
         return if (isDirect) {
-            val details = detailsFromDirectWithChatCode(bot, msgId, chatCode!!)
+            val chatCode = chatCode!!
+            val ref = referenceFromDirectWithChatCode(bot, msgId, chatCode) ?: return null
+            val details = detailsFromDirectWithChatCode(bot, ref.quote.id, chatCode)
             KookUpdatedMessageContent(
                 bot = bot,
                 isDirect = false,
@@ -359,7 +363,8 @@ public class KookUpdatedMessageContent internal constructor(
                 isMentionHere = false
             )
         } else {
-            val details = detailsFromChannel(bot, msgId)
+            val ref = referenceFromChannel(bot, msgId) ?: return null
+            val details = detailsFromChannel(bot, ref.quote.id)
             details.toContent(bot)
         }
     }
