@@ -5,7 +5,7 @@ kotlinx-serialization = "1.7.1"
 dokka = "1.9.20"
 openjdk-jmh = "1.37"
 ktor = "2.3.12"
-log4j = "2.24.2"
+log4j = "2.24.3"
 # simbot
 simbot = "4.6.0"
 suspendTransform = "0.9.0"
