@@ -2,7 +2,7 @@
 kotlin = "2.0.10"
 kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.7.1"
-dokka = "1.9.20"
+dokka = "2.0.0"
 openjdk-jmh = "1.37"
 ktor = "2.3.12"
 log4j = "2.24.3"
