@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.10"
 kotlinx-coroutines = "1.8.1"
-kotlinx-serialization = "1.7.1"
+kotlinx-serialization = "1.8.0"
 dokka = "1.9.20"
 openjdk-jmh = "1.37"
 ktor = "2.3.12"
