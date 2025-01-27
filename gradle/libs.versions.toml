@@ -31,7 +31,7 @@ simbot-common-loop = { group = "love.forte.simbot.common", name = "simbot-common
 simbot-gradle = { group = "love.forte.simbot.gradle", name = "simbot-gradle-suspendtransforms", version.ref = "simbot" }
 
 # jetbrains-annotation
-jetbrains-annotations = "org.jetbrains:annotations:26.0.1"
+jetbrains-annotations = "org.jetbrains:annotations:26.0.2"
 
 # kotlinx-coroutines
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
