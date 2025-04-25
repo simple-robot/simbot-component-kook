@@ -105,8 +105,10 @@ gradle-common-core = { group = "love.forte.gradle.common", name = "gradle-common
 gradle-common-multiplatform = { group = "love.forte.gradle.common", name = "gradle-common-kotlin-multiplatform", version.ref = "gradleCommon" }
 gradle-common-publication = { group = "love.forte.gradle.common", name = "gradle-common-publication", version.ref = "gradleCommon" }
 
+
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlinxBinaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }
 
 [bundles]
 gradle-common = ["gradle-common-core", "gradle-common-multiplatform", "gradle-common-publication"]
