@@ -25,6 +25,7 @@ import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.event.BotEvent
 import love.forte.simbot.event.Event
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.event.EventExtra
 import love.forte.simbot.kook.event.SystemExtra
 import love.forte.simbot.kook.event.Event as KEvent
@@ -38,6 +39,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  *
  * @author ForteScarlet
  */
+@SubclassOptInRequired(FuzzyEventTypeImplementation::class)
 public abstract class KookEvent : Event {
     override fun toString(): String {
         return "KookEvent(id=$id, time=$time)"
@@ -54,6 +56,7 @@ public abstract class KookEvent : Event {
  *
  * @author ForteScarlet
  */
+@SubclassOptInRequired(FuzzyEventTypeImplementation::class)
 public abstract class KookBotEvent<out EX : EventExtra, out E : KEvent<EX>> : KookEvent(), BotEvent {
     /**
      * 此事件对应的bot示例。
@@ -78,6 +81,7 @@ public abstract class KookBotEvent<out EX : EventExtra, out E : KEvent<EX>> : Ko
 /**
  * [KookBotEvent] 的 **系统事件** 相关的事件基类。
  */
+@SubclassOptInRequired(FuzzyEventTypeImplementation::class)
 public abstract class KookSystemEvent :
     KookBotEvent<SystemExtra, KEvent<SystemExtra>>() {
     override val id: ID

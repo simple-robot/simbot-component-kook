@@ -30,7 +30,7 @@ import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.event.*
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.suspendrunner.STP
-import love.forte.simbot.kook.event.Event as KkEvent
+import love.forte.simbot.kook.event.Event as KEvent
 import love.forte.simbot.kook.objects.User as KUser
 
 /**
@@ -72,6 +72,7 @@ import love.forte.simbot.kook.objects.User as KUser
  *
  * @author forte
  */
+@SubclassOptInRequired(FuzzyEventTypeImplementation::class)
 @STP
 public abstract class KookMemberChangedEvent : KookSystemEvent(), ChangeEvent {
     /**
@@ -88,6 +89,7 @@ public abstract class KookMemberChangedEvent : KookSystemEvent(), ChangeEvent {
  * KOOK [成员变更事件][KookMemberChangedEvent] 中与**语音频道的进出**相关的变更事件。
  * 这类事件代表某人进入、离开某个语音频道 (`channel`)，而不代表成员进入、离开了当前的频道服务器（`guild`）。
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 @STP
 public abstract class KookMemberChannelChangedEvent : KookMemberChangedEvent(), OrganizationSourceEvent {
     /**
@@ -114,7 +116,7 @@ public abstract class KookMemberChannelChangedEvent : KookMemberChangedEvent(), 
  * @author forte
  */
 public abstract class KookMemberJoinedChannelEvent : KookMemberChannelChangedEvent() {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<JoinedChannelEventExtra>
+    abstract override val sourceEvent: KEvent<JoinedChannelEventExtra>
 
     override val sourceBody: JoinedChannelEventBody
         get() = sourceEvent.extra.body
@@ -127,7 +129,7 @@ public abstract class KookMemberJoinedChannelEvent : KookMemberChannelChangedEve
  * @author forte
  */
 public abstract class KookMemberExitedChannelEvent : KookMemberChannelChangedEvent() {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<ExitedChannelEventExtra>
+    abstract override val sourceEvent: KEvent<ExitedChannelEventExtra>
 
     override val sourceBody: ExitedChannelEventBody
         get() = sourceEvent.extra.body
@@ -140,6 +142,7 @@ public abstract class KookMemberExitedChannelEvent : KookMemberChannelChangedEve
  * KOOK [成员变更事件][KookMemberChangedEvent] 中与**频道服务器进出**相关的变更事件。
  * 这类事件代表某人加入、离开某个频道服务器。
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 @STP
 public abstract class KookMemberGuildChangedEvent : KookMemberChangedEvent() {
     /**
@@ -157,7 +160,7 @@ public abstract class KookMemberGuildChangedEvent : KookMemberChangedEvent() {
  */
 @STP
 public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent(), GuildMemberDecreaseEvent {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<ExitedGuildEventExtra>
+    abstract override val sourceEvent: KEvent<ExitedGuildEventExtra>
 
     override val sourceBody: ExitedGuildEventBody
         get() = sourceEvent.extra.body
@@ -181,7 +184,7 @@ public abstract class KookMemberExitedGuildEvent : KookMemberGuildChangedEvent()
  */
 @STP
 public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent(), GuildMemberIncreaseEvent {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<JoinedGuildEventExtra>
+    abstract override val sourceEvent: KEvent<JoinedGuildEventExtra>
 
     override val sourceBody: JoinedGuildEventBody
         get() = sourceEvent.extra.body
@@ -207,9 +210,10 @@ public abstract class KookMemberJoinedGuildEvent : KookMemberGuildChangedEvent()
  * @see UpdatedGuildMemberEventExtra
  * @author forte
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), MemberChangeEvent, OrganizationSourceEvent {
 
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<UpdatedGuildMemberEventExtra>
+    abstract override val sourceEvent: KEvent<UpdatedGuildMemberEventExtra>
 
     override val sourceBody: UpdatedGuildMemberEventBody
         get() = sourceEvent.extra.body
@@ -246,6 +250,7 @@ public abstract class KookMemberUpdatedEvent : KookMemberChangedEvent(), MemberC
  *
  * @author forte
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 @STP
 public abstract class KookBotMemberChangedEvent : KookMemberChangedEvent(), GuildEvent {
     abstract override val sourceBody: BotSelfGuildEventBody
@@ -263,8 +268,9 @@ public abstract class KookBotMemberChangedEvent : KookMemberChangedEvent(), Guil
  * @see SelfExitedGuildEventExtra
  * @author forte
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookBotSelfExitedGuildEvent : KookBotMemberChangedEvent(), GuildEvent {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<SelfExitedGuildEventExtra>
+    abstract override val sourceEvent: KEvent<SelfExitedGuildEventExtra>
 
     override val sourceBody: BotSelfGuildEventBody
         get() = sourceEvent.extra.body
@@ -277,7 +283,7 @@ public abstract class KookBotSelfExitedGuildEvent : KookBotMemberChangedEvent(),
  * @author forte
  */
 public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent() {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<SelfJoinedGuildEventExtra>
+    abstract override val sourceEvent: KEvent<SelfJoinedGuildEventExtra>
 
     override val sourceBody: BotSelfGuildEventBody
         get() = sourceEvent.extra.body
@@ -302,6 +308,7 @@ public abstract class KookBotSelfJoinedGuildEvent : KookBotMemberChangedEvent() 
  *
  * @author forte
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), ChangeEvent {
     /**
      * 变更时间。
@@ -357,7 +364,7 @@ public sealed class KookUserOnlineStatusChangedEvent : KookSystemEvent(), Change
  *
  */
 public abstract class KookMemberOnlineEvent : KookUserOnlineStatusChangedEvent() {
-    abstract override val sourceEvent: KkEvent<GuildMemberOnlineEventExtra>
+    abstract override val sourceEvent: KEvent<GuildMemberOnlineEventExtra>
 
     override val sourceBody: GuildMemberOnlineStatusChangedEventBody
         get() = sourceEvent.extra.body
@@ -374,7 +381,7 @@ public abstract class KookMemberOnlineEvent : KookUserOnlineStatusChangedEvent()
  *
  */
 public abstract class KookMemberOfflineEvent : KookUserOnlineStatusChangedEvent() {
-    abstract override val sourceEvent: KkEvent<GuildMemberOfflineEventExtra>
+    abstract override val sourceEvent: KEvent<GuildMemberOfflineEventExtra>
 
     override val sourceBody: GuildMemberOnlineStatusChangedEventBody
         get() = sourceEvent.extra.body

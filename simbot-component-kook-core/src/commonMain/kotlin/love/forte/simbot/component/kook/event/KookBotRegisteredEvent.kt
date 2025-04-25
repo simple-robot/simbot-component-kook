@@ -27,12 +27,14 @@ import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.KookBotManager
 import love.forte.simbot.event.BotRegisteredEvent
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 
 /**
  * 当一个 [KookBot] 在 [KookBotManager] 中被_注册_时。
  *
  * @author ForteScarlet
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookBotRegisteredEvent : KookEvent(), BotRegisteredEvent {
     override val id: ID = UUID.random()
 

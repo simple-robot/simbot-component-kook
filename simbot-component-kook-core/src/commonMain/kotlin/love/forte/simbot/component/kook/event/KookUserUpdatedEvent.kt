@@ -22,6 +22,7 @@ package love.forte.simbot.component.kook.event
 
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.event.ChangeEvent
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.event.UserUpdatedEventBody
 import love.forte.simbot.kook.event.UserUpdatedEventExtra
 import love.forte.simbot.suspendrunner.STP
@@ -38,6 +39,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  *
  * @see UserUpdatedEventExtra
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookUserUpdatedEvent : KookSystemEvent(), ChangeEvent {
     override val time: Timestamp
         get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)

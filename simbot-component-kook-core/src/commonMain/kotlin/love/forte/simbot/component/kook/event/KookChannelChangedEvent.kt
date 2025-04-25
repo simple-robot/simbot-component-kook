@@ -27,6 +27,7 @@ import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.event.ChangeEvent
 import love.forte.simbot.event.ChannelEvent
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.event.OrganizationSourceEvent
 import love.forte.simbot.kook.event.*
 import love.forte.simbot.kook.objects.SimpleChannel
@@ -47,6 +48,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  * @see ChangeEvent
  * @see OrganizationSourceEvent
  */
+@SubclassOptInRequired(FuzzyEventTypeImplementation::class)
 public abstract class KookChannelChangedEvent : KookSystemEvent(), ChangeEvent, OrganizationSourceEvent {
     /**
      * 事件涉及子频道所属的频道服务器。
@@ -68,6 +70,7 @@ public abstract class KookChannelChangedEvent : KookSystemEvent(), ChangeEvent, 
  * @see KookChannelChangedEvent
  * @see AddedChannelEventExtra
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookAddedChannelEvent : KookChannelChangedEvent(), ChannelEvent {
 
     /**
@@ -110,6 +113,7 @@ public abstract class KookAddedChannelEvent : KookChannelChangedEvent(), Channel
  *
  * @see UpdatedChannelEventExtra
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent() {
 
     /**
@@ -135,8 +139,9 @@ public abstract class KookUpdatedChannelEvent : KookChannelChangedEvent() {
  *
  * @see DeletedChannelEventExtra
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), ChannelEvent {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<DeletedChannelEventExtra>
+    abstract override val sourceEvent: KEvent<DeletedChannelEventExtra>
 
     override val sourceBody: DeletedChannelEventBody
         get() = sourceEvent.extra.body
@@ -168,6 +173,7 @@ public abstract class KookDeletedChannelEvent : KookChannelChangedEvent(), Chann
  * @see ChangeEvent
  * @see OrganizationSourceEvent
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookCategoryChangedEvent : KookSystemEvent(), ChangeEvent, OrganizationSourceEvent {
     /**
      * 事件涉及子频道所属的频道服务器。
@@ -247,8 +253,9 @@ public abstract class KookUpdatedCategoryEvent : KookCategoryChangedEvent() {
  *
  * @see DeletedChannelEventExtra
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookDeletedCategoryEvent : KookCategoryChangedEvent(), ChannelEvent {
-    abstract override val sourceEvent: love.forte.simbot.kook.event.Event<DeletedChannelEventExtra>
+    abstract override val sourceEvent: KEvent<DeletedChannelEventExtra>
 
     override val sourceBody: DeletedChannelEventBody
         get() = sourceEvent.extra.body
