@@ -63,7 +63,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            compileOnly(libs.simbot.api)
+            implementation(libs.simbot.api)
             api(project(":simbot-component-kook-stdlib"))
             api(libs.simbot.common.annotations)
             // ktor

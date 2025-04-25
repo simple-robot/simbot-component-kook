@@ -28,15 +28,14 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 inline fun KotlinJvmTarget.configJava(crossinline block: KotlinJvmTarget.() -> Unit = {}) {
-    withJava()
     compilerOptions {
         javaParameters = true
         freeCompilerArgs.addAll(
@@ -51,7 +50,7 @@ inline fun KotlinJvmTarget.configJava(crossinline block: KotlinJvmTarget.() -> U
 }
 
 
-fun KotlinTopLevelExtension.configJavaToolchain(jdkVersion: Int) {
+fun KotlinBaseExtension.configJavaToolchain(jdkVersion: Int) {
     jvmToolchain(jdkVersion)
 }
 
@@ -91,8 +90,13 @@ inline fun Project.configJavaCompileWithModule(
 
         if (moduleName != null) {
             options.compilerArgumentProviders.add(CommandLineArgumentProvider {
-                // Provide compiled Kotlin classes to javac – needed for Java/Kotlin mixed sources to work
-                listOf("--patch-module", "$moduleName=${sourceSets["main"].output.asPath}")
+                val sourceSet = sourceSets.findByName("main") ?: sourceSets.findByName("jvmMain")
+                if (sourceSet != null) {
+                    // Provide compiled Kotlin classes to javac – needed for Java/Kotlin mixed sources to work
+                    listOf("--patch-module", "$moduleName=${sourceSet.output.asPath}")
+                } else {
+                    emptyList()
+                }
             })
         }
 
