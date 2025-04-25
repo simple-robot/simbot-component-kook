@@ -11,7 +11,7 @@ concurrency:
 env:
   JAVA_VERSION: 21
   JAVA_DISTRIBUTION: zulu
-  GRADLE_VERSION: 8.5
+  GRADLE_VERSION: 8.10.2
   IS_CI: true
   GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
   GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
@@ -40,17 +40,22 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: |
+            assemble
+            allTests
+            --stacktrace 
+            --warning-mode all 
+            -Pkotlin.native.enableKlibsCrossCompilation=false
 
-      - name: Run all tests
-        run: gradle assemble allTests --stacktrace --warning-mode all
-
+#      - name: Run all tests
+#        run: gradle assemble allTests --stacktrace --warning-mode all -Pkotlin.native.enableKlibsCrossCompilation=false
 
   publish-releases:
     name: Publish releases
     needs: run-test
     # 交叉编译 support
     # see https://kotlinlang.org/docs/multiplatform-publish-lib.html#host-requirements
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4

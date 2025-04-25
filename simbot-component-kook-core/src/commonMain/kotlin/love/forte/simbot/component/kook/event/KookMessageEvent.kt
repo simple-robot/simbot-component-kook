@@ -55,6 +55,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  *
  * @author ForteScarlet
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public sealed class KookMessageEvent : KookBotEvent<TextExtra, KEvent<TextExtra>>(), MessageEvent {
     override val id: ID
         get() = sourceEvent.msgId.ID
@@ -179,6 +180,7 @@ public abstract class KookContactMessageEvent : KookMessageEvent.Person(), Conta
  *
  * 此事件只会由 bot 自身触发。
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(), ChannelEvent {
     /**
      * 发生事件的频道。
@@ -198,6 +200,7 @@ public abstract class KookBotSelfChannelMessageEvent : KookMessageEvent.Channel(
  *
  * 此事件只会由 bot 自身触发，代表bot在私聊会话中发出的消息。
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookBotSelfMessageEvent : KookMessageEvent.Person(), ContactEvent {
     /**
      * 发生事件的私聊会话。

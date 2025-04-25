@@ -27,6 +27,7 @@ import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.event.ChangeEvent
 import love.forte.simbot.event.ChannelEvent
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.event.PingEventExtraBody
 import love.forte.simbot.kook.event.PinnedMessageEventExtra
 import love.forte.simbot.kook.event.UnpinnedMessageEventExtra
@@ -43,6 +44,7 @@ import love.forte.simbot.kook.event.Event as KEvent
  * - [UnpinnedMessageEventExtra]
  *
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookMessagePinEvent : KookChannelChangedEvent(), ChangeEvent, ChannelEvent {
     /**
      * 此事件涉及的频道信息。

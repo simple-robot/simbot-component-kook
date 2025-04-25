@@ -24,6 +24,7 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.bot.KookBot
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.DiscreetKookApi
 import love.forte.simbot.kook.event.Event
 import love.forte.simbot.kook.event.EventExtra
@@ -50,6 +51,7 @@ import love.forte.simbot.kook.event.UnknownExtra
  *
  * @author ForteScarlet
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 @DiscreetKookApi
 public class UnsupportedKookEvent(
     override val bot: KookBot,

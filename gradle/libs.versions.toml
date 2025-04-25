@@ -1,19 +1,19 @@
 [versions]
-kotlin = "2.0.10"
+kotlin = "2.1.20"
 kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.7.1"
 dokka = "1.9.20"
 openjdk-jmh = "1.37"
-ktor = "2.3.12"
+ktor = { prefer = "2.3.12", reject = ["3.+"] }
 log4j = "2.24.3"
 # simbot
-simbot = "4.6.0"
-suspendTransform = "0.9.0"
+simbot = { prefer = "4.12.0" }
+suspendTransform = "2.1.20-0.12.0"
 gradleCommon = "0.6.0"
 # ksp
-ksp = "2.0.10-1.0.24"
+ksp = "2.1.20-1.0.32"
 # https://square.github.io/kotlinpoet/
-kotlinPoet = "2.0.0"
+kotlinPoet = "2.1.0"
 
 [libraries]
 # simbot
@@ -105,8 +105,10 @@ gradle-common-core = { group = "love.forte.gradle.common", name = "gradle-common
 gradle-common-multiplatform = { group = "love.forte.gradle.common", name = "gradle-common-kotlin-multiplatform", version.ref = "gradleCommon" }
 gradle-common-publication = { group = "love.forte.gradle.common", name = "gradle-common-publication", version.ref = "gradleCommon" }
 
+
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlinxBinaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }
 
 [bundles]
 gradle-common = ["gradle-common-core", "gradle-common-multiplatform", "gradle-common-publication"]

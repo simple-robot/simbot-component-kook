@@ -18,15 +18,16 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 import love.forte.simbot.gradle.suspendtransforms.addSimbotJvmTransformers
+import love.forte.simbot.gradle.suspendtransforms.addSimbotJvmTransforms
 
 plugins {
     id("love.forte.plugin.suspend-transform")
 }
 
-suspendTransform {
+suspendTransformPlugin {
     includeRuntime = false
     includeAnnotation = false
 
-    addSimbotJvmTransformers()
+    addSimbotJvmTransforms()
 }
 

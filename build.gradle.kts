@@ -21,6 +21,7 @@ plugins {
     `simbot-kook-changelog-generator`
     `simbot-kook-dokka-multi-module`
     `simbot-kook-nexus-publish`
+    alias(libs.plugins.kotlinxBinaryCompatibilityValidator)
 }
 
 buildscript {
@@ -39,4 +40,27 @@ allprojects {
             }
         }
     }
+}
+
+apiValidation {
+    ignoredPackages.add("*.internal.*")
+
+    ignoredProjects.addAll(
+        listOf(
+            "api-reader",
+            "message-element-processor"
+        ),
+    )
+
+    // 实验性和内部API可能无法保证二进制兼容
+    nonPublicMarkers.addAll(
+        listOf(
+            "love.forte.simbot.annotations.ExperimentalSimbotAPI",
+            "love.forte.simbot.annotations.InternalSimbotAPI",
+            "love.forte.simbot.kook.ExperimentalKookApi",
+            "love.forte.simbot.kook.InternalKookApi",
+        ),
+    )
+
+    apiDumpDirectory = "api"
 }

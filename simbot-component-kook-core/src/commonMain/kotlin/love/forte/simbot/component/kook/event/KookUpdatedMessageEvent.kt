@@ -25,6 +25,7 @@ import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.message.KookMessageContent
 import love.forte.simbot.component.kook.message.KookUpdatedMessageContent
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.event.*
 
 
@@ -39,6 +40,7 @@ import love.forte.simbot.kook.event.*
  *
  * @see KookSystemEvent
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookUpdatedMessageEvent : KookSystemEvent() {
     /**
      * 源事件
