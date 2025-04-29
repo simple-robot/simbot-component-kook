@@ -44,11 +44,11 @@ kotlin {
     explicitApi()
     applyDefaultHierarchyTemplate()
 
-    sourceSets.configureEach {
-        languageSettings {
-            optIn("love.forte.simbot.kook.ExperimentalKookApi")
-            optIn("love.forte.simbot.kook.InternalKookApi")
-        }
+    compilerOptions {
+        optIn.addAll(
+            "love.forte.simbot.kook.ExperimentalKookApi",
+            "love.forte.simbot.kook.InternalKookApi",
+        )
     }
 
     configKotlinJvm()
