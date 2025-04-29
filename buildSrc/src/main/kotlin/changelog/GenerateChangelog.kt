@@ -29,6 +29,7 @@ import java.io.FileWriter
 import java.io.RandomAccessFile
 import java.nio.file.Files
 import java.util.*
+import kotlin.jvm.optionals.getOrElse
 
 data class CommitLog(val message: String, val hash: MutableList<String>, val pre: String?)
 
@@ -46,12 +47,20 @@ fun Project.generateChangelog(tag: String) {
         val libs = rootProject.extensions.getByType<VersionCatalogsExtension>()
             .named("libs")
 
-        val coreVersion = libs.findVersion("simbot").get()
+        val coreVersion = libs.findVersion("simbot")
+            .map { it.requiredVersion.ifEmpty { it.strictVersion }.ifEmpty { it.preferredVersion } }
+            .getOrElse { "?" }
+
+        val ktVersion = libs.findVersion("kotlin")
+            .map { it.requiredVersion.ifEmpty { it.strictVersion }.ifEmpty { it.preferredVersion } }
+            .getOrElse { "?" }
 
         file.writeText(
             """
-            > [!note]
-            > 对应核心版本: [**v$coreVersion**](https://github.com/simple-robot/simpler-robot/releases/tag/v$coreVersion)
+            | 依赖 | 版本 |
+            | ---: | :--- |
+            | Kotlin | **v$ktVersion** |
+            | simbot核心库 | [**v$coreVersion**](https://github.com/simple-robot/simpler-robot/releases/tag/v$coreVersion) |
                 
             我们欢迎并期望着您的 [反馈](https://github.com/simple-robot/simbot-component-kook/issues) 或 [协助](https://github.com/simple-robot/simbot-component-kook/pulls)，感谢您的贡献与支持！
             
