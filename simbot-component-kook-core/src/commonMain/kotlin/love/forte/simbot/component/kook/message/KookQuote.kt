@@ -41,6 +41,7 @@ import kotlin.jvm.JvmStatic
  */
 @SerialName("kook.quote")
 @Serializable
+@ConsistentCopyVisibility
 public data class KookQuote internal constructor(public val quote: Quote) :
     MessageReference {
     override val id: ID

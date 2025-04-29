@@ -54,6 +54,7 @@ import kotlin.jvm.JvmSynthetic
  * @see GetChannelMessageViewApi
  * @author ForteScarlet
  */
+@ConsistentCopyVisibility
 public data class KookChannelMessageDetailsContent internal constructor(
     internal val details: ChannelMessageDetails,
     private val bot: KookBot,

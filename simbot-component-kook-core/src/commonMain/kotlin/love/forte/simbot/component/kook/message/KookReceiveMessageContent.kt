@@ -420,12 +420,8 @@ public fun Event<TextExtra>.toMessages(): Messages {
 
         // 文件消息已转为卡片消息，详情请直接参考卡片消息
         is CardEventExtra -> {
-            // try decode
+            // try to decode
             extra.toMessages { tryDecodeCardContent(content, logger) }
-        }
-
-        else -> {
-            extra.toMessages { listOf(content.toText()) }
         }
     }
 }

@@ -119,7 +119,7 @@ jobs:
             --warning-mode all
             -x test
             --build-cache
-            dokkaHtmlMultiModule
+            dokkaGenerate
 
       - name: Push to doc repository
         uses: peaceiris/actions-gh-pages@v3

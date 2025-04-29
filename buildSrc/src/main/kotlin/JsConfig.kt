@@ -26,25 +26,10 @@ inline fun KotlinJsTargetDsl.configJs(
 ) {
     if (nodeJs) {
         nodejs()
-//        {
-////            testTask {
-////                useMocha {
-////                    timeout = "10000"
-////                }
-////            }
-//        }
     }
 
     if (browser) {
         browser()
-//        {
-//            testTask{
-//                useKarma {
-//                    useChromeHeadless()
-//                    // useConfigDirectory(File(project.rootProject.projectDir, "karma"))
-//                }
-//            }
-//        }
     }
 
     binaries.library()
