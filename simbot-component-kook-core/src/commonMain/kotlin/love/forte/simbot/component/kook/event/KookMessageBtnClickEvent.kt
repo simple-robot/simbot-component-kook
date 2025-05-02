@@ -23,6 +23,7 @@ package love.forte.simbot.component.kook.event
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.event.MessageBtnClickEventBody
 import love.forte.simbot.kook.event.MessageBtnClickEventExtra
 
@@ -34,6 +35,7 @@ import love.forte.simbot.kook.event.MessageBtnClickEventExtra
  *
  * @author ForteScarlet
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookMessageBtnClickEvent : KookSystemEvent() {
     override val time: Timestamp get() = Timestamp.ofMilliseconds(sourceEvent.msgTimestamp)
 

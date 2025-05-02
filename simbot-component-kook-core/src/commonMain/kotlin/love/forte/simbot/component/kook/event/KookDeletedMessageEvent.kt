@@ -20,6 +20,7 @@ package love.forte.simbot.component.kook.event
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
+import love.forte.simbot.event.FuzzyEventTypeImplementation
 import love.forte.simbot.kook.event.DeletedMessageEventExtra
 import love.forte.simbot.kook.event.DeletedPrivateMessageEventExtra
 import love.forte.simbot.kook.event.Event
@@ -37,6 +38,7 @@ import love.forte.simbot.kook.event.SystemExtra
  *
  * @see KookSystemEvent
  */
+@SubclassOptInRequired(FuzzyEventTypeImplementation::class)
 public abstract class KookDeletedMessageEvent : KookSystemEvent() {
     /**
      * 源事件
@@ -66,6 +68,7 @@ public abstract class KookDeletedMessageEvent : KookSystemEvent() {
  * @see KookDeletedMessageEvent
  *
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookDeletedChannelMessageEvent : KookDeletedMessageEvent() {
     /**
      * 频道消息被删除事件的源事件
@@ -99,6 +102,7 @@ public abstract class KookDeletedChannelMessageEvent : KookDeletedMessageEvent()
  * @see KookDeletedMessageEvent
  *
  */
+@OptIn(FuzzyEventTypeImplementation::class)
 public abstract class KookDeletedPrivateMessageEvent : KookDeletedMessageEvent() {
     /**
      * 私聊消息被删除事件的源事件

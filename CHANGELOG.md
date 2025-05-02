@@ -1,10 +1,16 @@
-# v4.0.2
+# v4.1.0
 
-> Release & Pull Notes: [v4.0.2](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.2) 
+> Release & Pull Notes: [v4.1.0](https://github.com/simple-robot/simpler-robot/releases/tag/v4.1.0) 
 
-- fix(core): 修复事件中接收的 MessageContent 中, `referenceMessage` 的行为与 `reference` 不一致，会错误地获取自身消息详情而非引用消息详情的问题 ([`517e442`](https://github.com/simple-robot/simpler-robot/commit/517e442))
+- build(deps): bump org.jetbrains:annotations from 26.0.1 to 26.0.2 ([`5297dda`](https://github.com/simple-robot/simpler-robot/commit/5297dda))
+- build(deps): bump log4j from 2.24.2 to 2.24.3 ([`f95ba57`](https://github.com/simple-robot/simpler-robot/commit/f95ba57))
+- build(deps): bump log4j from 2.24.1 to 2.24.2 ([`56644dd`](https://github.com/simple-robot/simpler-robot/commit/56644dd))
+- build(deps): bump com.squareup:kotlinpoet-ksp from 1.18.1 to 2.0.0 ([`5cbce0a`](https://github.com/simple-robot/simpler-robot/commit/5cbce0a))
+- build(deps): bump org.jetbrains:annotations from 24.1.0 to 26.0.1 ([`ba3948a`](https://github.com/simple-robot/simpler-robot/commit/ba3948a))
+- build(deps): bump log4j from 2.23.0 to 2.24.1 ([`8e19f2c`](https://github.com/simple-robot/simpler-robot/commit/8e19f2c))
+- build: 调整Opt注解的依赖传播方式 ([`134ea59`](https://github.com/simple-robot/simpler-robot/commit/134ea59))
+- optimize(core): 隐藏部分未隐藏的挂起函数 ([`cccc2b0`](https://github.com/simple-robot/simpler-robot/commit/cccc2b0))
 
-# v4.0.1
 
 > Release & Pull Notes: [v4.0.1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.0.1) 
 

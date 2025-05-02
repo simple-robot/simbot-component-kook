@@ -262,6 +262,7 @@ public class KookReceiveMessageContent internal constructor(
         }
     }
 
+    @JvmSynthetic
     override suspend fun referenceMessage(): KookMessageContent? {
         return if (isDirect) {
             val ref = referenceFromDirect(bot, source.msgId, source.authorId) ?: return null
@@ -419,12 +420,8 @@ public fun Event<TextExtra>.toMessages(): Messages {
 
         // 文件消息已转为卡片消息，详情请直接参考卡片消息
         is CardEventExtra -> {
-            // try decode
+            // try to decode
             extra.toMessages { tryDecodeCardContent(content, logger) }
-        }
-
-        else -> {
-            extra.toMessages { listOf(content.toText()) }
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2022-2025. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -18,44 +18,30 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.dokka.base.DokkaBase
-import org.jetbrains.dokka.base.DokkaBaseConfiguration
-import java.time.Year
-
-
-/*
- 使用在根配置，配置dokka多模块
- */
-
 plugins {
     id("org.jetbrains.dokka")
 }
 
-repositories {
-    mavenCentral()
+dependencies {
+    dokka(project(":simbot-component-kook-api"))
+    dokka(project(":simbot-component-kook-stdlib"))
+    dokka(project(":simbot-component-kook-core"))
 }
 
-fun org.jetbrains.dokka.gradle.AbstractDokkaTask.configOutput(format: String) {
-    moduleName.set("Simple Robot 组件 | KOOK")
-    outputDirectory.set(rootProject.file("build/dokka/$format"))
-}
+dokka {
+    moduleName = "Simple Robot 组件 | KOOK"
 
-tasks.named<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
-    configOutput("html")
-
-    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-        customAssets = listOf(
-            rootProject.file(".simbot/dokka-assets/logo-icon.svg"),
-            rootProject.file(".simbot/dokka-assets/logo-icon-light.svg"),
-        )
-        customStyleSheets = listOf(rootProject.file(".simbot/dokka-assets/css/kdoc-style.css"))
-        if (!isSimbotLocal()) {
-            templatesDir = rootProject.file(".simbot/dokka-templates")
+    dokkaPublications.all {
+        if (isSimbotLocal()) {
+            logger.info("Is 'SIMBOT_LOCAL', offline")
+            offlineMode = true
         }
-        footerMessage = "© 2021-${Year.now().value} <a href='https://github.com/simple-robot'>Simple Robot</a>. All rights reserved."
-        separateInheritedMembers = true
-        mergeImplicitExpectActualDeclarations = true
-        homepageLink = P.HOMEPAGE
+    }
+
+    configSourceSets(project)
+
+    pluginsConfiguration.html {
+        configHtmlCustoms(project)
     }
 }
 

@@ -29,6 +29,7 @@ plugins {
     kotlin("multiplatform")
     signing
     `maven-publish`
+    id("org.jetbrains.dokka")
 }
 
 
@@ -41,8 +42,8 @@ val jarJavadoc by tasks.registering(Jar::class) {
     group = "documentation"
     archiveClassifier.set("javadoc")
     if (!(isSnapshot || isSnapshot() || isSimbotLocal())) {
-        dependsOn(tasks.dokkaHtml)
-        from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+        dependsOn(tasks.dokkaGeneratePublicationHtml)
+        from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
     }
 }
 
@@ -101,6 +102,3 @@ fun show() {
 
 inline val Project.sourceSets: SourceSetContainer
     get() = extensions.getByName("sourceSets") as SourceSetContainer
-
-internal val TaskContainer.dokkaHtml: TaskProvider<org.jetbrains.dokka.gradle.DokkaTask>
-    get() = named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml")

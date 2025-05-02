@@ -54,6 +54,7 @@ import kotlin.jvm.JvmSynthetic
  * @see GetChannelMessageViewApi
  * @author ForteScarlet
  */
+@ConsistentCopyVisibility
 public data class KookChannelMessageDetailsContent internal constructor(
     internal val details: ChannelMessageDetails,
     private val bot: KookBot,
@@ -100,6 +101,7 @@ public data class KookChannelMessageDetailsContent internal constructor(
         return details.quote?.asMessage()
     }
 
+    @JvmSynthetic
     override suspend fun referenceMessage(): KookMessageContent? {
         val quote = details.quote ?: return null
         val view = GetChannelMessageViewApi.create(quote.id).requestDataBy(bot)
@@ -113,6 +115,7 @@ public data class KookChannelMessageDetailsContent internal constructor(
      * 会抛出请求 [DeleteChannelMessageApi] 过程中可能出现的任何异常。
      *
      */
+    @JvmSynthetic
     override suspend fun delete(vararg options: DeleteOption) {
         val stdOpts = options.standardAnalysis()
         val result = try {
