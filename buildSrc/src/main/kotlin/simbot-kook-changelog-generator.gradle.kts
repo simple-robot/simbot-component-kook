@@ -21,7 +21,7 @@
 import changelog.generateChangelog
 
 
-tasks.create("createChangelog") {
+tasks.register("createChangelog") {
     group = "documentation"
     doFirst {
         generateChangelog("v${P.version}")

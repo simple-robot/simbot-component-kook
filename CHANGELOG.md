@@ -1,3 +1,9 @@
+# v4.1.1
+
+> Release & Pull Notes: [v4.1.1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.1.1) 
+
+- fix(api): Fix api path of CreateInviteApi ([`796261a`](https://github.com/simple-robot/simpler-robot/commit/796261a))
+
 # v4.1.0
 
 > Release & Pull Notes: [v4.1.0](https://github.com/simple-robot/simpler-robot/releases/tag/v4.1.0) 

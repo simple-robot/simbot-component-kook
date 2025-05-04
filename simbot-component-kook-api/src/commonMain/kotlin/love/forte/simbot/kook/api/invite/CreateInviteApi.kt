@@ -38,10 +38,7 @@ public class CreateInviteApi private constructor(
 ) : KookPostApi<CreatedInvite>() {
     public companion object Factory {
         // /api/v3/invite/create	POST
-        private val PATH = ApiPath.create("invite", "list")
-
-        // TODO Empty CreateInviteApi
-        private val EMPTY = CreateInviteApi()
+        private val PATH = ApiPath.create("invite", "create")
 
         /**
          * 通过 [服务器id][guildId] 构建一个 [创建邀请链接][CreateInviteApi] 实例。
