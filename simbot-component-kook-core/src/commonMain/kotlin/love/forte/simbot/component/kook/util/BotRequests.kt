@@ -18,6 +18,7 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 @file:JvmName("KookBotRequests")
+@file:JvmMultifileClass
 
 package love.forte.simbot.component.kook.util
 
@@ -30,6 +31,7 @@ import love.forte.simbot.kook.stdlib.requestBy
 import love.forte.simbot.kook.stdlib.requestDataBy
 import love.forte.simbot.kook.stdlib.requestResultBy
 import love.forte.simbot.kook.stdlib.requestTextBy
+import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
 

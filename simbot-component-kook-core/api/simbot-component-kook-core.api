@@ -1346,8 +1346,6 @@ public final class love/forte/simbot/component/kook/message/KookCardMessage$Comp
 
 public final class love/forte/simbot/component/kook/message/KookChannelMessageDetailsContent : love/forte/simbot/component/kook/message/KookMessageContent {
 	public static final field Companion Llove/forte/simbot/component/kook/message/KookChannelMessageDetailsContent$Companion;
-	public final fun copy (Llove/forte/simbot/kook/messages/ChannelMessageDetails;Llove/forte/simbot/component/kook/bot/KookBot;)Llove/forte/simbot/component/kook/message/KookChannelMessageDetailsContent;
-	public static synthetic fun copy$default (Llove/forte/simbot/component/kook/message/KookChannelMessageDetailsContent;Llove/forte/simbot/kook/messages/ChannelMessageDetails;Llove/forte/simbot/component/kook/bot/KookBot;ILjava/lang/Object;)Llove/forte/simbot/component/kook/message/KookChannelMessageDetailsContent;
 	public synthetic fun delete ([Llove/forte/simbot/ability/DeleteOption;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getId ()Llove/forte/simbot/common/id/ID;
@@ -1444,8 +1442,6 @@ public final class love/forte/simbot/component/kook/message/KookMessagesTransfor
 public final class love/forte/simbot/component/kook/message/KookQuote : love/forte/simbot/message/MessageReference {
 	public static final field Companion Llove/forte/simbot/component/kook/message/KookQuote$Companion;
 	public final fun component1 ()Llove/forte/simbot/kook/objects/Quote;
-	public final fun copy (Llove/forte/simbot/kook/objects/Quote;)Llove/forte/simbot/component/kook/message/KookQuote;
-	public static synthetic fun copy$default (Llove/forte/simbot/component/kook/message/KookQuote;Llove/forte/simbot/kook/objects/Quote;ILjava/lang/Object;)Llove/forte/simbot/component/kook/message/KookQuote;
 	public static final fun create (Llove/forte/simbot/kook/objects/Quote;)Llove/forte/simbot/component/kook/message/KookQuote;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getId ()Llove/forte/simbot/common/id/ID;
@@ -1533,13 +1529,37 @@ public abstract interface class love/forte/simbot/component/kook/role/KookRoleOp
 
 public final class love/forte/simbot/component/kook/util/KookBotRequests {
 	public static final synthetic fun request (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestAsync (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestBlocking (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Lio/ktor/client/statement/HttpResponse;
 	public static final synthetic fun requestBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Lio/ktor/client/statement/HttpResponse;
+	public static final fun requestByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public static final synthetic fun requestData (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestDataAsync (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestDataBlocking (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Ljava/lang/Object;
 	public static final synthetic fun requestDataBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestDataByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestDataByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Ljava/lang/Object;
+	public static final fun requestDataByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
+	public static final fun requestDataReserve (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
+	public static final fun requestReserve (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public static final synthetic fun requestResult (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestResultAsync (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestResultBlocking (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Llove/forte/simbot/kook/api/ApiResult;
 	public static final synthetic fun requestResultBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestResultByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestResultByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Llove/forte/simbot/kook/api/ApiResult;
+	public static final fun requestResultByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
+	public static final fun requestResultReserve (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public static final synthetic fun requestText (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestTextAsync (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestTextBlocking (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Ljava/lang/String;
 	public static final synthetic fun requestTextBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestTextByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestTextByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Ljava/lang/String;
+	public static final fun requestTextByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/component/kook/bot/KookBot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
+	public static final fun requestTextReserve (Llove/forte/simbot/component/kook/bot/KookBot;Llove/forte/simbot/kook/api/KookApi;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 }
 
 public final class love/forte/simbot/component/kook/util/RegexWalkerKt {
