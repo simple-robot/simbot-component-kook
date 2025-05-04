@@ -37,6 +37,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestBy
+ * @since 4.1.1
  */
 @Api4J
 public fun KookApi<*>.requestByBlocking(bot: Bot): HttpResponse =
@@ -45,6 +46,7 @@ public fun KookApi<*>.requestByBlocking(bot: Bot): HttpResponse =
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -54,6 +56,7 @@ public fun KookApi<*>.requestByAsync(bot: Bot): CompletableFuture<out HttpRespon
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -63,6 +66,7 @@ public fun KookApi<*>.requestByReserve(bot: Bot): SuspendReserve<HttpResponse> =
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestTextBy
+ * @since 4.1.1
  */
 @Api4J
 public fun KookApi<*>.requestTextByBlocking(bot: Bot): String =
@@ -71,6 +75,7 @@ public fun KookApi<*>.requestTextByBlocking(bot: Bot): String =
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestTextBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -80,6 +85,7 @@ public fun KookApi<*>.requestTextByAsync(bot: Bot): CompletableFuture<out String
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestTextBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -89,6 +95,7 @@ public fun KookApi<*>.requestTextByReserve(bot: Bot): SuspendReserve<String> =
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestResultBy
+ * @since 4.1.1
  */
 @Api4J
 public fun KookApi<*>.requestResultByBlocking(bot: Bot): ApiResult =
@@ -97,6 +104,7 @@ public fun KookApi<*>.requestResultByBlocking(bot: Bot): ApiResult =
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestResultBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -106,6 +114,7 @@ public fun KookApi<*>.requestResultByAsync(bot: Bot): CompletableFuture<out ApiR
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestResultBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -115,6 +124,7 @@ public fun KookApi<*>.requestResultByReserve(bot: Bot): SuspendReserve<ApiResult
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestDataBy
+ * @since 4.1.1
  */
 @Api4J
 public fun <T : Any> KookApi<T>.requestDataByBlocking(bot: Bot): T =
@@ -123,6 +133,7 @@ public fun <T : Any> KookApi<T>.requestDataByBlocking(bot: Bot): T =
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestDataBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)
@@ -132,6 +143,7 @@ public fun <T : Any> KookApi<T>.requestDataByAsync(bot: Bot): CompletableFuture<
 /**
  * 使用 [Bot] 向 [KookApi] 发起请求。
  * @see KookApi.requestDataBy
+ * @since 4.1.1
  */
 @Api4J
 @OptIn(InternalSimbotAPI::class)

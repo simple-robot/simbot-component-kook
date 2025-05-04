@@ -166,9 +166,21 @@ public final class love/forte/simbot/kook/stdlib/BotKt {
 
 public final class love/forte/simbot/kook/stdlib/BotRequests {
 	public static final synthetic fun requestBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Lio/ktor/client/statement/HttpResponse;
+	public static final fun requestByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public static final synthetic fun requestDataBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestDataByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestDataByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Ljava/lang/Object;
+	public static final fun requestDataByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public static final synthetic fun requestResultBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestResultByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestResultByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Llove/forte/simbot/kook/api/ApiResult;
+	public static final fun requestResultByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public static final synthetic fun requestTextBy (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun requestTextByAsync (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Ljava/util/concurrent/CompletableFuture;
+	public static final fun requestTextByBlocking (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Ljava/lang/String;
+	public static final fun requestTextByReserve (Llove/forte/simbot/kook/api/KookApi;Llove/forte/simbot/kook/stdlib/Bot;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 }
 
 public final class love/forte/simbot/kook/stdlib/BotSubscribesKt {
