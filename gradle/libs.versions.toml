@@ -22,7 +22,7 @@ simbot-core = { group = "love.forte.simbot", name = "simbot-core", version.ref =
 simbot-spring = { group = "love.forte.simbot", name = "simbot-core-spring-boot-starter", version.ref = "simbot" }
 simbot-logger = { group = "love.forte.simbot.logger", name = "simbot-logger", version.ref = "simbot" }
 simbot-logger-slf4jimpl = { group = "love.forte.simbot.logger", name = "simbot-logger-slf4j2-impl", version.ref = "simbot" }
-simbot-common-apidefinition = { group = "love.forte.simbot.common", name = "simbot-common-apidefinition", version.ref = "simbot" }
+simbot-common-apidefinition = { module = "love.forte.simbot.common:simbot-common-apidefinition", version.ref = "simbot" }
 simbot-common-atomic = { group = "love.forte.simbot.common", name = "simbot-common-atomic", version.ref = "simbot" }
 simbot-common-core = { group = "love.forte.simbot.common", name = "simbot-common-core", version.ref = "simbot" }
 simbot-common-suspend = { group = "love.forte.simbot.common", name = "simbot-common-suspend-runner", version.ref = "simbot" }

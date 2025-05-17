@@ -46,4 +46,10 @@ dependencies {
 
     // gradle common
     implementation(libs.bundles.gradle.common)
+
+    // vanniktech/gradle-maven-publish-plugin
+    // https://github.com/vanniktech/gradle-maven-publish-plugin
+    // https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html#set-up-the-publishing-plugin
+//    implementation("com.vanniktech:gradle-maven-publish-plugin:0.32.0")
+
 }

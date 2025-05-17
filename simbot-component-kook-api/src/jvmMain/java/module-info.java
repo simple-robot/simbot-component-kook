@@ -1,7 +1,7 @@
 module simbot.component.kook.api {
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core;
-    requires static simbot.common.annotations;
+    requires transitive simbot.common.annotations;
     requires transitive simbot.logger;
     requires transitive simbot.common.apidefinition;
     requires transitive simbot.common.suspendrunner;
