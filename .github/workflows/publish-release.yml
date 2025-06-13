@@ -36,16 +36,14 @@ jobs:
           cache: 'gradle'
 
       # setup Gradle
-      - name: Gradle Run Test
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: |
-            assemble
-            allTests
-            --stacktrace 
-            --warning-mode all 
-            -Pkotlin.native.enableKlibsCrossCompilation=false
+
+      - name: Gradle Run Test
+        run: gradle assemble allTests -s --warning-mode all -Pkotlin.native.enableKlibsCrossCompilation=false
+
 
   publish-releases:
     name: Publish releases
@@ -60,19 +58,13 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
-      - name: Publish releases
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: |
-            publishAndReleaseToMavenCentral
-            --no-configuration-cache
-            --info 
-            --warning-mode all
-            -x test
-            --build-cache
-            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
+      - name: Publish releases
+        run: gradle publishAndReleaseToMavenCentral -i --warning-mode all --no-configuration-cache -x test -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
         env:
           SIMBOT_IS_SNAPSHOT: false
           SIMBOT_RELEASES_ONLY: true
@@ -92,6 +84,14 @@ jobs:
       # 检出仓库代码
       - name: Check Out Repo
         uses: actions/checkout@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+
+      - name: Create changelog file
+        run: gradle createChangelog -i
 
         # Create gitHub release
       - name: Create Github Release
@@ -118,22 +118,17 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 21
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
 
       # setup Gradle
-      - name: Gradle generate documentation
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.5
-          arguments: |
-            -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8" 
-            -Porg.gradle.daemon=false
-            --info 
-            --warning-mode all
-            -x test
-            --build-cache
-            dokkaGenerate
+          gradle-version: ${{ env.GRADLE_VERSION }}
+
+      - name: Gradle generate documentation
+        run: gradle dokkaGenerate -i --warning-mode all -x test --build-cache -Porg.gradle.daemon=false -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8"
 
       - name: Push to doc repository
         uses: peaceiris/actions-gh-pages@v3
