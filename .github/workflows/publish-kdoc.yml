@@ -38,16 +38,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-#          arguments: |
-#            -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8"
-#            -Porg.gradle.daemon=false
-#            --info
-#            --warning-mode all
-#            -x test
-#            --build-cache
-#            dokkaGenerate
       - name: Gradle generate documentation
-        run: gradle dokkaGenerate -i --warning-mode all -x test --build-cache -Porg.gradle.daemon=false -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8"
+        run: gradle dokkaGenerate -i --warning-mode all -x test --build-cache
+        env:
+          ORG_GRADLE_PROJECT_org.gradle.daemon: false
+          ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8"
 
       - name: Push to doc repository
         uses: peaceiris/actions-gh-pages@v3
