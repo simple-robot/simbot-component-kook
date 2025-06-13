@@ -23,6 +23,8 @@
 import love.forte.gradle.common.core.project.ProjectDetail
 import love.forte.gradle.common.core.property.systemProp
 
+// Publish your library to Maven Central – tutorial
+// https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html#prepare-accounts-and-credentials
 
 object P : ProjectDetail() {
     const val GROUP = "love.forte.simbot.component"
@@ -32,7 +34,7 @@ object P : ProjectDetail() {
     override val homepage: String
         get() = HOMEPAGE
 
-    const val VERSION = "4.1.1"
+    const val VERSION = "4.1.2"
     const val NEXT_VERSION = "4.1.2"
 
     override val snapshotVersion = "$NEXT_VERSION-SNAPSHOT"

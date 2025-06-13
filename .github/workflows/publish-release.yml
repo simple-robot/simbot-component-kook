@@ -13,11 +13,11 @@ env:
   JAVA_DISTRIBUTION: zulu
   GRADLE_VERSION: 8.10.2
   IS_CI: true
-  GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-  GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
-  GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+  SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+  GPG_KEY_CONTENTS: ${{ secrets.GPG_SECRET_KEY }}
+  SIGNING_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+  MAVEN_CENTRAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+  MAVEN_CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
   GRADLE_OPTS: "-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
@@ -47,9 +47,6 @@ jobs:
             --warning-mode all 
             -Pkotlin.native.enableKlibsCrossCompilation=false
 
-#      - name: Run all tests
-#        run: gradle assemble allTests --stacktrace --warning-mode all -Pkotlin.native.enableKlibsCrossCompilation=false
-
   publish-releases:
     name: Publish releases
     needs: run-test
@@ -68,8 +65,8 @@ jobs:
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: |
-            publishToSonatype
-            closeAndReleaseStagingRepositories
+            publishAndReleaseToMavenCentral
+            --no-configuration-cache
             --info 
             --warning-mode all
             -x test
@@ -79,6 +76,11 @@ jobs:
         env:
           SIMBOT_IS_SNAPSHOT: false
           SIMBOT_RELEASES_ONLY: true
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ env.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ env.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ env.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ env.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ env.GPG_KEY_CONTENTS }}
 
   create-release:
     name: Create release
