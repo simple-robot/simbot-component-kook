@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2022-2025. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -32,7 +32,7 @@ object P : ProjectDetail() {
     override val homepage: String
         get() = HOMEPAGE
 
-    const val VERSION = "4.1.1"
+    const val VERSION = "4.1.2"
     const val NEXT_VERSION = "4.1.2"
 
     override val snapshotVersion = "$NEXT_VERSION-SNAPSHOT"
