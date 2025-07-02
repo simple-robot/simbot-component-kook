@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2022-2025. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -23,6 +23,8 @@
 import love.forte.gradle.common.core.project.ProjectDetail
 import love.forte.gradle.common.core.property.systemProp
 
+// Publish your library to Maven Central – tutorial
+// https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html#prepare-accounts-and-credentials
 
 object P : ProjectDetail() {
     const val GROUP = "love.forte.simbot.component"
@@ -32,8 +34,8 @@ object P : ProjectDetail() {
     override val homepage: String
         get() = HOMEPAGE
 
-    const val VERSION = "4.1.1"
-    const val NEXT_VERSION = "4.1.2"
+    const val VERSION = "4.1.4"
+    const val NEXT_VERSION = "4.1.5"
 
     override val snapshotVersion = "$NEXT_VERSION-SNAPSHOT"
     override val version = if (isSnapshot()) snapshotVersion else VERSION

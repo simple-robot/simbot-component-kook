@@ -4,10 +4,11 @@ kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.7.1"
 dokka = "2.0.0"
 openjdk-jmh = "1.37"
-ktor = { prefer = "2.3.12", reject = ["3.+"] }
+# { prefer = "2.3.12", reject = ["3.+"] }
+ktor = "2.3.12"
 log4j = "2.24.3"
 # simbot
-simbot = { prefer = "4.12.0" }
+simbot = "4.12.0"
 suspendTransform = "2.1.20-0.12.0"
 gradleCommon = "0.6.0"
 # ksp
@@ -22,7 +23,7 @@ simbot-core = { group = "love.forte.simbot", name = "simbot-core", version.ref =
 simbot-spring = { group = "love.forte.simbot", name = "simbot-core-spring-boot-starter", version.ref = "simbot" }
 simbot-logger = { group = "love.forte.simbot.logger", name = "simbot-logger", version.ref = "simbot" }
 simbot-logger-slf4jimpl = { group = "love.forte.simbot.logger", name = "simbot-logger-slf4j2-impl", version.ref = "simbot" }
-simbot-common-apidefinition = { group = "love.forte.simbot.common", name = "simbot-common-apidefinition", version.ref = "simbot" }
+simbot-common-apidefinition = { module = "love.forte.simbot.common:simbot-common-apidefinition", version.ref = "simbot" }
 simbot-common-atomic = { group = "love.forte.simbot.common", name = "simbot-common-atomic", version.ref = "simbot" }
 simbot-common-core = { group = "love.forte.simbot.common", name = "simbot-common-core", version.ref = "simbot" }
 simbot-common-suspend = { group = "love.forte.simbot.common", name = "simbot-common-suspend-runner", version.ref = "simbot" }

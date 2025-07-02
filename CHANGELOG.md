@@ -1,3 +1,9 @@
+# v4.1.4
+
+> Release & Pull Notes: [v4.1.4](https://github.com/simple-robot/simpler-robot/releases/tag/v4.1.4) 
+
+- improve(deps): 改进依赖的引用方式，不再使用version catalog的富版本 ([`15e7e0d`](https://github.com/simple-robot/simpler-robot/commit/15e7e0d))
+
 # v4.1.1
 
 > Release & Pull Notes: [v4.1.1](https://github.com/simple-robot/simpler-robot/releases/tag/v4.1.1) 

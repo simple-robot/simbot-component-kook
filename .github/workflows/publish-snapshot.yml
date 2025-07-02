@@ -24,11 +24,11 @@ env:
   JAVA_DISTRIBUTION: zulu
   GRADLE_VERSION: 8.10.2
   IS_CI: true
-  GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-  GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
-  GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+  SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+  GPG_KEY_CONTENTS: ${{ secrets.GPG_SECRET_KEY }}
+  SIGNING_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+  MAVEN_CENTRAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+  MAVEN_CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
   SIMBOT_IS_SNAPSHOT: true
   SIMBOT_SNAPSHOT_ONLY: true
   GRADLE_OPTS: "-Dfile.encoding=UTF-8"
@@ -49,19 +49,21 @@ jobs:
           cache: 'gradle'
 
       # setup Gradle
-      - name: Gradle test and publish snapshot
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: |
-            assemble
-            allTests
-            --stacktrace 
-            --warning-mode all 
-            -Pkotlin.native.enableKlibsCrossCompilation=false
+#          arguments: |
+#            assemble
+#            allTests
+#            --stacktrace
+#            --warning-mode all
+#            -Pkotlin.native.enableKlibsCrossCompilation=false
 
-#      - name: Gradle run all tests
-#        run: gradle assemble allTests --stacktrace --warning-mode all -Pkotlin.native.enableKlibsCrossCompilation=false
+      - name: Gradle test and publish snapshot
+        run: gradle assemble allTests -s -warning-mode all
+        env:
+          ORG_GRADLE_PROJECT_kotlin.native.enableKlibsCrossCompilation: false
 
   publish-snapshots:
     name: Publish snapshots
@@ -77,17 +79,26 @@ jobs:
 
       # setup Gradle
       - name: Publish snapshots
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: |
-            publishToSonatype
-            closeAndReleaseStagingRepositories
-            --info 
-            --warning-mode all 
-            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+#          arguments: |
+#            publishAndReleaseToMavenCentral
+#            --no-configuration-cache
+#            --info
+#            --warning-mode all
+#            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+
+      - name: Publish snapshots
+        run: gradle publishAllPublicationsToMavenCentralRepository -s --warning-mode all --no-configuration-cache
         env:
           SIMBOT_IS_SNAPSHOT: true
+          ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ env.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ env.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ env.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ env.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ env.GPG_KEY_CONTENTS }}
 
   deploy-doc:
     name: Deploy snapshot doc
@@ -108,18 +119,25 @@ jobs:
           java-version: 21
 
       # setup Gradle
-      - name: Gradle generate documentation
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.5
-          arguments: |
-            -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8" 
-            -Porg.gradle.daemon=false
-            --info 
-            --warning-mode all
-            -x test
-            --build-cache
-            dokkaGenerate
+          gradle-version: ${{ env.GRADLE_VERSION }}
+#          arguments: |
+#            -Porg.gradle.jvmargs="-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8"
+#            -Porg.gradle.daemon=false
+#            --info
+#            --warning-mode all
+#            -x test
+#            --build-cache
+#            dokkaGenerate
+
+      - name: Gradle generate documentation
+        run: gradle dokkaGenerate -i --warning-mode all -x test --build-cache
+        env:
+          ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx4g -Xms4g -XX:MaxMetaspaceSize=2g -Dfile.encoding=UTF-8"
+          ORG_GRADLE_PROJECT_org.gradle.daemon: false
+          ORG_GRADLE_PROJECT_kotlin.native.enableKlibsCrossCompilation: false
 
       - name: Push to doc repository
         uses: peaceiris/actions-gh-pages@v3
