@@ -90,7 +90,7 @@ jobs:
 #            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
       - name: Publish snapshots
-        run: gradle publishAndReleaseToMavenCentral -s --warning-mode all --no-configuration-cache
+        run: gradle publishAllPublicationsToMavenCentralRepository -s --warning-mode all --no-configuration-cache
         env:
           SIMBOT_IS_SNAPSHOT: true
           ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
