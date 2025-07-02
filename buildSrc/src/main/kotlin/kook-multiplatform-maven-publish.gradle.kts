@@ -18,8 +18,6 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-import com.vanniktech.maven.publish.SonatypeHost
-import gradle.kotlin.dsl.accessors._962842af322993b246b9354775ec3900.mavenPublishing
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.property.ofIf
 import love.forte.gradle.common.core.property.systemProp
