@@ -15,7 +15,8 @@ on:
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
       - 'gradle.properties'
-
+    tags-ignore:
+      - v**
   # 手动触发工作流
   workflow_dispatch:
 
@@ -90,7 +91,7 @@ jobs:
 #            -Porg.gradle.jvmargs="-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
       - name: Publish snapshots
-        run: gradle publishAllPublicationsToMavenCentralRepository -s --warning-mode all --no-configuration-cache
+        run: gradle publishToMavenCentral -s --warning-mode all --no-configuration-cache
         env:
           SIMBOT_IS_SNAPSHOT: true
           ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx8g -Xms2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"

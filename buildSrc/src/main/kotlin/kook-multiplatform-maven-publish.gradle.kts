@@ -35,7 +35,7 @@ setup(P)
 val p = project
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
     if (!isSimbotLocal()) {
         signAllPublications()
     }
