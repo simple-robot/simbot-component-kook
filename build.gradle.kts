@@ -20,7 +20,6 @@ import love.forte.gradle.common.core.repository.Repositories
 plugins {
     `simbot-kook-changelog-generator`
     `simbot-kook-dokka-multi-module`
-    `simbot-kook-nexus-publish`
     alias(libs.plugins.kotlinxBinaryCompatibilityValidator)
 }
 
