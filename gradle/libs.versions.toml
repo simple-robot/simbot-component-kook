@@ -17,7 +17,7 @@ ksp = "2.1.20-1.0.32"
 kotlinPoet = "2.1.0"
 
 # see https://github.com/vanniktech/gradle-maven-publish-plugin
-maven-publish = "0.33.0"
+maven-publish = "0.34.0"
 
 [libraries]
 maven-publish = { module = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin", version.ref = "maven-publish" }
