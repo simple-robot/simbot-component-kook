@@ -22,6 +22,7 @@
    <img alt="issues" src="https://img.shields.io/github/issues-closed/simple-robot/simbot-component-kook?color=green" />
    <img alt="last commit" src="https://img.shields.io/github/last-commit/simple-robot/simbot-component-kook" />
    <a href="./COPYING"><img alt="copying" src="https://img.shields.io/github/license/simple-robot/simbot-component-kook" /></a>
+   <a href="https://deepwiki.com/simple-robot/simbot-component-kook"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 
 </div>
 
