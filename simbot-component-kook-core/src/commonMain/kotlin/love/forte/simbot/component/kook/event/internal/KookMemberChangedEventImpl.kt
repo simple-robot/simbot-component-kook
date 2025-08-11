@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2022-2025. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -34,12 +34,12 @@ import love.forte.simbot.kook.event.*
 
 internal data class KookMemberExitedChannelEventImpl(
     override val bot: KookBotImpl,
-    override val sourceEvent: Event<JoinedChannelEventExtra>,
+    override val sourceEvent: Event<ExitedChannelEventExtra>,
     private val _guild: KookGuildImpl,
     private val _channel: KookChatChannelImpl,
     private val _member: KookMemberImpl,
     override val sourceEventRaw: String
-) : KookMemberJoinedChannelEvent() {
+) : KookMemberExitedChannelEvent() {
     override suspend fun content() = _member
     override suspend fun channel(): KookChatChannel = _channel
     override suspend fun source(): KookGuild = _guild

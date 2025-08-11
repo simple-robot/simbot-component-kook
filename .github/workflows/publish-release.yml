@@ -2,7 +2,7 @@ name: Publish Release
 on:
   push:
     tags:
-      - 'v4**'
+      - 'v**'
 
 concurrency:
   cancel-in-progress: true
@@ -66,7 +66,7 @@ jobs:
           gradle-version: ${{ env.GRADLE_VERSION }}
 
       - name: Publish releases
-        run: gradle publishAndReleaseToMavenCentral -i --warning-mode all --no-configuration-cache -x test
+        run: gradle publishToMavenCentral -i --warning-mode all --no-configuration-cache -x test
         env:
           SIMBOT_IS_SNAPSHOT: false
           SIMBOT_RELEASES_ONLY: true

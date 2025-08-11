@@ -16,7 +16,12 @@ ksp = "2.1.20-1.0.32"
 # https://square.github.io/kotlinpoet/
 kotlinPoet = "2.1.0"
 
+# see https://github.com/vanniktech/gradle-maven-publish-plugin
+maven-publish = "0.34.0"
+
 [libraries]
+maven-publish = { module = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin", version.ref = "maven-publish" }
+
 # simbot
 simbot-api = { group = "love.forte.simbot", name = "simbot-api", version.ref = "simbot" }
 simbot-core = { group = "love.forte.simbot", name = "simbot-core", version.ref = "simbot" }

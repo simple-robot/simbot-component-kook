@@ -18,32 +18,27 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-import com.vanniktech.maven.publish.SonatypeHost
 import love.forte.gradle.common.core.project.setup
 import love.forte.gradle.common.core.property.ofIf
 import love.forte.gradle.common.core.property.systemProp
 import org.gradle.internal.impldep.org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization
 
 plugins {
-    kotlin("multiplatform")
     signing
     // https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html#configure-the-project
     id("com.vanniktech.maven.publish")
     id("org.jetbrains.dokka")
 }
 
-
 setup(P)
 
 val p = project
-val isSnapshot = project.version.toString().contains("SNAPSHOT", true)
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral(automaticRelease = true)
     if (!isSimbotLocal()) {
         signAllPublications()
     }
-    coordinates(groupId = p.group.toString(), artifactId = p.name, version = p.version.toString())
 
     pom {
         name = p.name
@@ -85,68 +80,6 @@ mavenPublishing {
         }
     }
 }
-
-//val jarJavadoc by tasks.registering(Jar::class) {
-//    group = "documentation"
-//    archiveClassifier.set("javadoc")
-//    if (!(isSnapshot || isSnapshot() || isSimbotLocal())) {
-//        dependsOn(tasks.dokkaGeneratePublicationHtml)
-//        from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
-//    }
-//}
-
-//publishing {
-//    repositories {
-//        mavenLocal()
-//        if (isSnapshot) {
-//            configPublishMaven(SnapshotRepository)
-//        } else {
-//            configPublishMaven(ReleaseRepository)
-//        }
-//    }
-//
-//    publications {
-//        withType<MavenPublication> {
-//            artifacts {
-//                artifact(jarJavadoc)
-//            }
-//
-//            setupPom(project.name, P)
-//        }
-//    }
-//}
-//
-//signing {
-//    val gpg = Gpg.ofSystemPropOrNull() ?: return@signing
-//    val (keyId, secretKey, password) = gpg
-//    useInMemoryPgpKeys(keyId, secretKey, password)
-//    sign(publishingExtension.publications)
-//}
-
-// TODO see https://github.com/gradle-nexus/publish-plugin/issues/208#issuecomment-1465029831
-//val signingTasks: TaskCollection<Sign> = tasks.withType<Sign>()
-//tasks.withType<PublishToMavenRepository>().configureEach {
-//    mustRunAfter(signingTasks)
-//}
-
-show()
-
-fun show() {
-    //// show project info
-    logger.info(
-        """
-        |=======================================================
-        |= project.group:       {}
-        |= project.name:        {}
-        |= project.version:     {}
-        |= project.description: {}
-        |= os.name:             {}
-        |=======================================================
-    """.trimIndent(),
-        group, name, version, description, systemProp("os.name")
-    )
-}
-
 
 inline val Project.sourceSets: SourceSetContainer
     get() = extensions.getByName("sourceSets") as SourceSetContainer

@@ -1,13 +1,3 @@
-import org.gradle.api.Project
-import org.gradle.api.tasks.compile.JavaCompile
-import org.jetbrains.dokka.gradle.DokkaExtension
-import org.jetbrains.dokka.gradle.engine.parameters.DokkaSourceSetSpec
-import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
-import org.jetbrains.dokka.gradle.engine.plugins.DokkaHtmlPluginParameters
-import java.io.File
-import java.net.URI
-import java.time.Year
-
 /*
  * Copyright (c) 2025. ForteScarlet.
  *
@@ -24,6 +14,16 @@ import java.time.Year
  * You should have received a copy of the GNU Lesser General Public License along with simbot-component-onebot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+
+import org.gradle.api.Project
+import org.gradle.api.tasks.compile.JavaCompile
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.engine.parameters.DokkaSourceSetSpec
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
+import org.jetbrains.dokka.gradle.engine.plugins.DokkaHtmlPluginParameters
+import java.io.File
+import java.net.URI
+import java.time.Year
 
 fun DokkaExtension.configSourceSets(project: Project) {
     dokkaSourceSets.configureEach {
@@ -47,9 +47,10 @@ fun DokkaExtension.configSourceSets(project: Project) {
             suppress.set(true)
         }
 
-        configSourceLink(project)
-
-        configExternalDocumentations()
+        if (!isSimbotLocal()) {
+            configSourceLink(project)
+            configExternalDocumentations()
+        }
     }
 }
 
