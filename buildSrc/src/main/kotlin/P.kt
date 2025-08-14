@@ -35,7 +35,7 @@ object P : ProjectDetail() {
         get() = HOMEPAGE
 
     const val VERSION = "4.1.5"
-    const val NEXT_VERSION = "4.1.6"
+    const val NEXT_VERSION = "4.2.0"
 
     override val snapshotVersion = "$NEXT_VERSION-SNAPSHOT"
     override val version = if (isSnapshot()) snapshotVersion else VERSION

@@ -39,9 +39,15 @@ public class SendChannelMessageApi private constructor(
     private val type: Int? = null,
     private val targetId: String,
     private val content: String,
-    private val quote: String? = null,
-    private val nonce: String? = null,
-    private val tempTargetId: String? = null,
+    private val quote: String?,
+    private val nonce: String?,
+    private val tempTargetId: String?,
+    /**
+     * 模板消息id, 如果使用了，content会作为模板消息的input。
+     * 参见[模板消息](https://developer.kookapp.cn/doc/http/template)
+     * @since 4.2.0
+     */
+    private val templateId: String?
 ) : KookPostApi<SendMessageResult>() {
     public companion object Factory {
         private val PATH = ApiPath.create("message", "create")
@@ -64,6 +70,39 @@ public class SendChannelMessageApi private constructor(
             quote: String? = null,
             nonce: String? = null,
             tempTargetId: String? = null,
+        ): SendChannelMessageApi = create(
+            type = type,
+            targetId = targetId,
+            content = content,
+            quote = quote,
+            nonce = nonce,
+            tempTargetId = tempTargetId,
+            templateId = null
+        )
+
+        /**
+         * 构造 [发送频道聊天消息][SendChannelMessageApi] 实例。
+         *
+         * @since 4.2.0
+         *
+         * @param type 消息类型, 不传默认为 1, 代表文本类型。 `9` 代表 kmarkdown 消息, `10` 代表卡片消息。
+         * @param targetId 目标频道 id
+         * @param content 消息内容
+         * @param quote 回复某条消息的 msgId
+         * @param nonce nonce, 服务端不做处理, 原样返回
+         * @param tempTargetId 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。
+         * 用于在频道内针对用户的操作进行单独的回应通知等。
+         * @param templateId 模板 id, 如果使用了，content会作为模板消息的input。
+         */
+        @JvmStatic
+        public fun create(
+            type: Int? = null,
+            targetId: String,
+            content: String,
+            quote: String? = null,
+            nonce: String? = null,
+            tempTargetId: String? = null,
+            templateId: String? = null,
         ): SendChannelMessageApi = SendChannelMessageApi(
             type = type,
             targetId = targetId,
@@ -71,6 +110,7 @@ public class SendChannelMessageApi private constructor(
             quote = quote,
             nonce = nonce,
             tempTargetId = tempTargetId,
+            templateId = templateId
         )
 
         /**
@@ -89,6 +129,10 @@ public class SendChannelMessageApi private constructor(
             type = type,
             targetId = targetId,
             content = content,
+            quote = null,
+            nonce = null,
+            tempTargetId = null,
+            templateId = null
         )
 
         /**
@@ -154,9 +198,17 @@ public class SendChannelMessageApi private constructor(
         public var nonce: String? = null
 
         /**
-         * 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。用于在频道内针对用户的操作进行单独的回应通知等。
+         * 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。
+         * 用于在频道内针对用户的操作进行单独的回应通知等。
          */
         public var tempTargetId: String? = null
+
+        /**
+         * 模板消息id, 如果使用了，content会作为模板消息的input。
+         * 参见[模板消息](https://developer.kookapp.cn/doc/http/template)
+         * @since 4.2.0
+         */
+        public var templateId: String? = null
 
         /**
          * 消息类型
@@ -189,9 +241,16 @@ public class SendChannelMessageApi private constructor(
         public fun nonce(nonce: String?): Builder = apply { this.nonce = nonce }
 
         /**
-         * 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。用于在频道内针对用户的操作进行单独的回应通知等。
+         * 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。
+         * 用于在频道内针对用户的操作进行单独地回应通知等。
          */
         public fun tempTargetId(tempTargetId: String?): Builder = apply { this.tempTargetId = tempTargetId }
+
+        /**
+         * 模板消息ID。
+         * @see templateId
+         */
+        public fun templateId(templateId: String?): Builder = apply { this.templateId = templateId }
 
         /**
          * 构建一个 [发送频道聊天消息][SendChannelMessageApi] 实例。
@@ -203,6 +262,7 @@ public class SendChannelMessageApi private constructor(
             quote = quote,
             nonce = nonce,
             tempTargetId = tempTargetId,
+            templateId = templateId,
         )
     }
 
@@ -213,6 +273,7 @@ public class SendChannelMessageApi private constructor(
         quote = quote,
         nonce = nonce,
         tempTargetId = tempTargetId,
+        templateId = templateId,
     )
 
     @Serializable
@@ -223,6 +284,7 @@ public class SendChannelMessageApi private constructor(
         @SerialName("quote") val quote: String? = null,
         @SerialName("nonce") val nonce: String? = null,
         @SerialName("temp_target_id") val tempTargetId: String? = null,
+        @SerialName("template_id") val templateId: String? = null,
     )
 
 }
