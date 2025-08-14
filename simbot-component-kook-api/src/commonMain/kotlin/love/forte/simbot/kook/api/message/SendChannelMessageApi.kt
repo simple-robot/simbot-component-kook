@@ -242,7 +242,7 @@ public class SendChannelMessageApi private constructor(
 
         /**
          * 用户 id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。
-         * 用于在频道内针对用户的操作进行单独地回应通知等。
+         * 用于在频道内针对用户的操作进行单独的回应通知等。
          */
         public fun tempTargetId(tempTargetId: String?): Builder = apply { this.tempTargetId = tempTargetId }
 
