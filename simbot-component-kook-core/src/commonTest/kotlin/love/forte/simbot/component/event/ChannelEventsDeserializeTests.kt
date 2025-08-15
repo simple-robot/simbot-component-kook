@@ -8,7 +8,10 @@ import kotlin.test.Test
 import kotlin.test.assertIs
 
 /**
- *
+ * Tests for channel events deserialization.
+ * 
+ * Reference: https://developer.kookapp.cn/doc/event/channel
+ * 
  * @author ForteScarlet
  */
 class ChannelEventsDeserializeTests {
