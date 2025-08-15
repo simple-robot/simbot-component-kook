@@ -281,12 +281,12 @@ public sealed class EventExtra {
             }
         }
 
-        private val TEXT_EVENT_SERIALIZER = Signal.Event.serializer(TextEventExtra.serializer())
-        private val IMAGE_EVENT_SERIALIZER = Signal.Event.serializer(ImageEventExtra.serializer())
-        private val VIDEO_EVENT_SERIALIZER = Signal.Event.serializer(VideoEventExtra.serializer())
-        private val KMARKDOWN_EVENT_SERIALIZER = Signal.Event.serializer(KMarkdownEventExtra.serializer())
-        private val CARD_EVENT_SERIALIZER = Signal.Event.serializer(CardEventExtra.serializer())
-        private val SYSTEM_EVENT_SERIALIZER = Signal.Event.serializer(SystemExtra.serializer())
+        private val TEXT_EVENT_SERIALIZER by lazy { Signal.Event.serializer(TextEventExtra.serializer()) }
+        private val IMAGE_EVENT_SERIALIZER by lazy { Signal.Event.serializer(ImageEventExtra.serializer()) }
+        private val VIDEO_EVENT_SERIALIZER by lazy { Signal.Event.serializer(VideoEventExtra.serializer()) }
+        private val KMARKDOWN_EVENT_SERIALIZER by lazy { Signal.Event.serializer(KMarkdownEventExtra.serializer()) }
+        private val CARD_EVENT_SERIALIZER by lazy { Signal.Event.serializer(CardEventExtra.serializer()) }
+        private val SYSTEM_EVENT_SERIALIZER by lazy { Signal.Event.serializer(SystemExtra.serializer()) }
     }
 }
 
