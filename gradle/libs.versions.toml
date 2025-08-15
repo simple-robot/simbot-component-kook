@@ -114,7 +114,7 @@ gradle-common-publication = { group = "love.forte.gradle.common", name = "gradle
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotlinxBinaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }
+kotlinxBinaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.18.1" }
 
 [bundles]
 gradle-common = ["gradle-common-core", "gradle-common-multiplatform", "gradle-common-publication"]
