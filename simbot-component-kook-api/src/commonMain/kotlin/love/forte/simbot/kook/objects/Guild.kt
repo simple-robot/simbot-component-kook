@@ -116,7 +116,9 @@ public data class SimpleGuildWithRolesAndChannels(
     override val icon: String,
     @SerialName("notify_type") override val notifyType: Int,
     override val region: String,
-    @SerialName("enable_open") override val enableOpen: Boolean,
+    @SerialName("enable_open")
+    @Serializable(BooleanToIntSerializer::class)
+    override val enableOpen: Boolean,
     @SerialName("open_id") override val openId: String,
     @SerialName("default_channel_id") override val defaultChannelId: String,
     @SerialName("welcome_channel_id") override val welcomeChannelId: String,
