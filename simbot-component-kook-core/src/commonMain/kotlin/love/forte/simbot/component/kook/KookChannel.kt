@@ -17,9 +17,13 @@
 
 package love.forte.simbot.component.kook
 
+import love.forte.simbot.ability.DeleteOption
+import love.forte.simbot.ability.DeleteSupport
+import love.forte.simbot.ability.StandardDeleteOption
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.definition.Channel
+import love.forte.simbot.suspendrunner.ST
 import kotlin.coroutines.CoroutineContext
 import love.forte.simbot.kook.objects.Channel as KChannel
 
@@ -32,7 +36,7 @@ import love.forte.simbot.kook.objects.Channel as KChannel
  *
  * @author ForteScarlet
  */
-public interface KookChannel : Channel {
+public interface KookChannel : Channel, DeleteSupport {
     override val coroutineContext: CoroutineContext
 
     override val category: KookCategory?
@@ -56,4 +60,24 @@ public interface KookChannel : Channel {
     override val name: String
         get() = source.name
 
+    /**
+     * 删除此频道。
+     *
+     * 如果 [options] 中不包括 [StandardDeleteOption.IGNORE_ON_FAILURE],
+     * 则当API请求失败时错误会传播地抛出。
+     *
+     * 注意：[StandardDeleteOption.IGNORE_ON_FAILURE] 会捕获并隐藏任何产生的异常。
+     * 因为 KOOK 文档中并未明确指出当"删除目标不存在"时的错误码或错误状态，因此 [StandardDeleteOption.IGNORE_ON_NO_SUCH_TARGET]
+     * 暂时无法生效。
+     * _如果实际上官方有相关说明或后续更新了相关说明，可以随时通过 ISSUES 或 PR 协助我们完善。_
+     *
+     *
+     * @throws love.forte.simbot.kook.api.ApiResponseException
+     * 如果 [options] 中不包括 [IGNORE_ON_FAILURE][StandardDeleteOption.IGNORE_ON_FAILURE],
+     * 则当API请求失败时错误会传播地抛出。
+     * @see love.forte.simbot.kook.api.channel.DeleteChannelApi
+     * @since 4.1.6
+     */
+    @ST
+    override suspend fun delete(vararg options: DeleteOption)
 }
