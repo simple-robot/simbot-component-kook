@@ -17,6 +17,7 @@
 
 package love.forte.simbot.component.kook.internal
 
+import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.KookCategory
@@ -144,6 +145,10 @@ internal class KookChatChannelImpl(
 
     override val category: KookCategory?
         get() = source.parentId.takeIf { it.isNotBlank() }?.let { bot.internalCategory(it) }?.category
+
+    override suspend fun delete(vararg options: DeleteOption) {
+        bot.deleteChannel(source.id, options)
+    }
 
     override fun toString(): String {
         return "KookChannel(id=${source.id}, name=${source.name}, guildId=${source.guildId})"

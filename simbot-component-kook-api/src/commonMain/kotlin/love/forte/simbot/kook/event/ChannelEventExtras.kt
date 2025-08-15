@@ -66,6 +66,7 @@ public data class DeletedChannelEventBody(
     /**
      * 删除时间(毫秒)
      */
+    @SerialName("deleted_at")
     val deletedAt: Long
 )
 

@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2025. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -18,16 +18,20 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
+package love.forte.simbot.component.kook.internal
 
-// internals
-include(":internal-processors:api-reader")
-include(":internal-processors:message-element-processor")
+import love.forte.simbot.ability.DeleteOption
+import love.forte.simbot.ability.StandardDeleteOption
+import love.forte.simbot.component.kook.bot.KookBot
+import love.forte.simbot.component.kook.util.requestData
+import love.forte.simbot.kook.api.channel.DeleteChannelApi
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-core")
+internal suspend fun KookBot.deleteChannel(id: String, options: Array<out DeleteOption>) {
+    val api = DeleteChannelApi.create(id)
 
-//include("simbot-component-kook-stdlib-test")
-
-include("internal-local-test")
+    if (StandardDeleteOption.IGNORE_ON_FAILURE in options) {
+        runCatching { requestData(api) }
+    } else {
+        requestData(api)
+    }
+}
