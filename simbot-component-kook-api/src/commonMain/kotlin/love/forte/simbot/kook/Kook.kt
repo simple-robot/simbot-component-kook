@@ -23,6 +23,8 @@ package love.forte.simbot.kook
 import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import love.forte.simbot.kook.Kook.API_VERSION
+import love.forte.simbot.kook.Kook.BASE_URL_VALUE
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -74,8 +76,9 @@ public object Kook {
     @JvmField
     public val SERVER_URL_WITH_VERSION: Url = Url("$BASE_URL_VALUE/$API_VERSION")
 
+    @InternalKookApi
     @OptIn(ExperimentalSerializationApi::class)
-    internal val DEFAULT_JSON = Json {
+    public val DEFAULT_JSON: Json = Json {
         isLenient = true
         encodeDefaults = true
         ignoreUnknownKeys = true

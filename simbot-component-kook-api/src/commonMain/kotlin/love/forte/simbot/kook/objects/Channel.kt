@@ -19,6 +19,7 @@ package love.forte.simbot.kook.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.util.BooleanToIntSerializer
 
 /**
  * [频道 Channel](https://developer.kookapp.cn/doc/objects#%E9%A2%91%E9%81%93%20Channel)
@@ -183,7 +184,9 @@ public data class SimpleChannel(
     @SerialName("user_id") override val userId: String,
     @SerialName("guild_id") override val guildId: String,
     override val topic: String,
-    @SerialName("is_category") override val isCategory: Boolean,
+    @SerialName("is_category")
+    @Serializable(with = BooleanToIntSerializer::class)
+    override val isCategory: Boolean,
     @SerialName("parent_id") override val parentId: String,
     override val level: Int,
     @SerialName("slow_mode") override val slowMode: Int,

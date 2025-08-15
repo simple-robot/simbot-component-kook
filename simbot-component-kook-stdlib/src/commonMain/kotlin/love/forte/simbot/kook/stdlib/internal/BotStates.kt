@@ -270,7 +270,7 @@ private class CreateHeartbeatJob(
         return CreateClient(bot, botLogger, session, hello, gateway, sn, heartbeatJob)
     }
 
-    private suspend fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLong): HeartbeatJob {
+    private fun DefaultClientWebSocketSession.heartbeatJob(sn: AtomicLong): HeartbeatJob {
         fun helloInterval(): Long {
             val r = kotlin.random.Random.nextLong(5000)
             return if (kotlin.random.Random.nextBoolean()) 30_000 + r else 30_000 - r
@@ -621,6 +621,19 @@ private class Receiving(
 
                         if (throwIt) {
                             throw se
+                        } else {
+                            // 无法解析 extra，降级为 UnknownExtra
+                            eventLogger.warn("Cannot resolve event deserialization strategy " +
+                                    "via json property 'd', use UnknownExtra instead. " +
+                                    "Enable `love.forte.simbot.kook.event.\${bot.clientId}`'s debug logger " +
+                                    "for more details and stacktrace.")
+
+                            eventLogger.debug(
+                                "Cannot resolve event deserialization strategy " +
+                                    "via json property 'd', use UnknownExtra instead. extra raw event string: {}",
+                                eventString,
+                                se
+                            )
                         }
 
                         event0!!

@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2022-2024. ForteScarlet.
+ *     Copyright (c) 2025. ForteScarlet.
  *
  *     This file is part of simbot-component-kook.
  *
@@ -18,16 +18,25 @@
  *     If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "simbot-component-kook"
 
-// internals
-include(":internal-processors:api-reader")
-include(":internal-processors:message-element-processor")
+plugins {
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+}
 
-include("simbot-component-kook-api")
-include("simbot-component-kook-stdlib")
-include("simbot-component-kook-core")
+dependencies {
+    implementation(libs.simbot.core)
+    runtimeOnly(libs.ktor.client.java)
+    runtimeOnly(libs.simbot.logger.slf4jimpl)
+    implementation(project(":simbot-component-kook-core"))
+}
 
-//include("simbot-component-kook-stdlib-test")
+kotlin {
+    compilerOptions {
+        optIn.addAll(
+            "love.forte.simbot.kook.ExperimentalKookApi",
+            "love.forte.simbot.kook.InternalKookApi",
+        )
+    }
+}
 
-include("internal-local-test")
