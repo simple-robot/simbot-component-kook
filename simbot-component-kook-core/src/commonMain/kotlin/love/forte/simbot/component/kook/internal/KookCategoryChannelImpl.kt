@@ -20,6 +20,7 @@
 
 package love.forte.simbot.component.kook.internal
 
+import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.component.kook.KookCategory
 import love.forte.simbot.component.kook.KookCategoryChannel
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
@@ -49,6 +50,10 @@ internal class KookCategoryChannelImpl(
 
     override val category: KookCategory
         get() = sourceCategory ?: KookCategoryImpl(bot, source)
+
+    override suspend fun delete(vararg options: DeleteOption) {
+        bot.deleteChannel(source.id, options)
+    }
 
     override fun toString(): String {
         return "KookChannelCategory(id=${source.id}, name=${source.name})"

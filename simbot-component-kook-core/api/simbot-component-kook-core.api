@@ -26,7 +26,11 @@ public abstract interface class love/forte/simbot/component/kook/KookCategoryCha
 	public abstract fun getCategory ()Llove/forte/simbot/component/kook/KookCategory;
 }
 
-public abstract interface class love/forte/simbot/component/kook/KookChannel : love/forte/simbot/definition/Channel {
+public abstract interface class love/forte/simbot/component/kook/KookChannel : love/forte/simbot/ability/DeleteSupport, love/forte/simbot/definition/Channel {
+	public abstract synthetic fun delete ([Llove/forte/simbot/ability/DeleteOption;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun deleteAsync ([Llove/forte/simbot/ability/DeleteOption;)Ljava/util/concurrent/CompletableFuture;
+	public fun deleteBlocking ([Llove/forte/simbot/ability/DeleteOption;)V
+	public fun deleteReserve ([Llove/forte/simbot/ability/DeleteOption;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 	public abstract fun getCategory ()Llove/forte/simbot/component/kook/KookCategory;
 	public abstract fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
 	public fun getId ()Llove/forte/simbot/common/id/ID;
