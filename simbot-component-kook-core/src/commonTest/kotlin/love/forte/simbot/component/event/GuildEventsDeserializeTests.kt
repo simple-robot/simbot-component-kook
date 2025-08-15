@@ -5,7 +5,9 @@ import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.kook.Kook
 import love.forte.simbot.kook.event.*
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 /**
  * Tests for KOOK guild events deserialization.
@@ -262,5 +264,92 @@ class GuildEventsDeserializeTests {
         val ser = Signal.Event.serializer(SystemExtra.serializer())
         val deserialized = json.decodeFromString(ser, rawJson)
         assertIs<UpdatedEmojiEventExtra>(deserialized.data.extra)
+    }
+
+    @OptIn(ExperimentalSimbotAPI::class)
+    @Test
+    fun testDeserializeUpdatedGuildEventWithBooleanEnableOpenTrue() {
+        //language=json
+        val rawJson =
+            """{
+  "s": 0,
+  "d": {
+    "channel_type": "GROUP",
+    "type": 255,
+    "target_id": "601630000000",
+    "author_id": "1",
+    "content": "[系统消息]",
+    "extra": {
+      "type": "updated_guild",
+      "body": {
+        "id": "601630000000",
+        "name": "test111",
+        "topic": "测试服务器主题",
+        "user_id": "2418xxx",
+        "icon": "https://xxx/icons/2020-05/YQyfHxxx.png/icon",
+        "notify_type": 1,
+        "region": "shanghai",
+        "enable_open": true,
+        "open_id": 1123123123,
+        "default_channel_id": "4881800000000",
+        "welcome_channel_id": "4881800000000"
+      }
+    },
+    "msg_id": "0108feaf-xxx-7d70145468f0",
+    "msg_timestamp": 1612764956322,
+    "nonce": "",
+    "verify_token": "xxx"
+  },
+  "sn": 9
+}"""
+
+        val ser = Signal.Event.serializer(SystemExtra.serializer())
+        val deserialized = json.decodeFromString(ser, rawJson)
+        val extra = deserialized.data.extra
+        assertIs<UpdateGuildEventExtra>(extra)
+        assertTrue(extra.body.enableOpen)
+    }
+
+    @Test
+    fun testDeserializeDeletedGuildEventWithBooleanEnableOpenFalse() {
+        //language=json
+        val rawJson =
+            """{
+  "s": 0,
+  "d": {
+    "channel_type": "GROUP",
+    "type": 255,
+    "target_id": "xxx",
+    "author_id": "1",
+    "content": "[系统消息]",
+    "extra": {
+      "type": "deleted_guild",
+      "body": {
+        "id": "xxx",
+        "name": "testDel",
+        "topic": "删除的服务器主题",
+        "user_id": "2418200000",
+        "icon": "",
+        "notify_type": 2,
+        "region": "beijing",
+        "enable_open": false,
+        "open_id": 0,
+        "default_channel_id": "xxxx",
+        "welcome_channel_id": "0"
+      }
+    },
+    "msg_id": "3d2bdb08-xxxx-faa2b9e77394",
+    "msg_timestamp": 1614086485182,
+    "nonce": "",
+    "verify_token": "xxx"
+  },
+  "sn": 210
+}"""
+
+        val ser = Signal.Event.serializer(SystemExtra.serializer())
+        val deserialized = json.decodeFromString(ser, rawJson)
+        val extra = deserialized.data.extra
+        assertIs<DeleteGuildEventExtra>(extra)
+        assertFalse(extra.body.enableOpen)
     }
 }
