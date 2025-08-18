@@ -34,7 +34,10 @@ import kotlin.jvm.JvmStatic
  *
  * @author ForteScarlet
  */
-public class ChannelKickoutApi private constructor(channelId: String, userId: String) : KookPostApi<Unit>() {
+public class ChannelKickoutApi private constructor(
+    channelId: String,
+    userId: String
+) : KookPostApi<Unit>() {
     // TODO 在 KookVoiceChannel 中添加支持的上层API
 
     public companion object Factory {
