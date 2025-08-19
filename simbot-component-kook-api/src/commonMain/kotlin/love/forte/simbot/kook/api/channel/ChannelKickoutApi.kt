@@ -33,6 +33,7 @@ import kotlin.jvm.JvmStatic
  * 踢出语音频道中的用户，只能踢出在语音频道中的用户
  *
  * @author ForteScarlet
+ * @since 4.2.0
  */
 public class ChannelKickoutApi private constructor(
     channelId: String,
