@@ -98,7 +98,7 @@ internal class KookBotImpl(
 
         return try {
             id.literal == botUserInfo.id
-        } catch (e: IllegalStateException) {
+        } catch (_: IllegalStateException) {
             // ignore match and return true
             true
         }
@@ -282,6 +282,7 @@ internal class KookBotImpl(
                                     internalCache.categories[channelInfo.id] = categoryImpl
                                     cac++
                                 } else {
+                                    // TODO 区分频道类型
                                     val channelImpl =
                                         KookChatChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId))
                                     internalCache.channels[channelInfo.id] = channelImpl
