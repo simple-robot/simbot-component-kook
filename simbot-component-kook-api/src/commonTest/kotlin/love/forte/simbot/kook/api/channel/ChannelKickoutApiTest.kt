@@ -122,7 +122,6 @@ class ChannelKickoutApiTest {
         assertNotNull(apiResult)
         assertEquals(0, apiResult.code)
         assertEquals("操作成功", apiResult.message)
-        assertEquals(apiResult.code, 0, "Success response should have code 0")
         assertNotNull(apiResult.data)
     }
 
