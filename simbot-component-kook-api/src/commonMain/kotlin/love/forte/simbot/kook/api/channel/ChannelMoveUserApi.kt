@@ -29,7 +29,7 @@ import love.forte.simbot.kook.api.KookPostApi
 import kotlin.jvm.JvmStatic
 
 /**
- * [语音频道之间移动用户](https://developer.kaiheila.cn/doc/http/channel#语音频道之间移动用户)
+ * [语音频道之间移动用户](https://developer.kookapp.cn/doc/http/channel#语音频道之间移动用户)
  *
  * 语音频道之间移动用户，只能在语音频道之间移动，用户也必须在其他语音频道在线才能够移动到目标频道。
  *
