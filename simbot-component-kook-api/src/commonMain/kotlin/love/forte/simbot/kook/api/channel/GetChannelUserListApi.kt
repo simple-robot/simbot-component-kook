@@ -93,7 +93,7 @@ public data class VoiceChannelUser @ApiResultType constructor(
     @SerialName("identify_num")
     override val identifyNum: String =
         username.split("#", limit = 2)
-            .let { if (it.size < 2) it[0] else "" },
+            .getOrNull(1) ?: "",
     /**
      * 当前是否在线
      */
