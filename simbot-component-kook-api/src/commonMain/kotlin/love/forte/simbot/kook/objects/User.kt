@@ -1,24 +1,30 @@
 /*
- * Copyright (c) 2023. ForteScarlet.
+ *     Copyright (c) 2023-2025. ForteScarlet.
  *
- * This file is part of simbot-component-kook.
+ *     This file is part of simbot-component-kook.
  *
- * simbot-component-kook is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ *     simbot-component-kook is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * simbot-component-kook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     simbot-component-kook is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with simbot-component-kook,
- * If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with simbot-component-kook,
+ *     If not, see <https://www.gnu.org/licenses/>.
  */
 
 package love.forte.simbot.kook.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.objects.SystemUser.SYSTEM_USER_ID
+import love.forte.simbot.kook.objects.SystemUser.SYSTEM_USER_IDENTIFY_NUM
+import love.forte.simbot.kook.objects.SystemUser.SYSTEM_USER_NAME
 import love.forte.simbot.kook.objects.SystemUser.id
 
 
@@ -141,8 +147,8 @@ public data class SimpleUser(
      * 没有 `identify_num` 的情况下，会**尝试**从 [username] 中切割 `#` 并解析出 identifyNum 的值，
      * 无法得到结果时使用空字符串。
      */
-    @SerialName("identify_num") override val identifyNum: String = username.split("#", limit = 2)
-        .let { if (it.size < 2) it[0] else "" },
+    @SerialName("identify_num") override val identifyNum: String =
+        username.substringAfter('#', ""),
     /**
      * 当前是否在线，默认为 `false`
      */
