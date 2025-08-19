@@ -5,7 +5,7 @@ kotlinx-serialization = "1.7.1"
 dokka = "2.0.0"
 openjdk-jmh = "1.37"
 # { prefer = "2.3.12", reject = ["3.+"] }
-ktor = "2.3.12"
+ktor = "3.2.3"
 log4j = "2.24.3"
 # simbot
 simbot = "4.12.0"
