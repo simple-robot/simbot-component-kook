@@ -139,7 +139,6 @@ class ChannelKickoutApiTest {
         assertNotNull(apiResult)
         assertEquals(40001, apiResult.code)
         assertEquals("频道不存在或不是语音频道", apiResult.message)
-        assertEquals(40001, apiResult.code, "Error response should have code 40001")
     }
 
     @Test
