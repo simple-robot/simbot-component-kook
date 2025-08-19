@@ -282,6 +282,5 @@ class ChannelKickoutApiTest {
         assertEquals(0, result.code)
         assertEquals("操作成功", result.message)
         assertNotNull(result.data)
-        assertEquals(result.code, 0, "Wrapper response should have success code 0")
     }
 }
