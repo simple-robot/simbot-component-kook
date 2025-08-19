@@ -664,6 +664,17 @@ public final class love/forte/simbot/kook/api/channel/GetChannelListApiKt {
 	public static synthetic fun toChannel$default (Llove/forte/simbot/kook/api/channel/ChannelInfo;Ljava/lang/String;Ljava/lang/String;ILjava/util/List;Ljava/util/List;IZILjava/lang/Object;)Llove/forte/simbot/kook/objects/Channel;
 }
 
+public final class love/forte/simbot/kook/api/channel/GetChannelUserListApi : love/forte/simbot/kook/api/KookGetApi {
+	public static final field Factory Llove/forte/simbot/kook/api/channel/GetChannelUserListApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/GetChannelUserListApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/channel/GetChannelUserListApi$Factory {
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/GetChannelUserListApi;
+}
+
 public final class love/forte/simbot/kook/api/channel/GetChannelViewApi : love/forte/simbot/kook/api/KookGetApi {
 	public static final field Factory Llove/forte/simbot/kook/api/channel/GetChannelViewApi$Factory;
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Boolean;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -676,6 +687,103 @@ public final class love/forte/simbot/kook/api/channel/GetChannelViewApi$Factory 
 	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/GetChannelViewApi;
 	public final fun create (Ljava/lang/String;Ljava/lang/Boolean;)Llove/forte/simbot/kook/api/channel/GetChannelViewApi;
 	public static synthetic fun create$default (Llove/forte/simbot/kook/api/channel/GetChannelViewApi$Factory;Ljava/lang/String;Ljava/lang/Boolean;ILjava/lang/Object;)Llove/forte/simbot/kook/api/channel/GetChannelViewApi;
+}
+
+public final class love/forte/simbot/kook/api/channel/LiveInfo {
+	public static final field Companion Llove/forte/simbot/kook/api/channel/LiveInfo$Companion;
+	public fun <init> ()V
+	public fun <init> (ZILjava/lang/String;J)V
+	public synthetic fun <init> (ZILjava/lang/String;JILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()I
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()J
+	public final fun copy (ZILjava/lang/String;J)Llove/forte/simbot/kook/api/channel/LiveInfo;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/channel/LiveInfo;ZILjava/lang/String;JILjava/lang/Object;)Llove/forte/simbot/kook/api/channel/LiveInfo;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAudienceCount ()I
+	public final fun getInLive ()Z
+	public final fun getLiveStartTime ()J
+	public final fun getLiveThumb ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/channel/LiveInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/channel/LiveInfo$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/channel/LiveInfo;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/channel/LiveInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/channel/LiveInfo$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/channel/VoiceChannelUser : love/forte/simbot/kook/objects/User {
+	public static final field Companion Llove/forte/simbot/kook/api/channel/VoiceChannelUser$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;ZZZZZJJLlove/forte/simbot/kook/api/channel/LiveInfo;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;ZZZZZJJLlove/forte/simbot/kook/api/channel/LiveInfo;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/util/List;
+	public final fun component11 ()Z
+	public final fun component12 ()Z
+	public final fun component13 ()Z
+	public final fun component14 ()Z
+	public final fun component15 ()Z
+	public final fun component16 ()J
+	public final fun component17 ()J
+	public final fun component18 ()Llove/forte/simbot/kook/api/channel/LiveInfo;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Z
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()I
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;ZZZZZJJLlove/forte/simbot/kook/api/channel/LiveInfo;)Llove/forte/simbot/kook/api/channel/VoiceChannelUser;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/channel/VoiceChannelUser;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;ZZZZZJJLlove/forte/simbot/kook/api/channel/LiveInfo;ILjava/lang/Object;)Llove/forte/simbot/kook/api/channel/VoiceChannelUser;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getActiveTime ()J
+	public fun getAvatar ()Ljava/lang/String;
+	public fun getId ()Ljava/lang/String;
+	public fun getIdentifyNum ()Ljava/lang/String;
+	public final fun getJoinedAt ()J
+	public final fun getLiveInfo ()Llove/forte/simbot/kook/api/channel/LiveInfo;
+	public fun getNickname ()Ljava/lang/String;
+	public final fun getOs ()Ljava/lang/String;
+	public fun getRoles ()Ljava/util/List;
+	public fun getStatus ()I
+	public fun getUsername ()Ljava/lang/String;
+	public fun getVipAvatar ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isAiReduceNoise ()Z
+	public fun isBot ()Z
+	public fun isMobileVerified ()Z
+	public fun isOnline ()Z
+	public final fun isPersonalCardBg ()Z
+	public final fun isVip ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/channel/VoiceChannelUser$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/channel/VoiceChannelUser$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/channel/VoiceChannelUser;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/channel/VoiceChannelUser;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/channel/VoiceChannelUser$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class love/forte/simbot/kook/api/guild/BoostData {
