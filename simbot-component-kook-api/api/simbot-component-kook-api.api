@@ -517,6 +517,20 @@ public final class love/forte/simbot/kook/api/channel/ChannelKickoutApi$Factory 
 	public final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/ChannelKickoutApi;
 }
 
+public final class love/forte/simbot/kook/api/channel/ChannelMoveUserApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/channel/ChannelMoveUserApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/util/List;)Llove/forte/simbot/kook/api/channel/ChannelMoveUserApi;
+	public static final fun create (Ljava/lang/String;[Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/ChannelMoveUserApi;
+	public fun getBody ()Ljava/lang/Object;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/channel/ChannelMoveUserApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/util/List;)Llove/forte/simbot/kook/api/channel/ChannelMoveUserApi;
+	public final fun create (Ljava/lang/String;[Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/ChannelMoveUserApi;
+}
+
 public final class love/forte/simbot/kook/api/channel/ChannelView {
 	public static final field Companion Llove/forte/simbot/kook/api/channel/ChannelView$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIZIZLjava/lang/String;Ljava/util/List;ILjava/util/List;)V
