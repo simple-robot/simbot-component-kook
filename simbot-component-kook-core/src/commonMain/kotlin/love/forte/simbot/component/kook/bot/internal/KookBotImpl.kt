@@ -34,6 +34,7 @@ import love.forte.simbot.common.collection.removeValue
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.KookChannel
+import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.KookComponent
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.KookBotConfiguration
@@ -124,7 +125,7 @@ internal class KookBotImpl(
                     val guild = KookGuildImpl(this@KookBotImpl, guildInfo)
                     guilds[guildId] = guild
                     guildInfo.channels.forEach {
-                        channels[it.id] = KookChatChannelImpl(this@KookBotImpl, it)
+                        channels[it.id] = it.toChatChannel(this@KookBotImpl) // KookChatChannelImpl(this@KookBotImpl, it)
                     }
 
                     members.collect {
@@ -154,7 +155,7 @@ internal class KookBotImpl(
     internal fun internalGuild(guildId: String) = internalCache.guilds[guildId]
     internal fun internalChatChannel(channelId: String) = internalCache.channels[channelId]
     internal fun internalCategory(categoryId: String) = internalCache.categories[categoryId]
-    internal fun internalChatChannels(guildId: String): Sequence<KookChatChannelImpl> =
+    internal fun internalChatChannels(guildId: String): Sequence<KookChatChannel> =
         internalCache.channels.values.asSequence().filter { it.source.guildId == guildId }
 
 
@@ -282,9 +283,9 @@ internal class KookBotImpl(
                                     internalCache.categories[channelInfo.id] = categoryImpl
                                     cac++
                                 } else {
-                                    // TODO 区分频道类型
                                     val channelImpl =
-                                        KookChatChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId))
+                                        channelInfo.toChannel(guildId = guildId).toChatChannel(this@KookBotImpl)
+//                                        KookChatChannelImpl(this@KookBotImpl, channelInfo.toChannel(guildId = guildId))
                                     internalCache.channels[channelInfo.id] = channelImpl
                                     chc++
                                 }
@@ -464,7 +465,7 @@ internal class InternalCache {
     data class MemberCacheId(val guildId: String, val userId: String)
 
     val guilds = concurrentMutableMap<String, KookGuildImpl>()
-    val channels = concurrentMutableMap<String, KookChatChannelImpl>()
+    val channels = concurrentMutableMap<String, KookChatChannel>()
     val categories = concurrentMutableMap<String, KookCategoryChannelImpl>()
 
     /**

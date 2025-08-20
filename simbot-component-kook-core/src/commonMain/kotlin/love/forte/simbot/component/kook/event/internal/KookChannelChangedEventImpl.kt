@@ -29,7 +29,6 @@ import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.event.*
 import love.forte.simbot.component.kook.internal.KookCategoryChannelImpl
-import love.forte.simbot.component.kook.internal.KookChatChannelImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent.Companion.toContent
@@ -43,7 +42,7 @@ internal data class KookAddedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<AddedChannelEventExtra>,
     private val _source: KookGuildImpl,
-    private val _after: KookChatChannelImpl,
+    private val _after: KookChatChannel,
     override val sourceEventRaw: String
 ) : KookAddedChannelEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceBody.guildId, sourceBody.userId)
@@ -56,7 +55,7 @@ internal data class KookUpdatedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<UpdatedChannelEventExtra>,
     private val _source: KookGuildImpl,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     override val sourceEventRaw: String
 ) : KookUpdatedChannelEvent() {
     override suspend fun source(): KookGuild = _source
@@ -69,7 +68,7 @@ internal data class KookDeletedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<DeletedChannelEventExtra>,
     private val _source: KookGuildImpl,
-    private val _before: KookChatChannelImpl,
+    private val _before: KookChatChannel,
     override val sourceEventRaw: String
 ) : KookDeletedChannelEvent() {
     override suspend fun source(): KookGuild = _source
@@ -119,7 +118,7 @@ internal data class KookPinnedMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<PinnedMessageEventExtra>,
     private val _source: KookGuildImpl,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     override val sourceEventRaw: String
 ) : KookPinnedMessageEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceEvent.targetId, sourceBody.operatorId)
@@ -138,7 +137,7 @@ internal data class KookUnpinnedMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<UnpinnedMessageEventExtra>,
     private val _source: KookGuildImpl,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     override val sourceEventRaw: String
 ) : KookUnpinnedMessageEvent() {
     override val operator: KookMemberImpl? = bot.internalMember(sourceEvent.targetId, sourceBody.operatorId)

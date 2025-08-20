@@ -33,10 +33,10 @@ import love.forte.simbot.component.kook.event.KookBotSelfChannelMessageEvent
 import love.forte.simbot.component.kook.event.KookBotSelfMessageEvent
 import love.forte.simbot.component.kook.event.KookChannelMessageEvent
 import love.forte.simbot.component.kook.event.KookContactMessageEvent
-import love.forte.simbot.component.kook.internal.KookChatChannelImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.component.kook.internal.KookUserChatImpl
+import love.forte.simbot.component.kook.internal.send
 import love.forte.simbot.component.kook.message.KookMessageReceipt
 import love.forte.simbot.component.kook.message.KookReceiveMessageContent
 import love.forte.simbot.component.kook.message.sendToChannel
@@ -53,7 +53,7 @@ internal class KookChannelMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<TextExtra>,
     private val _author: KookMemberImpl,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     private val _guild: KookGuildImpl,
     override val sourceEventRaw: String
 ) : KookChannelMessageEvent() {
@@ -127,7 +127,7 @@ internal class KookContactMessageEventImpl(
 internal class KookBotSelfChannelMessageEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: KEvent<TextExtra>,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     private val _member: KookMemberImpl,
     private val _guild: KookGuildImpl,
     override val sourceEventRaw: String
