@@ -28,6 +28,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import love.forte.simbot.kook.InternalKookApi
+import love.forte.simbot.kook.api.KookApiResults.SUCCESS_CODE
 import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_LIMIT
 import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_REMAINING
 import love.forte.simbot.kook.api.RateLimit.Companion.DEFAULT_RESET
@@ -207,7 +208,7 @@ public class ApiResult @ApiResultType constructor(
     /**
      * 此接口的响应码是否为成功的响应码.
      */
-    public val isSuccess: Boolean get() = isHttpSuccess && code == KookApiResults.SUCCESS_CODE
+    public val isSuccess: Boolean get() = isHttpSuccess && code == SUCCESS_CODE
 
     /**
      * 判断 [httpStatus] 是否 [成功][HttpStatusCode.isSuccess]。
@@ -256,8 +257,22 @@ public class ApiResult @ApiResultType constructor(
 
 
     override fun toString(): String =
-        "ApiResult(code=$code, message=$message, data=$data, httpStatus=$httpStatus, rateLimit=$rateLimit, raw=$raw)"
+        "ApiResult(" +
+                "code=$code, " +
+                "message=$message, " +
+                "data=$data, " +
+                "httpStatus=${httpStatusOrNull ?: "<Not Initialized>"}, " +
+                "rateLimit=${rateLimitOrNull ?: "<Not Initialized>"}, " +
+                "raw=${rawOrNull ?: "<Not Initialized>"})"
 
+    private val httpStatusOrNull
+        get() = if (::httpStatus.isInitialized) httpStatus else null
+
+    private val rateLimitOrNull
+        get() = if (::rateLimit.isInitialized) rateLimit else null
+
+    private val rawOrNull
+        get() = if (::raw.isInitialized) raw else null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
