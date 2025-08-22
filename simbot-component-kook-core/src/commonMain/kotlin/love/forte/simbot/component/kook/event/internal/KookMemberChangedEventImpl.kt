@@ -27,7 +27,6 @@ import love.forte.simbot.component.kook.KookGuild
 import love.forte.simbot.component.kook.KookMember
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.event.*
-import love.forte.simbot.component.kook.internal.KookChatChannelImpl
 import love.forte.simbot.component.kook.internal.KookGuildImpl
 import love.forte.simbot.component.kook.internal.KookMemberImpl
 import love.forte.simbot.kook.event.*
@@ -36,7 +35,7 @@ internal data class KookMemberExitedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<ExitedChannelEventExtra>,
     private val _guild: KookGuildImpl,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     private val _member: KookMemberImpl,
     override val sourceEventRaw: String
 ) : KookMemberExitedChannelEvent() {
@@ -50,7 +49,7 @@ internal data class KookMemberJoinedChannelEventImpl(
     override val bot: KookBotImpl,
     override val sourceEvent: Event<JoinedChannelEventExtra>,
     private val _guild: KookGuildImpl,
-    private val _channel: KookChatChannelImpl,
+    private val _channel: KookChatChannel,
     private val _member: KookMemberImpl,
     override val sourceEventRaw: String
 ) : KookMemberJoinedChannelEvent() {

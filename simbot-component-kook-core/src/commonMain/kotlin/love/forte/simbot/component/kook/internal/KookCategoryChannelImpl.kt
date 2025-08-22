@@ -41,7 +41,7 @@ internal class KookCategoryImpl(
 }
 
 internal class KookCategoryChannelImpl(
-    val bot: KookBotImpl,
+    override val bot: KookBotImpl,
     override val source: Channel,
     private val sourceCategory: KookCategory? = null
 ) : KookCategoryChannel {
@@ -56,6 +56,12 @@ internal class KookCategoryChannelImpl(
     }
 
     override fun toString(): String {
-        return "KookChannelCategory(id=${source.id}, name=${source.name})"
+        return "KookCategoryChannel(id=${source.id}, name=${source.name})"
     }
 }
+
+internal fun Channel.toCategory(bot: KookBotImpl, sourceChannel: KookCategoryChannel? = null): KookCategoryImpl =
+    KookCategoryImpl(bot, source = this, sourceChannel)
+
+internal fun Channel.toCategoryChannel(bot: KookBotImpl, sourceCategory: KookCategory? = null): KookCategoryChannelImpl =
+    KookCategoryChannelImpl(bot, source = this, sourceCategory)

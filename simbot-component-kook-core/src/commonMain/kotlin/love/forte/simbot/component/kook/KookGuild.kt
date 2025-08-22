@@ -117,6 +117,26 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
      * 获取此频道服务器内的所有聊天频道集合。
      */
     override val chatChannels: Collectable<KookChatChannel>
+
+    /**
+     * 尝试根据指定ID获取匹配的 [KookVoiceChannel]。未找到时得到null。
+     *
+     * @since 4.2.0
+     * @see channel
+     */
+    @ST(
+        blockingBaseName = "getVoiceChannel",
+        blockingSuffix = "",
+        asyncBaseName = "getVoiceChannel",
+        reserveBaseName = "getVoiceChannel"
+    )
+    public suspend fun voiceChannel(id: ID): KookVoiceChannel?
+
+    /**
+     * 获取此频道服务器内的所有语音频道集合。
+     */
+    public val voiceChannels: Collectable<KookVoiceChannel>
+
     // categories
 
     /**
