@@ -334,7 +334,7 @@ internal fun KookBotImpl.registerEvent() {
                                 )
                             } else {
                                 val channel = inCacheModify {
-                                    KookChatChannelImpl(bot = thisBot, source = channelBody).also {
+                                    channelBody.toChatChannel(thisBot).also {
                                         channels[channelBody.id] = it
                                     }
                                 }
@@ -380,7 +380,7 @@ internal fun KookBotImpl.registerEvent() {
                                 )
                             } else {
                                 val channel = inCacheModify {
-                                    KookChatChannelImpl(thisBot, channelBody).also {
+                                    channelBody.toChatChannel(thisBot).also {
                                         channels[channelBody.id] = it
                                     }
                                 }
@@ -540,7 +540,7 @@ internal fun KookBotImpl.registerEvent() {
                                     event.doAs(),
                                     guild,
                                     newMember,
-                                    oldMember!!,
+                                    oldMember,
                                     rawEvent
                                 )
                             )

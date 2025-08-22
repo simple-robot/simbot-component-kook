@@ -81,6 +81,12 @@ internal class KookGuildImpl(
     override suspend fun chatChannel(id: ID): KookChatChannel? =
         bot.internalChatChannel(id.literal)
 
+    override suspend fun voiceChannel(id: ID): KookVoiceChannel? =
+        bot.internalVoiceChannel(id.literal)
+
+    override val voiceChannels: Collectable<KookVoiceChannel>
+        get() = bot.internalVoiceChannels(source.id).asCollectable()
+
     @ExperimentalSimbotAPI
     override val categories: Collectable<KookCategoryChannel>
         get() = bot.internalCategories(source.id).asCollectable()

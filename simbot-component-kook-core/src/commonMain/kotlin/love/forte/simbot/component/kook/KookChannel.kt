@@ -22,6 +22,7 @@ import love.forte.simbot.ability.DeleteSupport
 import love.forte.simbot.ability.StandardDeleteOption
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.definition.Channel
 import love.forte.simbot.suspendrunner.ST
 import kotlin.coroutines.CoroutineContext
@@ -37,6 +38,12 @@ import love.forte.simbot.kook.objects.Channel as KChannel
  * @author ForteScarlet
  */
 public interface KookChannel : Channel, DeleteSupport {
+    /**
+     * Channel 所属 bot
+     * @since 4.2.0
+     */
+    public val bot: KookBot
+
     override val coroutineContext: CoroutineContext
 
     override val category: KookCategory?
