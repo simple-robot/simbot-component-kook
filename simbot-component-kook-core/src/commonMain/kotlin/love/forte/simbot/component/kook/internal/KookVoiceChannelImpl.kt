@@ -70,7 +70,7 @@ internal class KookVoiceChannelImpl(
                 val delegateMember = bot.internalMember(guildId = source.guildId, userId = it.id)
                 logger.trace("Processing voice channel user-list(id={})'s delegate member: {}", it.id, delegateMember)
                 if (delegateMember == null) {
-                    logger.warn("Delegate member for voice channel's user(id={}) is null.", it)
+                    logger.warn("Delegate member for voice channel's user({}) is null.", it)
                     return@mapNotNull null
                 }
                 it.toVoiceMember(bot, source.id, delegateMember)
