@@ -21,6 +21,7 @@
 package love.forte.simbot.component.kook
 
 import love.forte.simbot.common.id.ID
+import love.forte.simbot.suspendrunner.ST
 
 /**
  * Kook 语音频道内的成员。
@@ -36,6 +37,7 @@ public interface KookVoiceMember : KookMember {
      * @throws love.forte.simbot.kook.api.ApiResponseException 如果API的相应结果不是正确结果
      * @throws love.forte.simbot.kook.api.ApiResultException 如果API的相应结果不是正确结果
      */
+    @ST
     public suspend fun move(targetChannel: ID)
 
     /**
@@ -44,5 +46,6 @@ public interface KookVoiceMember : KookMember {
      * @throws love.forte.simbot.kook.api.ApiResponseException 如果API的相应结果不是正确结果
      * @throws love.forte.simbot.kook.api.ApiResultException 如果API的相应结果不是正确结果
      */
+    @ST
     public suspend fun kickout()
 }
