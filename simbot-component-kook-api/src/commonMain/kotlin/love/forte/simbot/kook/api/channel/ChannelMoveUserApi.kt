@@ -23,8 +23,7 @@ package love.forte.simbot.kook.api.channel
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.builtins.serializer
 import love.forte.simbot.kook.api.KookPostApi
 import kotlin.jvm.JvmStatic
 
@@ -40,7 +39,7 @@ import kotlin.jvm.JvmStatic
 public class ChannelMoveUserApi private constructor(
     targetId: String,
     userIds: List<String>
-) : KookPostApi<List<JsonElement>>() {
+) : KookPostApi<Unit>() {
 
     public companion object Factory {
         private val PATH = ApiPath.create("channel", "move-user")
@@ -66,8 +65,8 @@ public class ChannelMoveUserApi private constructor(
             ChannelMoveUserApi(targetId, userIds.asList())
     }
 
-    override val resultDeserializationStrategy: DeserializationStrategy<List<JsonElement>>
-        get() = ListSerializer(JsonElement.serializer())
+    override val resultDeserializationStrategy: DeserializationStrategy<Unit>
+        get() = Unit.serializer()
 
     override val apiPath: ApiPath
         get() = PATH

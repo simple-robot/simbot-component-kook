@@ -23,7 +23,6 @@ package love.forte.simbot.component.kook.internal
 import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.ability.StandardDeleteOption
 import love.forte.simbot.component.kook.KookCategory
-import love.forte.simbot.component.kook.KookChannel
 import love.forte.simbot.component.kook.KookChatChannel
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
@@ -52,18 +51,6 @@ internal suspend fun KookBot.deleteChannel(id: String, options: Array<out Delete
 internal fun Channel.category(bot: KookBotImpl): KookCategory? {
     return parentId.takeIf { it.isNotBlank() }
         ?.let { bot.internalCategory(it) }?.category
-}
-
-/**
- * 将Channel对象转换为对应的KookChannel实现
- * @return 根据频道类型返回分类频道或聊天频道
- */
-internal fun Channel.toChannel(bot: KookBotImpl): KookChannel {
-    if (isCategory) {
-        return toCategoryChannel(bot, sourceCategory = toCategory(bot))
-    }
-
-    return toChatChannel(bot, typeValueOrNull)
 }
 
 
