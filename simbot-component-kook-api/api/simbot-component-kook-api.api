@@ -819,6 +819,120 @@ public final class love/forte/simbot/kook/api/channel/LiveInfo$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Factory;
+	public synthetic fun <init> (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Body;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun builder (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public static final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+	public synthetic fun getBody ()Ljava/lang/Object;
+	public fun getBody ()Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Body;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi$Body {
+	public static final field Companion Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Body$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChannelId ()Ljava/lang/String;
+	public final fun getLevel ()Ljava/lang/Integer;
+	public final fun getLimitAmount ()Ljava/lang/Integer;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getParentId ()Ljava/lang/String;
+	public final fun getPassword ()Ljava/lang/String;
+	public final fun getSlowMode ()Ljava/lang/Integer;
+	public final fun getTopic ()Ljava/lang/String;
+	public final fun getVoiceQuality ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/channel/UpdateChannelApi$Body$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Body$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Body;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Body;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi$Body$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi$Builder {
+	public final fun build ()Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+	public final fun getChannelId ()Ljava/lang/String;
+	public final fun getLevel ()Ljava/lang/Integer;
+	public final fun getLimitAmount ()Ljava/lang/Integer;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getParentId ()Ljava/lang/String;
+	public final fun getPassword ()Ljava/lang/String;
+	public final fun getSlowModeValue ()Ljava/lang/Integer;
+	public final fun getTopic ()Ljava/lang/String;
+	public final fun getVoiceQualityValue ()Ljava/lang/String;
+	public final fun level (I)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun limitAmount (I)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun name (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun parentId (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun password (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun setLevel (Ljava/lang/Integer;)V
+	public final fun setLimitAmount (Ljava/lang/Integer;)V
+	public final fun setName (Ljava/lang/String;)V
+	public final fun setParentId (Ljava/lang/String;)V
+	public final fun setPassword (Ljava/lang/String;)V
+	public final fun setSlowModeValue (Ljava/lang/Integer;)V
+	public final fun setTopic (Ljava/lang/String;)V
+	public final fun setVoiceQualityValue (Ljava/lang/String;)V
+	public final fun slowMode (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun slowModeValue (I)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun topic (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun voiceQuality (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun voiceQualityValue (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi$Factory {
+	public final fun builder (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode : java/lang/Enum {
+	public static final field HOURS_1 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field HOURS_2 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field HOURS_6 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field MINUTES_1 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field MINUTES_10 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field MINUTES_15 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field MINUTES_2 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field MINUTES_30 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field MINUTES_5 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field NONE Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field SECONDS_10 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field SECONDS_15 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field SECONDS_30 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static final field SECONDS_5 Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+	public static fun values ()[Llove/forte/simbot/kook/api/channel/UpdateChannelApi$SlowMode;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality : java/lang/Enum {
+	public static final field HIGH Llove/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality;
+	public static final field NORMAL Llove/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality;
+	public static final field SMOOTH Llove/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality;
+	public static fun values ()[Llove/forte/simbot/kook/api/channel/UpdateChannelApi$VoiceQuality;
+}
+
+public final class love/forte/simbot/kook/api/channel/UpdateChannelApiKt {
+	public static final fun create (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Factory;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Llove/forte/simbot/kook/api/channel/UpdateChannelApi;
+	public static final fun slowMode-HG0u8IE (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;J)V
+}
+
 public final class love/forte/simbot/kook/api/channel/VoiceChannelUser : love/forte/simbot/kook/objects/User {
 	public static final field Companion Llove/forte/simbot/kook/api/channel/VoiceChannelUser$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;ZZZZZJJLlove/forte/simbot/kook/api/channel/LiveInfo;)V
