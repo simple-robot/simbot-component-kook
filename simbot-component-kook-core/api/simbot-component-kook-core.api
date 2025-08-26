@@ -283,8 +283,14 @@ public abstract interface class love/forte/simbot/component/kook/KookVoiceChanne
 }
 
 public abstract interface class love/forte/simbot/component/kook/KookVoiceMember : love/forte/simbot/component/kook/KookMember {
-	public abstract fun kickout (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun move (Llove/forte/simbot/common/id/ID;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract synthetic fun kickout (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun kickoutAsync ()Ljava/util/concurrent/CompletableFuture;
+	public fun kickoutBlocking ()V
+	public fun kickoutReserve ()Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
+	public abstract synthetic fun move (Llove/forte/simbot/common/id/ID;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun moveAsync (Llove/forte/simbot/common/id/ID;)Ljava/util/concurrent/CompletableFuture;
+	public fun moveBlocking (Llove/forte/simbot/common/id/ID;)V
+	public fun moveReserve (Llove/forte/simbot/common/id/ID;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 }
 
 public abstract interface class love/forte/simbot/component/kook/bot/KookBot : kotlinx/coroutines/CoroutineScope, love/forte/simbot/bot/Bot {

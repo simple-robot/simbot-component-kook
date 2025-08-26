@@ -464,6 +464,87 @@ public final class love/forte/simbot/kook/api/asset/CreateAssetApi$Factory {
 	public static synthetic fun create$default (Llove/forte/simbot/kook/api/asset/CreateAssetApi$Factory;[BLjava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/asset/CreateAssetApi;
 }
 
+public final class love/forte/simbot/kook/api/blacklist/BlacklistItem {
+	public static final field Companion Llove/forte/simbot/kook/api/blacklist/BlacklistItem$Companion;
+	public fun <init> (Ljava/lang/String;JLjava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()J
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Llove/forte/simbot/kook/objects/SimpleUser;
+	public final fun copy (Ljava/lang/String;JLjava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;)Llove/forte/simbot/kook/api/blacklist/BlacklistItem;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/blacklist/BlacklistItem;Ljava/lang/String;JLjava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;ILjava/lang/Object;)Llove/forte/simbot/kook/api/blacklist/BlacklistItem;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCreatedTime ()J
+	public final fun getRemark ()Ljava/lang/String;
+	public final fun getUser ()Llove/forte/simbot/kook/objects/SimpleUser;
+	public final fun getUserId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/blacklist/BlacklistItem$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/blacklist/BlacklistItem$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/blacklist/BlacklistItem;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/blacklist/BlacklistItem;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/BlacklistItem$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/CreateBlacklistApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/CreateBlacklistApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;ILjava/lang/Object;)Llove/forte/simbot/kook/api/blacklist/CreateBlacklistApi;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/DeleteBlacklistApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/blacklist/DeleteBlacklistApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/DeleteBlacklistApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/DeleteBlacklistApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/DeleteBlacklistApi;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/GetBlacklistListApi : love/forte/simbot/kook/api/KookGetApi {
+	public static final field Factory Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/GetBlacklistListApi$Factory {
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi$Factory;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;ILjava/lang/Object;)Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi;
+}
+
+public final class love/forte/simbot/kook/api/blacklist/GetBlacklistListApiKt {
+	public static final fun createFlow (Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi$Factory;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun createItemFlow (Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi$Factory;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+}
+
 public final class love/forte/simbot/kook/api/channel/ChannelInfo {
 	public static final field Companion Llove/forte/simbot/kook/api/channel/ChannelInfo$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;III)V
