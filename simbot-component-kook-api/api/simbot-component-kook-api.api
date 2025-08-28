@@ -545,6 +545,44 @@ public final class love/forte/simbot/kook/api/blacklist/GetBlacklistListApiKt {
 	public static final fun createItemFlow (Llove/forte/simbot/kook/api/blacklist/GetBlacklistListApi$Factory;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
 }
 
+public final class love/forte/simbot/kook/api/category/CategoryListData {
+	public static final field Companion Llove/forte/simbot/kook/api/category/CategoryListData$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Llove/forte/simbot/kook/api/category/CategoryListData;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/category/CategoryListData;Ljava/util/List;ILjava/lang/Object;)Llove/forte/simbot/kook/api/category/CategoryListData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getList ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/category/CategoryListData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/category/CategoryListData$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/category/CategoryListData;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/category/CategoryListData;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/category/CategoryListData$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/category/GetCategoryListApi : love/forte/simbot/kook/api/KookGetApi {
+	public static final field Factory Llove/forte/simbot/kook/api/category/GetCategoryListApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/category/GetCategoryListApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/category/GetCategoryListApi$Factory {
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/category/GetCategoryListApi;
+}
+
 public final class love/forte/simbot/kook/api/channel/ChannelInfo {
 	public static final field Companion Llove/forte/simbot/kook/api/channel/ChannelInfo$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;III)V
@@ -2062,6 +2100,558 @@ public synthetic class love/forte/simbot/kook/api/role/UserRoleOperated$$seriali
 }
 
 public final class love/forte/simbot/kook/api/role/UserRoleOperated$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/Category {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/Category$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;IILjava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;IILjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;IILjava/util/List;)Llove/forte/simbot/kook/api/thread/Category;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/Category;Ljava/lang/String;Ljava/lang/String;IILjava/util/List;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/Category;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAllow ()I
+	public final fun getDeny ()I
+	public final fun getId ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getRoles ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/Category$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/Category$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/Category;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/Category;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/Category$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/CategoryRole {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/CategoryRole$Companion;
+	public fun <init> (Ljava/lang/String;JLjava/lang/String;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()J
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()I
+	public final fun copy (Ljava/lang/String;JLjava/lang/String;I)Llove/forte/simbot/kook/api/thread/CategoryRole;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/CategoryRole;Ljava/lang/String;JLjava/lang/String;IILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/CategoryRole;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAllow ()I
+	public final fun getRoleId ()J
+	public final fun getType ()Ljava/lang/String;
+	public final fun getUserId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/CategoryRole$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/CategoryRole$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/CategoryRole;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/CategoryRole;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/CategoryRole$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/CreateThreadApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/thread/CreateThreadApi$Factory;
+	public synthetic fun <init> (Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun builder (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/CreateThreadApi$Builder;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/CreateThreadApi;
+	public static final fun create (Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;)Llove/forte/simbot/kook/api/thread/CreateThreadApi;
+	public synthetic fun getBody ()Ljava/lang/Object;
+	public fun getBody ()Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/thread/CreateThreadApi$Body {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCategoryId ()Ljava/lang/String;
+	public final fun getChannelId ()Ljava/lang/String;
+	public final fun getContent ()Ljava/lang/String;
+	public final fun getCover ()Ljava/lang/String;
+	public final fun getGuildId ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/CreateThreadApi$Body$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/CreateThreadApi$Body$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/CreateThreadApi$Builder {
+	public final fun build ()Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;
+	public final fun categoryId (Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/CreateThreadApi$Builder;
+	public final fun cover (Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/CreateThreadApi$Builder;
+}
+
+public final class love/forte/simbot/kook/api/thread/CreateThreadApi$Factory {
+	public final fun builder (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/CreateThreadApi$Builder;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/CreateThreadApi;
+	public final fun create (Llove/forte/simbot/kook/api/thread/CreateThreadApi$Body;)Llove/forte/simbot/kook/api/thread/CreateThreadApi;
+}
+
+public final class love/forte/simbot/kook/api/thread/DeleteThreadApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Factory;
+	public synthetic fun <init> (Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public static final fun create (Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public static final fun createForPost (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public static final fun createForThread (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public synthetic fun getBody ()Ljava/lang/Object;
+	public fun getBody ()Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/thread/DeleteThreadApi$Body {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChannelId ()Ljava/lang/String;
+	public final fun getPostId ()Ljava/lang/String;
+	public final fun getThreadId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/DeleteThreadApi$Body$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/DeleteThreadApi$Body$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/DeleteThreadApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public final fun create (Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Body;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/thread/DeleteThreadApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public final fun createForPost (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+	public final fun createForThread (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/DeleteThreadApi;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadListApi : love/forte/simbot/kook/api/KookGetApi {
+	public static final field Factory Llove/forte/simbot/kook/api/thread/GetThreadListApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadListApi$Factory {
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/thread/GetThreadListApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/GetThreadListApi;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadListApiKt {
+	public static final fun createFlow (Llove/forte/simbot/kook/api/thread/GetThreadListApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun createFlow$default (Llove/forte/simbot/kook/api/thread/GetThreadListApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun createItemFlow (Llove/forte/simbot/kook/api/thread/GetThreadListApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun createItemFlow$default (Llove/forte/simbot/kook/api/thread/GetThreadListApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadPostApi : love/forte/simbot/kook/api/KookGetApi {
+	public static final field Factory Llove/forte/simbot/kook/api/thread/GetThreadPostApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadPostApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/thread/GetThreadPostApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/GetThreadPostApi;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadPostApiKt {
+	public static final fun createFlow (Llove/forte/simbot/kook/api/thread/GetThreadPostApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun createFlow$default (Llove/forte/simbot/kook/api/thread/GetThreadPostApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun createItemFlow (Llove/forte/simbot/kook/api/thread/GetThreadPostApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun createItemFlow$default (Llove/forte/simbot/kook/api/thread/GetThreadPostApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadViewApi : love/forte/simbot/kook/api/KookGetApi {
+	public static final field Factory Llove/forte/simbot/kook/api/thread/GetThreadViewApi$Factory;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadViewApi;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/thread/GetThreadViewApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/GetThreadViewApi;
+}
+
+public final class love/forte/simbot/kook/api/thread/Post {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/Post$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Boolean;Llove/forte/simbot/kook/objects/User;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Boolean;Llove/forte/simbot/kook/objects/User;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Z
+	public final fun component11 ()Ljava/util/List;
+	public final fun component12 ()Ljava/util/List;
+	public final fun component13 ()Ljava/util/List;
+	public final fun component14 ()Ljava/util/List;
+	public final fun component15 ()Ljava/lang/Long;
+	public final fun component16 ()Ljava/lang/Boolean;
+	public final fun component17 ()Llove/forte/simbot/kook/objects/User;
+	public final fun component18 ()Ljava/util/List;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/Integer;
+	public final fun component8 ()Ljava/util/List;
+	public final fun component9 ()Z
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Boolean;Llove/forte/simbot/kook/objects/User;Ljava/util/List;)Llove/forte/simbot/kook/api/thread/Post;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/Post;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Boolean;Llove/forte/simbot/kook/objects/User;Ljava/util/List;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/Post;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBelongToPostId ()Ljava/lang/String;
+	public final fun getCategoryId ()Ljava/lang/String;
+	public final fun getChannelPart ()Ljava/util/List;
+	public final fun getContent ()Ljava/lang/String;
+	public final fun getCreateTime ()Ljava/lang/Long;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getItemPart ()Ljava/util/List;
+	public final fun getMention ()Ljava/util/List;
+	public final fun getMentionAll ()Z
+	public final fun getMentionHere ()Z
+	public final fun getMentionPart ()Ljava/util/List;
+	public final fun getMentionRolePart ()Ljava/util/List;
+	public final fun getReplies ()Ljava/util/List;
+	public final fun getReplyId ()Ljava/lang/String;
+	public final fun getStatus ()Ljava/lang/Integer;
+	public final fun getThreadId ()Ljava/lang/String;
+	public final fun getUser ()Llove/forte/simbot/kook/objects/User;
+	public fun hashCode ()I
+	public final fun isUpdated ()Ljava/lang/Boolean;
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/Post$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/Post$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/Post;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/Post;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/Post$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/PostOrderType : java/lang/Enum {
+	public static final field ASC Llove/forte/simbot/kook/api/thread/PostOrderType;
+	public static final field DESC Llove/forte/simbot/kook/api/thread/PostOrderType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/PostOrderType;
+	public static fun values ()[Llove/forte/simbot/kook/api/thread/PostOrderType;
+}
+
+public final class love/forte/simbot/kook/api/thread/ReplyThreadApi : love/forte/simbot/kook/api/KookPostApi {
+	public static final field Factory Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Factory;
+	public synthetic fun <init> (Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+	public static final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+	public static final fun create (Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+	public synthetic fun getBody ()Ljava/lang/Object;
+	public fun getBody ()Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body;
+	public fun getResultDeserializationStrategy ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class love/forte/simbot/kook/api/thread/ReplyThreadApi$Body {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChannelId ()Ljava/lang/String;
+	public final fun getContent ()Ljava/lang/String;
+	public final fun getReplyId ()Ljava/lang/String;
+	public final fun getThreadId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/ReplyThreadApi$Body$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ReplyThreadApi$Body$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ReplyThreadApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+	public final fun create (Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Body;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/thread/ReplyThreadApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/ReplyThreadApi;
+}
+
+public final class love/forte/simbot/kook/api/thread/Thread {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/Thread$Companion;
+	public fun <init> (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/Thread;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/Thread;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/Thread;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCategory ()Ljava/lang/String;
+	public final fun getCover ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getStatus ()I
+	public final fun getTitle ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/Thread$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/Thread$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/Thread;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/Thread;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/Thread$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadListData {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/ThreadListData$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Llove/forte/simbot/kook/api/thread/ThreadListData;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/ThreadListData;Ljava/util/List;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/ThreadListData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getItems ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/ThreadListData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/ThreadListData$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/ThreadListData;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/ThreadListData;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadListData$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadMedia {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/ThreadMedia$Companion;
+	public fun <init> (ILjava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (ILjava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ThreadMedia;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/ThreadMedia;ILjava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/ThreadMedia;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSrc ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getType ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/ThreadMedia$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/ThreadMedia$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/ThreadMedia;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/ThreadMedia;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadMedia$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadSortType : java/lang/Enum {
+	public static final field LATEST_CREATE Llove/forte/simbot/kook/api/thread/ThreadSortType;
+	public static final field LATEST_REPLY Llove/forte/simbot/kook/api/thread/ThreadSortType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()I
+	public static fun valueOf (Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ThreadSortType;
+	public static fun values ()[Llove/forte/simbot/kook/api/thread/ThreadSortType;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadTag {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/ThreadTag$Companion;
+	public fun <init> (JLjava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()J
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (JLjava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/thread/ThreadTag;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/ThreadTag;JLjava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/ThreadTag;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIcon ()Ljava/lang/String;
+	public final fun getId ()J
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/ThreadTag$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/ThreadTag$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/ThreadTag;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/ThreadTag;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadTag$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadView {
+	public static final field Companion Llove/forte/simbot/kook/api/thread/ThreadView$Companion;
+	public fun <init> (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;Llove/forte/simbot/kook/api/thread/Category;Ljava/util/List;Ljava/lang/String;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V
+	public synthetic fun <init> (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;Llove/forte/simbot/kook/api/thread/Category;Ljava/util/List;Ljava/lang/String;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/util/List;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/util/List;
+	public final fun component13 ()Z
+	public final fun component14 ()Z
+	public final fun component15 ()Ljava/util/List;
+	public final fun component16 ()Ljava/util/List;
+	public final fun component17 ()Ljava/util/List;
+	public final fun component18 ()Ljava/util/List;
+	public final fun component19 ()Ljava/lang/Long;
+	public final fun component2 ()I
+	public final fun component20 ()Ljava/lang/Long;
+	public final fun component21 ()Ljava/lang/Boolean;
+	public final fun component22 ()Ljava/lang/Boolean;
+	public final fun component23 ()Ljava/lang/Integer;
+	public final fun component24 ()Ljava/lang/Integer;
+	public final fun component25 ()Ljava/lang/Integer;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/util/List;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()Llove/forte/simbot/kook/objects/SimpleUser;
+	public final fun component9 ()Llove/forte/simbot/kook/api/thread/Category;
+	public final fun copy (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;Llove/forte/simbot/kook/api/thread/Category;Ljava/util/List;Ljava/lang/String;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/thread/ThreadView;
+	public static synthetic fun copy$default (Llove/forte/simbot/kook/api/thread/ThreadView;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Llove/forte/simbot/kook/objects/SimpleUser;Llove/forte/simbot/kook/api/thread/Category;Ljava/util/List;Ljava/lang/String;Ljava/util/List;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;ILjava/lang/Object;)Llove/forte/simbot/kook/api/thread/ThreadView;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCategory ()Llove/forte/simbot/kook/api/thread/Category;
+	public final fun getChannelPart ()Ljava/util/List;
+	public final fun getCollectNum ()Ljava/lang/Integer;
+	public final fun getContent ()Ljava/lang/String;
+	public final fun getContentDeleted ()Ljava/lang/Boolean;
+	public final fun getContentDeletedType ()Ljava/lang/Integer;
+	public final fun getCover ()Ljava/lang/String;
+	public final fun getCreateTime ()Ljava/lang/Long;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getItemPart ()Ljava/util/List;
+	public final fun getLatestActiveTime ()Ljava/lang/Long;
+	public final fun getMedias ()Ljava/util/List;
+	public final fun getMention ()Ljava/util/List;
+	public final fun getMentionAll ()Z
+	public final fun getMentionHere ()Z
+	public final fun getMentionPart ()Ljava/util/List;
+	public final fun getMentionRolePart ()Ljava/util/List;
+	public final fun getPostCount ()Ljava/lang/Integer;
+	public final fun getPostId ()Ljava/lang/String;
+	public final fun getPreviewContent ()Ljava/lang/String;
+	public final fun getStatus ()I
+	public final fun getTags ()Ljava/util/List;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getUser ()Llove/forte/simbot/kook/objects/SimpleUser;
+	public fun hashCode ()I
+	public final fun isUpdated ()Ljava/lang/Boolean;
+	public fun toString ()Ljava/lang/String;
+}
+
+public synthetic class love/forte/simbot/kook/api/thread/ThreadView$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/thread/ThreadView$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/thread/ThreadView;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/thread/ThreadView;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/thread/ThreadView$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
