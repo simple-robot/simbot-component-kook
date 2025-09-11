@@ -23,6 +23,7 @@ package love.forte.simbot.kook.objects.template
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.forte.simbot.kook.api.ApiResultType
+import love.forte.simbot.kook.api.template.ExperimentalTemplateApi
 
 /**
  * 消息模板对象，表示一个消息模板。
@@ -32,41 +33,47 @@ import love.forte.simbot.kook.api.ApiResultType
  * @author ForteScarlet
  * @since 4.3.0
  */
+@ExperimentalTemplateApi
 public interface Template {
     /**
-     * 模板 ID
+     * 模板的id,最长16
      */
     public val id: String
 
     /**
-     * 模板名称
+     * 模型的标题，最长64
      */
-    public val name: String
+    public val title: String
+
+    /**
+     * 目前固定为0，代表模型使用twig渲染
+     */
+    public val type: Int
+
+    /**
+     * 1代表kmd消息，2代表通过json发卡片消息，3代表通过yaml发卡片消息
+     */
+    public val msgtype: Int
+
+    /**
+     * 0代表未审核，1代表审核中，2代表审核通过，3代表审核拒绝，当前没有开发审核，都为0
+     */
+    public val status: Int
+
+    /**
+     * 测试数据， 主要用于界面上的便利测试
+     */
+    public val testData: String
+
+    /**
+     * 测试的频道，最长64。 主要用于界面上的便利测试
+     */
+    public val testChannel: String
 
     /**
      * 模板内容
      */
     public val content: String
-
-    /**
-     * 模板描述
-     */
-    public val description: String?
-
-    /**
-     * 模板状态
-     */
-    public val status: Int
-
-    /**
-     * 创建时间戳
-     */
-    public val createdAt: Long
-
-    /**
-     * 更新时间戳
-     */
-    public val updatedAt: Long
 }
 
 /**
@@ -75,40 +82,16 @@ public interface Template {
  * @since 4.3.0
  */
 @Serializable
+@ExperimentalTemplateApi
 public data class SimpleTemplate @ApiResultType constructor(
     override val id: String,
-    override val name: String,
-    override val content: String,
-    override val description: String? = null,
-    override val status: Int,
-    @SerialName("created_at")
-    override val createdAt: Long,
-    @SerialName("updated_at")
-    override val updatedAt: Long
+    override val title: String,
+    override val type: Int = 0,
+    override val msgtype: Int = 1,
+    override val status: Int = 0,
+    @SerialName("test_data")
+    override val testData: String = "",
+    @SerialName("test_channel")
+    override val testChannel: String = "",
+    override val content: String = ""
 ) : Template
-
-/**
- * 模板列表响应包装器
- *
- * @since 4.3.0
- */
-@Serializable
-public data class TemplateList @ApiResultType constructor(
-    val items: List<SimpleTemplate>,
-    val meta: TemplateListMeta? = null
-)
-
-/**
- * 模板列表响应的元数据
- *
- * @since 4.3.0
- */
-@Serializable
-public data class TemplateListMeta @ApiResultType constructor(
-    val page: Int? = null,
-    @SerialName("page_total")
-    val pageTotal: Int? = null,
-    @SerialName("page_size")
-    val pageSize: Int? = null,
-    val total: Int? = null
-)

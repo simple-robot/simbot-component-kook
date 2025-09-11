@@ -30,7 +30,6 @@ import love.forte.simbot.kook.api.requestResult
 import love.forte.simbot.kook.objects.template.SimpleTemplate
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
 /**
@@ -38,6 +37,7 @@ import kotlin.test.assertNotNull
  *
  * @author ForteScarlet
  */
+@OptIn(ExperimentalTemplateApi::class)
 class CreateTemplateApiTest {
     private val json = Json(Kook.DEFAULT_JSON) {
         ignoreUnknownKeys = true
@@ -46,10 +46,10 @@ class CreateTemplateApiTest {
 
     @Test
     fun testApiBasics() {
-        val name = "Test Template"
+        val title = "Test Template"
         val content = "Hello {{user.name}}!"
-        val description = "A test template"
-        val api = CreateTemplateApi.create(name, content, description)
+        val msgtype = 1
+        val api = CreateTemplateApi.create(title, content, msgtype)
 
         // 测试 API 属性
         assertEquals(HttpMethod.Post, api.method)
@@ -60,7 +60,8 @@ class CreateTemplateApiTest {
     fun testRequestBodyStructureMinimal() = runTest {
         val title = "Minimal Template"
         val content = "Simple content"
-        val api = CreateTemplateApi.create(title, content)
+        val msgtype = 1
+        val api = CreateTemplateApi.create(title, content, msgtype)
 
         // 使用 MockEngine 捕获实际请求体
         var capturedRequestBody: String? = null
@@ -85,16 +86,21 @@ class CreateTemplateApiTest {
         // 验证 JSON 结构符合预期的序列化格式
         assertEquals(title, requestJson["title"]?.jsonPrimitive?.content)
         assertEquals(content, requestJson["content"]?.jsonPrimitive?.content)
-        // 在最小情况下不应包含可选字段
-        assertFalse(requestJson.containsKey("description"))
+        assertEquals(msgtype, requestJson["msgtype"]?.jsonPrimitive?.content?.toInt())
+        assertEquals(0, requestJson["type"]?.jsonPrimitive?.content?.toInt())
+        assertEquals("", requestJson["test_data"]?.jsonPrimitive?.content)
+        assertEquals("", requestJson["test_channel"]?.jsonPrimitive?.content)
     }
 
     @Test
     fun testRequestBodyStructureComplete() = runTest {
         val title = "Complete Template"
         val content = "Welcome to {{guild.name}}, {{user.name}}!"
-        val description = "A complete template with description"
-        val api = CreateTemplateApi.create(title, content, description)
+        val msgtype = 2
+        val type = 0
+        val testData = "{\"user\": \"test\"}"
+        val testChannel = "test_channel"
+        val api = CreateTemplateApi.create(title, content, msgtype, type, testData, testChannel)
 
         // Capture actual request body using MockEngine
         var capturedRequestBody: String? = null
@@ -119,8 +125,10 @@ class CreateTemplateApiTest {
         // Verify JSON structure matches expected serialization
         assertEquals(title, requestJson["title"]?.jsonPrimitive?.content)
         assertEquals(content, requestJson["content"]?.jsonPrimitive?.content)
-        assertEquals(description, requestJson["description"]?.jsonPrimitive?.content)
-        assertEquals(3, requestJson.size)
+        assertEquals(msgtype, requestJson["msgtype"]?.jsonPrimitive?.content?.toInt())
+        assertEquals(type, requestJson["type"]?.jsonPrimitive?.content?.toInt())
+        assertEquals(testData, requestJson["test_data"]?.jsonPrimitive?.content)
+        assertEquals(testChannel, requestJson["test_channel"]?.jsonPrimitive?.content)
     }
 
     @Test
@@ -134,29 +142,31 @@ class CreateTemplateApiTest {
         assertEquals(0, apiResult.code)
         assertEquals("操作成功", apiResult.message)
 
-        val template = apiResult.parseData(json, SimpleTemplate.serializer())
+        val template = apiResult.parseData(json, CreateTemplateResult.serializer(SimpleTemplate.serializer()))
         assertNotNull(template)
-        assertEquals("template_001", template.id)
-        assertEquals("Welcome Template", template.name)
-        assertEquals("Welcome to {{guild.name}}!", template.content)
-        assertEquals("Template for welcoming new users", template.description)
-        assertEquals(1, template.status)
-        assertEquals(1634567890000L, template.createdAt)
-        assertEquals(1634654290000L, template.updatedAt)
+        assertNotNull(template.model)
+        assertEquals("template_001", template.model.id)
+        assertEquals("Welcome Template", template.model.title)
+        assertEquals("Welcome to {{guild.name}}!", template.model.content)
+        assertEquals(0, template.model.type)
+        assertEquals(1, template.model.msgtype)
+        assertEquals(0, template.model.status)
+        assertEquals("{}", template.model.testData)
+        assertEquals("", template.model.testChannel)
     }
 
     @Test
     fun testFactoryMethods() {
-        val name = "Factory Test Template"
+        val title = "Factory Test Template"
         val content = "Factory test content"
-        val description = "Factory test description"
+        val msgtype = 1
 
-        // 测试带描述的 create 方法
-        val api1 = CreateTemplateApi.create(name, content, description)
+        // 测试带完整参数的 create 方法
+        val api1 = CreateTemplateApi.create(title, content, msgtype, 0, "{}", "test_channel")
         assertNotNull(api1)
 
-        // 测试不带描述的 create 方法
-        val api2 = CreateTemplateApi.create(name, content)
+        // 测试带最少参数的 create 方法
+        val api2 = CreateTemplateApi.create(title, content, msgtype)
         assertNotNull(api2)
     }
 
@@ -165,13 +175,16 @@ class CreateTemplateApiTest {
             "code": 0,
             "message": "操作成功",
             "data": {
-                "id": "template_001",
-                "name": "Welcome Template",
-                "content": "Welcome to {{guild.name}}!",
-                "description": "Template for welcoming new users",
-                "status": 1,
-                "created_at": 1634567890000,
-                "updated_at": 1634654290000
+                "model": {
+                    "id": "template_001",
+                    "title": "Welcome Template",
+                    "content": "Welcome to {{guild.name}}!",
+                    "type": 0,
+                    "msgtype": 1,
+                    "status": 0,
+                    "test_data": "{}",
+                    "test_channel": ""
+                }
             }
         }
     """.trimIndent()

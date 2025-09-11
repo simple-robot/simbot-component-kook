@@ -38,6 +38,7 @@ import kotlin.test.assertNotNull
  *
  * @author ForteScarlet
  */
+@OptIn(ExperimentalTemplateApi::class)
 class UpdateTemplateApiTest {
     private val json = Json(Kook.DEFAULT_JSON) {
         ignoreUnknownKeys = true
@@ -47,10 +48,10 @@ class UpdateTemplateApiTest {
     @Test
     fun testApiBasics() {
         val id = "template_001"
-        val name = "Updated Template"
+        val title = "Updated Template"
         val content = "Updated content"
-        val description = "Updated description"
-        val api = UpdateTemplateApi.create(id, name, content, description)
+        val msgtype = 1
+        val api = UpdateTemplateApi.create(id, title, content, msgtype)
 
         // Test API properties
         assertEquals(HttpMethod.Post, api.method)
@@ -60,8 +61,8 @@ class UpdateTemplateApiTest {
     @Test
     fun testRequestBodyStructurePartialUpdate() = runTest {
         val id = "template_001"
-        val name = "Updated Name Only"
-        val api = UpdateTemplateApi.create(id, name = name)
+        val title = "Updated Title Only"
+        val api = UpdateTemplateApi.create(id, title = title)
 
         // Capture actual request body using MockEngine
         var capturedRequestBody: String? = null
@@ -85,19 +86,25 @@ class UpdateTemplateApiTest {
 
         // Verify JSON structure matches expected serialization
         assertEquals(id, requestJson["id"]?.jsonPrimitive?.content)
-        assertEquals(name, requestJson["name"]?.jsonPrimitive?.content)
+        assertEquals(title, requestJson["title"]?.jsonPrimitive?.content)
         // Optional fields should not be present in partial update
         assertFalse(requestJson.containsKey("content"))
-        assertFalse(requestJson.containsKey("description"))
+        assertFalse(requestJson.containsKey("msgtype"))
+        assertFalse(requestJson.containsKey("type"))
+        assertFalse(requestJson.containsKey("test_data"))
+        assertFalse(requestJson.containsKey("test_channel"))
     }
 
     @Test
     fun testRequestBodyStructureCompleteUpdate() = runTest {
         val id = "template_001"
-        val name = "Completely Updated Template"
+        val title = "Completely Updated Template"
         val content = "Welcome to {{guild.name}}, {{user.name}}! Updated version."
-        val description = "A completely updated template"
-        val api = UpdateTemplateApi.create(id, name, content, description)
+        val msgtype = 2
+        val type = 0
+        val testData = "{\"test\": true}"
+        val testChannel = "update_channel"
+        val api = UpdateTemplateApi.create(id, title, content, msgtype, type, testData, testChannel)
 
         // Capture actual request body using MockEngine
         var capturedRequestBody: String? = null
@@ -121,10 +128,13 @@ class UpdateTemplateApiTest {
 
         // Verify JSON structure matches expected serialization
         assertEquals(id, requestJson["id"]?.jsonPrimitive?.content)
-        assertEquals(name, requestJson["name"]?.jsonPrimitive?.content)
+        assertEquals(title, requestJson["title"]?.jsonPrimitive?.content)
         assertEquals(content, requestJson["content"]?.jsonPrimitive?.content)
-        assertEquals(description, requestJson["description"]?.jsonPrimitive?.content)
-        assertEquals(4, requestJson.size)
+        assertEquals(msgtype, requestJson["msgtype"]?.jsonPrimitive?.content?.toInt())
+        assertEquals(type, requestJson["type"]?.jsonPrimitive?.content?.toInt())
+        assertEquals(testData, requestJson["test_data"]?.jsonPrimitive?.content)
+        assertEquals(testChannel, requestJson["test_channel"]?.jsonPrimitive?.content)
+        assertEquals(7, requestJson.size)
     }
 
     @Test
@@ -157,13 +167,14 @@ class UpdateTemplateApiTest {
         assertEquals(id, requestJson["id"]?.jsonPrimitive?.content)
         assertEquals(content, requestJson["content"]?.jsonPrimitive?.content)
         // Other optional fields should not be present
-        assertFalse(requestJson.containsKey("name"))
-        assertFalse(requestJson.containsKey("description"))
+        assertFalse(requestJson.containsKey("title"))
+        assertFalse(requestJson.containsKey("msgtype"))
+        assertEquals(2, requestJson.size)
     }
 
     @Test
     fun testSuccessfulResponseDeserialization() {
-        // Based on template API response structure
+        // 基于模板 API 响应结构
         val successResponseJson = createSuccessResponseJson()
 
         val apiResult = json.decodeFromString(ApiResult.serializer(), successResponseJson)
@@ -172,38 +183,39 @@ class UpdateTemplateApiTest {
         assertEquals(0, apiResult.code)
         assertEquals("操作成功", apiResult.message)
 
-        val template = apiResult.parseData(json, SimpleTemplate.serializer())
+        val template = apiResult.parseData(json, UpdateTemplateResult.serializer(SimpleTemplate.serializer())).model
         assertNotNull(template)
         assertEquals("template_001", template.id)
-        assertEquals("Updated Template", template.name)
+        assertEquals("Updated Template", template.title)
         assertEquals("Updated content", template.content)
-        assertEquals("Updated description", template.description)
-        assertEquals(1, template.status)
-        assertEquals(1634567890000L, template.createdAt)
-        assertEquals(1634654290000L, template.updatedAt)
+        assertEquals(0, template.type)
+        assertEquals(1, template.msgtype)
+        assertEquals(0, template.status)
+        assertEquals("{}", template.testData)
+        assertEquals("", template.testChannel)
     }
 
     @Test
     fun testFactoryMethods() {
         val id = "template_001"
-        val name = "Factory Test Template"
+        val title = "Factory Test Template"
         val content = "Factory test content"
-        val description = "Factory test description"
+        val msgtype = 1
 
         // Test create method with all parameters
-        val api1 = UpdateTemplateApi.create(id, name, content, description)
+        val api1 = UpdateTemplateApi.create(id, title, content, msgtype, 0, "{}", "test")
         assertNotNull(api1)
 
-        // Test create method with only ID and name
-        val api2 = UpdateTemplateApi.create(id, name = name)
+        // Test create method with only ID and title
+        val api2 = UpdateTemplateApi.create(id, title = title)
         assertNotNull(api2)
 
         // Test create method with only ID and content
         val api3 = UpdateTemplateApi.create(id, content = content)
         assertNotNull(api3)
 
-        // Test create method with only ID and description
-        val api4 = UpdateTemplateApi.create(id, description = description)
+        // Test create method with only ID and msgtype
+        val api4 = UpdateTemplateApi.create(id, msgtype = msgtype)
         assertNotNull(api4)
     }
 
@@ -212,13 +224,16 @@ class UpdateTemplateApiTest {
             "code": 0,
             "message": "操作成功",
             "data": {
-                "id": "template_001",
-                "name": "Updated Template",
-                "content": "Updated content",
-                "description": "Updated description",
-                "status": 1,
-                "created_at": 1634567890000,
-                "updated_at": 1634654290000
+                "model": {
+                    "id": "template_001",
+                    "title": "Updated Template",
+                    "content": "Updated content",
+                    "type": 0,
+                    "msgtype": 1,
+                    "status": 0,
+                    "test_data": "{}",
+                    "test_channel": ""
+                }
             }
         }
     """.trimIndent()

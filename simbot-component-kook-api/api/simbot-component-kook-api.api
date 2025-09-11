@@ -2103,6 +2103,99 @@ public final class love/forte/simbot/kook/api/role/UserRoleOperated$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class love/forte/simbot/kook/api/template/CreateTemplateApi$Factory {
+	public final fun create (Ljava/lang/String;Ljava/lang/String;I)Llove/forte/simbot/kook/api/template/CreateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;II)Llove/forte/simbot/kook/api/template/CreateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;)Llove/forte/simbot/kook/api/template/CreateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/template/CreateTemplateApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/template/CreateTemplateApi$Factory;Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/template/CreateTemplateApi;
+}
+
+public synthetic class love/forte/simbot/kook/api/template/CreateTemplateResult$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/template/CreateTemplateResult;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/template/CreateTemplateResult;)V
+	public final fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/template/CreateTemplateResult$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/template/DeleteTemplateApi$Factory {
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/template/DeleteTemplateApi;
+}
+
+public abstract interface annotation class love/forte/simbot/kook/api/template/ExperimentalTemplateApi : java/lang/annotation/Annotation {
+}
+
+public final class love/forte/simbot/kook/api/template/GetTemplateListApi$Factory {
+	public final fun create ()Llove/forte/simbot/kook/api/template/GetTemplateListApi;
+	public final fun create (Ljava/lang/Integer;)Llove/forte/simbot/kook/api/template/GetTemplateListApi;
+	public final fun create (Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/template/GetTemplateListApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/template/GetTemplateListApi$Factory;Ljava/lang/Integer;Ljava/lang/Integer;ILjava/lang/Object;)Llove/forte/simbot/kook/api/template/GetTemplateListApi;
+}
+
+public synthetic class love/forte/simbot/kook/api/template/TemplatePageList$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/template/TemplatePageList;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/template/TemplatePageList;)V
+	public final fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/template/TemplatePageList$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
+}
+
+public synthetic class love/forte/simbot/kook/api/template/TemplatePageMeta$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/api/template/TemplatePageMeta$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/template/TemplatePageMeta;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/template/TemplatePageMeta;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/template/TemplatePageMeta$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/template/UpdateTemplateApi$Factory {
+	public final fun create (Ljava/lang/String;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public final fun create (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+	public static synthetic fun create$default (Llove/forte/simbot/kook/api/template/UpdateTemplateApi$Factory;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Llove/forte/simbot/kook/api/template/UpdateTemplateApi;
+}
+
+public synthetic class love/forte/simbot/kook/api/template/UpdateTemplateResult$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/api/template/UpdateTemplateResult;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/api/template/UpdateTemplateResult;)V
+	public final fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/api/template/UpdateTemplateResult$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
+}
+
 public final class love/forte/simbot/kook/api/thread/Category {
 	public static final field Companion Llove/forte/simbot/kook/api/thread/Category$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;IILjava/util/List;)V
@@ -7256,6 +7349,21 @@ public abstract class love/forte/simbot/kook/objects/kmd/ValueAppenderKookMarkdo
 
 public abstract class love/forte/simbot/kook/objects/kmd/ValueAppenderMarkdownKookMarkdownGrammar : love/forte/simbot/kook/objects/kmd/ValueAppenderKookMarkdownGrammar {
 	public fun <init> (Ljava/lang/CharSequence;)V
+}
+
+public synthetic class love/forte/simbot/kook/objects/template/SimpleTemplate$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Llove/forte/simbot/kook/objects/template/SimpleTemplate$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Llove/forte/simbot/kook/objects/template/SimpleTemplate;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Llove/forte/simbot/kook/objects/template/SimpleTemplate;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class love/forte/simbot/kook/objects/template/SimpleTemplate$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class love/forte/simbot/kook/util/BooleanToIntSerializer : kotlinx/serialization/KSerializer {

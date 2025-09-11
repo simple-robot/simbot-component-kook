@@ -21,19 +21,23 @@ import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import love.forte.simbot.kook.Kook
 import love.forte.simbot.kook.api.ApiResult
 import love.forte.simbot.kook.api.requestResult
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 /**
  * Tests for [DeleteTemplateApi].
  *
  * @author ForteScarlet
  */
+@OptIn(ExperimentalTemplateApi::class)
 class DeleteTemplateApiTest {
     private val json = Json(Kook.DEFAULT_JSON) {
         ignoreUnknownKeys = true
@@ -91,27 +95,9 @@ class DeleteTemplateApiTest {
         assertEquals(0, apiResult.code)
         assertEquals("操作成功", apiResult.message)
 
-        val deleteResult = apiResult.parseData(json, DeleteTemplateResult.serializer())
-        assertNotNull(deleteResult)
-        assertTrue(deleteResult.success, "Deletion should be successful")
-        assertEquals("Template deleted successfully", deleteResult.message)
-    }
-
-    @Test
-    fun testSuccessfulResponseDeserializationMinimal() {
-        // Test minimal response with only success field
-        val minimalResponseJson = createMinimalSuccessResponseJson()
-
-        val apiResult = json.decodeFromString(ApiResult.serializer(), minimalResponseJson)
-
-        assertNotNull(apiResult)
-        assertEquals(0, apiResult.code)
-        assertEquals("操作成功", apiResult.message)
-
-        val deleteResult = apiResult.parseData(json, DeleteTemplateResult.serializer())
-        assertNotNull(deleteResult)
-        assertTrue(deleteResult.success, "Deletion should be successful")
-        assertNull(deleteResult.message, "Message should be null in minimal response")
+        // DeleteTemplateApi returns Unit, so we just verify the response structure
+        val unitResult = apiResult.parseData(json, Unit.serializer())
+        assertEquals(Unit, unitResult)
     }
 
     @Test
@@ -131,9 +117,20 @@ class DeleteTemplateApiTest {
         val apis = ids.map { DeleteTemplateApi.create(it) }
 
         assertEquals(3, apis.size)
-        apis.forEachIndexed { _, api ->
+        apis.forEach { api ->
             assertNotNull(api)
             assertEquals("https://www.kookapp.cn/api/v3/template/delete", api.url.toString())
+        }
+    }
+
+    @Test
+    fun testIdValidation() {
+        // Test with various ID formats
+        val validIds = listOf("template_001", "tpl_123", "abc123def", "1234567890123456")
+        
+        validIds.forEach { id ->
+            val api = DeleteTemplateApi.create(id)
+            assertNotNull(api, "API should be created for valid ID: $id")
         }
     }
 
@@ -141,20 +138,7 @@ class DeleteTemplateApiTest {
         {
             "code": 0,
             "message": "操作成功",
-            "data": {
-                "success": true,
-                "message": "Template deleted successfully"
-            }
-        }
-    """.trimIndent()
-
-    private fun createMinimalSuccessResponseJson(): String = """
-        {
-            "code": 0,
-            "message": "操作成功",
-            "data": {
-                "success": true
-            }
+            "data": {}
         }
     """.trimIndent()
 }
