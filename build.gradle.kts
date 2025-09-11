@@ -79,6 +79,7 @@ apiValidation {
             "love.forte.simbot.annotations.InternalSimbotAPI",
             "love.forte.simbot.kook.ExperimentalKookApi",
             "love.forte.simbot.kook.InternalKookApi",
+            "love.forte.simbot.kook.api.template.ExperimentalTemplateApi"
         ),
     )
 
