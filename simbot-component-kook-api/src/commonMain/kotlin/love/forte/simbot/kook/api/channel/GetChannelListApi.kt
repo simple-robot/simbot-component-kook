@@ -123,6 +123,43 @@ public data class ChannelInfo @ApiResultType constructor(
      */
     @SerialName("limit_amount")
     public val limitAmount: Int,
+
+    /**
+     * @since 4.3.0
+     */
+    @SerialName("guild_id")
+    public val guildId: String = "",
+
+    /**
+     * 主题
+     * @since 4.3.0
+     */
+    public val topic: String = "",
+
+    /**
+     * 慢速模式。单位为秒。
+     * @since 4.3.0
+     */
+    @SerialName("slow_mode")
+    public val slowMode: Int = 0,
+
+    /**
+     * @since 4.3.0
+     */
+    @SerialName("permission_overwrites")
+    public val permissionOverwrites: List<PermissionOverwrite> = emptyList(),
+
+    /**
+     * @since 4.3.0
+     */
+    @SerialName("permission_sync")
+    public val permissionSync: Int = 0,
+
+    /**
+     * @since 4.3.0
+     */
+    @SerialName("has_password")
+    public val hasPassword: Boolean = false,
 )
 
 /**
@@ -130,13 +167,13 @@ public data class ChannelInfo @ApiResultType constructor(
  * 并可选的提供一些缺失字段的默认值。
  */
 public fun ChannelInfo.toChannel(
-    guildId: String,
-    topic: String = "",
-    slowMode: Int = 0,
-    permissionOverwrites: List<PermissionOverwrite> = emptyList(),
+    guildId: String = this.guildId,
+    topic: String = this.topic,
+    slowMode: Int = this.slowMode,
+    permissionOverwrites: List<PermissionOverwrite> = this.permissionOverwrites,
     permissionUsers: List<PermissionUser> = emptyList(),
-    permissionSync: Int = 0,
-    hasPassword: Boolean = false,
+    permissionSync: Int = this.permissionSync,
+    hasPassword: Boolean = this.hasPassword,
 ): Channel = ChannelInfoChannel(
     this,
     guildId = guildId,

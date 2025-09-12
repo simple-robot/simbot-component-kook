@@ -34,9 +34,34 @@ public abstract interface class love/forte/simbot/component/kook/KookChannel : l
 	public abstract fun getBot ()Llove/forte/simbot/component/kook/bot/KookBot;
 	public abstract fun getCategory ()Llove/forte/simbot/component/kook/KookCategory;
 	public abstract fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
+	public fun getGuildId ()Llove/forte/simbot/common/id/ID;
+	public fun getHasPassword ()Z
 	public fun getId ()Llove/forte/simbot/common/id/ID;
+	public fun getLevel ()I
 	public fun getName ()Ljava/lang/String;
+	public fun getParentId ()Llove/forte/simbot/common/id/ID;
+	public fun getPermissionSync ()I
+	public fun getSlowMode ()I
 	public abstract fun getSource ()Llove/forte/simbot/kook/objects/Channel;
+	public fun getTopic ()Ljava/lang/String;
+	public fun getUserId ()Llove/forte/simbot/common/id/ID;
+	public abstract fun updater ()Llove/forte/simbot/component/kook/KookChannelUpdater;
+}
+
+public final class love/forte/simbot/component/kook/KookChannelKt {
+	public static final fun getSlowModeDuration (Llove/forte/simbot/component/kook/KookChannel;)J
+	public static final fun update (Llove/forte/simbot/component/kook/KookChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class love/forte/simbot/component/kook/KookChannelUpdater {
+	public fun applyBuilder (Lkotlin/jvm/functions/Function1;)Llove/forte/simbot/component/kook/KookChannelUpdater;
+	public abstract synthetic fun execute (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun executeAsync ()Ljava/util/concurrent/CompletableFuture;
+	public fun executeBlocking ()Llove/forte/simbot/component/kook/KookChannel;
+	public fun executeReserve ()Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
+	public abstract fun getBuilder ()Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;
+	public abstract fun getChannel ()Llove/forte/simbot/component/kook/KookChannel;
+	public abstract fun setBuilder (Llove/forte/simbot/kook/api/channel/UpdateChannelApi$Builder;)V
 }
 
 public abstract interface class love/forte/simbot/component/kook/KookChatCapableChannel : kotlinx/coroutines/CoroutineScope, love/forte/simbot/component/kook/KookChannel, love/forte/simbot/definition/ChatChannel {
