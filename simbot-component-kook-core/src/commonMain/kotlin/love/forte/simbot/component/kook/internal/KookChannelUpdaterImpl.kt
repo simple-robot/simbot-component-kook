@@ -22,7 +22,7 @@ package love.forte.simbot.component.kook.internal
 
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.KookChannel
-import love.forte.simbot.component.kook.KookChannelUpdator
+import love.forte.simbot.component.kook.KookChannelUpdater
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.util.requestDataBy
 import love.forte.simbot.kook.api.channel.UpdateChannelApi
@@ -31,8 +31,8 @@ import love.forte.simbot.kook.api.channel.toChannel
 /**
  * @author ForteScarlet
  */
-internal class KookChannelUpdatorImpl(override val channel: KookChannel, private val bot: KookBotImpl) :
-    KookChannelUpdator {
+internal class KookChannelUpdaterImpl(override val channel: KookChannel, private val bot: KookBotImpl) :
+    KookChannelUpdater {
     override var builder: UpdateChannelApi.Builder = UpdateChannelApi.builder(channel.id.literal)
 
     override suspend fun execute(): KookChannel {

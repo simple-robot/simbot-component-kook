@@ -28,7 +28,7 @@ import love.forte.simbot.suspendrunner.ST
  * [KookChannel] 的更新器。
  * @since 4.3.0
  */
-public interface KookChannelUpdator {
+public interface KookChannelUpdater {
     public val channel: KookChannel
 
     /**
@@ -39,7 +39,7 @@ public interface KookChannelUpdator {
     /**
      * 使用当前的 [builder] 在DSL中配置更新信息。
      */
-    public fun applyBuilder(block: UpdateChannelApi.Builder.() -> UpdateChannelApi.Builder): KookChannelUpdator =
+    public fun applyBuilder(block: UpdateChannelApi.Builder.() -> UpdateChannelApi.Builder): KookChannelUpdater =
         apply {
             builder = builder.block()
         }

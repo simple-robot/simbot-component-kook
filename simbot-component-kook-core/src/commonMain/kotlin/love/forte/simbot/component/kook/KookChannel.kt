@@ -150,11 +150,11 @@ public interface KookChannel : Channel, DeleteSupport {
 
     /**
      * 获取一个频道更新器。
-     * 提供需要修改的内容，然后使用 [KookChannelUpdator.execute] 更新频道数据。
+     * 提供需要修改的内容，然后使用 [KookChannelUpdater.execute] 更新频道数据。
      *
      * @since 4.3.0
      */
-    public fun updator(): KookChannelUpdator
+    public fun updater(): KookChannelUpdater
 }
 
 /**
@@ -168,8 +168,8 @@ public val KookChannel.slowModeDuration: Duration
     }
 
 /**
- * 使用 DSL 直接配置 [KookChannelUpdator.builder] 并更新频道信息。
+ * 使用 DSL 直接配置 [KookChannelUpdater.builder] 并更新频道信息。
  * @since 4.3.0
  */
 public suspend inline fun KookChannel.update(block: UpdateChannelApi.Builder.() -> Unit): KookChannel =
-    updator().apply { builder.block() }.execute()
+    updater().apply { builder.block() }.execute()

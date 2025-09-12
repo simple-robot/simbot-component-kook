@@ -23,7 +23,7 @@ package love.forte.simbot.component.kook.internal
 import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.component.kook.KookCategory
 import love.forte.simbot.component.kook.KookCategoryChannel
-import love.forte.simbot.component.kook.KookChannelUpdator
+import love.forte.simbot.component.kook.KookChannelUpdater
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.kook.objects.Channel
 import kotlin.coroutines.CoroutineContext
@@ -56,7 +56,7 @@ internal class KookCategoryChannelImpl(
         bot.deleteChannel(source.id, options)
     }
 
-    override fun updator(): KookChannelUpdator = KookChannelUpdatorImpl(this, bot)
+    override fun updater(): KookChannelUpdater = KookChannelUpdaterImpl(this, bot)
 
     override fun toString(): String {
         return "KookCategoryChannel(id=${source.id}, name=${source.name})"
