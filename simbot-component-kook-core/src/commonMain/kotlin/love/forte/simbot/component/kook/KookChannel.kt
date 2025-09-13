@@ -24,8 +24,11 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.definition.Channel
+import love.forte.simbot.kook.api.channel.UpdateChannelApi
 import love.forte.simbot.suspendrunner.ST
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import love.forte.simbot.kook.objects.Channel as KChannel
 
 
@@ -68,6 +71,63 @@ public interface KookChannel : Channel, DeleteSupport {
         get() = source.name
 
     /**
+     * 频道创建者id
+     * @since 4.3.0
+     */
+    public val userId: ID
+        get() = source.userId.ID
+
+    /**
+     * 频道所属服务器id
+     * @since 4.3.0
+     */
+    public val guildId: ID
+        get() = source.guildId.ID
+
+    /**
+     * 频道简介
+     * @since 4.3.0
+     */
+    public val topic: String
+        get() = source.topic
+
+    /**
+     * 上级分组的id
+     * @since 4.3.0
+     */
+    public val parentId: ID
+        get() = source.parentId.ID
+
+    /**
+     * 频道排序level
+     * @since 4.3.0
+     */
+    public val level: Int
+        get() = source.level
+
+    /**
+     * 慢速模式下限制发言的最短时间间隔, 单位为秒(s)
+     * @since 4.3.0
+     * @see slowModeDuration
+     */
+    public val slowMode: Int
+        get() = source.slowMode
+
+    /**
+     * 权限设置是否与分组同步, 1 or 0
+     * @since 4.3.0
+     */
+    public val permissionSync: Int
+        get() = source.permissionSync
+
+    /**
+     * 是否有密码
+     * @since 4.3.0
+     */
+    public val hasPassword: Boolean
+        get() = source.hasPassword
+
+    /**
      * 删除此频道。
      *
      * 如果 [options] 中不包括 [StandardDeleteOption.IGNORE_ON_FAILURE],
@@ -87,4 +147,29 @@ public interface KookChannel : Channel, DeleteSupport {
      */
     @ST
     override suspend fun delete(vararg options: DeleteOption)
+
+    /**
+     * 获取一个频道更新器。
+     * 提供需要修改的内容，然后使用 [KookChannelUpdater.execute] 更新频道数据。
+     *
+     * @since 4.3.0
+     */
+    public fun updater(): KookChannelUpdater
 }
+
+/**
+ * 获取频道的慢速模式的持续时间。
+ * @since 4.3.0
+ */
+public val KookChannel.slowModeDuration: Duration
+    get() = when (slowMode) {
+        0 -> Duration.ZERO
+        else -> slowMode.seconds
+    }
+
+/**
+ * 使用 DSL 直接配置 [KookChannelUpdater.builder] 并更新频道信息。
+ * @since 4.3.0
+ */
+public suspend inline fun KookChannel.update(block: UpdateChannelApi.Builder.() -> Unit): KookChannel =
+    updater().apply { builder.block() }.execute()

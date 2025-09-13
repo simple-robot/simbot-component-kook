@@ -21,8 +21,13 @@ import io.ktor.http.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.forte.simbot.kook.InternalKookApi
 import love.forte.simbot.kook.api.ApiResultType
 import love.forte.simbot.kook.api.KookGetApi
+import love.forte.simbot.kook.objects.Channel
+import love.forte.simbot.kook.objects.PermissionOverwrite
+import love.forte.simbot.kook.objects.PermissionUser
+import love.forte.simbot.kook.util.BooleanToIntSerializer
 import love.forte.simbot.kook.util.parameters
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
@@ -110,20 +115,18 @@ public data class ChannelView @ApiResultType constructor(
 
     /** 是否为分组类型 */
     @SerialName("is_category")
-    public val isCategory: Boolean = type == 0,
+    @Serializable(BooleanToIntSerializer::class)
+    public val isCategory: Boolean = false,
 
     /** 语音服务器地址，HOST:PORT的格式 */
     @SerialName("server_url")
     val serverUrl: String,
 
-    // maybe miss
-
-//    /**
-//     * 针对角色的频道权限覆盖
-//     */
-//    @SerialName("permission_overwrites")
-//    public val permissionOverwrites: List<ChannelPermissionOverwrites> = emptyList(),
-// TODO permissionOverwrites
+    /**
+     * 针对角色的频道权限覆盖
+     */
+    @SerialName("permission_overwrites")
+    public val permissionOverwrites: List<PermissionOverwrite> = emptyList(),
 
     /**
      * 针对用户的频道权限覆盖
@@ -145,3 +148,72 @@ public data class ChannelView @ApiResultType constructor(
      */
     public val children: List<String>? = null
 )
+
+/**
+ * 将 [ChannelView] 转化为 [Channel] 类型，
+ * 并可选的提供一些缺失字段的默认值。
+ *
+ * @since 4.3.0
+ */
+@InternalKookApi
+public fun ChannelView.toChannel(
+    permissionUsers: List<PermissionUser> = emptyList(),
+): Channel = ChannelViewChannel(
+    this,
+    permissionUsers = permissionUsers,
+)
+
+private class ChannelViewChannel(
+    private val channelView: ChannelView,
+    override val permissionUsers: List<PermissionUser>,
+) : Channel {
+    override val id: String
+        get() = channelView.id
+    override val name: String
+        get() = channelView.name
+    override val userId: String
+        get() = channelView.userId
+    override val guildId: String
+        get() = channelView.guildId
+    override val topic: String
+        get() = channelView.topic
+    override val isCategory: Boolean
+        get() = channelView.isCategory
+    override val parentId: String
+        get() = channelView.parentId
+    override val level: Int
+        get() = channelView.level
+    override val slowMode: Int
+        get() = channelView.slowMode
+    override val type: Int
+        get() = channelView.type
+    override val permissionSync: Int
+        get() = channelView.permissionSync
+    override val hasPassword: Boolean
+        get() = channelView.hasPassword
+    override val permissionOverwrites: List<PermissionOverwrite>
+        get() = channelView.permissionOverwrites
+
+    override fun toString(): String {
+        return "ChannelViewChannel(channelView=$channelView, permissionOverwrites=$permissionOverwrites, permissionUsers=$permissionUsers)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ChannelViewChannel) return false
+
+        if (channelView != other.channelView) return false
+        if (permissionOverwrites != other.permissionOverwrites) return false
+        if (permissionUsers != other.permissionUsers) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = channelView.hashCode()
+        result = 31 * result + permissionOverwrites.hashCode()
+        result = 31 * result + permissionUsers.hashCode()
+        return result
+    }
+}
+

@@ -24,6 +24,7 @@ import love.forte.simbot.ability.DeleteOption
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.KookCategory
+import love.forte.simbot.component.kook.KookChannelUpdater
 import love.forte.simbot.component.kook.KookChatCapableChannel
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.message.KookChannelMessageDetailsContent
@@ -68,6 +69,8 @@ internal abstract class AbstractKookChatCapableChannelImpl(
     override suspend fun delete(vararg options: DeleteOption) {
         bot.deleteChannel(source.id, options)
     }
+
+    override fun updater(): KookChannelUpdater = KookChannelUpdaterImpl(this, bot)
 }
 
 internal suspend fun KookChatCapableChannel.send(
