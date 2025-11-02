@@ -25,6 +25,7 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.time.Timestamp
 import love.forte.simbot.component.kook.blacklist.KookBlacklistItem
+import love.forte.simbot.component.kook.blacklist.KookGuildBlacklistOperator
 import love.forte.simbot.kook.api.blacklist.BlacklistItem
 import love.forte.simbot.kook.objects.User
 
@@ -34,7 +35,8 @@ import love.forte.simbot.kook.objects.User
  */
 internal class KookBlacklistItemImpl(
     private val source: BlacklistItem,
-    override val guildId: ID
+    override val guildId: ID,
+    private val operator: KookGuildBlacklistOperator
 ) : KookBlacklistItem {
     override val userId: ID
         get() = source.userId.ID
@@ -46,6 +48,13 @@ internal class KookBlacklistItemImpl(
     override val createdTime: Timestamp = Timestamp.ofMilliseconds(source.createdTime)
 
     override suspend fun delete(vararg options: DeleteOption) {
-        TODO("Not yet implemented")
+        operator.delete(targetId = userId, options = options)
+    }
+
+    override fun toString(): String {
+        return "KookBlacklistItemImpl(source=$source, guildId=$guildId, userId=$userId)"
     }
 }
+
+internal fun BlacklistItem.toKookBlacklistItem(guildId: ID, operator: KookGuildBlacklistOperator): KookBlacklistItem =
+    KookBlacklistItemImpl(this, guildId, operator)

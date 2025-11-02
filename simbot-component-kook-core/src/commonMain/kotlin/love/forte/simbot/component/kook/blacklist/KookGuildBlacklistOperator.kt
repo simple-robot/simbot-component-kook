@@ -30,13 +30,19 @@ import love.forte.simbot.kook.api.blacklist.CreateBlacklistApi
 import love.forte.simbot.suspendrunner.ST
 
 /**
- * KOOK 黑名单相关内容的操作器。
+ * KOOK 服务器黑名单相关内容的操作器。
  *
  * @since 4.4.0
  *
  * @author ForteScarlet
  */
-public interface KookBlacklistOperator {
+@ExperimentalBlacklistApi
+public interface KookGuildBlacklistOperator {
+    /**
+     * 服务器ID
+     */
+    public val guildId: ID
+
     /**
      * 获取黑名单的分页列表。
      *
@@ -45,21 +51,20 @@ public interface KookBlacklistOperator {
      * @return 分页列表
      */
     @ST
-    public suspend fun list(guildId: ID, page: Int?, size: Int?): ListData<KookBlacklistItem>
+    public suspend fun list(page: Int?, size: Int?): ListData<KookBlacklistItem>
 
     /**
      * 获取全量列表数据。
      */
     @ST
-    public suspend fun all(guildId: ID): List<KookBlacklistItem> =
-        flow(guildId).toList()
+    public suspend fun all(): List<KookBlacklistItem> = flow().toList()
 
     /**
      * 获取黑名单列表元素的 Flow。
      *
      * @param batchSize 每批次大小
      */
-    public fun flow(guildId: ID, batchSize: Int? = null): Flow<KookBlacklistItem>
+    public fun flow(batchSize: Int? = null): Flow<KookBlacklistItem>
 
     /**
      * 添加一个目标到黑名单。
@@ -71,7 +76,7 @@ public interface KookBlacklistOperator {
      * @see CreateBlacklistApi
      */
     @ST
-    public suspend fun add(guildId: ID, targetId: ID, remark: String?, delMsgDays: Int?)
+    public suspend fun add(targetId: ID, remark: String?, delMsgDays: Int?)
 
     /**
      * 添加一个目标到黑名单。
@@ -81,8 +86,8 @@ public interface KookBlacklistOperator {
      * @see CreateBlacklistApi
      */
     @ST
-    public suspend fun add(guildId: ID, targetId: ID) {
-        add(guildId, targetId, null, null)
+    public suspend fun add(targetId: ID) {
+        add(targetId, null, null)
     }
 
     /**
@@ -92,5 +97,5 @@ public interface KookBlacklistOperator {
      * 并且没有提供 [StandardDeleteOption.IGNORE_ON_FAILURE]
      */
     @ST
-    public suspend fun delete(guildId: ID, targetId: ID, vararg options: DeleteOption)
+    public suspend fun delete(targetId: ID, vararg options: DeleteOption)
 }

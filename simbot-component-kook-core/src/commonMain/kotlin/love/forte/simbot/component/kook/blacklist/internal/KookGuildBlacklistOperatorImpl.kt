@@ -26,13 +26,16 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import love.forte.simbot.ability.DeleteOption
+import love.forte.simbot.ability.StandardDeleteOption
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.blacklist.KookBlacklistItem
-import love.forte.simbot.component.kook.blacklist.KookBlacklistOperator
+import love.forte.simbot.component.kook.blacklist.KookGuildBlacklistOperator
 import love.forte.simbot.component.kook.bot.KookBot
 import love.forte.simbot.component.kook.util.requestData
 import love.forte.simbot.kook.api.ListData
+import love.forte.simbot.kook.api.blacklist.CreateBlacklistApi
+import love.forte.simbot.kook.api.blacklist.DeleteBlacklistApi
 import love.forte.simbot.kook.api.blacklist.GetBlacklistListApi
 import love.forte.simbot.kook.api.blacklist.createFlow
 
@@ -40,38 +43,46 @@ import love.forte.simbot.kook.api.blacklist.createFlow
  *
  * @author ForteScarlet
  */
-internal class KookBlacklistOperatorImpl(private val bot: KookBot) : KookBlacklistOperator {
+internal class KookGuildBlacklistOperatorImpl(
+    private val bot: KookBot,
+    override val guildId: ID
+) : KookGuildBlacklistOperator {
     override suspend fun list(
-        guildId: ID,
         page: Int?,
         size: Int?
     ): ListData<KookBlacklistItem> {
-        TODO("Not yet implemented")
+        val api = GetBlacklistListApi.create(guildId = guildId.literal, page = page, pageSize = size)
+        val raw = bot.requestData(api)
+        return ListData(
+            raw.items.map { it.toKookBlacklistItem(guildId, this) },
+            raw.meta,
+            raw.sort
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun flow(guildId: ID, batchSize: Int?): Flow<KookBlacklistItem> {
+    override fun flow(batchSize: Int?): Flow<KookBlacklistItem> {
         return GetBlacklistListApi.createFlow { page ->
             val api = GetBlacklistListApi.create(guildId = guildId.literal, page = page, pageSize = batchSize)
             bot.requestData(api)
         }.flatMapConcat { it.items.asFlow() }
-            .map { TODO("Not yet implemented") }
+            .map { it.toKookBlacklistItem(guildId, this) }
     }
 
-    override suspend fun add(
-        guildId: ID,
-        targetId: ID,
-        remark: String?,
-        delMsgDays: Int?
-    ) {
-        TODO("Not yet implemented")
+    override suspend fun add(targetId: ID, remark: String?, delMsgDays: Int?) {
+        val api = CreateBlacklistApi.create(guildId.literal, targetId.literal, remark, delMsgDays)
+        bot.requestData(api)
     }
 
-    override suspend fun delete(
-        guildId: ID,
-        targetId: ID,
-        vararg options: DeleteOption
-    ) {
-        TODO("Not yet implemented")
+    override suspend fun delete(targetId: ID, vararg options: DeleteOption) {
+        val api = DeleteBlacklistApi.create(guildId.literal, targetId.literal)
+
+        if (options.contains(StandardDeleteOption.IGNORE_ON_FAILURE)) {
+            runCatching { bot.requestData(api) }
+            // Log?
+            return
+        }
+
+        bot.requestData(api)
     }
 }

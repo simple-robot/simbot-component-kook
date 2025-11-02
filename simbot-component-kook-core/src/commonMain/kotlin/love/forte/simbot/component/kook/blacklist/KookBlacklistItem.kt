@@ -35,6 +35,7 @@ import love.forte.simbot.suspendrunner.ST
  *
  * @author ForteScarlet
  */
+@ExperimentalBlacklistApi
 public interface KookBlacklistItem : DeleteSupport {
     /**
      * 用户 ID

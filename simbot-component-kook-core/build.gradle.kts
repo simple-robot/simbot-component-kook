@@ -48,6 +48,7 @@ kotlin {
         optIn.addAll(
             "love.forte.simbot.kook.ExperimentalKookApi",
             "love.forte.simbot.kook.InternalKookApi",
+            "love.forte.simbot.component.kook.blacklist.ExperimentalBlacklistApi"
         )
     }
 
@@ -80,6 +81,7 @@ kotlin {
             implementation(libs.simbot.api)
             implementation(libs.simbot.core)
             implementation(libs.simbot.common.core)
+            implementation(libs.ktor.client.mock)
         }
 
         jvmTest.dependencies {
