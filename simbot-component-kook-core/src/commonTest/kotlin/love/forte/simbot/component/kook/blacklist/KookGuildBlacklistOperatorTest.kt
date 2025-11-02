@@ -20,10 +20,8 @@
 
 package love.forte.simbot.component.kook.blacklist
 
-import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -51,22 +49,15 @@ import kotlin.test.assertTrue
  *
  * @author ForteScarlet
  */
-@OptIn(ExperimentalBlacklistApi::class)
 class KookGuildBlacklistOperatorTest {
-
-    /**
-     * 创建一个用于测试的 mock HttpClient
-     */
-    private fun createMockClient(handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData): HttpClient {
-        return HttpClient(MockEngine(handler))
-    }
 
     /**
      * 创建一个用于测试的 mock KookBot
      */
     private fun createMockBot(client: HttpClientEngine): KookBot {
         val sourceBot = BotFactory.create(Ticket.botWsTicket("test_client_id", "test_token")) {
-            clientEngine = client // TODO()
+            clientEngine = client
+            wsEngine = client
         }
 
         return object : KookBot {

@@ -318,6 +318,9 @@ public abstract interface class love/forte/simbot/component/kook/KookVoiceMember
 	public fun moveReserve (Llove/forte/simbot/common/id/ID;)Llove/forte/simbot/suspendrunner/reserve/SuspendReserve;
 }
 
+public abstract interface annotation class love/forte/simbot/component/kook/blacklist/ExperimentalBlacklistApi : java/lang/annotation/Annotation {
+}
+
 public abstract interface class love/forte/simbot/component/kook/bot/KookBot : kotlinx/coroutines/CoroutineScope, love/forte/simbot/bot/Bot {
 	public fun cancel (Ljava/lang/Throwable;)V
 	public fun getAvatar ()Ljava/lang/String;
