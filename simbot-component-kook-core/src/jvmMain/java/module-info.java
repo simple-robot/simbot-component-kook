@@ -36,6 +36,7 @@ module simbot.component.kook.core {
     exports love.forte.simbot.component.kook.event;
     exports love.forte.simbot.component.kook.message;
     exports love.forte.simbot.component.kook.role;
+    exports love.forte.simbot.component.kook.blacklist;
     exports love.forte.simbot.component.kook.util;
 
     // provider

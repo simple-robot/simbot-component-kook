@@ -29,6 +29,9 @@ import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
 import love.forte.simbot.common.id.literal
 import love.forte.simbot.component.kook.*
+import love.forte.simbot.component.kook.blacklist.ExperimentalBlacklistApi
+import love.forte.simbot.component.kook.blacklist.KookGuildBlacklistOperator
+import love.forte.simbot.component.kook.blacklist.internal.KookGuildBlacklistOperatorImpl
 import love.forte.simbot.component.kook.bot.internal.KookBotImpl
 import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleCreator
@@ -142,6 +145,10 @@ internal class KookGuildImpl(
 
     @ExperimentalSimbotAPI
     override fun roleCreator(): KookGuildRoleCreator = KookGuildRoleCreatorImpl(bot, this)
+
+    @ExperimentalBlacklistApi
+    override val blacklist: KookGuildBlacklistOperator
+        get() = KookGuildBlacklistOperatorImpl(bot, id)
 
     override fun toString(): String {
         return "KookGuild(id=${source.id}, name=${source.name})"
