@@ -25,6 +25,8 @@ import love.forte.simbot.annotations.ExperimentalSimbotAPI
 import love.forte.simbot.common.collectable.Collectable
 import love.forte.simbot.common.id.ID
 import love.forte.simbot.common.id.StringID.Companion.ID
+import love.forte.simbot.component.kook.blacklist.ExperimentalBlacklistApi
+import love.forte.simbot.component.kook.blacklist.KookGuildBlacklistOperator
 import love.forte.simbot.component.kook.role.KookGuildRole
 import love.forte.simbot.component.kook.role.KookGuildRoleCreator
 import love.forte.simbot.component.kook.role.KookRole
@@ -207,4 +209,15 @@ public interface KookGuild : Guild, CoroutineScope, KookRoleOperator {
     @ExperimentalSimbotAPI
     override fun roleCreator(): KookGuildRoleCreator
     //endregion
+
+    // Blacklist
+
+    /**
+     * 获取针对当前频道服务器的黑名单操作器。
+     *
+     * @since 4.4.0
+     * @see KookGuildBlacklistOperator
+     */
+    @ExperimentalBlacklistApi
+    public val blacklist: KookGuildBlacklistOperator
 }
