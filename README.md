@@ -40,8 +40,18 @@ KOOK组件库可以作为底层API依赖使用、
 - 基于 [`Kotlin`](https://kotlinlang.org/) 提供 [KMP 多平台](https://kotlinlang.org/docs/multiplatform.html) 特性，提供 Java 友好的API。
 - 基于 [`Kotlin coroutines`](https://github.com/Kotlin/kotlinx.coroutines) 与 [`Ktor`](https://ktor.io/) 提供轻量高效的API。
 
-> [!Note]
 > 下文中 `Simple Robot v4` 简称为 `simbot4`
+
+---
+
+> [!important]
+> 为了方便代码管理，我们正在陆续将一些较为成熟的组件库合并到 [核心库](https://github.com/simple-robot/simpler-robot) 中一同管理。
+> 因此，本仓库的内容将会直接合并到 [核心库](https://github.com/simple-robot/simpler-robot) 的 [simbot-component-qq](https://github.com/simple-robot/simpler-robot/tree/dev/simbot-component-kook) 目录下维护，并与核心库 **共享版本号**，也就是从下一个大版本开始，本组件的版本将会跟随核心库一起进入 5.x 版本。
+> 
+> 除了其他原本就在计划内的内容更新之外，其他的信息（例如 Maven 仓库的路径、包路径等）均保持不变，迁移就只是改个版本号的事儿~
+>
+> 本仓库会继续保留并维护当前的 4.x 版本直到 5.x 正式推出，之后会进入归档状态。
+
 
 
 ## 文档与引导
